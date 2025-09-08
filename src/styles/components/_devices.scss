@@ -1,0 +1,481 @@
+.sidebar-devices {
+  margin-bottom: $spacing-lg;
+  background-color: $surface;
+  display: flex;
+  flex-direction: column;
+  border-radius: $border-radius-md;
+
+  h2 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: $font-weight-semibold;
+    color: $text-primary;
+  }
+
+  .devices-content {
+    font-size: 0.875rem;
+    color: $text-secondary;
+
+    // Pairing Section
+    .pairing-section {
+      margin-bottom: $spacing-md;
+
+      .pairing-form-display {
+        border-radius: $border-radius-md;
+        overflow: hidden;
+
+        .pairing-form-header {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          padding: $spacing-md;
+
+          h3 {
+            margin: 0;
+            font-size: 1rem;
+            font-weight: $font-weight-semibold;
+            color: $text-primary;
+          }
+
+          button {
+            background: none;
+            border: none;
+            color: $text-secondary;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: $border-radius-sm;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: $transition-base;
+
+            &:hover {
+              background-color: $gray-200;
+              color: $text-primary;
+            }
+          }
+        }
+
+        .pairing-form-content {
+          .pairing-instructions {
+            font-size: 0.875rem;
+            color: $text-secondary;
+            margin-bottom: $spacing-md;
+            text-align: center;
+          }
+
+          .pairing-code-inputs {
+            display: flex;
+            gap: $spacing-xs;
+            justify-content: center;
+            margin-bottom: $spacing-md;
+
+            .pairing-code-input {
+              width: 52px;
+              height: 66px;
+              text-align: center;
+              font-size: 1.2rem;
+              font-weight: $font-weight-bold;
+              border: 2px solid $border-color;
+              border-radius: $border-radius-md;
+              color: $text-primary;
+              transition: $transition-base;
+
+              &:focus {
+                outline: none;
+                border-color: $primary;
+                box-shadow: 0 0 0 2px rgba($primary, 0.2);
+              }
+
+              &:hover {
+                border-color: $gray-400;
+              }
+            }
+          }
+
+          .btn {
+            width: 100%;
+            padding: $spacing-sm;
+            border-radius: $border-radius-sm;
+            font-weight: $font-weight-medium;
+            cursor: pointer;
+            transition: $transition-base;
+            border: none;
+
+            &.btn-primary {
+              background-color: $primary;
+              color: $surface;
+
+              &:hover:not(:disabled) {
+                background-color: darken($primary, 8%);
+              }
+
+              &:disabled {
+                background-color: $gray-400;
+                cursor: not-allowed;
+              }
+            }
+
+            &.btn-active {
+              background-color: $primary;
+              color: $surface;
+            }
+
+            &.btn-inactive {
+              background-color: $gray-400;
+              color: $surface;
+              cursor: not-allowed;
+            }
+          }
+
+          .pairing-error {
+            color: $error;
+            font-size: 0.875rem;
+            text-align: center;
+            margin-top: $spacing-sm;
+          }
+        }
+      }
+    }
+
+    // Devices List
+    .devices-list {
+      margin-top: $spacing-sm;
+
+      .device-item {
+        margin-bottom: $spacing-sm;
+        padding: $spacing-sm;
+        border: 1px solid $border-color;
+        border-radius: $border-radius-sm;
+        background-color: $surface;
+        transition: $transition-base;
+
+        &:hover {
+          border-color: $gray-300;
+          background-color: $gray-50;
+        }
+
+        .device-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: $spacing-xs;
+
+          .device-name-display {
+            display: flex;
+            align-items: center;
+            gap: $spacing-sm;
+
+            strong {
+              color: $text-primary;
+              font-size: 0.875rem;
+              font-weight: $font-weight-medium;
+            }
+
+            .device-name-edit-btn {
+              border: none;
+              color: $text-secondary;
+              cursor: pointer;
+              padding: 2px;
+              border-radius: $border-radius-sm;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              transition: $transition-base;
+              padding: $spacing-xs;
+
+              &:hover {
+                background-color: $primary;
+                color: $surface;
+              }
+
+              &:focus {
+                outline: none;
+                box-shadow: 0 0 0 2px rgba($primary, 0.2);
+              }
+            }
+          }
+
+          .device-name-edit {
+            display: flex;
+            align-items: center;
+            gap: $spacing-xs;
+            flex: 1;
+            margin-right: $spacing-sm;
+
+            .device-name-input {
+              flex: 1;
+              padding: 4px 8px;
+              border: 1px solid $primary;
+              border-radius: $border-radius-sm;
+              font-size: 0.875rem;
+              font-weight: $font-weight-medium;
+              color: $text-primary;
+              background-color: $surface;
+              min-width: 120px;
+
+              &:focus {
+                outline: none;
+                box-shadow: 0 0 0 2px rgba($primary, 0.2);
+              }
+
+              &::placeholder {
+                color: $text-tertiary;
+              }
+            }
+
+            .device-name-edit-actions {
+              display: flex;
+              gap: 2px;
+
+              .device-name-save-btn,
+              .device-name-cancel-btn {
+                background: none;
+                border: none;
+                cursor: pointer;
+                padding: 4px;
+                border-radius: $border-radius-sm;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: $transition-base;
+
+                &:focus {
+                  outline: none;
+                  box-shadow: 0 0 0 2px rgba($primary, 0.2);
+                }
+              }
+
+              .device-name-save-btn {
+                color: $success;
+
+                &:hover {
+                  background-color: $success;
+                  color: $surface;
+                }
+              }
+
+              .device-name-cancel-btn {
+                color: $error;
+
+                &:hover {
+                  background-color: $error;
+                  color: $surface;
+                }
+              }
+            }
+          }
+
+          .device-header-right {
+            display: flex;
+            align-items: center;
+            gap: $spacing-xs;
+
+            .device-status {
+              font-size: 0.75rem;
+              padding: 2px 6px;
+              border-radius: $border-radius-sm;
+              font-weight: $font-weight-medium;
+
+              &.online {
+                border: 1px solid $success;
+                color: $success;
+              }
+
+              &.offline {
+                background-color: $gray-400;
+                color: $surface;
+              }
+            }
+
+            .device-pairing-status {
+              font-size: 0.75rem;
+              padding: 2px 6px;
+              border-radius: $border-radius-sm;
+              font-weight: $font-weight-medium;
+              margin-left: 4px;
+
+              &.paired {
+                background-color: $primary;
+                color: $surface;
+              }
+
+              &.needs-pairing {
+                background-color: $warning;
+                color: $surface;
+              }
+            }
+
+            .device-refresh-btn {
+              background: none;
+              border: none;
+              color: $text-secondary;
+              cursor: pointer;
+              padding: 2px;
+              border-radius: $border-radius-sm;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              transition: $transition-base;
+
+              &:hover {
+                background-color: $primary;
+                color: $surface;
+              }
+
+              &:focus {
+                outline: none;
+                box-shadow: 0 0 0 2px rgba($primary, 0.2);
+              }
+
+              &:disabled {
+                cursor: not-allowed;
+                opacity: 0.6;
+              }
+
+              .rotating {
+                animation: rotate 1s linear infinite;
+              }
+            }
+
+            .device-delete-btn {
+              background: none;
+              border: none;
+              color: $text-secondary;
+              cursor: pointer;
+              padding: 2px;
+              border-radius: $border-radius-sm;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              transition: $transition-base;
+
+              &:hover {
+                background-color: $error;
+                color: $surface;
+              }
+
+              &:focus {
+                outline: none;
+                box-shadow: 0 0 0 2px rgba($error, 0.2);
+              }
+            }
+          }
+        }
+
+        .device-info {
+          font-size: 0.75rem;
+          color: $text-secondary;
+
+          .device-resolution {
+            margin-bottom: 2px;
+          }
+
+          .device-last-seen {
+            font-style: italic;
+          }
+        }
+      }
+    }
+
+    // Unpaired Devices Section (at same level as devices-list)
+    .unpaired-devices {
+      margin-top: $spacing-md;
+      border-top: 1px solid $border-color;
+      padding-top: $spacing-md;
+
+      h3 {
+        margin: 0 0 $spacing-sm 0;
+        font-size: 0.875rem;
+        font-weight: $font-weight-semibold;
+        color: $text-primary;
+      }
+
+      .unpaired-device-item {
+        background-color: $surface;
+        border: 1px solid $border-color;
+        border-radius: $border-radius-md;
+        padding: $spacing-sm;
+        margin-bottom: $spacing-xs;
+        transition: $transition-base;
+
+        &:hover {
+          border-color: $primary;
+        }
+
+        .unpaired-device-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: $spacing-xs;
+
+          .device-name {
+            font-weight: $font-weight-semibold;
+            color: $text-primary;
+          }
+
+          .device-id {
+            font-size: 0.75rem;
+            color: $text-secondary;
+            font-family: monospace;
+          }
+        }
+
+        .unpaired-device-info {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+
+          .pairing-status {
+            font-size: 0.75rem;
+            padding: 2px 6px;
+            border-radius: $border-radius-sm;
+            font-weight: $font-weight-medium;
+
+            &.needs-pairing {
+              background-color: $warning;
+              color: $surface;
+            }
+          }
+
+          .device-last-seen {
+            font-size: 0.75rem;
+            color: $text-secondary;
+          }
+        }
+      }
+    }
+
+    // Extra Screen Section
+    .extra-screen-section {
+      margin-top: $spacing-md;
+      text-align: center;
+    }
+
+    // No Devices Message
+    .no-devices {
+      text-align: center;
+      padding: $spacing-md;
+      color: $text-secondary;
+
+      p {
+        margin: 0 0 $spacing-xs 0;
+      }
+
+      .device-help {
+        font-size: 0.75rem;
+        font-style: italic;
+      }
+    }
+  }
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+

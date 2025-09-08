@@ -1,0 +1,167 @@
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-sm;
+  padding: $spacing-sm $spacing-md;
+  font-size: $font-size-base;
+  font-weight: $font-weight-medium;
+  border: none;
+  border-radius: $border-radius-md;
+  cursor: pointer;
+  text-decoration: none;
+  transition: $transition-base;
+  font-family: inherit;
+  line-height: 1;
+  min-height: 36px;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba($primary, 0.2);
+  }
+}
+
+// Button variants - Shopify style
+.btn-primary {
+  background-color: $primary;
+  color: $surface;
+
+  &:hover:not(:disabled) {
+    background-color: darken($primary, 8%);
+  }
+
+  &:active:not(:disabled) {
+    background-color: darken($primary, 12%);
+  }
+}
+
+.btn-success {
+  background-color: $success;
+  color: $surface;
+
+  &:hover:not(:disabled) {
+    background-color: darken($success, 8%);
+  }
+
+  &:active:not(:disabled) {
+    background-color: darken($success, 12%);
+  }
+}
+
+.btn-danger {
+  background-color: $error;
+  color: $surface;
+
+  &:hover:not(:disabled) {
+    background-color: darken($error, 8%);
+  }
+
+  &:active:not(:disabled) {
+    background-color: darken($error, 12%);
+  }
+}
+
+.btn-secondary {
+  background-color: $surface;
+  border: 1px solid $border-color;
+  color: $text-primary;
+
+  &:hover:not(:disabled) {
+    background-color: $gray-50;
+    border-color: $gray-300;
+  }
+
+  &:active:not(:disabled) {
+    background-color: $gray-100;
+  }
+}
+
+// Action Button - Shopify style
+.btn-action {
+  padding: $spacing-xs $spacing-sm;
+  border-radius: $border-radius-sm;
+  border: 1px solid $border-color;
+  background-color: $surface;
+  color: $text-secondary;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-normal;
+  min-height: 28px;
+
+  &:hover:not(:disabled) {
+    background-color: $gray-50;
+    color: $text-primary;
+  }
+
+  &:active:not(:disabled) {
+    background-color: $gray-100;
+  }
+}
+
+// Icon Button - Shopify style
+.btn-icon {
+  width: $icon-button-size;
+  height: $icon-button-size;
+  border-radius: $border-radius-sm;
+  border: 1px solid $border-color;
+  background-color: $surface;
+  color: $text-secondary;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: auto;
+
+  &:hover:not(:disabled) {
+    background-color: $gray-50;
+    color: $text-primary;
+    border-color: $gray-300;
+  }
+
+  &:active:not(:disabled) {
+    background-color: $gray-100;
+  }
+
+  svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+// Button sizes - Shopify style
+.btn-sm {
+  padding: $spacing-xs $spacing-sm;
+  font-size: $font-size-sm;
+  min-height: 28px;
+}
+
+.btn-lg {
+  padding: $spacing-md $spacing-lg;
+  font-size: $font-size-lg;
+  min-height: 44px;
+}
+
+// Google button specific styles
+.btn-google {
+  background-color: #4285f4;
+  color: $surface;
+  width: 100%;
+  margin-bottom: $spacing-lg;
+
+  &:hover:not(:disabled) {
+    background-color: darken(#4285f4, 8%);
+  }
+
+  &:active:not(:disabled) {
+    background-color: darken(#4285f4, 12%);
+  }
+
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+}

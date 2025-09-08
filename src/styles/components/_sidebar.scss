@@ -1,0 +1,197 @@
+.sidebar {
+  // Base styles for the sidebar container
+  width: $sidebar-width;
+  color: $text-primary;
+  padding: $spacing-md;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  gap: $spacing-md;
+  background-color: $surface;
+  border-right: 1px solid $border-color;
+  font-family: $font-family-base;
+  transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  z-index: 1000;
+  margin: $spacing-md;
+  border-radius: $border-radius-lg;
+  background-color: white;
+
+  // Custom scrollbar styling
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: $gray-300;
+    border-radius: 3px;
+    
+    &:hover {
+      background-color: $gray-400;
+    }
+  }
+
+  // Toggle button
+  .sidebar-toggle-btn {
+    position: absolute;
+    top: $spacing-md;
+    right: 12px;
+    width: 40px;
+    height: 40px;
+    background-color: white;
+    border: 1px solid $border-color;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 1001;
+    transition: all 0.2s ease;
+    color: $primary;
+    
+    &:hover {
+      background-color: $gray-100;
+      border-color: $gray-400;
+      transform: scale(1.05);
+    }
+  }
+
+  // Collapsed state
+  &.collapsed {
+    transform: translateX(-100%);
+    width: $sidebar-width;
+    padding: $spacing-md;
+
+    .sidebar-section {
+      h2 {
+        display: block;
+      }
+
+      .sidebar-content {
+        display: block;
+      }
+    }
+
+    .sidebar-toggle-btn {
+      right: -24px;
+    }
+
+    // Show all content when collapsed (it will be off-screen anyway)
+    .sidebar-section {
+      .sidebar-content {
+        .pairing-section,
+        .devices-list,
+        .extra-screen-section {
+          display: block;
+        }
+      }
+    }
+  }
+
+  // Logo Section
+  .sidebar-logo {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: $spacing-md 0;
+    margin-bottom: $spacing-lg;
+
+    .logo-image {
+      width: 120px;
+      transition: height 0.3s ease;
+    }
+  }
+
+  // Delete confirmation modal styles
+  .delete-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 99999;
+    isolation: isolate;
+  }
+
+  .delete-modal {
+    background-color: $surface;
+    border-radius: $border-radius-lg;
+    padding: $spacing-xl;
+    max-width: 400px;
+    width: 90%;
+    box-shadow: $shadow-lg;
+
+    h3 {
+      margin: 0 0 $spacing-md 0;
+      color: $text-primary;
+      font-size: 1.125rem;
+      font-weight: $font-weight-semibold;
+    }
+
+    p {
+      margin: 0 0 $spacing-sm 0;
+      color: $text-secondary;
+      line-height: 1.5;
+
+      strong {
+        color: $text-primary;
+      }
+    }
+
+    .delete-warning {
+      color: $error;
+      font-size: 0.875rem;
+      font-weight: $font-weight-medium;
+      margin-bottom: $spacing-lg;
+    }
+
+    .delete-modal-actions {
+      display: flex;
+      gap: $spacing-sm;
+      justify-content: flex-end;
+
+      .btn {
+        padding: $spacing-sm $spacing-md;
+        border-radius: $border-radius-sm;
+        font-weight: $font-weight-medium;
+        cursor: pointer;
+        transition: $transition-base;
+        border: none;
+
+        &.btn-secondary {
+          background-color: $gray-100;
+          color: $text-primary;
+
+          &:hover {
+            background-color: $gray-200;
+          }
+        }
+
+        &.btn-danger {
+          background-color: $error;
+          color: $surface;
+
+          &:hover {
+            background-color: darken($error, 8%);
+          }
+        }
+      }
+    }
+  }
+
+  // Add bottom padding to ensure content doesn't get cut off when scrolling
+  .sidebar-section:last-child {
+    margin-bottom: $spacing-xl;
+  }
+}

@@ -1,0 +1,116 @@
+// Design System Colors - Shopify Style
+$primary: #f07167; // Keep existing primary color
+$primary-dark: #e05a50; // Darker shade of primary
+$secondary: #5c6ac4; // Shopify blue
+$background: #f6f6f7; // Shopify light gray background
+$surface: #ffffff;
+$text-primary: #202223; // Shopify dark text
+$text-secondary: #6d7175; // Shopify secondary text
+$text-tertiary: #6d7175; // Shopify secondary text
+
+$success: #50b83c; // Shopify green
+$warning: #ffea8a; // Shopify warning
+$error: #d82c0d; // Shopify red
+$inactive: #c9cccf; // Shopify inactive
+
+// Green colors for enabled/disabled states - Shopify style
+$green-500: #50b83c;
+$green-600: #47c1bf;
+$green-700: #2c6ecb;
+
+// Red colors for errors - Shopify style
+$red-500: #d82c0d;
+$red-600: #bf0711;
+$red-700: #a4000f;
+
+$error-light: #f8d7d3;
+
+// Legacy color mappings for backward compatibility
+$primary-color: $primary;
+$secondary-color: $secondary;
+
+$success-color: $success;
+$danger-color: $error;
+$warning-color: $warning;
+$info-color: $primary;
+$light-color: $background;
+$dark-color: $text-primary;
+$white: $surface;
+$black: $text-primary;
+$page-bg: $background;
+
+// Grays - Shopify style
+$gray-50: #fafbfb;
+$gray-100: #f6f6f7;
+$gray-200: #e1e3e5;
+$gray-300: #c9cccf;
+$gray-400: #8c9196;
+$gray-500: #6d7175;
+$gray-600: #5c5f62;
+$gray-700: #4a4d50;
+$gray-800: #2c2f32;
+$gray-900: #202223;
+
+// Border colors - Shopify style
+$border-color: $gray-200;
+$border-color-focus: $primary;
+
+// Sidebar colors - Shopify style
+$sidebar-bg: $surface;
+$sidebar-text: $text-primary;
+$sidebar-border: $gray-200;
+$sidebar-hover: $gray-50;
+
+// Typography - Keep existing fonts
+$font-family-base: "Mona Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+$font-family-heading: "Mona Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+$font-family-mono: "SF Mono", Monaco, Inconsolata, "Roboto Mono", monospace;
+$font-size-base: 14px;
+$font-size-sm: 12px;
+$font-size-lg: 16px;
+$font-size-xl: 20px;
+$font-size-xs: 10px;
+$line-height-base: 1.5;
+
+// Font weights - Shopify style
+$font-weight-normal: 400;
+$font-weight-medium: 500;
+$font-weight-semibold: 600;
+$font-weight-bold: 700;
+
+
+// Spacing - Shopify style (4px base unit)
+$spacing-base: 4px;
+$spacing-xs: $spacing-base * 1; // 4px
+$spacing-sm: $spacing-base * 2; // 8px
+$spacing-md: $spacing-base * 4; // 16px
+$spacing-lg: $spacing-base * 6; // 24px
+$spacing-xl: $spacing-base * 8; // 32px
+$spacing-xxl: $spacing-base * 12; // 48px;
+
+// Border radius - Shopify style
+$border-radius-sm: 2px;
+$border-radius-md: 4px;
+$border-radius-lg: 6px;
+$border-radius-xl: 8px;
+$border-radius-xxl: 12px;
+
+// Shadows - Shopify style
+$shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+$shadow-md: 0 2px 6px rgba(0, 0, 0, 0.15);
+$shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.2);
+
+// Layout
+$sidebar-width: 520px; // Shopify sidebar width
+$container-max-width: 1200px;
+
+// Transitions - Shopify style
+$transition-base: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+$transition-fast: all 0.1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
+// Component-specific variables
+$content-row-min-height: 48px; // Shopify row height
+$status-badge-size: 16px;
+$toggle-switch-width: 36px;
+$toggle-switch-height: 20px;
+$icon-button-size: 28px; // Shopify icon button size

@@ -1,0 +1,300 @@
+// Settings Component Styles
+// Mirrors the HTML structure from Settings.js
+
+.sidebar-section {
+  margin-bottom: $spacing-lg;
+  background-color: $surface;
+  display: flex;
+  flex-direction: column;
+  border-radius: $border-radius-md;
+
+  .settings-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: $spacing-md;
+    padding-bottom: $spacing-sm;
+    border-bottom: 1px solid $border-color;
+
+    h2 {
+      margin: 0;
+      font-size: 1.125rem;
+      color: $text-primary;
+    }
+  }
+
+  // Advanced Settings Toggle
+  .advanced-settings-toggle {
+    margin-bottom: $spacing-md;
+
+    .advanced-settings-btn {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: $spacing-sm;
+      padding: $spacing-sm;
+      background: none;
+      border: 1px solid $border-color;
+      border-radius: $border-radius-sm;
+      color: $text-secondary;
+      cursor: pointer;
+      transition: $transition-base;
+      font-size: 0.875rem;
+
+      &:hover {
+        background-color: $gray-100;
+        color: $text-primary;
+        border-color: $gray-300;
+      }
+
+      &:focus {
+        outline: none;
+        box-shadow: 0 0 0 2px rgba($primary, 0.2);
+      }
+    }
+  }
+
+  // Advanced Settings Content
+  .advanced-settings-content {
+    .settings-section {
+      margin-bottom: $spacing-lg;
+
+      h3 {
+        margin: 0 0 $spacing-sm 0;
+        font-size: 1rem;
+        color: $text-primary;
+      }
+
+      // Logo Upload Section
+      .logo-upload-area {
+        .logo-preview {
+          text-align: center;
+          margin-bottom: $spacing-md;
+
+          .logo-image-container {
+            position: relative;
+            display: inline-block;
+            margin-bottom: $spacing-sm;
+
+            .logo-image {
+              width: 80px;
+              height: 80px;
+              object-fit: contain;
+              border-radius: $border-radius-sm;
+              border: 1px solid $border-color;
+              background-color: $surface;
+            }
+
+            .logo-remove-btn {
+              position: absolute;
+              top: -8px;
+              right: -8px;
+              width: 24px;
+              height: 24px;
+              background-color: $error;
+              color: $surface;
+              border: none;
+              border-radius: 50%;
+              cursor: pointer;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              transition: $transition-base;
+
+              &:hover {
+                background-color: darken($error, 8%);
+                transform: scale(1.1);
+              }
+
+              &:disabled {
+                opacity: 0.6;
+                cursor: not-allowed;
+              }
+            }
+          }
+
+          .logo-change-text {
+            display: block;
+            color: $primary;
+            cursor: pointer;
+            font-size: 0.875rem;
+            text-decoration: underline;
+
+            &:hover {
+              color: darken($primary, 8%);
+            }
+
+            input {
+              display: none;
+            }
+          }
+        }
+
+        .logo-upload-placeholder {
+          text-align: center;
+          padding: $spacing-lg;
+          border: 2px dashed $border-color;
+          border-radius: $border-radius-md;
+          background-color: $gray-50;
+
+          .logo-upload-label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: $spacing-sm;
+            cursor: pointer;
+            color: $text-secondary;
+
+            .upload-icon {
+              width: 48px;
+              height: 48px;
+              color: $gray-400;
+            }
+
+            span {
+              font-size: 0.875rem;
+              font-weight: $font-weight-medium;
+            }
+
+            input {
+              display: none;
+            }
+          }
+
+          .upload-status {
+            margin-top: $spacing-sm;
+            font-size: 0.75rem;
+            color: $text-secondary;
+            font-style: italic;
+          }
+        }
+      }
+
+      // Color Settings Section
+      .color-settings {
+        .color-input-group {
+          margin-bottom: $spacing-md;
+
+          label {
+            display: block;
+            margin-bottom: $spacing-xs;
+            font-weight: $font-weight-medium;
+            color: $text-primary;
+            font-size: 0.875rem;
+          }
+
+          .color-input-wrapper {
+            display: flex;
+            gap: $spacing-sm;
+            align-items: center;
+
+            .color-picker {
+              width: 40px;
+              height: 40px;
+              border: none;
+              border-radius: $border-radius-sm;
+              cursor: pointer;
+              background: none;
+
+              &::-webkit-color-swatch-wrapper {
+                padding: 0;
+              }
+
+              &::-webkit-color-swatch {
+                border: 1px solid $border-color;
+                border-radius: $border-radius-sm;
+              }
+            }
+
+            .color-text-input {
+              flex: 1;
+              padding: $spacing-sm;
+              border: 1px solid $border-color;
+              border-radius: $border-radius-sm;
+              font-size: 0.875rem;
+              font-family: monospace;
+              color: $text-primary;
+              background-color: $surface;
+
+              &:focus {
+                outline: none;
+                border-color: $primary;
+                box-shadow: 0 0 0 2px rgba($primary, 0.2);
+              }
+
+              &::placeholder {
+                color: $text-tertiary;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // Settings Actions
+    .settings-actions {
+      margin-top: $spacing-lg;
+      text-align: center;
+
+      .btn {
+        padding: $spacing-sm $spacing-lg;
+        border-radius: $border-radius-sm;
+        font-weight: $font-weight-medium;
+        cursor: pointer;
+        transition: $transition-base;
+        border: none;
+        font-size: 0.875rem;
+
+        &.btn-primary {
+          background-color: $primary;
+          color: $surface;
+
+          &:hover:not(:disabled) {
+            background-color: darken($primary, 8%);
+          }
+
+          &:disabled {
+            background-color: $gray-400;
+            cursor: not-allowed;
+            opacity: 0.6;
+          }
+        }
+      }
+    }
+  }
+
+  // Compact Settings (collapsed state)
+  .compact-settings {
+    padding: $spacing-sm;
+    background-color: $surface;
+
+    .compact-settings-header {
+      display: flex;
+      align-items: center;
+      gap: $spacing-xs;
+      padding: $spacing-xs;
+      cursor: pointer;
+      border-radius: $border-radius-sm;
+      transition: $transition-base;
+      color: $text-secondary;
+      font-size: 0.75rem;
+      font-weight: $font-weight-medium;
+
+      &:hover {
+        background-color: $gray-100;
+        color: $text-primary;
+      }
+
+      svg {
+        flex-shrink: 0;
+      }
+
+      span {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+  }
+}

@@ -1,0 +1,212 @@
+.form-group {
+  margin-bottom: $spacing-lg;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: $spacing-sm;
+  font-weight: $font-weight-medium;
+  color: $text-primary;
+  font-size: $font-size-base;
+}
+
+.form-input {
+  width: 100%;
+  padding: $spacing-sm $spacing-md;
+  font-size: $font-size-base;
+  font-weight: $font-weight-normal;
+  color: $text-primary;
+  border: 1px solid $border-color;
+  border-radius: $border-radius-md;
+  background-color: $surface;
+  font-family: inherit;
+  transition: $transition-base;
+  min-height: 36px;
+
+  &:focus {
+    outline: none;
+    border-color: $border-color-focus;
+    box-shadow: 0 0 0 1px $border-color-focus;
+  }
+
+  &::placeholder {
+    color: $text-secondary;
+  }
+
+  &:disabled {
+    background-color: $gray-50;
+    color: $text-secondary;
+    cursor: not-allowed;
+    border-color: $gray-200;
+  }
+}
+
+.form-textarea {
+  @extend .form-input;
+  min-height: 100px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+// Toggle Switch - Shopify style
+.toggle-switch {
+  width: $toggle-switch-width;
+  height: $toggle-switch-height;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  transition: $transition-base;
+  position: relative;
+  background-color: $gray-300;
+
+  &.active {
+    background-color: $success;
+  }
+
+  &.inactive {
+    background-color: $gray-300;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background-color: $surface;
+    transition: $transition-base;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+
+  &.active::after {
+    transform: translateX(16px);
+  }
+
+  &:hover {
+    opacity: 0.9;
+  }
+}
+
+// Select dropdown - Shopify style
+.form-select {
+  @extend .form-input;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right $spacing-sm center;
+  background-repeat: no-repeat;
+  background-size: 16px 12px;
+  padding-right: $spacing-xl;
+
+  &:focus {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23f07167' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+  }
+}
+
+// Checkbox - Shopify style
+.form-checkbox {
+  width: 16px;
+  height: 16px;
+  border: 1px solid $border-color;
+  border-radius: $border-radius-sm;
+  background-color: $surface;
+  cursor: pointer;
+  transition: $transition-base;
+  appearance: none;
+  position: relative;
+
+  &:checked {
+    background-color: $primary;
+    border-color: $primary;
+    background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='m12.207 4.793-1.414-1.414L6.5 7.086 5.207 5.793l-1.414 1.414L6.5 9.914z'/%3e%3c/svg%3e");
+    background-size: 12px 12px;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: $border-color-focus;
+    box-shadow: 0 0 0 1px $border-color-focus;
+  }
+
+  &:hover:not(:checked) {
+    border-color: $gray-400;
+  }
+}
+
+// Radio button - Shopify style
+.form-radio {
+  width: 16px;
+  height: 16px;
+  border: 1px solid $border-color;
+  border-radius: 50%;
+  background-color: $surface;
+  cursor: pointer;
+  transition: $transition-base;
+  appearance: none;
+  position: relative;
+
+  &:checked {
+    background-color: $primary;
+    border-color: $primary;
+    background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3ccircle cx='8' cy='8' r='3'/%3e%3c/svg%3e");
+    background-size: 6px 6px;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: $border-color-focus;
+    box-shadow: 0 0 0 1px $border-color-focus;
+  }
+
+  &:hover:not(:checked) {
+    border-color: $gray-400;
+  }
+}
+
+// Form validation states
+.form-input {
+  &.is-valid {
+    border-color: $success;
+    
+    &:focus {
+      border-color: $success;
+      box-shadow: 0 0 0 1px $success;
+    }
+  }
+
+  &.is-invalid {
+    border-color: $error;
+    
+    &:focus {
+      border-color: $error;
+      box-shadow: 0 0 0 1px $error;
+    }
+  }
+}
+
+// Form help text
+.form-help {
+  margin-top: $spacing-xs;
+  font-size: $font-size-sm;
+  color: $text-secondary;
+  line-height: 1.4;
+}
+
+.form-error {
+  margin-top: $spacing-xs;
+  font-size: $font-size-sm;
+  color: $error;
+  line-height: 1.4;
+}
+
+.form-success {
+  margin-top: $spacing-xs;
+  font-size: $font-size-sm;
+  color: $success;
+  line-height: 1.4;
+}

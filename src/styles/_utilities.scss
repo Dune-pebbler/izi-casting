@@ -1,0 +1,349 @@
+// Text utilities
+.text-center {
+  text-align: center;
+}
+
+.text-left {
+  text-align: left;
+}
+
+.text-right {
+  text-align: right;
+}
+
+// Color utilities
+.text-primary { color: $text-primary; }
+.text-secondary { color: $text-secondary; }
+.text-success { color: $success; }
+.text-warning { color: $warning; }
+.text-error { color: $error; }
+.text-inactive { color: $inactive; }
+
+.bg-primary { background-color: $primary; }
+.bg-secondary { background-color: $secondary; }
+.bg-surface { background-color: $surface; }
+.bg-background { background-color: $background; }
+.bg-success { background-color: $success; }
+.bg-warning { background-color: $warning; }
+.bg-error { background-color: $error; }
+
+// Spacing utilities
+.mb-0 { margin-bottom: 0; }
+.mb-1 { margin-bottom: $spacing-xs; }
+.mb-2 { margin-bottom: $spacing-sm; }
+.mb-3 { margin-bottom: $spacing-md; }
+.mb-4 { margin-bottom: $spacing-lg; }
+.mb-5 { margin-bottom: $spacing-xl; }
+
+.mt-0 { margin-top: 0; }
+.mt-1 { margin-top: $spacing-xs; }
+.mt-2 { margin-top: $spacing-sm; }
+.mt-3 { margin-top: $spacing-md; }
+.mt-4 { margin-top: $spacing-lg; }
+.mt-5 { margin-top: $spacing-xl; }
+
+.p-0 { padding: 0; }
+.p-1 { padding: $spacing-xs; }
+.p-2 { padding: $spacing-sm; }
+.p-3 { padding: $spacing-md; }
+.p-4 { padding: $spacing-lg; }
+.p-5 { padding: $spacing-xl; }
+
+// Display utilities
+.d-flex {
+  display: flex;
+}
+
+.d-block {
+  display: block;
+}
+
+.d-none {
+  display: none;
+}
+
+.d-inline-flex {
+  display: inline-flex;
+}
+
+// Flex utilities
+.justify-center {
+  justify-content: center;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.justify-end {
+  justify-content: flex-end;
+}
+
+.align-center {
+  align-items: center;
+}
+
+.align-start {
+  align-items: flex-start;
+}
+
+.align-end {
+  align-items: flex-end;
+}
+
+.flex-column {
+  flex-direction: column;
+}
+
+.flex-wrap {
+  flex-wrap: wrap;
+}
+
+.flex-1 {
+  flex: 1;
+}
+
+// Width utilities
+.w-100 {
+  width: 100%;
+}
+
+.w-auto {
+  width: auto;
+}
+
+// Height utilities
+.h-100 {
+  height: 100%;
+}
+
+.h-auto {
+  height: auto;
+}
+
+// Position utilities
+.position-relative {
+  position: relative;
+}
+
+.position-absolute {
+  position: absolute;
+}
+
+.position-fixed {
+  position: fixed;
+}
+
+// Border utilities - Shopify style
+.border {
+  border: 1px solid $border-color;
+}
+
+.border-top {
+  border-top: 1px solid $border-color;
+}
+
+.border-bottom {
+  border-bottom: 1px solid $border-color;
+}
+
+.border-left {
+  border-left: 1px solid $border-color;
+}
+
+.border-right {
+  border-right: 1px solid $border-color;
+}
+
+// Border radius utilities
+.rounded {
+  border-radius: $border-radius-md;
+}
+
+.rounded-sm {
+  border-radius: $border-radius-sm;
+}
+
+.rounded-lg {
+  border-radius: $border-radius-lg;
+}
+
+.rounded-full {
+  border-radius: 50%;
+}
+
+// Shadow utilities
+.shadow-sm {
+  box-shadow: $shadow-sm;
+}
+
+.shadow-md {
+  box-shadow: $shadow-md;
+}
+
+.shadow-lg {
+  box-shadow: $shadow-lg;
+}
+
+// Font weight utilities
+.font-normal { font-weight: $font-weight-normal; }
+.font-medium { font-weight: $font-weight-medium; }
+.font-semibold { font-weight: $font-weight-semibold; }
+.font-bold { font-weight: $font-weight-bold; }
+
+// Mona Sans specific font weight utilities (using variable font)
+.mona-sans-200 { 
+  font-family: "Mona Sans", sans-serif;
+  font-weight: 200;
+  font-style: normal;
+}
+
+.mona-sans-300 { 
+  font-family: "Mona Sans", sans-serif;
+  font-weight: 300;
+  font-style: normal;
+}
+
+.mona-sans-400 { 
+  font-family: "Mona Sans", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.mona-sans-500 { 
+  font-family: "Mona Sans", sans-serif;
+  font-weight: 500;
+  font-style: normal;
+}
+
+.mona-sans-600 { 
+  font-family: "Mona Sans", sans-serif;
+  font-weight: 600;
+  font-style: normal;
+}
+
+.mona-sans-700 { 
+  font-family: "Mona Sans", sans-serif;
+  font-weight: 700;
+  font-style: normal;
+}
+
+.mona-sans-800 { 
+  font-family: "Mona Sans", sans-serif;
+  font-weight: 800;
+  font-style: normal;
+}
+
+.mona-sans-900 { 
+  font-family: "Mona Sans", sans-serif;
+  font-weight: 900;
+  font-style: normal;
+}
+
+// Mona Sans italic utilities
+.mona-sans-italic-200 { 
+  font-family: "Mona Sans", sans-serif;
+  font-weight: 200;
+  font-style: italic;
+}
+
+.mona-sans-italic-400 { 
+  font-family: "Mona Sans", sans-serif;
+  font-weight: 400;
+  font-style: italic;
+}
+
+.mona-sans-italic-600 { 
+  font-family: "Mona Sans", sans-serif;
+  font-weight: 600;
+  font-style: italic;
+}
+
+.mona-sans-italic-700 { 
+  font-family: "Mona Sans", sans-serif;
+  font-weight: 700;
+  font-style: italic;
+}
+
+// Montserrat font utilities
+.montserrat-100 { 
+  font-family: "Montserrat", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 100;
+  font-style: normal;
+}
+
+.montserrat-400 { 
+  font-family: "Montserrat", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.montserrat-600 { 
+  font-family: "Montserrat", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 600;
+  font-style: normal;
+}
+
+.montserrat-700 { 
+  font-family: "Montserrat", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 700;
+  font-style: normal;
+}
+
+// Open Sans font utilities
+.open-sans-300 { 
+  font-family: "Open Sans", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 300;
+  font-style: normal;
+  font-variation-settings: "wdth" 100;
+}
+
+.open-sans-400 { 
+  font-family: "Open Sans", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+  font-variation-settings: "wdth" 100;
+}
+
+.open-sans-600 { 
+  font-family: "Open Sans", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 600;
+  font-style: normal;
+  font-variation-settings: "wdth" 100;
+}
+
+.open-sans-700 { 
+  font-family: "Open Sans", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 700;
+  font-style: normal;
+  font-variation-settings: "wdth" 100;
+}
+
+// Pirata One font utility
+.pirata-one-regular {
+  font-family: "Pirata One", system-ui;
+  font-weight: 400;
+  font-style: normal;
+}
+
+// Font size utilities
+.text-xs { font-size: $font-size-xs; }
+.text-sm { font-size: $font-size-sm; }
+.text-base { font-size: $font-size-base; }
+.text-lg { font-size: $font-size-lg; }
+.text-xl { font-size: $font-size-xl; }
+
+// Gap utilities
+.gap-1 { gap: $spacing-xs; }
+.gap-2 { gap: $spacing-sm; }
+.gap-3 { gap: $spacing-md; }
+.gap-4 { gap: $spacing-lg; }
+.gap-5 { gap: $spacing-xl; }

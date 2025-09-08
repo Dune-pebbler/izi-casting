@@ -1,0 +1,90 @@
+// Feed Component Styles
+// Mirrors the HTML structure from Feed.js
+
+.sidebar-section {
+  margin-bottom: $spacing-lg;
+  background-color: $surface;
+  display: flex;
+  flex-direction: column;
+  border-radius: $border-radius-md;
+
+  .settings-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: $spacing-md;
+    padding-bottom: $spacing-sm;
+    border-bottom: 1px solid $border-color;
+
+    h2 {
+      margin: 0;
+      font-size: 1.125rem;
+      color: $text-primary;
+    }
+  }
+
+  .settings-section {
+    margin-bottom: $spacing-lg;
+
+    h3 {
+      margin: 0 0 $spacing-sm 0;
+      font-size: 1rem;
+      color: $text-primary;
+    }
+
+    .feed-input-group {
+      margin-bottom: $spacing-md;
+
+      label {
+        display: block;
+        margin-bottom: $spacing-xs;
+        font-weight: $font-weight-medium;
+        color: $text-primary;
+      }
+
+      .feed-url-input {
+        width: 100%;
+        padding: $spacing-sm;
+        border: 1px solid $border-color;
+        border-radius: $border-radius-sm;
+        font-size: 0.875rem;
+        margin-bottom: $spacing-xs;
+
+        &:focus {
+          outline: none;
+          border-color: $primary;
+          box-shadow: 0 0 0 2px rgba($primary, 0.2);
+        }
+      }
+
+      .input-help {
+        display: block;
+        color: $text-secondary;
+        font-size: 0.75rem;
+        margin-bottom: $spacing-sm;
+      }
+
+      .feed-examples {
+        display: flex;
+        gap: $spacing-xs;
+        flex-wrap: wrap;
+
+        .feed-example-btn {
+          padding: $spacing-xs $spacing-sm;
+          background-color: $gray-100;
+          border: 1px solid $border-color;
+          border-radius: $border-radius-sm;
+          font-size: 0.75rem;
+          color: $text-secondary;
+          cursor: pointer;
+          transition: $transition-base;
+
+          &:hover {
+            background-color: $gray-200;
+            color: $text-primary;
+          }
+        }
+      }
+    }
+  }
+}
