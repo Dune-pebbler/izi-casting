@@ -1,0 +1,514 @@
+// Feed List Component Styles
+// Mirrors the HTML structure from FeedList.js
+
+.feed-list {
+  margin-bottom: $spacing-lg;
+  background-color: $surface;
+  display: flex;
+  flex-direction: column;
+  border-radius: $border-radius-md;
+
+  .settings-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: $spacing-md;
+    padding-bottom: $spacing-sm;
+
+    h2 {
+      margin: 0;
+      font-size: 1rem; // Reduced from 1.25rem
+      color: $text-primary;
+    }
+  }
+
+  // Feed Content Wrapper
+  .feed-content-wrapper {
+    margin-bottom: $spacing-md;
+    border: 1px solid $border-color;
+    border-radius: $border-radius-lg;
+    background-color: $surface;
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    overflow: hidden;
+
+    &:hover {
+      box-shadow: $shadow-md;
+      border-color: rgba($primary, 0.2);
+    }
+
+    &.dragging {
+      opacity: 0.6;
+      transform: rotate(1deg) scale(1.02);
+      box-shadow: $shadow-lg;
+    }
+
+  }
+
+  // Feed Header
+  .feed-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: $spacing-sm;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    min-height: 64px;
+
+    &:hover {
+      background-color: rgba($primary, 0.03);
+    }
+  }
+
+  .feed-header-left {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+  }
+
+  .feed-drag-handle {
+    cursor: grab;
+    color: $text-secondary;
+    padding: $spacing-sm;
+    border-radius: $border-radius-sm;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:hover {
+      color: $text-primary;
+      background-color: rgba($primary, 0.08);
+    }
+
+    &:active {
+      cursor: grabbing;
+      background-color: rgba($primary, 0.15);
+    }
+  }
+
+
+  .feed-actions {
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+  }
+
+  .feed-info {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+  }
+
+  .feed-duration {
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+    font-size: 0.95rem;
+    background-color: rgba($primary, 0.05);
+    padding: $spacing-xs $spacing-sm;
+    border-radius: $border-radius-sm;
+    border: 1px solid rgba($primary, 0.1);
+
+    .duration-label {
+      color: $text-secondary;
+      font-weight: $font-weight-medium;
+    }
+
+    .duration-value {
+      color: $primary;
+      font-weight: $font-weight-semibold;
+    }
+  }
+
+  // Action Buttons
+  .visibility-btn,
+  .copy-feed-btn,
+  .delete-feed-btn {
+    padding: $spacing-sm;
+    border: none;
+    border-radius: $border-radius-sm;
+    background-color: transparent;
+    color: $text-secondary;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 36px;
+    min-height: 36px;
+    position: relative;
+
+    &:hover {
+      background-color: rgba($primary, 0.08);
+      color: $primary;
+      transform: translateY(-1px);
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+  }
+
+  .visibility-btn {
+    &.enabled {
+      color: $success;
+      background-color: rgba($success, 0.1);
+      
+      &:hover {
+        background-color: rgba($success, 0.15);
+        color: darken($success, 10%);
+      }
+    }
+
+    &.disabled {
+      color: $text-secondary;
+      
+      &:hover {
+        background-color: rgba($text-secondary, 0.1);
+        color: $text-primary;
+      }
+    }
+  }
+
+  .delete-feed-btn {
+    &:hover {
+      background-color: rgba($danger, 0.1);
+      color: $danger;
+    }
+  }
+
+  .feed-details {
+    padding: $spacing-sm;
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-sm;
+  }
+
+  .feed-url {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    font-size: 0.95rem;
+    padding: $spacing-sm;
+    background-color: $surface;
+    border-radius: $border-radius-sm;
+
+    .url-label {
+      color: $text-secondary;
+      font-weight: $font-weight-semibold;
+      min-width: 40px;
+    }
+
+    .url-value {
+      color: $text-primary;
+      flex: 1;
+      font-family: $font-family-mono;
+      font-size: 0.9rem;
+
+      &.url-editable {
+        cursor: pointer;
+        padding: $spacing-xs;
+        border-radius: $border-radius-sm;
+        transition: all 0.2s ease;
+        border: 1px solid transparent;
+
+        &:hover {
+          background-color: rgba($primary, 0.05);
+          border-color: rgba($primary, 0.2);
+        }
+      }
+    }
+
+    .url-edit-container {
+      display: flex;
+      align-items: center;
+      gap: $spacing-xs;
+      flex: 1;
+
+      .url-input {
+        flex: 1;
+        padding: $spacing-xs;
+        border: 1px solid $primary;
+        border-radius: $border-radius-sm;
+        font-family: $font-family-mono;
+        font-size: 0.9rem;
+        background-color: $surface;
+        color: $text-primary;
+        transition: border-color 0.2s ease;
+
+        &:focus {
+          outline: none;
+          border-color: $primary;
+          box-shadow: 0 0 0 2px rgba($primary, 0.2);
+        }
+      }
+
+      .url-edit-actions {
+        display: flex;
+        gap: $spacing-xs;
+
+        .url-save-btn,
+        .url-cancel-btn {
+          padding: $spacing-xs;
+          border: none;
+          border-radius: $border-radius-sm;
+          cursor: pointer;
+          font-size: 0.8rem;
+          font-weight: $font-weight-semibold;
+          transition: all 0.2s ease;
+          min-width: 24px;
+          min-height: 24px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .url-save-btn {
+          background-color: $success;
+          color: white;
+
+          &:hover {
+            background-color: darken($success, 10%);
+          }
+        }
+
+        .url-cancel-btn {
+          background-color: $danger;
+          color: white;
+
+          &:hover {
+            background-color: darken($danger, 10%);
+          }
+        }
+      }
+    }
+  }
+
+  // Inline Edit Form
+  .feed-edit-form {
+    padding: $spacing-lg;
+    border-top: 1px solid rgba($primary, 0.2);
+    background-color: rgba($primary, 0.03);
+    border-radius: 0 0 $border-radius-lg $border-radius-lg;
+
+    .form-group {
+      margin-bottom: $spacing-md;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      label {
+        display: block;
+        margin-bottom: $spacing-xs;
+        font-weight: $font-weight-medium;
+        color: $text-primary;
+        font-size: 1rem; // Increased from 0.875rem
+      }
+
+      .form-input {
+        width: 100%;
+        padding: $spacing-sm;
+        border: 1px solid $border-color;
+        border-radius: $border-radius-sm;
+        font-size: 1rem; // Increased from 0.875rem
+        background-color: $surface;
+        color: $text-primary;
+        transition: border-color 0.2s ease;
+
+        &:focus {
+          outline: none;
+          border-color: $primary;
+          box-shadow: 0 0 0 2px rgba($primary, 0.2);
+        }
+      }
+
+      .input-help {
+        display: block;
+        color: $text-secondary;
+        font-size: 0.75rem;
+        margin-top: $spacing-xs;
+      }
+
+      .checkbox-group {
+        display: flex;
+        align-items: center;
+        gap: $spacing-sm;
+
+        .checkbox-label {
+          display: flex;
+          align-items: center;
+          gap: $spacing-xs;
+          cursor: pointer;
+          font-size: 1rem; // Increased from 0.875rem
+
+          input[type="checkbox"] {
+            width: 18px; // Increased from 16px
+            height: 18px; // Increased from 16px
+            cursor: pointer;
+          }
+
+          .checkbox-text {
+            color: $text-primary;
+          }
+        }
+      }
+    }
+
+    .form-actions {
+      display: flex;
+      gap: $spacing-sm;
+      justify-content: flex-end;
+      margin-top: $spacing-md;
+      padding-top: $spacing-md;
+      border-top: 1px solid $border-color;
+
+      .btn {
+        padding: $spacing-md $spacing-lg; // Increased padding
+        border: none;
+        border-radius: $border-radius-sm;
+        font-size: 1rem; // Increased from 0.875rem
+        font-weight: $font-weight-medium;
+        cursor: pointer;
+        transition: all 0.2s ease;
+
+        &.btn-primary {
+          background-color: $primary;
+          color: white;
+
+          &:hover {
+            background-color: darken($primary, 10%);
+          }
+        }
+
+        &.btn-secondary {
+          background-color: $gray-200;
+          color: $text-primary;
+
+          &:hover {
+            background-color: $gray-300;
+          }
+        }
+      }
+    }
+  }
+
+  // Popular Feeds
+  .popular-feeds {
+    display: flex;
+    gap: $spacing-xs;
+    flex-wrap: wrap;
+    margin-top: $spacing-xs;
+
+    .popular-feed-btn {
+      padding: $spacing-sm $spacing-md; // Increased padding
+      background-color: $gray-100;
+      border: 1px solid $border-color;
+      border-radius: $border-radius-sm;
+      font-size: 0.875rem; // Increased from 0.75rem
+      color: $text-secondary;
+      cursor: pointer;
+      transition: $transition-base;
+
+      &:hover {
+        background-color: $gray-200;
+        color: $text-primary;
+      }
+    }
+  }
+
+  // Add Feed Button
+  .add-feed-button {
+    margin-top: $spacing-md;
+    padding: $spacing-md;
+    border: 2px dashed $border-color;
+    border-radius: $border-radius-md;
+    background-color: transparent;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      border-color: $primary;
+      background-color: rgba($primary, 0.05);
+    }
+
+    .add-feed-content {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: $spacing-sm;
+      color: $text-secondary;
+      font-size: 1rem; // Increased from 0.875rem
+      font-weight: $font-weight-medium;
+
+      &:hover {
+        color: $primary;
+      }
+    }
+  }
+
+  .settings-section {
+    margin-bottom: $spacing-lg;
+
+    h3 {
+      margin: 0 0 $spacing-sm 0;
+      font-size: 1rem;
+      color: $text-primary;
+    }
+
+    .feed-input-group {
+      margin-bottom: $spacing-md;
+
+      label {
+        display: block;
+        margin-bottom: $spacing-xs;
+        font-weight: $font-weight-medium;
+        color: $text-primary;
+      }
+
+      .feed-url-input {
+        width: 100%;
+        padding: $spacing-sm;
+        border: 1px solid $border-color;
+        border-radius: $border-radius-sm;
+        font-size: 0.875rem;
+        margin-bottom: $spacing-xs;
+
+        &:focus {
+          outline: none;
+          border-color: $primary;
+          box-shadow: 0 0 0 2px rgba($primary, 0.2);
+        }
+      }
+
+      .input-help {
+        display: block;
+        color: $text-secondary;
+        font-size: 0.75rem;
+        margin-bottom: $spacing-sm;
+      }
+
+      .feed-examples {
+        display: flex;
+        gap: $spacing-xs;
+        flex-wrap: wrap;
+
+        .feed-example-btn {
+          padding: $spacing-xs $spacing-sm;
+          background-color: $gray-100;
+          border: 1px solid $border-color;
+          border-radius: $border-radius-sm;
+          font-size: 0.75rem;
+          color: $text-secondary;
+          cursor: pointer;
+          transition: $transition-base;
+
+          &:hover {
+            background-color: $gray-200;
+            color: $text-primary;
+          }
+        }
+      }
+    }
+  }
+}

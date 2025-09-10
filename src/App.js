@@ -6,7 +6,8 @@ import { store } from './store/store';
 import LoginView from './components/LoginView';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminView from './components/AdminView';
-import DisplayView from './components/DisplayView';
+import DisplayView from './components/front-end/DisplayView';
+import FeedTest from './components/front-end/FeedTest';
 import './styles/main.scss';
 
 // Main App Component
@@ -18,6 +19,7 @@ function App() {
           <Routes>
             <Route path="/login" element={<LoginView />} />
             <Route path="/" element={<DisplayView />} />
+            <Route path="/test" element={<FeedTest />} />
             <Route path="/admin" element={
               <ProtectedRoute>
                 <AdminView />
