@@ -45,6 +45,10 @@ function DisplayView() {
   const [animationStep, setAnimationStep] = useState(0); // 0: initial, 1: text fade in, 2: code display
   // Refs to prevent unnecessary re-renders
   const hasInitializedRef = useRef(false);
+  const generateDisplayPairingCodeRef = useRef();
+  const isPairedRef = useRef(isPaired);
+  const isGeneratingCodeRef = useRef(isGeneratingCode);
+  const displayPairingCodeRef = useRef(displayPairingCode);
   
   // Utility function to clear invalid device ID
   const clearInvalidDeviceId = useCallback(() => {
@@ -57,7 +61,7 @@ function DisplayView() {
     return false;
   }, []);
 
-  console.log("reload triggered");
+  // console.log("reload triggered"); // Removed to prevent console spam
   // Generate a unique pairing code
   const generatePairingCode = useCallback(() => {
     const code = Math.floor(10000 + Math.random() * 90000).toString();
@@ -139,7 +143,8 @@ function DisplayView() {
 
   // Generate and save display pairing code
   const generateDisplayPairingCode = useCallback(async () => {
-    if (isGeneratingCode) {
+    // Use a ref to prevent multiple simultaneous generations
+    if (hasInitializedRef.current && isGeneratingCode) {
       console.log("Already generating code, skipping...");
       return; // Prevent multiple simultaneous generations
     }
@@ -180,22 +185,30 @@ function DisplayView() {
 
         console.log("Saving to devices collection...");
         // Also save the code to the device document for reference
+        // Only update isPaired to false if the device is not already paired
+        const deviceUpdateData = {
+          deviceId: currentDeviceId,
+          displayPairingCode: newCode,
+          isLinked: true, // Mark as linked so it appears in admin panel
+          deviceInfo: {
+            userAgent: navigator.userAgent,
+            screenResolution: `${screen.width}x${screen.height}`,
+            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+            language: navigator.language,
+            createdAt: new Date().toISOString(),
+            lastSeen: new Date().toISOString(),
+          },
+        };
+        
+        // Only set isPaired to false if we're not already paired
+        // This prevents overwriting a successful pairing
+        if (!isPairedRef.current) {
+          deviceUpdateData.isPaired = false;
+        }
+        
         await setDoc(
           doc(db, "devices", currentDeviceId),
-          {
-            deviceId: currentDeviceId,
-            displayPairingCode: newCode,
-            isPaired: false,
-            isLinked: true, // Mark as linked so it appears in admin panel
-            deviceInfo: {
-              userAgent: navigator.userAgent,
-              screenResolution: `${screen.width}x${screen.height}`,
-              timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-              language: navigator.language,
-              createdAt: new Date().toISOString(),
-              lastSeen: new Date().toISOString(),
-            },
-          },
+          deviceUpdateData,
           { merge: true }
         );
 
@@ -234,7 +247,15 @@ function DisplayView() {
       );
       dispatch(setIsGeneratingCode(false));
     }
-  }, [isGeneratingCode, generatePairingCode, dispatch]);
+  }, [generatePairingCode, dispatch]);
+
+  // Store the function in a ref so it can be called from useEffect hooks
+  generateDisplayPairingCodeRef.current = generateDisplayPairingCode;
+  
+  // Update refs when state changes
+  isPairedRef.current = isPaired;
+  isGeneratingCodeRef.current = isGeneratingCode;
+  displayPairingCodeRef.current = displayPairingCode;
 
   // Fullscreen functions
   const requestFullscreen = async () => {
@@ -434,7 +455,8 @@ function DisplayView() {
 
           console.log("Device pairing status changed:", newPairedStatus);
 
-          if (newPairedStatus !== isPaired) {
+          // Only update if the status actually changed
+          if (newPairedStatus !== isPairedRef.current) {
             dispatch(setIsPaired(newPairedStatus));
 
             if (newPairedStatus) {
@@ -446,20 +468,23 @@ function DisplayView() {
               console.log(
                 "Device is no longer paired. Switching to pairing mode."
               );
-              // Generate new pairing code when unpaired
-              if (!isGeneratingCode) {
-                generateDisplayPairingCode();
+              // Only generate new pairing code if we're not already generating one
+              // and if we don't already have a valid pairing code
+              if (!isGeneratingCodeRef.current && !displayPairingCodeRef.current) {
+                console.log("Generating new pairing code for unpaired device");
+                generateDisplayPairingCodeRef.current?.();
               }
             }
           }
 
         } else {
           // Device document doesn't exist, treat as unpaired
-          if (isPaired) {
+          if (isPairedRef.current) {
             console.log("Device document not found, treating as unpaired");
             dispatch(setIsPaired(false));
-            if (!isGeneratingCode) {
-              generateDisplayPairingCode();
+            // Only generate new code if we don't already have one
+            if (!isGeneratingCodeRef.current && !displayPairingCodeRef.current) {
+              generateDisplayPairingCodeRef.current?.();
             }
           }
         }
@@ -473,7 +498,7 @@ function DisplayView() {
       console.log("Cleaning up device pairing listener");
       unsubscribeDevice();
     };
-  }, [isGeneratingCode, generateDisplayPairingCode, dispatch]);
+  }, [deviceId, dispatch]); // Removed isPaired and isGeneratingCode from dependencies to prevent loops
 
   // Listen for device commands (refresh, etc.)
   useEffect(() => {
@@ -758,7 +783,7 @@ function DisplayView() {
           // Generate new code when timer reaches 0 (only if still not paired)
           if (!isPaired) {
             console.log("Timer reached 0, generating new code...");
-            generateDisplayPairingCode();
+            generateDisplayPairingCodeRef.current?.();
           }
           dispatch(setCodeTimeRemaining(30)); // Reset timer
         } else {
@@ -778,7 +803,6 @@ function DisplayView() {
     displayPairingCode,
     isGeneratingCode,
     codeTimeRemaining,
-    generateDisplayPairingCode,
     dispatch,
   ]);
 
@@ -822,7 +846,7 @@ function DisplayView() {
         console.log("Device not paired, generating pairing code...");
         // Add a small delay to ensure state is updated
         setTimeout(() => {
-          generateDisplayPairingCode();
+          generateDisplayPairingCodeRef.current?.();
         }, 500);
       } else {
         console.log("Device is already paired, skipping pairing code generation");
@@ -830,7 +854,7 @@ function DisplayView() {
     };
 
     initializeDevice();
-  }, [generateDeviceId, generateDisplayPairingCode, checkDevicePairing, dispatch, clearInvalidDeviceId]);
+  }, [generateDeviceId, checkDevicePairing, dispatch, clearInvalidDeviceId]);
 
   if (!isPaired) {
     return (
