@@ -23,6 +23,7 @@ $red-500: #d82c0d;
 $red-600: #bf0711;
 $red-700: #a4000f;
 
+
 $error-light: #f8d7d3;
 
 // Legacy color mappings for backward compatibility
@@ -38,6 +39,8 @@ $dark-color: $text-primary;
 $white: $surface;
 $black: $text-primary;
 $page-bg: $background;
+
+$danger: $error;
 
 // Grays - Shopify style
 $gray-50: #fafbfb;
