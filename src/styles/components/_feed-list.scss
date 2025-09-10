@@ -99,7 +99,7 @@
     gap: $spacing-sm;
   }
 
-  .feed-duration {
+  .feed-max-posts {
     display: flex;
     align-items: center;
     gap: $spacing-xs;
@@ -109,14 +109,90 @@
     border-radius: $border-radius-sm;
     border: 1px solid rgba($primary, 0.1);
 
-    .duration-label {
+    .max-posts-label {
       color: $text-secondary;
       font-weight: $font-weight-medium;
     }
 
-    .duration-value {
+    .max-posts-value {
       color: $primary;
       font-weight: $font-weight-semibold;
+
+      &.max-posts-editable {
+        cursor: pointer;
+        padding: 2px 4px;
+        border-radius: 3px;
+        transition: all 0.2s ease;
+
+        &:hover {
+          background-color: rgba($primary, 0.1);
+          transform: scale(1.05);
+        }
+      }
+    }
+
+    .max-posts-edit-container {
+      display: flex;
+      align-items: center;
+      gap: $spacing-xs;
+    }
+
+    .max-posts-input {
+      width: 50px;
+      padding: 2px 4px;
+      border: 1px solid $primary;
+      border-radius: 3px;
+      font-size: 0.9rem;
+      text-align: center;
+      background-color: $white;
+      color: $text-primary;
+
+      &:focus {
+        outline: none;
+        border-color: $primary;
+        box-shadow: 0 0 0 2px rgba($primary, 0.2);
+      }
+    }
+
+    .max-posts-edit-actions {
+      display: flex;
+      gap: 2px;
+    }
+
+    .max-posts-save-btn,
+    .max-posts-cancel-btn {
+      width: 20px;
+      height: 20px;
+      border: none;
+      border-radius: 3px;
+      font-size: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+
+      &:hover {
+        transform: scale(1.1);
+      }
+    }
+
+    .max-posts-save-btn {
+      background-color: $success;
+      color: $white;
+
+      &:hover {
+        background-color: darken($success, 10%);
+      }
+    }
+
+    .max-posts-cancel-btn {
+      background-color: $error;
+      color: $white;
+
+      &:hover {
+        background-color: darken($error, 10%);
+      }
     }
   }
 

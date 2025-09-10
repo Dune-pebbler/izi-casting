@@ -32,12 +32,14 @@ function FeedList() {
   const [inlineEditForm, setInlineEditForm] = useState({
     name: '',
     url: '',
-    duration: 10,
+    maxPosts: 5,
     isEnabled: true,
     isVisible: true
   });
   const [editingUrl, setEditingUrl] = useState(null);
   const [tempUrl, setTempUrl] = useState('');
+  const [editingMaxPosts, setEditingMaxPosts] = useState(null);
+  const [tempMaxPosts, setTempMaxPosts] = useState('');
 
   // Load feeds from Firestore
   useEffect(() => {
@@ -51,7 +53,7 @@ function FeedList() {
           const migratedFeeds = data.feeds.map(feed => ({
             ...feed,
             isEnabled: feed.isEnabled !== false, // Default to true if not set
-            duration: feed.duration || 10, // Default 10 seconds
+            maxPosts: feed.maxPosts || 5, // Default 5 posts
             isVisible: feed.isVisible !== false // Default to true if not set
           }));
           setFeeds(migratedFeeds);
@@ -62,7 +64,7 @@ function FeedList() {
             name: 'Default Feed',
             url: data.feedUrl,
             isEnabled: true,
-            duration: 10,
+            maxPosts: 5,
             isVisible: true
           };
           setFeeds([defaultFeed]);
@@ -84,7 +86,7 @@ function FeedList() {
       name: `Feed ${feeds.length + 1}`,
       url: '',
       isEnabled: true,
-      duration: 10,
+      maxPosts: 5,
       isVisible: true
     };
     const updatedFeeds = [...feeds, newFeed];
@@ -185,7 +187,7 @@ function FeedList() {
     setInlineEditForm({
       name: feed.name || '',
       url: feed.url || '',
-      duration: feed.duration || 10,
+      maxPosts: feed.maxPosts || 5,
       isEnabled: feed.isEnabled !== false,
       isVisible: feed.isVisible !== false
     });
@@ -196,7 +198,7 @@ function FeedList() {
     setInlineEditForm({
       name: '',
       url: '',
-      duration: 10,
+      maxPosts: 5,
       isEnabled: true,
       isVisible: true
     });
@@ -225,7 +227,7 @@ function FeedList() {
       ...feeds.find(f => f.id === inlineEditingFeed),
       name: inlineEditForm.name.trim(),
       url: inlineEditForm.url.trim(),
-      duration: parseInt(inlineEditForm.duration) || 10,
+      maxPosts: parseInt(inlineEditForm.maxPosts) || 5,
       isEnabled: inlineEditForm.isEnabled,
       isVisible: inlineEditForm.isVisible
     };
@@ -288,6 +290,47 @@ function FeedList() {
     }
   };
 
+  // Max Posts editing functions
+  const startMaxPostsEdit = (feed) => {
+    setEditingMaxPosts(feed.id);
+    setTempMaxPosts(feed.maxPosts?.toString() || '5');
+  };
+
+  const cancelMaxPostsEdit = () => {
+    setEditingMaxPosts(null);
+    setTempMaxPosts('');
+  };
+
+  const saveMaxPostsEdit = async (feedId) => {
+    const maxPostsValue = parseInt(tempMaxPosts);
+    
+    if (!tempMaxPosts.trim() || isNaN(maxPostsValue)) {
+      toast.error('Please enter a valid number');
+      return;
+    }
+
+    if (maxPostsValue < 1 || maxPostsValue > 50) {
+      toast.error('Max posts must be between 1 and 50');
+      return;
+    }
+
+    const updatedFeeds = feeds.map(feed => 
+      feed.id === feedId ? { ...feed, maxPosts: maxPostsValue } : feed
+    );
+    setFeeds(updatedFeeds);
+    await saveFeedsToFirebase(updatedFeeds);
+    toast.success('Max posts updated successfully!');
+    cancelMaxPostsEdit();
+  };
+
+  const handleMaxPostsKeyPress = (e, feedId) => {
+    if (e.key === 'Enter') {
+      saveMaxPostsEdit(feedId);
+    } else if (e.key === 'Escape') {
+      cancelMaxPostsEdit();
+    }
+  };
+
   const popularFeeds = [
     { name: 'BBC News', url: 'https://feeds.bbci.co.uk/news/rss.xml' },
     { name: 'CNN', url: 'https://rss.cnn.com/rss/edition.rss' },
@@ -347,9 +390,47 @@ function FeedList() {
           </div>
           <div className="feed-actions" onClick={(e) => e.stopPropagation()}>
             <div className="feed-info">
-              <div className="feed-duration">
-                <span className="duration-label">Duration:</span>
-                <span className="duration-value">{feed.duration}s</span>
+              <div className="feed-max-posts">
+                <span className="max-posts-label">Max Posts:</span>
+                {editingMaxPosts === feed.id ? (
+                  <div className="max-posts-edit-container">
+                    <input
+                      type="number"
+                      value={tempMaxPosts}
+                      onChange={(e) => setTempMaxPosts(e.target.value)}
+                      onKeyDown={(e) => handleMaxPostsKeyPress(e, feed.id)}
+                      onBlur={() => saveMaxPostsEdit(feed.id)}
+                      className="max-posts-input"
+                      min="1"
+                      max="50"
+                      autoFocus
+                    />
+                    <div className="max-posts-edit-actions">
+                      <button
+                        onClick={() => saveMaxPostsEdit(feed.id)}
+                        className="max-posts-save-btn"
+                        title="Save max posts"
+                      >
+                        ✓
+                      </button>
+                      <button
+                        onClick={cancelMaxPostsEdit}
+                        className="max-posts-cancel-btn"
+                        title="Cancel"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <span 
+                    className="max-posts-value max-posts-editable" 
+                    title="Click to edit max posts"
+                    onClick={() => startMaxPostsEdit(feed)}
+                  >
+                    {feed.maxPosts}
+                  </span>
+                )}
               </div>
             </div>
             <button
@@ -479,18 +560,18 @@ function FeedList() {
             </div>
 
             <div className="form-group">
-              <label htmlFor={`feedDuration-${feed.id}`}>Display Duration (seconds)</label>
+              <label htmlFor={`feedMaxPosts-${feed.id}`}>Maximum Number of Posts</label>
               <input
                 type="number"
-                id={`feedDuration-${feed.id}`}
+                id={`feedMaxPosts-${feed.id}`}
                 min="1"
-                max="300"
-                value={inlineEditForm.duration}
-                onChange={(e) => handleInlineFormChange('duration', parseInt(e.target.value) || 10)}
+                max="50"
+                value={inlineEditForm.maxPosts}
+                onChange={(e) => handleInlineFormChange('maxPosts', parseInt(e.target.value) || 5)}
                 className="form-input"
               />
               <small className="input-help">
-                How long each feed item should be displayed (1-300 seconds)
+                Maximum number of posts to display from this feed (1-50)
               </small>
             </div>
 

@@ -314,17 +314,17 @@ function Feed({ feeds, settings }) {
             const items = await fetchRssFeedItems(feed.url);
             console.log(`✅ Feed ${feed.name} returned ${items.length} items`);
             
-            // Calculate dynamic duration for each item based on content length
-            const itemsWithDuration = (items || []).map(item => ({
+            // Limit items to maxPosts and add feed metadata
+            const limitedItems = (items || []).slice(0, feed.maxPosts || 5).map(item => ({
               ...item,
               dynamicDuration: calculateReadingTime(item.title, item.description),
               feedId: feed.id,
               feedName: feed.name,
-              feedDuration: feed.duration || 10 // Use feed's configured duration as fallback
+              maxPosts: feed.maxPosts || 5
             }));
             
             // Log processed items to check for content changes
-            console.log(`🔄 Processed ${feed.name} items:`, itemsWithDuration.map(item => ({
+            console.log(`🔄 Processed ${feed.name} items:`, limitedItems.map(item => ({
               title: item.title,
               titleLength: item.title?.length || 0,
               description: item.description,
@@ -332,7 +332,7 @@ function Feed({ feeds, settings }) {
               dynamicDuration: item.dynamicDuration
             })));
             
-            return { ...feed, items: itemsWithDuration };
+            return { ...feed, items: limitedItems };
           } catch (error) {
             console.error(`❌ Error processing feed ${feed.name} (${feed.url}):`, error.message);
             
@@ -405,7 +405,7 @@ function Feed({ feeds, settings }) {
     
     const rotateFeeds = () => {
       const currentItem = rssFeed[currentIndex];
-      const duration = (currentItem.dynamicDuration || currentItem.feedDuration || 10) * 1000;
+      const duration = (currentItem.dynamicDuration || 10) * 1000;
 
       console.log(`Feed item "${currentItem?.title || 'No title'}" will display for ${duration/1000} seconds`);
 
@@ -436,11 +436,6 @@ function Feed({ feeds, settings }) {
   return (
     <div className="feed-container">
       <div className="rss-item">
-        {currentItem?.feedName && (
-          <div className="rss-feed-name">
-            {currentItem.feedName}
-          </div>
-        )}
         <div className="rss-title">
           {currentItem?.title || "No title"}
         </div>
@@ -466,21 +461,31 @@ function Feed({ feeds, settings }) {
                   if (isOverflowing) {
                     el.classList.add('scrolling-text');
                     
-                    // Calculate scroll distance to show most of the text but stop 80vw earlier
-                    const viewportWidth = window.innerWidth;
-                    const stopEarlyDistance = viewportWidth * 0.8; // 80vw
-                    const scrollDistance = Math.max(textWidth - stopEarlyDistance, 0); // Don't scroll if text is shorter than 80vw
+                    // Calculate scroll distance to show the full text
+                    const scrollDistance = textWidth - containerWidth;
                     
                     // Use the feed item's actual display duration for the animation
                     const feedDuration = currentItem?.dynamicDuration || 10; // Use the calculated duration
                     const animationDuration = feedDuration * 1000; // Convert to milliseconds
                     
+                    // Calculate consistent scroll speed (pixels per second)
+                    // Target: 100 pixels per second for comfortable reading
+                    const targetScrollSpeed = 100; // pixels per second
+                    const scrollTimeMs = Math.max((scrollDistance / targetScrollSpeed) * 1000, 1000); // minimum 1 second, convert to ms
+                    
+                    // Calculate pause times to fit within total duration
+                    const totalScrollTime = Math.min(scrollTimeMs, animationDuration * 0.8); // max 80% of total time
+                    const pauseTime = (animationDuration - totalScrollTime) / 2; // split pause time between start and end
+                    
                     // Create and apply the animation directly via JavaScript
+                    const startPauseRatio = pauseTime / animationDuration;
+                    const endPauseRatio = (animationDuration - pauseTime) / animationDuration;
+                    
                     const keyframes = [
                       { transform: 'translateX(0)', offset: 0 },
-                      { transform: 'translateX(0)', offset: 0.1 }, // Stay at start for 10% of duration
-                      { transform: `translateX(-${scrollDistance}px)`, offset: 0.9 }, // Scroll for 80% of duration
-                      { transform: `translateX(-${scrollDistance}px)`, offset: 1 } // Stay at end for 10% of duration
+                      { transform: 'translateX(0)', offset: startPauseRatio }, // Pause at start
+                      { transform: `translateX(-${scrollDistance}px)`, offset: endPauseRatio }, // Scroll to end
+                      { transform: `translateX(-${scrollDistance}px)`, offset: 1 } // Pause at end
                     ];
                     
                     const animationOptions = {
@@ -499,9 +504,16 @@ function Feed({ feeds, settings }) {
                       )
                     );
                     
-                    if (!isAlreadyAnimating) {
+                    // Also check if we've already set up animation for this specific item
+                    const animationKey = `${currentItem?.title}-${scrollDistance}-${animationDuration}`;
+                    const hasAnimated = el.dataset.animationKey === animationKey;
+                    
+                    if (!isAlreadyAnimating && !hasAnimated) {
                       // Stop any existing animation
                       el.getAnimations().forEach(anim => anim.cancel());
+                      
+                      // Mark this element as having been animated
+                      el.dataset.animationKey = animationKey;
                       
                       // Add a small delay to prevent jump on re-render
                       setTimeout(() => {
@@ -513,7 +525,11 @@ function Feed({ feeds, settings }) {
                     console.log(`🎬 Scrolling animation started:`, {
                       scrollDistance: `${scrollDistance}px`,
                       duration: `${animationDuration}ms`,
-                      feedDuration: `${feedDuration}s`
+                      feedDuration: `${feedDuration}s`,
+                      scrollSpeed: `${targetScrollSpeed}px/s`,
+                      calculatedScrollTime: `${scrollTimeMs}ms`,
+                      actualScrollTime: `${totalScrollTime}ms`,
+                      pauseTime: `${pauseTime}ms`
                     });
                   } else {
                     el.classList.remove('scrolling-text');
