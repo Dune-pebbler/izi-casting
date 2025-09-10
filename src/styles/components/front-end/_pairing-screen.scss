@@ -1,0 +1,205 @@
+// Pairing screen styles
+.pairing-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  max-width: 600px;
+  width: 100%;
+  height: 100vh;
+  justify-content: center;
+  padding: 0 $spacing-xl;
+}
+
+.pairing-logo {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  padding-top: $spacing-xl;
+
+  img {
+    width: 180px;
+    height: auto;
+  }
+}
+
+.pairing-main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 400px;
+}
+
+.pairing-title {
+  font-size: 2.5rem;
+  font-weight: $font-weight-bold;
+  margin-bottom: $spacing-md;
+  color: $black;
+  letter-spacing: -0.5px;
+}
+
+.pairing-instructions {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: $gray-600;
+  margin-bottom: $spacing-xl;
+  text-align: center;
+}
+
+.pairing-code-section {
+  width: 100%;
+  margin-bottom: $spacing-lg;
+}
+
+.pairing-code-label {
+  font-size: 0.9rem;
+  color: $gray-500;
+  margin-bottom: $spacing-sm;
+  text-align: center;
+  font-weight: $font-weight-medium;
+}
+
+.pairing-code-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $spacing-md;
+}
+
+.pairing-code-value {
+  display: flex;
+  gap: $spacing-sm;
+  justify-content: center;
+  align-items: center;
+  font-family: $font-family-mono;
+  font-size: 3rem;
+  font-weight: $font-weight-bold;
+  letter-spacing: 0.5rem;
+  color: $black;
+  transition: all 0.3s ease;
+
+  &.flashing {
+    animation: flash 0.5s ease-in-out infinite alternate;
+  }
+}
+
+.pairing-code-digit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 80px;
+  background-color: $white;
+  border: 2px solid $gray-200;
+  border-radius: $border-radius-lg;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: $primary;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+  }
+}
+
+@keyframes flash {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0.7;
+    transform: scale(1.02);
+  }
+}
+
+.pairing-timer-container {
+  width: 100%;
+  height: 6px;
+  background-color: $gray-200;
+  border-radius: 3px;
+  overflow: hidden;
+  position: relative;
+}
+
+.pairing-timer-bar {
+  height: 100%;
+  background-color: $primary;
+  border-radius: 3px;
+  transition: width 1s linear, background-color 0.3s ease;
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    animation: shimmer 2s infinite;
+  }
+}
+
+.pairing-timer-text {
+  font-size: 0.8rem;
+  color: $gray-500;
+  text-align: center;
+  margin-top: $spacing-xs;
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.pairing-code-generating {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $spacing-md;
+  padding: $spacing-xl;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid $gray-200;
+  border-top: 4px solid $primary;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.generating-text {
+  font-size: 1rem;
+  color: $gray-600;
+  font-weight: $font-weight-medium;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.pairing-error {
+  color: $error;
+  font-size: 0.9rem;
+  text-align: center;
+  margin-top: $spacing-md;
+  padding: $spacing-sm $spacing-md;
+  background-color: rgba($error, 0.1);
+  border: 1px solid rgba($error, 0.2);
+  border-radius: $border-radius-md;
+  font-weight: $font-weight-medium;
+}

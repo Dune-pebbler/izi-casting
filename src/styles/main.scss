@@ -3,7 +3,12 @@
 @import 'base';
 @import 'components/login';
 @import 'components/admin';
-@import 'components/display';
+@import 'components/front-end/display-container';
+@import 'components/front-end/pairing-screen';
+@import 'components/front-end/fullscreen-indicator';
+@import 'components/front-end/slide-display';
+@import 'components/front-end/progress-bar';
+@import 'components/front-end/bottom-bar';
 @import 'components/buttons';
 @import 'components/forms';
 @import 'components/sidebar';

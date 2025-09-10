@@ -1,0 +1,18 @@
+// Progress Bar Styles
+.display-progress-bar {
+  position: fixed;
+  margin: $spacing-md;
+  width: calc(100% - $spacing-md * 2);
+  bottom: 20vh;
+  min-height: 3px;
+  background-color: rgba(255, 255, 255, 0.2);
+  z-index: 5;
+  transition: height 0.3s ease;
+}
+
+.display-progress-fill {
+  height: 100%;
+  background-color: $primary-color;
+  transition: width 0.1s ease;
+  border-radius: 0 2px 2px 0;
+}

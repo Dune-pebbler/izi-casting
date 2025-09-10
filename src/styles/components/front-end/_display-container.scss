@@ -1,0 +1,17 @@
+// Main Display Container Styles
+.display-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: $black;
+  color: $white;
+  position: relative;
+
+  &.pairing-screen {
+    background-color: #f9fafc;
+    color: $black;
+    align-items: center;
+    justify-content: center;
+    padding: $spacing-lg;
+  }
+}

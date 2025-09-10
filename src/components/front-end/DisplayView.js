@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { doc, onSnapshot, setDoc, getDoc } from "firebase/firestore";
 import { db } from "../../firebase";
-import { sanitizeHTMLContent } from "../../utils/sanitize";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { 
   setIsPaired, 
@@ -13,7 +12,11 @@ import {
   setCodeTimeRemaining,
   setIsCodeFlashing
 } from "../../store/slices/deviceSlice";
-import Feed from "./Feed";
+import PairingScreen from "./PairingScreen";
+import SlideDisplay from "./SlideDisplay";
+import ProgressBar from "./ProgressBar";
+import BottomBar from "./BottomBar";
+import FullscreenIndicator from "./FullscreenIndicator";
 
 function DisplayView() {
   // Redux state
@@ -858,58 +861,12 @@ function DisplayView() {
 
   if (!isPaired) {
     return (
-      <div className="display-container pairing-screen">
-        <div className="pairing-content">
-          <div className="pairing-logo">
-            <img src="/izicasting-logo.svg" alt="Izi Casting Logo" />
-          </div>
-
-          <div className="pairing-main">
-            <h1 className="pairing-title">Apparaat koppelen</h1>
-
-            <p className="pairing-instructions">
-              Voer deze koppelcode in op het admin paneel
-            </p>
-
-            <div className="pairing-code-section">
-              {displayPairingCode ? (
-                <div className="pairing-code-display">
-                  <div
-                    className={`pairing-code-value ${
-                      isCodeFlashing ? "flashing" : ""
-                    }`}
-                  >
-                    {displayPairingCode.split("").map((digit, index) => (
-                      <span key={index} className="pairing-code-digit">
-                        {digit}
-                      </span>
-                    ))}
-                  </div>
-
-                  {/* Timer bar */}
-                  <div className="pairing-timer-container">
-                    <div
-                      className="pairing-timer-bar"
-                      style={{
-                        width: `${(codeTimeRemaining / 30) * 100}%`,
-                        backgroundColor:
-                          codeTimeRemaining <= 5 ? "#FF3B30" : "#f07167",
-                      }}
-                    />
-                  </div>
-                </div>
-              ) : (
-                <div className="pairing-code-generating">
-                  <div className="loading-spinner"></div>
-                  <div className="generating-text">Code genereren...</div>
-                </div>
-              )}
-            </div>
-
-            {pairingError && <p className="pairing-error">{pairingError}</p>}
-          </div>
-        </div>
-      </div>
+      <PairingScreen
+        displayPairingCode={displayPairingCode}
+        isCodeFlashing={isCodeFlashing}
+        codeTimeRemaining={codeTimeRemaining}
+        pairingError={pairingError}
+      />
     );
   }
 
@@ -945,200 +902,29 @@ function DisplayView() {
         color: settings.foregroundColor,
       }}
     >
-      {/* Fullscreen indicator */}
-      {!isFullscreen && fullscreenSupported && (
-        <div className="fullscreen-indicator">
-          <button onClick={requestFullscreen} className="fullscreen-btn">
-            <span>⛶</span> Volledig scherm
-          </button>
-        </div>
-      )}
-      <div className="display-content">
-        {/* Layout-specific display */}
-        {slideLayout === "side-by-side" && (
-          <>
-            {/* Left side - Image */}
-            <div className="display-left">
-              {slideType === "image" && currentSlide.imageUrl ? (
-                <div className="display-image-container">
-                  <img
-                    src={currentSlide.imageUrl}
-                    alt="Slide"
-                    className="display-image"
-                    style={{
-                      objectPosition: currentSlide.imagePosition || "center",
-                    }}
-                    onLoad={() => {
-                      // Throttle console logging to prevent spam
-                      if (Date.now() % 10000 < 100) {
-                        // Only log every ~10 seconds
-                        console.log(
-                          "Image loaded with position:",
-                          currentSlide.imagePosition || "center"
-                        );
-                      }
-                    }}
-                  />
-                </div>
-              ) : (
-                <div className="display-image-placeholder">
-                  <div className="placeholder-text">No Image</div>
-                </div>
-              )}
-            </div>
+      <FullscreenIndicator
+        isFullscreen={isFullscreen}
+        fullscreenSupported={fullscreenSupported}
+        requestFullscreen={requestFullscreen}
+      />
+      
+      <SlideDisplay
+        currentSlide={currentSlide}
+        slideType={slideType}
+        slideLayout={slideLayout}
+      />
 
-            {/* Right side - Text */}
-            <div className="display-right">
-              <div className="display-text-container">
-                {currentSlide.text ? (
-                  <div
-                    className="display-text"
-                    dangerouslySetInnerHTML={{
-                      __html: sanitizeHTMLContent(currentSlide.text),
-                    }}
-                  />
-                ) : (
-                  <div className="display-text-placeholder">
-                    <div className="placeholder-text">No Text Content</div>
-                  </div>
-                )}
-              </div>
-            </div>
-          </>
-        )}
+      <ProgressBar
+        currentSlide={currentSlide}
+        slideProgress={slideProgress}
+        getProgressBarHeight={getProgressBarHeight}
+      />
 
-        {slideLayout === "image-only" && (
-          <div className="display-full-image">
-            {slideType === "image" && currentSlide.imageUrl ? (
-              <div className="display-image-container-full">
-                <img
-                  src={currentSlide.imageUrl}
-                  alt="Slide"
-                  className="display-image-full"
-                  style={{
-                    objectPosition: currentSlide.imagePosition || "center",
-                  }}
-                  onLoad={() => {
-                    // Throttle console logging to prevent spam
-                    if (Date.now() % 10000 < 100) {
-                      // Only log every ~10 seconds
-                      console.log(
-                        "Image loaded with position:",
-                        currentSlide.imagePosition || "center"
-                      );
-                    }
-                  }}
-                />
-              </div>
-            ) : (
-              <div className="display-image-placeholder-full">
-                <div className="placeholder-text">No Image</div>
-              </div>
-            )}
-          </div>
-        )}
-
-        {slideLayout === "text-over-image" && (
-          <div className="display-text-over-image">
-            <div className="display-image-background">
-              {slideType === "image" && currentSlide.imageUrl ? (
-                <div className="display-image-container-overlay">
-                  <img
-                    src={currentSlide.imageUrl}
-                    alt="Slide"
-                    className="display-image-overlay"
-                    style={{
-                      objectPosition: currentSlide.imagePosition || "center",
-                    }}
-                    onLoad={() => {
-                      // Throttle console logging to prevent spam
-                      if (Date.now() % 10000 < 100) {
-                        // Only log every ~10 seconds
-                        console.log(
-                          "Image loaded with position:",
-                          currentSlide.imagePosition || "center"
-                        );
-                      }
-                    }}
-                  />
-                </div>
-              ) : (
-                <div className="display-image-placeholder-overlay">
-                  <div className="placeholder-text">No Image</div>
-                </div>
-              )}
-            </div>
-
-            <div className="display-text-overlay">
-              {currentSlide.text ? (
-                <div
-                  className="display-text-overlay-content"
-                  dangerouslySetInnerHTML={{
-                    __html: sanitizeHTMLContent(currentSlide.text),
-                  }}
-                />
-              ) : (
-                <div className="display-text-placeholder-overlay">
-                  <div className="placeholder-text">No Text Content</div>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
-        {slideLayout === "text-only" && (
-          <div className="display-text-only">
-            <div className="display-text-container-full">
-              {currentSlide.text ? (
-                <div
-                  className="display-text-full"
-                  dangerouslySetInnerHTML={{
-                    __html: sanitizeHTMLContent(currentSlide.text),
-                  }}
-                />
-              ) : (
-                <div className="display-text-placeholder-full">
-                  <div className="placeholder-text">No Text Content</div>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Progress bar - only show if showBar is true */}
-      {currentSlide?.showBar !== false && (
-        <div
-          className="display-progress-bar"
-          style={{ height: `${getProgressBarHeight()}px` }}
-        >
-          <div
-            className="display-progress-fill"
-            style={{ width: `${slideProgress}%` }}
-          />
-        </div>
-      )}
-
-      {/* Bottom bar with RSS feed and logo - only show if showBar is true */}
-      {currentSlide?.showBar !== false && (
-        <div
-          className="display-bottom-bar"
-          style={{
-            backgroundColor: settings.backgroundColor,
-            color: settings.foregroundColor,
-          }}
-        >
-          <div className="display-rss-feed">
-            <Feed feeds={feeds} settings={settings} />
-          </div>
-
-          {settings.logoUrl && (
-            <div className="display-bottom-logo">
-              <img src={settings.logoUrl} alt="Logo" className="bottom-logo" />
-            </div>
-          )}
-        </div>
-      )}
+      <BottomBar
+        currentSlide={currentSlide}
+        settings={settings}
+        feeds={feeds}
+      />
     </div>
   );
 }
