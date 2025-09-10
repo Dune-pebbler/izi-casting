@@ -416,9 +416,7 @@ function DisplayView() {
           let title = getTextContent([
             "title",
             "name", 
-            "dc\\:title",
-            "*[local-name()='title']",
-            "*[local-name()='name']"
+            "dc\\:title"
           ]);
 
           // Try different ways to get description (support CDATA and various formats)
@@ -426,10 +424,7 @@ function DisplayView() {
             "description",
             "summary",
             "content",
-            "dc\\:description",
-            "*[local-name()='description']",
-            "*[local-name()='summary']",
-            "*[local-name()='content']"
+            "dc\\:description"
           ]);
 
           // Clean up HTML tags from description
@@ -443,9 +438,7 @@ function DisplayView() {
           let link = getTextContent([
             "link",
             "guid",
-            "dc\\:identifier",
-            "*[local-name()='link']",
-            "*[local-name()='guid']"
+            "dc\\:identifier"
           ]);
           
           // Also try link href attribute
@@ -460,10 +453,7 @@ function DisplayView() {
             "published",
             "updated",
             "dc\\:date",
-            "lastBuildDate",
-            "*[local-name()='pubDate']",
-            "*[local-name()='published']",
-            "*[local-name()='updated']"
+            "lastBuildDate"
           ]);
 
           const feedItem = {
@@ -521,11 +511,14 @@ function DisplayView() {
     // Calculate reading time in seconds
     const readingTimeSeconds = (totalWords / wordsPerMinute) * 60;
     
-    // Set minimum duration of 3 seconds and maximum of 30 seconds
-    const minDuration = 3;
-    const maxDuration = 30;
+    // Make duration 50% longer by multiplying by 1.5
+    const extendedReadingTime = readingTimeSeconds * 1.5;
     
-    return Math.max(minDuration, Math.min(maxDuration, Math.ceil(readingTimeSeconds)));
+    // Set minimum duration of 3 seconds and maximum of 45 seconds (increased from 30 to accommodate 50% longer)
+    const minDuration = 3;
+    const maxDuration = 45;
+    
+    return Math.max(minDuration, Math.min(maxDuration, Math.ceil(extendedReadingTime)));
   }, []);
 
   // Calculate progress bar height based on duration
@@ -1520,8 +1513,10 @@ function DisplayView() {
                           if (isOverflowing) {
                             el.classList.add('scrolling-text');
                             
-                            // Calculate scroll distance to show full text (scroll the entire text width)
-                            const scrollDistance = textWidth + 50; // Full text width + some padding
+                            // Calculate scroll distance to show most of the text but stop 80vw earlier
+                            const viewportWidth = window.innerWidth;
+                            const stopEarlyDistance = viewportWidth * 0.8; // 80vw
+                            const scrollDistance = Math.max(textWidth - stopEarlyDistance, 0); // Don't scroll if text is shorter than 80vw
                             
                             // Use the feed item's actual display duration for the animation
                             const currentItem = rssFeed[currentFeedIndex];
