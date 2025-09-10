@@ -388,7 +388,6 @@ function FeedList() {
         {/* Feed Details */}
         <div className="feed-details">
           <div className="feed-url">
-            <span className="url-label">URL:</span>
             {editingUrl === feed.id ? (
               <div className="url-edit-container">
                 <input

@@ -68,7 +68,8 @@
     transform: translateX(-100%);
     width: $sidebar-width;
     padding: $spacing-md;
-
+    overflow: visible;
+    
     .sidebar-section {
       h2 {
         display: block;

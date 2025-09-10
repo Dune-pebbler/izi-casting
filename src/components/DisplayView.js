@@ -46,8 +46,6 @@ function DisplayView() {
   const [animationStep, setAnimationStep] = useState(0); // 0: initial, 1: text fade in, 2: code display
   // Refs to prevent unnecessary re-renders
   const hasInitializedRef = useRef(false);
-
-  console.log("DisplayView isPaired:", isPaired);
   
   // Utility function to clear invalid device ID
   const clearInvalidDeviceId = useCallback(() => {
@@ -60,24 +58,6 @@ function DisplayView() {
     return false;
   }, []);
 
-  // Fallback news items when RSS feed is not available
-  const fallbackNews = [
-    {
-      title: "Welcome to Izi Casting Display",
-      description:
-        "Your digital signage system is ready to display your content and news feeds.",
-    },
-    {
-      title: "System Status: Online",
-      description:
-        "All systems are running smoothly. Your displays are connected and active.",
-    },
-    {
-      title: "Content Management",
-      description:
-        "Use the admin panel to manage your slides, upload content, and configure settings.",
-    },
-  ];
 
   // Generate a unique pairing code
   const generatePairingCode = useCallback(() => {
@@ -293,9 +273,14 @@ function DisplayView() {
     }
   };
 
-  // Fetch RSS feed with debouncing
-  const fetchRssFeed = useCallback(async (url) => {
-    if (!url) return;
+  // Fetch RSS feed and return items (for multiple feeds support)
+  const fetchRssFeedItems = useCallback(async (url) => {
+    if (!url) {
+      console.warn("fetchRssFeedItems: No URL provided");
+      return [];
+    }
+
+    console.log(`fetchRssFeedItems: Starting fetch for URL: ${url}`);
 
     try {
       // Try multiple CORS proxies for better reliability
@@ -307,9 +292,11 @@ function DisplayView() {
 
       let feedData = null;
       let lastError = null;
+      let successfulProxy = null;
 
       for (const proxyUrl of proxies) {
         try {
+          console.log(`fetchRssFeedItems: Trying proxy: ${proxyUrl}`);
           const response = await fetch(proxyUrl, {
             method: "GET",
             headers: {
@@ -319,31 +306,55 @@ function DisplayView() {
           });
 
           if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
           }
 
           let data;
           if (proxyUrl.includes("allorigins.win")) {
             const jsonData = await response.json();
             data = jsonData.contents;
+            console.log(`fetchRssFeedItems: Got data from allorigins.win, length: ${data?.length || 0}`);
           } else {
             data = await response.text();
+            console.log(`fetchRssFeedItems: Got data from ${proxyUrl}, length: ${data?.length || 0}`);
           }
 
-          if (data) {
+          // Handle base64 data URLs (some proxies return data this way)
+          if (data && data.startsWith('data:application/rss+xml;')) {
+            console.log('fetchRssFeedItems: Detected base64 data URL, decoding...');
+            try {
+              const base64Data = data.split(',')[1];
+              const decodedData = atob(base64Data);
+              data = decodedData;
+              console.log(`fetchRssFeedItems: Decoded base64 data, new length: ${data.length}`);
+            } catch (decodeError) {
+              console.error('fetchRssFeedItems: Failed to decode base64 data:', decodeError);
+              throw new Error('Failed to decode base64 RSS data');
+            }
+          }
+
+          if (data && data.trim().length > 0) {
             feedData = data;
+            successfulProxy = proxyUrl;
+            console.log(`fetchRssFeedItems: Successfully fetched data from ${proxyUrl}`);
             break;
+          } else {
+            console.warn(`fetchRssFeedItems: Empty data from ${proxyUrl}`);
           }
         } catch (error) {
           lastError = error;
-          console.log(`Proxy ${proxyUrl} failed:`, error.message);
+          console.warn(`fetchRssFeedItems: Proxy ${proxyUrl} failed:`, error.message);
           continue;
         }
       }
 
       if (!feedData) {
+        console.error("fetchRssFeedItems: All proxies failed. Last error:", lastError);
         throw lastError || new Error("All proxies failed");
       }
+
+      console.log(`fetchRssFeedItems: Successfully fetched data from ${successfulProxy}, parsing XML...`);
+      console.log(`fetchRssFeedItems: XML content preview (first 200 chars):`, feedData.substring(0, 200));
 
       // Parse the XML
       const parser = new DOMParser();
@@ -352,32 +363,74 @@ function DisplayView() {
       // Check for parsing errors
       const parseError = xmlDoc.querySelector("parsererror");
       if (parseError) {
-        throw new Error("XML parsing failed");
+        console.error("fetchRssFeedItems: XML parsing failed. Parse error details:", parseError.textContent);
+        console.error("fetchRssFeedItems: Raw feed data (first 500 chars):", feedData.substring(0, 500));
+        throw new Error(`XML parsing failed: ${parseError.textContent}`);
       }
 
-      // Try different RSS/Atom selectors
+      // Try different RSS/Atom/RDF selectors
       let items = xmlDoc.querySelectorAll("item");
+      let feedType = "RSS 2.0";
+      
       if (items.length === 0) {
         items = xmlDoc.querySelectorAll("entry"); // Atom format
+        feedType = "Atom";
+        console.log(`fetchRssFeedItems: Found ${items.length} Atom entries`);
+      } else {
+        console.log(`fetchRssFeedItems: Found ${items.length} RSS 2.0 items`);
+      }
+
+      // Try RDF/RSS 1.0 format if no items found
+      if (items.length === 0) {
+        // Try different RDF selectors
+        items = xmlDoc.querySelectorAll("rdf\\:li, li, rdf\\:item, item"); // RDF/RSS 1.0 format
+        if (items.length > 0) {
+          feedType = "RDF/RSS 1.0";
+          console.log(`fetchRssFeedItems: Found ${items.length} RDF items`);
+        }
+      }
+
+      if (items.length === 0) {
+        console.warn("fetchRssFeedItems: No RSS items, Atom entries, or RDF items found in feed");
+        console.log("fetchRssFeedItems: Available elements in XML:", Array.from(xmlDoc.documentElement.children).map(el => el.tagName));
+        console.log("fetchRssFeedItems: Root element:", xmlDoc.documentElement.tagName);
+        console.log("fetchRssFeedItems: Root namespace:", xmlDoc.documentElement.namespaceURI);
+      } else {
+        console.log(`fetchRssFeedItems: Successfully detected ${feedType} format with ${items.length} items`);
       }
 
       const feedItems = Array.from(items)
-        .map((item) => {
-          // Try different ways to get title
-          let title = item.querySelector("title")?.textContent || "";
-          if (!title) {
-            title = item.querySelector("name")?.textContent || "";
-          }
+        .map((item, index) => {
+          // Helper function to get text content from various selectors
+          const getTextContent = (selectors) => {
+            for (const selector of selectors) {
+              const element = item.querySelector(selector);
+              if (element && element.textContent) {
+                return element.textContent;
+              }
+            }
+            return "";
+          };
 
-          // Try different ways to get description
-          let description =
-            item.querySelector("description")?.textContent || "";
-          if (!description) {
-            description = item.querySelector("summary")?.textContent || "";
-          }
-          if (!description) {
-            description = item.querySelector("content")?.textContent || "";
-          }
+          // Try different ways to get title (support CDATA and various formats)
+          let title = getTextContent([
+            "title",
+            "name", 
+            "dc\\:title",
+            "*[local-name()='title']",
+            "*[local-name()='name']"
+          ]);
+
+          // Try different ways to get description (support CDATA and various formats)
+          let description = getTextContent([
+            "description",
+            "summary",
+            "content",
+            "dc\\:description",
+            "*[local-name()='description']",
+            "*[local-name()='summary']",
+            "*[local-name()='content']"
+          ]);
 
           // Clean up HTML tags from description
           if (description) {
@@ -386,165 +439,93 @@ function DisplayView() {
             description = tempDiv.textContent || tempDiv.innerText || "";
           }
 
-          // Try different ways to get link
-          let link = item.querySelector("link")?.textContent || "";
+          // Try different ways to get link (support various link formats)
+          let link = getTextContent([
+            "link",
+            "guid",
+            "dc\\:identifier",
+            "*[local-name()='link']",
+            "*[local-name()='guid']"
+          ]);
+          
+          // Also try link href attribute
           if (!link) {
-            link = item.querySelector("link")?.getAttribute("href") || "";
+            const linkElement = item.querySelector("link");
+            link = linkElement?.getAttribute("href") || "";
           }
 
-          // Try different ways to get date
-          let pubDate = item.querySelector("pubDate")?.textContent || "";
-          if (!pubDate) {
-            pubDate = item.querySelector("published")?.textContent || "";
-          }
-          if (!pubDate) {
-            pubDate = item.querySelector("updated")?.textContent || "";
-          }
+          // Try different ways to get date (support various date formats)
+          let pubDate = getTextContent([
+            "pubDate",
+            "published",
+            "updated",
+            "dc\\:date",
+            "lastBuildDate",
+            "*[local-name()='pubDate']",
+            "*[local-name()='published']",
+            "*[local-name()='updated']"
+          ]);
 
-          return {
+          const feedItem = {
             title: title.trim(),
             description: description.trim(),
             link: link.trim(),
             pubDate: pubDate.trim(),
           };
+
+          if (index < 3) { // Log first 3 items for debugging
+            console.log(`fetchRssFeedItems: Item ${index + 1}:`, {
+              title: feedItem.title.substring(0, 50) + (feedItem.title.length > 50 ? '...' : ''),
+              hasDescription: !!feedItem.description,
+              hasLink: !!feedItem.link
+            });
+          }
+
+          return feedItem;
         })
         .filter((item) => item.title || item.description); // Only include items with content
 
-      // Throttle console logging to prevent spam
-      if (Date.now() % 10000 < 100) {
-        // Only log every ~10 seconds
-        console.log("Parsed RSS feed items:", feedItems.length);
-      }
-      setRssFeed(feedItems);
-      setCurrentFeedIndex(0);
+      console.log(`fetchRssFeedItems: Successfully parsed ${feedItems.length} feed items from ${url}`);
+      
+      // Log detailed content of each feed item
+      feedItems.forEach((item, index) => {
+        console.log(`📄 Feed Item ${index + 1} Content:`, {
+          title: item.title,
+          titleLength: item.title?.length || 0,
+          description: item.description,
+          descriptionLength: item.description?.length || 0,
+          link: item.link,
+          pubDate: item.pubDate
+        });
+      });
+      
+      return feedItems;
     } catch (error) {
-      console.error("Error fetching RSS feed:", error);
-      setRssFeed([]);
+      console.error(`fetchRssFeedItems: Error fetching RSS feed from ${url}:`, error);
+      console.error("fetchRssFeedItems: Error details:", {
+        message: error.message,
+        stack: error.stack,
+        url: url
+      });
+      return [];
     }
   }, []);
 
-  // Fetch RSS feed and return items (for multiple feeds support)
-  const fetchRssFeedItems = useCallback(async (url) => {
-    if (!url) return [];
-
-    try {
-      // Try multiple CORS proxies for better reliability
-      const proxies = [
-        `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`,
-        `https://cors-anywhere.herokuapp.com/${url}`,
-        `https://thingproxy.freeboard.io/fetch/${url}`,
-      ];
-
-      let feedData = null;
-      let lastError = null;
-
-      for (const proxyUrl of proxies) {
-        try {
-          const response = await fetch(proxyUrl, {
-            method: "GET",
-            headers: {
-              Accept: "application/rss+xml, application/xml, text/xml, */*",
-              "User-Agent": "Mozilla/5.0 (compatible; RSSReader/1.0)",
-            },
-          });
-
-          if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
-          }
-
-          let data;
-          if (proxyUrl.includes("allorigins.win")) {
-            const jsonData = await response.json();
-            data = jsonData.contents;
-          } else {
-            data = await response.text();
-          }
-
-          if (data) {
-            feedData = data;
-            break;
-          }
-        } catch (error) {
-          lastError = error;
-          console.log(`Proxy ${proxyUrl} failed:`, error.message);
-          continue;
-        }
-      }
-
-      if (!feedData) {
-        throw lastError || new Error("All proxies failed");
-      }
-
-      // Parse the XML
-      const parser = new DOMParser();
-      const xmlDoc = parser.parseFromString(feedData, "text/xml");
-
-      // Check for parsing errors
-      const parseError = xmlDoc.querySelector("parsererror");
-      if (parseError) {
-        throw new Error("XML parsing failed");
-      }
-
-      // Try different RSS/Atom selectors
-      let items = xmlDoc.querySelectorAll("item");
-      if (items.length === 0) {
-        items = xmlDoc.querySelectorAll("entry"); // Atom format
-      }
-
-      const feedItems = Array.from(items)
-        .map((item) => {
-          // Try different ways to get title
-          let title = item.querySelector("title")?.textContent || "";
-          if (!title) {
-            title = item.querySelector("name")?.textContent || "";
-          }
-
-          // Try different ways to get description
-          let description =
-            item.querySelector("description")?.textContent || "";
-          if (!description) {
-            description = item.querySelector("summary")?.textContent || "";
-          }
-          if (!description) {
-            description = item.querySelector("content")?.textContent || "";
-          }
-
-          // Clean up HTML tags from description
-          if (description) {
-            const tempDiv = document.createElement("div");
-            tempDiv.innerHTML = description;
-            description = tempDiv.textContent || tempDiv.innerText || "";
-          }
-
-          // Try different ways to get link
-          let link = item.querySelector("link")?.textContent || "";
-          if (!link) {
-            link = item.querySelector("link")?.getAttribute("href") || "";
-          }
-
-          // Try different ways to get date
-          let pubDate = item.querySelector("pubDate")?.textContent || "";
-          if (!pubDate) {
-            pubDate = item.querySelector("published")?.textContent || "";
-          }
-          if (!pubDate) {
-            pubDate = item.querySelector("updated")?.textContent || "";
-          }
-
-          return {
-            title: title.trim(),
-            description: description.trim(),
-            link: link.trim(),
-            pubDate: pubDate.trim(),
-          };
-        })
-        .filter((item) => item.title || item.description); // Only include items with content
-
-      return feedItems;
-    } catch (error) {
-      console.error("Error fetching RSS feed:", error);
-      return [];
-    }
+  // Calculate reading time based on content length
+  const calculateReadingTime = useCallback((title, description) => {
+    const wordsPerMinute = 200; // Average reading speed
+    const titleWords = (title || '').split(/\s+/).length;
+    const descriptionWords = (description || '').split(/\s+/).length;
+    const totalWords = titleWords + descriptionWords;
+    
+    // Calculate reading time in seconds
+    const readingTimeSeconds = (totalWords / wordsPerMinute) * 60;
+    
+    // Set minimum duration of 3 seconds and maximum of 30 seconds
+    const minDuration = 3;
+    const maxDuration = 30;
+    
+    return Math.max(minDuration, Math.min(maxDuration, Math.ceil(readingTimeSeconds)));
   }, []);
 
   // Calculate progress bar height based on duration
@@ -564,8 +545,6 @@ function DisplayView() {
 
     return Math.min(calculatedHeight, maxHeight);
   }, [slides, currentSlideIndex]);
-
-
 
   // Fullscreen change event listeners and keyboard shortcuts
   useEffect(() => {
@@ -889,43 +868,113 @@ function DisplayView() {
 
   // Load RSS feeds when feeds change with debouncing
   useEffect(() => {
+    console.log('Feed loading effect triggered. Total feeds:', feeds.length);
+    
     if (feeds.length > 0) {
       const timeoutId = setTimeout(() => {
-        // Fetch all enabled feeds
-        const feedPromises = feeds.map(async feed => {
-          const items = await fetchRssFeedItems(feed.url);
-          return { ...feed, items: items || [] };
+        // Fetch all enabled and visible feeds in order
+        const enabledFeeds = feeds.filter(feed => 
+          feed.isEnabled !== false && 
+          feed.isVisible !== false && 
+          feed.url && 
+          feed.url.trim() !== ''
+        );
+        
+        console.log('Processing enabled feeds:', enabledFeeds.map(f => ({ id: f.id, name: f.name, url: f.url })));
+        
+        const feedPromises = enabledFeeds.map(async (feed, index) => {
+          console.log(`Processing feed ${index + 1}/${enabledFeeds.length}: ${feed.name} (${feed.url})`);
+          try {
+            const items = await fetchRssFeedItems(feed.url);
+            console.log(`Feed ${feed.name} returned ${items.length} items`);
+            
+            // Calculate dynamic duration for each item based on content length
+            const itemsWithDuration = (items || []).map(item => ({
+              ...item,
+              dynamicDuration: calculateReadingTime(item.title, item.description),
+              feedId: feed.id,
+              feedName: feed.name,
+              feedDuration: feed.duration || 10 // Use feed's configured duration as fallback
+            }));
+            
+            // Log processed items to check for content changes
+            console.log(`🔄 Processed ${feed.name} items:`, itemsWithDuration.map(item => ({
+              title: item.title,
+              titleLength: item.title?.length || 0,
+              description: item.description,
+              descriptionLength: item.description?.length || 0,
+              dynamicDuration: item.dynamicDuration
+            })));
+            
+            return { ...feed, items: itemsWithDuration };
+          } catch (error) {
+            console.error(`Error processing feed ${feed.name} (${feed.url}):`, error);
+            return { ...feed, items: [] };
+          }
         });
         
         Promise.all(feedPromises).then(feedResults => {
-          // Combine all feed items
+          // Combine all feed items while preserving order
           const allItems = feedResults.flatMap(result => result.items);
+          const totalFeeds = feedResults.length;
+          const feedsWithItems = feedResults.filter(result => result.items.length > 0).length;
+          
+          console.log(`Feed loading complete: ${allItems.length} total items from ${feedsWithItems}/${totalFeeds} feeds`);
+          
+          // Log final RSS feed content to check for truncation
+          console.log(`📋 Final RSS Feed Array:`, allItems.map((item, index) => ({
+            index: index,
+            feedName: item.feedName,
+            title: item.title,
+            titleLength: item.title?.length || 0,
+            description: item.description,
+            descriptionLength: item.description?.length || 0,
+            dynamicDuration: item.dynamicDuration
+          })));
+          
+          if (allItems.length === 0) {
+            console.warn('No feed items loaded. Check feed URLs and network connectivity.');
+          }
+          
           setRssFeed(allItems);
           setCurrentFeedIndex(0);
         }).catch(error => {
-          console.error('Error fetching multiple feeds:', error);
+          console.error('Error in Promise.all for multiple feeds:', error);
           setRssFeed([]);
         });
       }, 1000); // Debounce for 1 second
 
       return () => clearTimeout(timeoutId);
     } else {
+      console.log('No feeds configured, clearing RSS feed');
       setRssFeed([]);
     }
-  }, [feeds, fetchRssFeedItems]);
+  }, [feeds, fetchRssFeedItems, calculateReadingTime]);
 
-  // Rotate through RSS feed items or fallback news
+  // Rotate through RSS feed items with dynamic duration
   useEffect(() => {
-    const itemsToRotate = rssFeed.length > 0 ? rssFeed : fallbackNews;
-    if (itemsToRotate.length === 0) return;
+    if (rssFeed.length === 0) return;
 
-    const interval = setInterval(() => {
-      setCurrentFeedIndex((prevIndex) =>
-        prevIndex === itemsToRotate.length - 1 ? 0 : prevIndex + 1
-      );
-    }, 5000); // Change every 5 seconds
+    let currentIndex = 0;
+    
+    const rotateFeeds = () => {
+      const currentItem = rssFeed[currentIndex];
+      const duration = (currentItem.dynamicDuration || currentItem.feedDuration || 10) * 1000;
 
-    return () => clearInterval(interval);
+      console.log(`Feed item "${currentItem?.title || 'No title'}" will display for ${duration/1000} seconds`);
+
+      // Update the current feed index for display
+      setCurrentFeedIndex(currentIndex);
+
+      // Set up next rotation
+      setTimeout(() => {
+        currentIndex = (currentIndex + 1) % rssFeed.length;
+        rotateFeeds();
+      }, duration);
+    };
+
+    // Start the rotation
+    rotateFeeds();
   }, [rssFeed]);
 
   // Flatten all slides from all playlists into a single array
@@ -982,57 +1031,55 @@ function DisplayView() {
   useEffect(() => {
     if (slides.length === 0) return;
 
-    const currentSlide = slides[currentSlideIndex];
-    const slideDuration = (currentSlide?.duration || 5) * 1000; // Convert to milliseconds
+    let currentIndex = 0;
+    
+    const rotateSlides = () => {
+      const currentSlide = slides[currentIndex];
+      const slideDuration = (currentSlide?.duration || 5) * 1000; // Convert to milliseconds
 
-    // Throttle console logging to prevent spam
-    if (Date.now() % 5000 < 100) {
-      // Only log every ~5 seconds
-      console.log(
-        "Slide timing - Current slide:",
-        currentSlide?.name,
-        "Duration:",
-        currentSlide?.duration,
-        "Calculated duration (ms):",
-        slideDuration
-      );
-    }
+      // Throttle console logging to prevent spam
+      if (Date.now() % 5000 < 100) {
+        // Only log every ~5 seconds
+        console.log(
+          "Slide timing - Current slide:",
+          currentSlide?.name,
+          "Duration:",
+          currentSlide?.duration,
+          "Calculated duration (ms):",
+          slideDuration
+        );
+      }
 
-    const interval = setInterval(() => {
-      setCurrentSlideIndex((prevIndex) =>
-        prevIndex === slides.length - 1 ? 0 : prevIndex + 1
-      );
-    }, slideDuration);
+      // Update the current slide index for display and ref for progress tracking
+      setCurrentSlideIndex(currentIndex);
+      currentSlideRef.current = currentIndex;
 
-    return () => clearInterval(interval);
-  }, [slides, currentSlideIndex, slides.length]);
+      // Set up next rotation
+      setTimeout(() => {
+        currentIndex = (currentIndex + 1) % slides.length;
+        rotateSlides();
+      }, slideDuration);
+    };
 
-  // Progress tracking effect
+    // Start the rotation
+    rotateSlides();
+  }, [slides]);
+
+  // Progress tracking effect - now uses a ref to track current slide
+  const currentSlideRef = useRef(0);
+  
   useEffect(() => {
     if (slides.length === 0) return;
 
-    const currentSlide = slides[currentSlideIndex];
-    const slideDuration = (currentSlide?.duration || 5) * 1000; // Convert to milliseconds
     const progressInterval = 100; // Update progress every 100ms
-
-    // Throttle console logging to prevent spam
-    if (Date.now() % 5000 < 100) {
-      // Only log every ~5 seconds
-      console.log(
-        "Progress tracking - Slide:",
-        currentSlide?.name,
-        "Duration:",
-        currentSlide?.duration,
-        "Progress duration (ms):",
-        slideDuration
-      );
-    }
-    setSlideProgress(0); // Reset progress when slide changes
+    setSlideProgress(0); // Reset progress when slides change
 
     const progressIntervalId = setInterval(() => {
       setSlideProgress((prevProgress) => {
-        const newProgress =
-          prevProgress + (progressInterval / slideDuration) * 100;
+        const currentSlide = slides[currentSlideRef.current];
+        const slideDuration = (currentSlide?.duration || 5) * 1000;
+        
+        const newProgress = prevProgress + (progressInterval / slideDuration) * 100;
 
         // If we reach 100%, reset to 0 for single slides or let it stay at 100% for multiple slides
         if (newProgress >= 100) {
@@ -1048,7 +1095,7 @@ function DisplayView() {
     }, progressInterval);
 
     return () => clearInterval(progressIntervalId);
-  }, [slides, currentSlideIndex, slides.length]);
+  }, [slides]);
 
   // Cleanup effect to prevent memory leaks
   useEffect(() => {
@@ -1103,6 +1150,7 @@ function DisplayView() {
     generateDisplayPairingCode,
     dispatch,
   ]);
+
   // Generate or get device ID on component mount
   useEffect(() => {
     if (hasInitializedRef.current) return; // Prevent multiple initializations
@@ -1426,23 +1474,118 @@ function DisplayView() {
           }}
         >
           <div className="display-rss-feed">
-            {rssFeed.length > 0 || !settings.feedUrl ? (
+            {rssFeed.length > 0 ? (
               <div className="rss-item">
+                {rssFeed[currentFeedIndex]?.feedName && (
+                  <div className="rss-feed-name">
+                    {rssFeed[currentFeedIndex].feedName}
+                  </div>
+                )}
                 <div className="rss-title">
-                  {rssFeed.length > 0
-                    ? rssFeed[currentFeedIndex]?.title || "No title"
-                    : fallbackNews[currentFeedIndex % fallbackNews.length]
-                        ?.title}
+                  {(() => {
+                    const currentItem = rssFeed[currentFeedIndex];
+                    if (currentItem) {
+                      console.log(`🎬 Currently Displaying Feed Item:`, {
+                        index: currentFeedIndex,
+                        feedName: currentItem.feedName,
+                        title: currentItem.title,
+                        titleLength: currentItem.title?.length || 0,
+                        description: currentItem.description,
+                        descriptionLength: currentItem.description?.length || 0,
+                        dynamicDuration: currentItem.dynamicDuration
+                      });
+                    }
+                    return currentItem?.title || "No title";
+                  })()}
                 </div>
-                <div className="rss-description">
-                  {rssFeed.length > 0
-                    ? rssFeed[currentFeedIndex]?.description || "No description"
-                    : fallbackNews[currentFeedIndex % fallbackNews.length]
-                        ?.description}
+                <div className="rss-description-container">
+                  <div 
+                    className="rss-description"
+                    ref={(el) => {
+                      if (el && rssFeed[currentFeedIndex]?.description) {
+                        // Use requestAnimationFrame to defer the measurement to avoid render loops
+                        requestAnimationFrame(() => {
+                          // Temporarily remove line clamp to measure full text width
+                          const originalStyle = el.style.cssText;
+                          el.style.webkitLineClamp = 'unset';
+                          el.style.display = 'block';
+                          el.style.whiteSpace = 'nowrap';
+                          el.style.overflow = 'visible';
+                          
+                          // Check if text overflows the container
+                          const containerWidth = el.parentElement.clientWidth;
+                          const textWidth = el.scrollWidth;
+                          const isOverflowing = textWidth > containerWidth;
+                          
+                          if (isOverflowing) {
+                            el.classList.add('scrolling-text');
+                            
+                            // Calculate scroll distance to show full text (scroll the entire text width)
+                            const scrollDistance = textWidth + 50; // Full text width + some padding
+                            
+                            // Use the feed item's actual display duration for the animation
+                            const currentItem = rssFeed[currentFeedIndex];
+                            const feedDuration = currentItem?.dynamicDuration || 10; // Use the calculated duration
+                            const animationDuration = feedDuration * 1000; // Convert to milliseconds
+                            
+                            // Create and apply the animation directly via JavaScript
+                            const keyframes = [
+                              { transform: 'translateX(0)', offset: 0 },
+                              { transform: 'translateX(0)', offset: 0.1 }, // Stay at start for 10% of duration
+                              { transform: `translateX(-${scrollDistance}px)`, offset: 0.9 }, // Scroll for 80% of duration
+                              { transform: `translateX(-${scrollDistance}px)`, offset: 1 } // Stay at end for 10% of duration
+                            ];
+                            
+                            const animationOptions = {
+                              duration: animationDuration,
+                              easing: 'linear',
+                              fill: 'forwards'
+                            };
+                            
+                            // Check if animation is already running for this feed item
+                            const existingAnimations = el.getAnimations();
+                            const isAlreadyAnimating = existingAnimations.some(anim => 
+                              anim.playState === 'running' && 
+                              anim.effect && 
+                              anim.effect.getKeyframes().some(kf => 
+                                kf.transform && kf.transform.includes(`translateX(-${scrollDistance}px)`)
+                              )
+                            );
+                            
+                            if (!isAlreadyAnimating) {
+                              // Stop any existing animation
+                              el.getAnimations().forEach(anim => anim.cancel());
+                              
+                              // Add a small delay to prevent jump on re-render
+                              setTimeout(() => {
+                                // Start the new animation
+                                el.animate(keyframes, animationOptions);
+                              }, 100);
+                            }
+                            
+                            console.log(`🎬 Scrolling animation started:`, {
+                              scrollDistance: `${scrollDistance}px`,
+                              duration: `${animationDuration}ms`,
+                              feedDuration: `${feedDuration}s`
+                            });
+                          } else {
+                            el.classList.remove('scrolling-text');
+                            // Stop any existing animation
+                            el.getAnimations().forEach(anim => anim.cancel());
+                          }
+                          
+                          // Restore original style
+                          el.style.cssText = originalStyle;
+                        });
+                      }
+                    }}
+                  >
+                    {rssFeed[currentFeedIndex]?.description || "No description"}
+                  </div>
                 </div>
               </div>
             ) : (
-              <div className="rss-placeholder">Loading RSS feed...</div>
+              <div className="rss-placeholder">No RSS feeds configured</div>
             )}
           </div>
 
