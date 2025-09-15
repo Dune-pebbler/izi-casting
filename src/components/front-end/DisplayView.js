@@ -653,6 +653,7 @@ function DisplayView() {
             slide.isVisible &&
             ((slide.type === "text" && slide.text && slide.text.trim()) ||
               (slide.type === "image" && slide.imageUrl) ||
+              (slide.type === "video" && slide.videoUrl) ||
               (!slide.type && slide.text && slide.text.trim())) // Backward compatibility
         );
 
@@ -668,6 +669,34 @@ function DisplayView() {
       return acc;
     }, []);
 
+    // Enhanced debugging for slide processing
+    console.log("🎬 Slide processing debug:");
+    console.log("📊 Total playlists:", playlists.length);
+    playlists.forEach((playlist, index) => {
+      console.log(`📁 Playlist ${index + 1}:`, {
+        id: playlist.id,
+        name: playlist.name,
+        isEnabled: playlist.isEnabled,
+        slidesCount: playlist.slides?.length || 0
+      });
+      
+      if (playlist.slides) {
+        playlist.slides.forEach((slide, slideIndex) => {
+          console.log(`  📄 Slide ${slideIndex + 1}:`, {
+            id: slide.id,
+            name: slide.name,
+            type: slide.type,
+            isVisible: slide.isVisible,
+            hasText: !!slide.text,
+            hasImageUrl: !!slide.imageUrl,
+            hasVideoUrl: !!slide.videoUrl,
+            layout: slide.layout,
+            duration: slide.duration
+          });
+        });
+      }
+    });
+
     // Throttle console logging to prevent spam
     if (Date.now() % 10000 < 100) {
       // Only log every ~10 seconds
@@ -675,8 +704,10 @@ function DisplayView() {
         "All flattened slides with positions:",
         allSlides.map((s) => ({
           id: s.id,
+          type: s.type,
           imagePosition: s.imagePosition,
           duration: s.duration,
+          hasVideoUrl: !!s.videoUrl
         }))
       );
     }

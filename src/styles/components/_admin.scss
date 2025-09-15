@@ -67,6 +67,7 @@
     border-bottom: none;
     margin-bottom: 0;
     border-radius: $border-radius-lg $border-radius-lg 0 0;
+    background-color: #fafbfb;
   }
 }
 
@@ -75,7 +76,6 @@
   justify-content: space-between;
   align-items: center;
   padding: $spacing-md;
-  background-color: $surface;
   border-radius: $border-radius-lg;
   cursor: pointer;
   transition: $transition-base;
@@ -725,7 +725,6 @@
   &:hover {
     border-color: $primary;
     background-color: rgba($primary, 0.05);
-    border-style: solid;
   }
 
   &:active {

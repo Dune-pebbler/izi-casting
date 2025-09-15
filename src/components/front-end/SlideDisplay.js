@@ -1,12 +1,28 @@
 import React from "react";
 import { sanitizeHTMLContent } from "../../utils/sanitize";
 import TextPagination from "./TextPagination";
+import VideoPlayer from "./VideoPlayer";
 import { getTextPaginationConfig } from "../../config/textPagination";
 
 function SlideDisplay({ currentSlide, slideType, slideLayout }) {
   // Get configuration for the current layout
   const textConfig = getTextPaginationConfig(slideLayout);
   const shouldUsePagination = textConfig !== null;
+
+  // Debug logging for slide display
+  console.log("🎥 SlideDisplay render:", {
+    currentSlide: currentSlide ? {
+      id: currentSlide.id,
+      name: currentSlide.name,
+      type: currentSlide.type,
+      layout: currentSlide.layout,
+      hasText: !!currentSlide.text,
+      hasImageUrl: !!currentSlide.imageUrl,
+      hasVideoUrl: !!currentSlide.videoUrl
+    } : null,
+    slideType,
+    slideLayout
+  });
 
   if (!currentSlide) {
     return (
@@ -184,6 +200,23 @@ function SlideDisplay({ currentSlide, slideType, slideLayout }) {
               </div>
             )}
           </div>
+        </div>
+      )}
+
+      {slideLayout === "video" && (
+        <div className="display-video">
+          {currentSlide.videoUrl ? (
+            <VideoPlayer
+              videoUrl={currentSlide.videoUrl}
+              autoplay={true}
+              loop={true}
+              muted={true}
+            />
+          ) : (
+            <div className="display-video-placeholder">
+              <div className="placeholder-text">No Video URL</div>
+            </div>
+          )}
         </div>
       )}
     </div>

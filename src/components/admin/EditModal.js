@@ -5,6 +5,7 @@ import LayoutSelector from "./modal/LayoutSelector";
 import ImageUpload from "./modal/ImageUpload";
 import PositionSelector from "./modal/PositionSelector";
 import TextEditor from "./modal/TextEditor";
+import VideoUrlInput from "./modal/VideoUrlInput";
 
 function EditModal({
   slide,
@@ -16,6 +17,7 @@ function EditModal({
   slideName,
   slideDuration,
   showBar,
+  videoUrl,
   onClose,
   onSave,
   onDelete,
@@ -26,6 +28,7 @@ function EditModal({
   onSlideNameChange,
   onDurationChange,
   onShowBarChange,
+  onVideoUrlChange,
 }) {
   const renderLayoutContent = () => {
     switch (slideLayout) {
@@ -107,6 +110,20 @@ function EditModal({
               <TextEditor
                 content={modalTinyMCEContent}
                 onContentChange={onContentChange}
+              />
+            </div>
+          </div>
+        );
+
+      case "video":
+        return (
+          <div className="modal-video">
+            <div className="video-input-section">
+              <VideoUrlInput
+                videoUrl={videoUrl}
+                onVideoUrlChange={onVideoUrlChange}
+                onRemoveVideo={() => onVideoUrlChange('')}
+                onDurationChange={onDurationChange}
               />
             </div>
           </div>

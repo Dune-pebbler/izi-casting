@@ -40,6 +40,7 @@ function AdminView() {
   const [modalSlideName, setModalSlideName] = useState('');
   const [modalSlideDuration, setModalSlideDuration] = useState(5);
   const [modalShowBar, setModalShowBar] = useState(true);
+  const [modalVideoUrl, setModalVideoUrl] = useState('');
   const [currentEditingPlaylistId, setCurrentEditingPlaylistId] = useState(null);
 
   // Playlist editing state
@@ -275,6 +276,7 @@ function AdminView() {
     setModalSlideName(slide.name || '');
     setModalSlideDuration(slide.duration || 5);
     setModalShowBar(slide.showBar !== false);
+    setModalVideoUrl(slide.videoUrl || '');
   };
 
   const closeEditModal = () => {
@@ -349,12 +351,26 @@ function AdminView() {
               text: sanitizeHTMLContent(modalTinyMCEContent),
               tinyMCEContent: modalTinyMCEContent,
               imageUrl: modalImageUrl,
-              type: modalImageUrl ? 'image' : 'text',
+              videoUrl: modalVideoUrl,
+              type: modalVideoUrl ? 'video' : (modalImageUrl ? 'image' : 'text'),
               imagePosition: imagePosition,
               layout: slideLayout,
               duration: modalSlideDuration === '' ? 5 : modalSlideDuration,
               showBar: modalShowBar
             };
+
+            // Debug logging for slide updates
+            console.log("💾 Saving slide with data:", {
+              id: updatedSlide.id,
+              name: updatedSlide.name,
+              type: updatedSlide.type,
+              layout: updatedSlide.layout,
+              hasVideoUrl: !!updatedSlide.videoUrl,
+              videoUrl: updatedSlide.videoUrl,
+              hasImageUrl: !!updatedSlide.imageUrl,
+              hasText: !!updatedSlide.text,
+              isVisible: updatedSlide.isVisible
+            });
             return updatedSlide;
           }
           return slide;
@@ -708,6 +724,8 @@ function AdminView() {
           onSlideNameChange={setModalSlideName}
           onDurationChange={setModalSlideDuration}
           onShowBarChange={setModalShowBar}
+          videoUrl={modalVideoUrl}
+          onVideoUrlChange={setModalVideoUrl}
         />
       )}
 

@@ -3,7 +3,8 @@ import {
   LayoutGrid, 
   Image, 
   FileText, 
-  Type 
+  Type,
+  Play
 } from 'lucide-react';
 
 function LayoutSelector({ currentLayout, onLayoutChange }) {
@@ -31,6 +32,12 @@ function LayoutSelector({ currentLayout, onLayoutChange }) {
       label: 'Text Only',
       icon: FileText,
       title: 'Text Only'
+    },
+    {
+      id: 'video',
+      label: 'Video',
+      icon: Play,
+      title: 'Video Player (YouTube/Vimeo)'
     }
   ];
 

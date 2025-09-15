@@ -562,54 +562,35 @@ function Feed({ feeds, settings }) {
                     // Calculate scroll distance to show the full text
                     const scrollDistance = textWidth - containerWidth;
                     
-                    // Use the feed item's actual display duration for the animation
-                    const feedDuration = currentItem?.dynamicDuration || 10; // Use the calculated duration
-                    const animationDuration = feedDuration * 1000; // Convert to milliseconds
+                    // Use a consistent scroll speed for all content
+                    const consistentScrollSpeed = 150; // pixels per second - consistent for all content
                     
-                    // Calculate scroll speed to fit within the available time
-                    // Reserve 10% of total time for pauses (5% at start, 5% at end)
-                    const availableScrollTime = animationDuration * 0.9; // 90% of total time for scrolling
-                    const actualScrollSpeed = scrollDistance / (availableScrollTime / 1000); // pixels per second
+                    // Calculate the time needed to scroll the full distance at consistent speed
+                    const scrollTime = (scrollDistance / consistentScrollSpeed) * 1000; // convert to milliseconds
                     
-                    // Use the actual scroll speed, but don't go faster than 200px/s for readability
-                    const maxScrollSpeed = 200; // pixels per second
-                    const finalScrollSpeed = Math.min(actualScrollSpeed, maxScrollSpeed);
+                    // Add pause time at start and end (2 seconds total: 1s start + 1s end)
+                    const pauseTime = 1000; // 1 second pause at start and end
+                    const totalAnimationDuration = scrollTime + (pauseTime * 2);
                     
-                    // Calculate actual scroll time based on final speed
-                    const totalScrollTime = (scrollDistance / finalScrollSpeed) * 1000; // convert to ms
-                    const pauseTime = Math.max(0, (animationDuration - totalScrollTime) / 2); // split pause time between start and end, ensure non-negative
-                    
-                    // Create and apply the animation directly via JavaScript
-                    const startPauseRatio = Math.min(pauseTime / animationDuration, 0.3); // Cap at 30% to prevent issues
-                    const endPauseRatio = Math.max((animationDuration - pauseTime) / animationDuration, startPauseRatio + 0.1); // Ensure it's after startPauseRatio
-                    
-                    // Ensure offsets are monotonically non-decreasing with proper validation
-                    const offset1 = Math.min(startPauseRatio, 0.2); // Cap at 20% for start pause
-                    const offset2 = Math.max(offset1 + 0.1, Math.min(endPauseRatio, 0.8)); // Ensure proper spacing
-                    const offset3 = 1; // Always end at 100%
-                    
-                    // Validate that offsets are monotonically non-decreasing
-                    let keyframes;
-                    if (offset1 >= offset2 || offset2 >= offset3) {
-                      console.warn('Invalid keyframe offsets detected, using fallback values:', { offset1, offset2, offset3 });
-                      // Use safe fallback values
-                      keyframes = [
-                        { transform: 'translateX(0)', offset: 0 },
-                        { transform: 'translateX(0)', offset: 0.1 },
-                        { transform: `translateX(-${scrollDistance}px)`, offset: 0.9 },
-                        { transform: `translateX(-${scrollDistance}px)`, offset: 1 }
-                      ];
-                    } else {
-                      keyframes = [
-                        { transform: 'translateX(0)', offset: 0 },
-                        { transform: 'translateX(0)', offset: offset1 }, // Pause at start
-                        { transform: `translateX(-${scrollDistance}px)`, offset: offset2 }, // Scroll to end
-                        { transform: `translateX(-${scrollDistance}px)`, offset: offset3 } // Pause at end
-                      ];
+                    // Update the feed item's duration to match the calculated time
+                    if (currentItem) {
+                      currentItem.dynamicDuration = Math.max(totalAnimationDuration / 1000, 5); // minimum 5 seconds
                     }
                     
+                    // Create and apply the animation with consistent timing
+                    const startPauseRatio = pauseTime / totalAnimationDuration;
+                    const endPauseRatio = (totalAnimationDuration - pauseTime) / totalAnimationDuration;
+                    
+                    // Create keyframes with consistent timing
+                    const keyframes = [
+                      { transform: 'translateX(0)', offset: 0 },
+                      { transform: 'translateX(0)', offset: startPauseRatio },
+                      { transform: `translateX(-${scrollDistance}px)`, offset: endPauseRatio },
+                      { transform: `translateX(-${scrollDistance}px)`, offset: 1 }
+                    ];
+                    
                     const animationOptions = {
-                      duration: animationDuration,
+                      duration: totalAnimationDuration,
                       easing: 'linear',
                       fill: 'forwards'
                     };
@@ -625,7 +606,7 @@ function Feed({ feeds, settings }) {
                     );
                     
                     // Also check if we've already set up animation for this specific item
-                    const animationKey = `${currentItem?.title}-${scrollDistance}-${animationDuration}`;
+                    const animationKey = `${currentItem?.title}-${scrollDistance}-${totalAnimationDuration}`;
                     const hasAnimated = el.dataset.animationKey === animationKey;
                     
                     if (!isAlreadyAnimating && !hasAnimated) {
@@ -644,11 +625,9 @@ function Feed({ feeds, settings }) {
                     
                     console.log(`🎬 Scrolling animation started:`, {
                       scrollDistance: `${scrollDistance}px`,
-                      duration: `${animationDuration}ms`,
-                      feedDuration: `${feedDuration}s`,
-                      actualScrollSpeed: `${actualScrollSpeed.toFixed(1)}px/s`,
-                      finalScrollSpeed: `${finalScrollSpeed.toFixed(1)}px/s`,
-                      totalScrollTime: `${totalScrollTime}ms`,
+                      duration: `${totalAnimationDuration}ms`,
+                      feedDuration: `${currentItem?.dynamicDuration || 10}s`,
+                      scrollSpeed: `${consistentScrollSpeed}px/s`,
                       pauseTime: `${pauseTime}ms`
                     });
                   } else {
