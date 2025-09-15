@@ -5,7 +5,7 @@ import { Toaster } from 'sonner';
 import { store } from './store/store';
 import LoginView from './components/LoginView';
 import ProtectedRoute from './components/ProtectedRoute';
-import AdminView from './components/AdminView';
+import AdminView from './components/admin/AdminView';
 import DisplayView from './components/front-end/DisplayView';
 import FeedTest from './components/front-end/FeedTest';
 import './styles/main.scss';

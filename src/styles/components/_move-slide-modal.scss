@@ -1,0 +1,223 @@
+// Move Slide Modal Styles
+.move-slide-modal {
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 99999;
+    isolation: isolate;
+  }
+
+  .modal {
+    background-color: $surface;
+    border-radius: $border-radius-lg;
+    width: 90%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow: hidden;
+    animation: modalSlideIn 0.2s ease-out;
+  }
+
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: $spacing-lg;
+    border-bottom: 1px solid $border-color;
+    background-color: $surface;
+
+    h3 {
+      margin: 0;
+      color: $text-primary;
+      font-size: $font-size-lg;
+      font-weight: $font-weight-semibold;
+    }
+
+    .modal-close-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      background: none;
+      border: none;
+      border-radius: $border-radius-sm;
+      color: $text-secondary;
+      cursor: pointer;
+      transition: $transition-base;
+
+      &:hover {
+        background-color: $gray-100;
+        color: $text-primary;
+      }
+
+      &:active {
+        transform: scale(0.95);
+      }
+    }
+  }
+
+  .modal-content {
+    padding: $spacing-lg;
+
+    .modal-description {
+      margin: 0 0 $spacing-lg 0;
+      color: $text-secondary;
+      font-size: $font-size-base;
+      line-height: 1.5;
+
+      strong {
+        color: $text-primary;
+        font-weight: $font-weight-medium;
+      }
+    }
+
+    .form-group {
+      margin-bottom: $spacing-lg;
+
+      label {
+        display: block;
+        margin-bottom: $spacing-sm;
+        color: $text-primary;
+        font-size: $font-size-sm;
+        font-weight: $font-weight-medium;
+      }
+
+      .form-select {
+        width: 100%;
+        padding: $spacing-md;
+        border: 1px solid $border-color;
+        border-radius: $border-radius-sm;
+        background-color: white;
+        color: $text-primary;
+        font-size: $font-size-base;
+        font-family: inherit;
+        cursor: pointer;
+        transition: $transition-base;
+
+        &:focus {
+          outline: none;
+          border-color: $primary;
+          box-shadow: 0 0 0 3px rgba($primary, 0.1);
+        }
+
+        &:hover {
+          border-color: $gray-400;
+        }
+
+        option {
+          padding: $spacing-sm;
+          color: $text-primary;
+        }
+      }
+    }
+  }
+
+  .modal-actions {
+    display: flex;
+    gap: $spacing-md;
+    padding: $spacing-lg;
+    border-top: 1px solid $border-color;
+    background-color: $gray-50;
+    justify-content: flex-end;
+
+    .btn {
+      padding: $spacing-sm $spacing-lg;
+      border-radius: $border-radius-sm;
+      font-size: $font-size-sm;
+      font-weight: $font-weight-medium;
+      cursor: pointer;
+      transition: $transition-base;
+      border: 1px solid transparent;
+      min-width: 80px;
+
+      &.btn-secondary {
+        background-color: white;
+        color: $text-secondary;
+        border-color: $border-color;
+
+        &:hover {
+          background-color: $gray-50;
+          color: $text-primary;
+          border-color: $gray-300;
+        }
+
+        &:active {
+          transform: translateY(1px);
+        }
+      }
+
+      &.btn-primary {
+        background-color: $primary;
+        color: white;
+        border-color: $primary;
+
+        &:hover {
+          background-color: darken($primary, 5%);
+          border-color: darken($primary, 5%);
+        }
+
+        &:active {
+          transform: translateY(1px);
+        }
+
+        &:disabled {
+          background-color: $gray-300;
+          border-color: $gray-300;
+          color: $gray-500;
+          cursor: not-allowed;
+          transform: none;
+
+          &:hover {
+            background-color: $gray-300;
+            border-color: $gray-300;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Animation for modal appearance
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .move-slide-modal {
+    .modal {
+      width: 95%;
+      margin: $spacing-md;
+    }
+
+    .modal-header,
+    .modal-content,
+    .modal-actions {
+      padding: $spacing-md;
+    }
+
+    .modal-actions {
+      flex-direction: column-reverse;
+      gap: $spacing-sm;
+
+      .btn {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  }
+}

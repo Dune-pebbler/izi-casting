@@ -1,5 +1,5 @@
 import React, { useMemo, useCallback } from 'react';
-import { Copy, GripVertical, Eye, EyeOff, Plus } from 'lucide-react';
+import { Copy, GripVertical, Eye, EyeOff, Plus, ChevronsUpDown } from 'lucide-react';
 import { sanitizeHTMLContent } from '../../utils/sanitize';
 import {
   DndContext,
@@ -31,7 +31,8 @@ function SlideList({
   uploadingImage,
   onCopySlide,
   onReorderSlides,
-  onAddSlide
+  onAddSlide,
+  onMoveSlide
 }) {
   // Function to strip HTML tags and get clean text
   const stripHtml = (html) => {
@@ -236,6 +237,16 @@ function SlideList({
             </div>
           </div>
           <div className="slide-header-actions">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onMoveSlide(slide);
+              }}
+              className="move-slide-btn"
+              title="Move to other playlist"
+            >
+              <ChevronsUpDown size={16} />
+            </button>
             <button
               onClick={(e) => {
                 e.stopPropagation();

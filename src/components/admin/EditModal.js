@@ -118,8 +118,9 @@ function EditModal({
   };
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+    <div className="slide-edit-modal">
+      <div className="modal-overlay" onClick={onClose}>
+        <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <div className="modal-header-left">
             <div className="slide-name-input-container">
@@ -199,6 +200,7 @@ function EditModal({
         </div>
 
         <div className="modal-body">{renderLayoutContent()}</div>
+        </div>
       </div>
     </div>
   );
