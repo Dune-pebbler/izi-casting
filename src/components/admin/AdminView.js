@@ -67,10 +67,16 @@ function AdminView() {
     let totalDuration = 0;
 
     playlists.forEach(playlist => {
-      if (playlist.slides) {
-        totalSlides += playlist.slides.length;
-        activeSlides += playlist.slides.filter(slide => slide.isVisible !== false).length;
-        totalDuration += calculatePlaylistDuration(playlist.slides);
+      const isPlaylistEnabled = playlist.isEnabled !== false;
+      
+      if (playlist.slides && isPlaylistEnabled) {
+        const playlistSlides = playlist.slides.length;
+        const playlistActiveSlides = playlist.slides.filter(slide => slide.isVisible !== false).length;
+        const playlistDuration = calculatePlaylistDuration(playlist.slides);
+        
+        totalSlides += playlistSlides;
+        activeSlides += playlistActiveSlides;
+        totalDuration += playlistDuration;
       }
     });
 
@@ -539,7 +545,7 @@ function AdminView() {
   const reorderSlides = async (playlistId, newSlides) => {
     const updatedPlaylists = playlists.map(playlist => {
       if (playlist.id === playlistId) {
-        const totalDuration = newSlides.reduce((total, slide) => total + (slide.duration || 5), 0);
+        const totalDuration = calculatePlaylistDuration(newSlides);
         return { ...playlist, slides: newSlides, totalDuration };
       }
       return playlist;
@@ -624,17 +630,17 @@ function AdminView() {
       <div className="admin-main-content">
         <div className="admin-header-section">
           <div className="admin-header-content">
-            <h1 className="admin-header">Afspeellijsten ({playlists.length})</h1>
+            <h1 className="admin-header">Afspeellijsten</h1>
             <div className="admin-stats">
               <div className="admin-slide-count">
                 <span className="admin-stat-value">
-                  <Monitor size={14} />
+                  <Monitor size={16} />
                   <span>{totalStats.activeSlides}/{totalStats.totalSlides}</span>
                 </span>
               </div>
               <div className="admin-duration">
                 <span className="admin-stat-value">
-                  <Clock size={14} />
+                  <Clock size={16} />
                   <span>{totalStats.totalDuration}s</span>
                 </span>
               </div>

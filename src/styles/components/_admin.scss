@@ -28,6 +28,7 @@
 .admin-header-content {
   display: flex;
   align-items: center;
+  gap:16px;
 }
 
 .admin-stats {
@@ -46,9 +47,9 @@
     display: flex;
     align-items: center;
     gap: $spacing-xs;
-    font-size: $font-size-base;
+    font-size: $font-size-lg;
     color: $primary;
-    font-weight: $font-weight-medium;
+    font-weight: $font-weight-bold;
   }
 }
 
@@ -58,9 +59,14 @@
   background-color: $surface;
   border: 1px solid $border-color;
   position: relative;
-  
+
   &:last-child {
     margin-bottom: 0;
+  }
+  &.expanded {
+    border-bottom: none;
+    margin-bottom: 0;
+    border-radius: $border-radius-lg $border-radius-lg 0 0;
   }
 }
 
@@ -78,11 +84,8 @@
   &:hover {
     background-color: $gray-50;
   }
-  
+
   // Remove border-bottom when playlist is expanded
-  .admin-content-wrapper.expanded & {
-    border-bottom: none;
-  }
 }
 
 .playlist-header-left {
@@ -340,7 +343,7 @@
   &.enabled {
     color: $success;
     border-color: $success;
-    
+
     &:hover {
       background-color: rgba($success, 0.1);
     }
@@ -348,7 +351,7 @@
 
   &.disabled {
     color: $gray-400;
-    
+
     &:hover {
       color: $text-secondary;
     }
@@ -476,7 +479,7 @@
 /* Advanced Settings Styles */
 .advanced-settings-toggle {
   margin: $spacing-md 0;
-  
+
   .advanced-settings-btn {
     display: flex;
     align-items: center;
@@ -491,21 +494,21 @@
     color: $text-primary;
     font-size: $font-size-sm;
     font-weight: 500;
-    
+
     &:hover {
       background-color: $gray-50;
       border-color: $gray-300;
     }
-    
+
     &:active {
       background-color: $gray-100;
     }
-    
+
     svg {
       color: $gray-500;
       flex-shrink: 0;
     }
-    
+
     span {
       flex: 1;
       text-align: left;
@@ -519,14 +522,14 @@
   background-color: $gray-50;
   border-radius: $border-radius-md;
   border: 1px solid $border-color;
-  
+
   .settings-section {
     margin-bottom: $spacing-lg;
-    
+
     &:last-child {
       margin-bottom: 0;
     }
-    
+
     h3 {
       margin: 0 0 $spacing-sm 0;
       font-size: $font-size-sm;
@@ -543,18 +546,18 @@
     flex-direction: column;
     align-items: center;
     gap: $spacing-sm;
-    
+
     .logo-image-container {
       position: relative;
       display: inline-block;
-      
+
       .logo-image {
         max-width: 120px;
         max-height: 80px;
         border-radius: $border-radius-sm;
         border: 1px solid $border-color;
       }
-      
+
       .logo-remove-btn {
         position: absolute;
         top: -8px;
@@ -570,69 +573,69 @@
         align-items: center;
         justify-content: center;
         transition: $transition-base;
-        
+
         &:hover {
           background-color: $red-600;
         }
-        
+
         &:disabled {
           opacity: 0.5;
           cursor: not-allowed;
         }
       }
     }
-    
+
     .logo-change-text {
       color: $primary;
       font-size: $font-size-xs;
       cursor: pointer;
       text-decoration: underline;
-      
+
       &:hover {
         color: $primary-dark;
       }
-      
+
       input {
         display: none;
       }
     }
   }
-  
+
   .logo-upload-placeholder {
     border: 2px dashed $border-color;
     border-radius: $border-radius-md;
     padding: $spacing-lg;
     text-align: center;
     transition: $transition-base;
-    
+
     &:hover {
       border-color: $primary;
       background-color: rgba($primary, 0.05);
     }
-    
+
     .logo-upload-label {
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: $spacing-sm;
       cursor: pointer;
-      
+
       .upload-icon {
         color: $gray-400;
         width: 48px;
         height: 48px;
       }
-      
+
       span {
         color: $text-secondary;
         font-size: $font-size-sm;
       }
-      
+
       input {
         display: none;
       }
     }
-    
+
     .upload-status {
       margin-top: $spacing-sm;
       color: $text-secondary;
@@ -647,7 +650,7 @@
   display: flex;
   flex-direction: column;
   gap: $spacing-md;
-  
+
   .color-input-group {
     label {
       display: block;
@@ -656,12 +659,12 @@
       font-weight: 500;
       color: $text-primary;
     }
-    
+
     .color-input-wrapper {
       display: flex;
       gap: $spacing-sm;
       align-items: center;
-      
+
       .color-picker {
         width: 40px;
         height: 40px;
@@ -669,17 +672,17 @@
         border-radius: $border-radius-sm;
         cursor: pointer;
         padding: 0;
-        
+
         &::-webkit-color-swatch-wrapper {
           padding: 0;
         }
-        
+
         &::-webkit-color-swatch {
           border: none;
           border-radius: $border-radius-sm;
         }
       }
-      
+
       .color-text-input {
         flex: 1;
         padding: $spacing-xs $spacing-sm;
@@ -687,7 +690,7 @@
         border-radius: $border-radius-sm;
         font-size: $font-size-xs;
         font-family: $font-family-mono;
-        
+
         &:focus {
           outline: none;
           border-color: $primary;
@@ -703,12 +706,11 @@
   margin-top: $spacing-lg;
   padding-top: $spacing-md;
   border-top: 1px solid $border-color;
-  
+
   .btn {
     width: 100%;
   }
 }
-
 
 /* Add Playlist Button Styles */
 .add-playlist-button {
@@ -758,7 +760,6 @@
     }
   }
 }
-
 
 /* Small button styles */
 .btn-small {

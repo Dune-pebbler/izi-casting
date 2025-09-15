@@ -95,8 +95,7 @@ const PlaylistHeader = ({
               <span className="duration-value">
                 <Clock size={14} />
                 <span>
-                  {playlist.totalDuration ||
-                    calculatePlaylistDuration(playlist.slides)}
+                  {calculatePlaylistDuration(playlist.slides)}
                   s
                 </span>
               </span>

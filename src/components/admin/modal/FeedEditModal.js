@@ -62,7 +62,8 @@ function FeedEditModal({ feed, onClose, onSave }) {
     { name: 'CNN', url: 'https://rss.cnn.com/rss/edition.rss' },
     { name: 'Reuters', url: 'https://feeds.reuters.com/reuters/topNews' },
     { name: 'NPR News', url: 'https://feeds.npr.org/1001/rss.xml' },
-    { name: 'The Guardian', url: 'https://www.theguardian.com/world/rss' }
+    { name: 'The Guardian', url: 'https://www.theguardian.com/world/rss' },
+    { name: 'Informanagement (JSON)', url: 'https://nl.informanagement.com/rss/customfeed.aspx?command=rss&mode=xml&nr=24&length=200&sjabloon=confianza052025' }
   ];
 
   return (

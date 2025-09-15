@@ -127,140 +127,238 @@ function Feed({ feeds, settings }) {
         throw new Error("Received HTML instead of RSS/XML feed. Please check the URL.");
       }
 
-      // Parse the XML
-      const parser = new DOMParser();
-      const xmlDoc = parser.parseFromString(feedData, "text/xml");
-
-      // Check for parsing errors
-      const parseError = xmlDoc.querySelector("parsererror");
-      if (parseError) {
-        console.error("fetchRssFeedItems: XML parsing failed. Parse error details:", parseError.textContent);
-        console.error("fetchRssFeedItems: Raw feed data (first 500 chars):", feedData.substring(0, 500));
-        throw new Error(`XML parsing failed: ${parseError.textContent}`);
-      }
-
-      // Try different RSS/Atom/RDF selectors
-      let items = xmlDoc.querySelectorAll("item");
-      let feedType = "RSS 2.0";
+      // Check if the feed data is JSON or XML
+      let feedItems = [];
       
-      if (items.length === 0) {
-        items = xmlDoc.querySelectorAll("entry"); // Atom format
-        feedType = "Atom";
-        console.log(`fetchRssFeedItems: Found ${items.length} Atom entries`);
-      } else {
-        console.log(`fetchRssFeedItems: Found ${items.length} RSS 2.0 items`);
-      }
-
-      // Try RDF/RSS 1.0 format if no items found
-      if (items.length === 0) {
-        // Try different RDF selectors
-        items = xmlDoc.querySelectorAll("rdf\\:li, li, rdf\\:item, item"); // RDF/RSS 1.0 format
-        if (items.length > 0) {
-          feedType = "RDF/RSS 1.0";
-          console.log(`fetchRssFeedItems: Found ${items.length} RDF items`);
-        }
-      }
-
-      if (items.length === 0) {
-        console.warn("fetchRssFeedItems: No RSS items, Atom entries, or RDF items found in feed");
-        console.log("fetchRssFeedItems: Available elements in XML:", Array.from(xmlDoc.documentElement.children).map(el => el.tagName));
-        console.log("fetchRssFeedItems: Root element:", xmlDoc.documentElement.tagName);
-        console.log("fetchRssFeedItems: Root namespace:", xmlDoc.documentElement.namespaceURI);
-      } else {
-        console.log(`fetchRssFeedItems: Successfully detected ${feedType} format with ${items.length} items`);
-      }
-
-      const feedItems = Array.from(items)
-        .map((item, index) => {
-          // Helper function to get text content from various selectors
-          const getTextContent = (selectors) => {
-            for (const selector of selectors) {
-              const element = item.querySelector(selector);
-              if (element && element.textContent) {
-                return element.textContent;
+      try {
+        // Try to parse as JSON first
+        const jsonData = JSON.parse(feedData);
+        console.log("fetchRssFeedItems: Successfully detected JSON feed format");
+        
+        if (Array.isArray(jsonData)) {
+          feedItems = jsonData.map((item, index) => {
+            const feedItem = item.item || item; // Handle both {item: {...}} and direct item structure
+            
+            // Extract title - handle CDATA sections
+            let title = "";
+            if (feedItem.title) {
+              if (typeof feedItem.title === 'string') {
+                title = feedItem.title;
+              } else if (feedItem.title['#cdata-section']) {
+                title = feedItem.title['#cdata-section'];
+              } else if (feedItem.title.textContent) {
+                title = feedItem.title.textContent;
               }
             }
-            return "";
-          };
+            
+            // Extract description - handle CDATA sections
+            let description = "";
+            if (feedItem.description) {
+              if (typeof feedItem.description === 'string') {
+                description = feedItem.description;
+              } else if (feedItem.description['#cdata-section']) {
+                description = feedItem.description['#cdata-section'];
+              } else if (feedItem.description.textContent) {
+                description = feedItem.description.textContent;
+              }
+            }
+            
+            // Clean up HTML tags from description
+            if (description) {
+              const tempDiv = document.createElement("div");
+              tempDiv.innerHTML = description;
+              description = tempDiv.textContent || tempDiv.innerText || "";
+            }
+            
+            // Extract link - handle CDATA sections
+            let link = "";
+            if (feedItem.link) {
+              if (typeof feedItem.link === 'string') {
+                link = feedItem.link;
+              } else if (feedItem.link['#cdata-section']) {
+                link = feedItem.link['#cdata-section'];
+              } else if (feedItem.link.textContent) {
+                link = feedItem.link.textContent;
+              }
+            }
+            
+            // Extract category - handle CDATA sections
+            let category = "";
+            if (feedItem.category) {
+              if (typeof feedItem.category === 'string') {
+                category = feedItem.category;
+              } else if (feedItem.category['#cdata-section']) {
+                category = feedItem.category['#cdata-section'];
+              } else if (feedItem.category.textContent) {
+                category = feedItem.category.textContent;
+              }
+            }
+            
+            // Extract date
+            const pubDate = feedItem.pubDate || feedItem.date || "";
+            
+            const parsedItem = {
+              title: title.trim(),
+              description: description.trim(),
+              link: link.trim(),
+              category: category.trim(),
+              pubDate: pubDate.trim(),
+            };
 
-          // Try different ways to get title (support CDATA and various formats)
-          let title = getTextContent([
-            "title",
-            "name", 
-            "dc\\:title"
-          ]);
+            if (index < 3) { // Log first 3 items for debugging
+              console.log(`fetchRssFeedItems: JSON Item ${index + 1}:`, {
+                title: parsedItem.title.substring(0, 50) + (parsedItem.title.length > 50 ? '...' : ''),
+                hasDescription: !!parsedItem.description,
+                hasLink: !!parsedItem.link,
+                category: parsedItem.category
+              });
+            }
 
-          // Try different ways to get description (support CDATA and various formats)
-          let description = getTextContent([
-            "description",
-            "summary",
-            "content",
-            "dc\\:description"
-          ]);
+            return parsedItem;
+          }).filter((item) => item.title || item.description); // Only include items with content
+        }
+        
+        console.log(`fetchRssFeedItems: Successfully parsed ${feedItems.length} JSON feed items from ${url}`);
+        return feedItems;
+        
+      } catch (jsonError) {
+        console.log("fetchRssFeedItems: Not JSON format, trying XML parsing...");
+        
+        // Parse the XML
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(feedData, "text/xml");
 
-          // Clean up HTML tags from description
-          if (description) {
-            const tempDiv = document.createElement("div");
-            tempDiv.innerHTML = description;
-            description = tempDiv.textContent || tempDiv.innerText || "";
+        // Check for parsing errors
+        const parseError = xmlDoc.querySelector("parsererror");
+        if (parseError) {
+          console.error("fetchRssFeedItems: XML parsing failed. Parse error details:", parseError.textContent);
+          console.error("fetchRssFeedItems: Raw feed data (first 500 chars):", feedData.substring(0, 500));
+          throw new Error(`XML parsing failed: ${parseError.textContent}`);
+        }
+
+        // Try different RSS/Atom/RDF selectors
+        let items = xmlDoc.querySelectorAll("item");
+        let feedType = "RSS 2.0";
+        
+        if (items.length === 0) {
+          items = xmlDoc.querySelectorAll("entry"); // Atom format
+          feedType = "Atom";
+          console.log(`fetchRssFeedItems: Found ${items.length} Atom entries`);
+        } else {
+          console.log(`fetchRssFeedItems: Found ${items.length} RSS 2.0 items`);
+        }
+
+        // Try RDF/RSS 1.0 format if no items found
+        if (items.length === 0) {
+          // Try different RDF selectors
+          items = xmlDoc.querySelectorAll("rdf\\:li, li, rdf\\:item, item"); // RDF/RSS 1.0 format
+          if (items.length > 0) {
+            feedType = "RDF/RSS 1.0";
+            console.log(`fetchRssFeedItems: Found ${items.length} RDF items`);
           }
+        }
 
-          // Try different ways to get link (support various link formats)
-          let link = getTextContent([
-            "link",
-            "guid",
-            "dc\\:identifier"
-          ]);
-          
-          // Also try link href attribute
-          if (!link) {
-            const linkElement = item.querySelector("link");
-            link = linkElement?.getAttribute("href") || "";
-          }
+        if (items.length === 0) {
+          console.warn("fetchRssFeedItems: No RSS items, Atom entries, or RDF items found in feed");
+          console.log("fetchRssFeedItems: Available elements in XML:", Array.from(xmlDoc.documentElement.children).map(el => el.tagName));
+          console.log("fetchRssFeedItems: Root element:", xmlDoc.documentElement.tagName);
+          console.log("fetchRssFeedItems: Root namespace:", xmlDoc.documentElement.namespaceURI);
+        } else {
+          console.log(`fetchRssFeedItems: Successfully detected ${feedType} format with ${items.length} items`);
+        }
 
-          // Try different ways to get date (support various date formats)
-          let pubDate = getTextContent([
-            "pubDate",
-            "published",
-            "updated",
-            "dc\\:date",
-            "lastBuildDate"
-          ]);
+        const feedItems = Array.from(items)
+          .map((item, index) => {
+            // Helper function to get text content from various selectors
+            const getTextContent = (selectors) => {
+              for (const selector of selectors) {
+                const element = item.querySelector(selector);
+                if (element && element.textContent) {
+                  return element.textContent;
+                }
+              }
+              return "";
+            };
 
-          const feedItem = {
-            title: title.trim(),
-            description: description.trim(),
-            link: link.trim(),
-            pubDate: pubDate.trim(),
-          };
+            // Try different ways to get title (support CDATA and various formats)
+            let title = getTextContent([
+              "title",
+              "name", 
+              "dc\\:title"
+            ]);
 
-          if (index < 3) { // Log first 3 items for debugging
-            console.log(`fetchRssFeedItems: Item ${index + 1}:`, {
-              title: feedItem.title.substring(0, 50) + (feedItem.title.length > 50 ? '...' : ''),
-              hasDescription: !!feedItem.description,
-              hasLink: !!feedItem.link
-            });
-          }
+            // Try different ways to get description (support CDATA and various formats)
+            let description = getTextContent([
+              "description",
+              "summary",
+              "content",
+              "dc\\:description"
+            ]);
 
-          return feedItem;
-        })
-        .filter((item) => item.title || item.description); // Only include items with content
+            // Clean up HTML tags from description
+            if (description) {
+              const tempDiv = document.createElement("div");
+              tempDiv.innerHTML = description;
+              description = tempDiv.textContent || tempDiv.innerText || "";
+            }
 
-      console.log(`fetchRssFeedItems: Successfully parsed ${feedItems.length} feed items from ${url}`);
-      
-      // Log detailed content of each feed item
-      feedItems.forEach((item, index) => {
-        console.log(`📄 Feed Item ${index + 1} Content:`, {
-          title: item.title,
-          titleLength: item.title?.length || 0,
-          description: item.description,
-          descriptionLength: item.description?.length || 0,
-          link: item.link,
-          pubDate: item.pubDate
+            // Try different ways to get link (support various link formats)
+            let link = getTextContent([
+              "link",
+              "guid",
+              "dc\\:identifier"
+            ]);
+            
+            // Also try link href attribute
+            if (!link) {
+              const linkElement = item.querySelector("link");
+              link = linkElement?.getAttribute("href") || "";
+            }
+
+            // Try different ways to get date (support various date formats)
+            let pubDate = getTextContent([
+              "pubDate",
+              "published",
+              "updated",
+              "dc\\:date",
+              "lastBuildDate"
+            ]);
+
+            const feedItem = {
+              title: title.trim(),
+              description: description.trim(),
+              link: link.trim(),
+              pubDate: pubDate.trim(),
+            };
+
+            if (index < 3) { // Log first 3 items for debugging
+              console.log(`fetchRssFeedItems: Item ${index + 1}:`, {
+                title: feedItem.title.substring(0, 50) + (feedItem.title.length > 50 ? '...' : ''),
+                hasDescription: !!feedItem.description,
+                hasLink: !!feedItem.link
+              });
+            }
+
+            return feedItem;
+          })
+          .filter((item) => item.title || item.description); // Only include items with content
+
+        console.log(`fetchRssFeedItems: Successfully parsed ${feedItems.length} feed items from ${url}`);
+        
+        // Log detailed content of each feed item
+        feedItems.forEach((item, index) => {
+          console.log(`📄 Feed Item ${index + 1} Content:`, {
+            title: item.title,
+            titleLength: item.title?.length || 0,
+            description: item.description,
+            descriptionLength: item.description?.length || 0,
+            link: item.link,
+            pubDate: item.pubDate
+          });
         });
-      });
-      
-      return feedItems;
+        
+        return feedItems;
+      }
     } catch (error) {
       console.error(`fetchRssFeedItems: Error fetching RSS feed from ${url}:`, error);
       console.error("fetchRssFeedItems: Error details:", {

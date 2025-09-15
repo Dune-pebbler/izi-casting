@@ -17,13 +17,17 @@ export const usePlaylistManager = () => {
       if (doc.exists()) {
         const data = doc.data();
         if (data.playlists) {
-          // Migrate existing playlists to include new properties
-          const migratedPlaylists = data.playlists.map(playlist => ({
-            ...playlist,
-            isEnabled: playlist.isEnabled !== false, // Default to true if not set
-            repeatCount: playlist.repeatCount || 1,
-            totalDuration: playlist.totalDuration || calculatePlaylistDuration(playlist.slides || [])
-          }));
+          // Migrate existing playlists to include new properties and recalculate duration
+          const migratedPlaylists = data.playlists.map(playlist => {
+            const recalculatedDuration = calculatePlaylistDuration(playlist.slides || []);
+            
+            return {
+              ...playlist,
+              isEnabled: playlist.isEnabled !== false, // Default to true if not set
+              repeatCount: playlist.repeatCount || 1,
+              totalDuration: recalculatedDuration // Always recalculate with new logic
+            };
+          });
           setPlaylists(migratedPlaylists);
         } else if (data.slides) {
           // Migrate old single playlist structure to new multiple playlists structure
@@ -48,8 +52,21 @@ export const usePlaylistManager = () => {
     return () => unsubscribe();
   }, []);
 
+
   const calculatePlaylistDuration = (slides) => {
-    return slides.reduce((total, slide) => total + (slide.duration || 5), 0);
+    const totalDuration = slides.reduce((total, slide) => {
+      const slideDuration = slide.duration || 5;
+      const isVisible = slide.isVisible !== false; // Default to true if not set
+      
+      // Only add duration if slide is visible
+      if (isVisible) {
+        return total + slideDuration;
+      } else {
+        return total;
+      }
+    }, 0);
+    
+    return totalDuration;
   };
 
   const savePlaylistsToFirebase = async (playlistsToSave) => {
