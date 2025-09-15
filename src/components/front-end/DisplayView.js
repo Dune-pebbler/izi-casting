@@ -39,6 +39,7 @@ function DisplayView() {
     backgroundColor: "#FAFAFA",
     foregroundColor: "#212121",
     feedUrl: "", // Keep for backward compatibility
+    showClock: true, // Default to showing clock
   });
   const [feeds, setFeeds] = useState([]);
   // Fullscreen state
@@ -52,6 +53,7 @@ function DisplayView() {
   const isPairedRef = useRef(isPaired);
   const isGeneratingCodeRef = useRef(isGeneratingCode);
   const displayPairingCodeRef = useRef(displayPairingCode);
+  const isGeneratingCodeInternalRef = useRef(false);
   
   // Utility function to clear invalid device ID
   const clearInvalidDeviceId = useCallback(() => {
@@ -64,8 +66,9 @@ function DisplayView() {
     return false;
   }, []);
 
-  // console.log("reload triggered"); // Removed to prevent console spam
-  // Generate a unique pairing code
+  console .log("DisplayView component rendered");
+  // Component render - progress updates now use refs to prevent re-renders
+  
   const generatePairingCode = useCallback(() => {
     const code = Math.floor(10000 + Math.random() * 90000).toString();
     console.log("Generated pairing code:", code);
@@ -147,12 +150,13 @@ function DisplayView() {
   // Generate and save display pairing code
   const generateDisplayPairingCode = useCallback(async () => {
     // Use a ref to prevent multiple simultaneous generations
-    if (hasInitializedRef.current && isGeneratingCode) {
-      console.log("Already generating code, skipping...");
+    if (isGeneratingCodeInternalRef.current) {
+      console.log("Already generating code internally, skipping...");
       return; // Prevent multiple simultaneous generations
     }
 
     console.log("Starting code generation...");
+    isGeneratingCodeInternalRef.current = true;
     dispatch(setIsGeneratingCode(true));
     dispatch(clearPairingError());
 
@@ -248,6 +252,7 @@ function DisplayView() {
       console.log(
         "Code generation finished, setting isGeneratingCode to false"
       );
+      isGeneratingCodeInternalRef.current = false;
       dispatch(setIsGeneratingCode(false));
     }
   }, [generatePairingCode, dispatch]);
@@ -296,23 +301,6 @@ function DisplayView() {
     }
   };
 
-  // Calculate progress bar height based on duration
-  const getProgressBarHeight = useCallback(() => {
-    if (slides.length === 0) return 3;
-
-    const currentSlide = slides[currentSlideIndex];
-    const duration = currentSlide?.duration || 5;
-
-    // Scale height based on duration
-    // Base height: 3px for 5 seconds
-    // Scale up for longer durations, cap at 20px for very long durations
-    const baseHeight = 3;
-    const maxHeight = 20;
-    const scaleFactor = Math.min(duration / 5, 10); // Scale up to 10x for very long durations
-    const calculatedHeight = baseHeight * scaleFactor;
-
-    return Math.min(calculatedHeight, maxHeight);
-  }, [slides, currentSlideIndex]);
 
   // Fullscreen change event listeners and keyboard shortcuts
   useEffect(() => {
@@ -427,16 +415,20 @@ function DisplayView() {
 
     document.body.appendChild(refreshIndicator);
 
-    // Remove the indicator after animation
+    // Remove the indicator after animation and then force reload
     setTimeout(() => {
       if (refreshIndicator.parentNode) {
         refreshIndicator.parentNode.removeChild(refreshIndicator);
       }
+      // Force browser reload after showing the feedback
+      console.log("Force reloading browser...");
+      window.location.reload();
     }, 2000);
   }, []);
 
   // Listen for device pairing status changes in real-time
   useEffect(() => {
+    console.log("🎧 Device pairing listener useEffect triggered");
     const currentDeviceId = deviceId || localStorage.getItem("izi_device_id");
     if (!currentDeviceId || currentDeviceId.trim() === '') {
       console.log("No valid device ID available for listener");
@@ -501,10 +493,11 @@ function DisplayView() {
       console.log("Cleaning up device pairing listener");
       unsubscribeDevice();
     };
-  }, [deviceId, dispatch]); // Removed isPaired and isGeneratingCode from dependencies to prevent loops
+  }, [deviceId]); // Only depend on deviceId, not dispatch to prevent loops
 
   // Listen for device commands (refresh, etc.)
   useEffect(() => {
+    console.log("🎮 Device commands listener useEffect triggered");
     const currentDeviceId = deviceId || localStorage.getItem("izi_device_id");
     if (!currentDeviceId || currentDeviceId.trim() === '') {
       console.log("No valid device ID available for commands listener");
@@ -564,10 +557,11 @@ function DisplayView() {
       console.log("Cleaning up device commands listener");
       unsubscribeCommands();
     };
-  }, [deviceId, handleRefreshSlides, dispatch]);
+  }, [deviceId, handleRefreshSlides]); // Removed dispatch from dependencies
 
   // Load content and settings from Firestore
   useEffect(() => {
+    console.log("📄 Content loading useEffect triggered, isPaired:", isPaired);
     if (!isPaired) return; // Only load content if device is paired
 
     const displayDocRef = doc(db, "display", "content");
@@ -607,6 +601,7 @@ function DisplayView() {
           backgroundColor: data.backgroundColor || "#FAFAFA",
           foregroundColor: data.foregroundColor || "#212121",
           feedUrl: data.feedUrl || "", // Keep for backward compatibility
+          showClock: data.showClock !== undefined ? data.showClock : true, // Default to true if not set
         });
         
         // Handle feeds - support both old single feed and new multiple feeds structure
@@ -639,6 +634,7 @@ function DisplayView() {
 
   // Flatten all slides from all playlists into a single array
   useEffect(() => {
+    console.log("🎬 Playlists flattening useEffect triggered, playlists:", playlists.length);
     if (playlists.length === 0) {
       setSlides([]);
       return;
@@ -684,14 +680,17 @@ function DisplayView() {
         }))
       );
     }
+    console.log("🎬 Setting slides:", allSlides.length, "slides");
     setSlides(allSlides);
     setCurrentSlideIndex(0); // Reset to first slide when slides change
   }, [playlists]);
 
   useEffect(() => {
+    console.log("🎠 Slide rotation useEffect triggered, slides:", slides.length);
     if (slides.length === 0) return;
 
     let currentIndex = 0;
+    let timeoutId = null;
     
     const rotateSlides = () => {
       const currentSlide = slides[currentIndex];
@@ -711,11 +710,12 @@ function DisplayView() {
       }
 
       // Update the current slide index for display and ref for progress tracking
+      console.log("🎠 Setting current slide index:", currentIndex);
       setCurrentSlideIndex(currentIndex);
       currentSlideRef.current = currentIndex;
 
       // Set up next rotation
-      setTimeout(() => {
+      timeoutId = setTimeout(() => {
         currentIndex = (currentIndex + 1) % slides.length;
         rotateSlides();
       }, slideDuration);
@@ -723,39 +723,65 @@ function DisplayView() {
 
     // Start the rotation
     rotateSlides();
+
+    // Cleanup function to clear timeout
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
   }, [slides]);
 
-  // Progress tracking effect - now uses a ref to track current slide
+  // Progress tracking effect - resets when currentSlideIndex changes
   const currentSlideRef = useRef(0);
+  const progressRef = useRef(0);
+  const progressBarRef = useRef(null);
   
   useEffect(() => {
     if (slides.length === 0) return;
 
-    const progressInterval = 100; // Update progress every 100ms
-    setSlideProgress(0); // Reset progress when slides change
+    const progressInterval = 100; // Update progress every 100ms for smoother animation
+    progressRef.current = 0;
+    let startTime = Date.now();
 
     const progressIntervalId = setInterval(() => {
-      setSlideProgress((prevProgress) => {
-        const currentSlide = slides[currentSlideRef.current];
-        const slideDuration = (currentSlide?.duration || 5) * 1000;
-        
-        const newProgress = prevProgress + (progressInterval / slideDuration) * 100;
+      const currentSlide = slides[currentSlideRef.current];
+      const slideDuration = (currentSlide?.duration || 5) * 1000;
+      
+      // Calculate progress based on elapsed time for more accurate timing
+      const elapsedTime = Date.now() - startTime;
+      const newProgress = Math.min((elapsedTime / slideDuration) * 100, 100);
 
-        // If we reach 100%, reset to 0 for single slides or let it stay at 100% for multiple slides
-        if (newProgress >= 100) {
-          if (slides.length === 1) {
-            // For single slides, reset progress to create a continuous loop
-            return 0;
-          } else {
-            return 100;
-          }
+      // If we reach 100%, reset to 0 for single slides or let it stay at 100% for multiple slides
+      if (newProgress >= 100) {
+        if (slides.length === 1) {
+          // For single slides, reset progress to create a continuous loop
+          progressRef.current = 0;
+          // Reset start time for continuous loop
+          startTime = Date.now();
+        } else {
+          progressRef.current = 100;
         }
-        return newProgress;
-      });
+      } else {
+        progressRef.current = newProgress;
+      }
+      
+      // Update progress bar directly without causing re-render
+      if (progressBarRef.current) {
+        progressBarRef.current.style.width = `${progressRef.current}%`;
+      }
     }, progressInterval);
 
     return () => clearInterval(progressIntervalId);
-  }, [slides]);
+  }, [slides, currentSlideIndex]); // Add currentSlideIndex to dependencies
+
+  // Reset progress when currentSlideIndex changes (new slide starts)
+  useEffect(() => {
+    progressRef.current = 0;
+    if (progressBarRef.current) {
+      progressBarRef.current.style.width = '0%';
+    }
+  }, [currentSlideIndex]);
 
   // Cleanup effect to prevent memory leaks
   useEffect(() => {
@@ -763,12 +789,18 @@ function DisplayView() {
       // Cleanup any remaining timeouts or intervals
       setSlideProgress(0);
       setCurrentSlideIndex(0);
-      hasInitializedRef.current = false; // Reset initialization flag
+      // Don't reset hasInitializedRef here - it should persist across re-renders
     };
   }, []);
 
   // Countdown timer for pairing code
   useEffect(() => {
+    console.log("⏰ Countdown timer useEffect triggered", {
+      isPaired,
+      displayPairingCode: !!displayPairingCode,
+      isGeneratingCode,
+      codeTimeRemaining
+    });
     if (
       !isPaired &&
       displayPairingCode &&
@@ -806,11 +838,11 @@ function DisplayView() {
     displayPairingCode,
     isGeneratingCode,
     codeTimeRemaining,
-    dispatch,
-  ]);
+  ]); // Removed dispatch from dependencies
 
   // Generate or get device ID on component mount
   useEffect(() => {
+    console.log("🚀 Initialization useEffect triggered, hasInitialized:", hasInitializedRef.current);
     if (hasInitializedRef.current) return; // Prevent multiple initializations
 
     console.log("DisplayView component mounted");
@@ -857,7 +889,7 @@ function DisplayView() {
     };
 
     initializeDevice();
-  }, [generateDeviceId, checkDevicePairing, dispatch, clearInvalidDeviceId]);
+  }, []); // Empty dependency array - this should only run once on mount
 
   if (!isPaired) {
     return (
@@ -917,7 +949,7 @@ function DisplayView() {
       <ProgressBar
         currentSlide={currentSlide}
         slideProgress={slideProgress}
-        getProgressBarHeight={getProgressBarHeight}
+        progressBarRef={progressBarRef}
       />
 
       <BottomBar

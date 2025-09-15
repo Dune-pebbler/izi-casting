@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { doc, setDoc, onSnapshot } from 'firebase/firestore';
-import { db } from '../../firebase';
+import { db } from '../../../firebase';
 import { GripVertical, Copy, Trash2, Plus, Eye, EyeOff } from 'lucide-react';
 import { toast } from 'sonner';
 import {

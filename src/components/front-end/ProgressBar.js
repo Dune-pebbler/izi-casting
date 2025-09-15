@@ -1,7 +1,7 @@
 import React from "react";
 
-function ProgressBar({ currentSlide, slideProgress, getProgressBarHeight }) {
-  // Only show if showBar is true (default is true)
+function ProgressBar({ currentSlide, slideProgress, progressBarRef }) {
+
   if (currentSlide?.showBar === false) {
     return null;
   }
@@ -9,9 +9,9 @@ function ProgressBar({ currentSlide, slideProgress, getProgressBarHeight }) {
   return (
     <div
       className="display-progress-bar"
-      style={{ height: `${getProgressBarHeight()}px` }}
     >
       <div
+        ref={progressBarRef}
         className="display-progress-fill"
         style={{ width: `${slideProgress}%` }}
       />

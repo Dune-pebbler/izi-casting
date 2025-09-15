@@ -426,7 +426,7 @@ function Feed({ feeds, settings }) {
   if (rssFeed.length === 0) {
     return (
       <div className="feed-container">
-        <div className="rss-placeholder">No RSS feeds configured</div>
+        <div className="rss-placeholder">RSS feeds aan het laden...</div>
       </div>
     );
   }
@@ -468,25 +468,47 @@ function Feed({ feeds, settings }) {
                     const feedDuration = currentItem?.dynamicDuration || 10; // Use the calculated duration
                     const animationDuration = feedDuration * 1000; // Convert to milliseconds
                     
-                    // Calculate consistent scroll speed (pixels per second)
-                    // Target: 100 pixels per second for comfortable reading
-                    const targetScrollSpeed = 100; // pixels per second
-                    const scrollTimeMs = Math.max((scrollDistance / targetScrollSpeed) * 1000, 1000); // minimum 1 second, convert to ms
+                    // Calculate scroll speed to fit within the available time
+                    // Reserve 10% of total time for pauses (5% at start, 5% at end)
+                    const availableScrollTime = animationDuration * 0.9; // 90% of total time for scrolling
+                    const actualScrollSpeed = scrollDistance / (availableScrollTime / 1000); // pixels per second
                     
-                    // Calculate pause times to fit within total duration
-                    const totalScrollTime = Math.min(scrollTimeMs, animationDuration * 0.8); // max 80% of total time
-                    const pauseTime = (animationDuration - totalScrollTime) / 2; // split pause time between start and end
+                    // Use the actual scroll speed, but don't go faster than 200px/s for readability
+                    const maxScrollSpeed = 200; // pixels per second
+                    const finalScrollSpeed = Math.min(actualScrollSpeed, maxScrollSpeed);
+                    
+                    // Calculate actual scroll time based on final speed
+                    const totalScrollTime = (scrollDistance / finalScrollSpeed) * 1000; // convert to ms
+                    const pauseTime = Math.max(0, (animationDuration - totalScrollTime) / 2); // split pause time between start and end, ensure non-negative
                     
                     // Create and apply the animation directly via JavaScript
-                    const startPauseRatio = pauseTime / animationDuration;
-                    const endPauseRatio = (animationDuration - pauseTime) / animationDuration;
+                    const startPauseRatio = Math.min(pauseTime / animationDuration, 0.3); // Cap at 30% to prevent issues
+                    const endPauseRatio = Math.max((animationDuration - pauseTime) / animationDuration, startPauseRatio + 0.1); // Ensure it's after startPauseRatio
                     
-                    const keyframes = [
-                      { transform: 'translateX(0)', offset: 0 },
-                      { transform: 'translateX(0)', offset: startPauseRatio }, // Pause at start
-                      { transform: `translateX(-${scrollDistance}px)`, offset: endPauseRatio }, // Scroll to end
-                      { transform: `translateX(-${scrollDistance}px)`, offset: 1 } // Pause at end
-                    ];
+                    // Ensure offsets are monotonically non-decreasing with proper validation
+                    const offset1 = Math.min(startPauseRatio, 0.2); // Cap at 20% for start pause
+                    const offset2 = Math.max(offset1 + 0.1, Math.min(endPauseRatio, 0.8)); // Ensure proper spacing
+                    const offset3 = 1; // Always end at 100%
+                    
+                    // Validate that offsets are monotonically non-decreasing
+                    let keyframes;
+                    if (offset1 >= offset2 || offset2 >= offset3) {
+                      console.warn('Invalid keyframe offsets detected, using fallback values:', { offset1, offset2, offset3 });
+                      // Use safe fallback values
+                      keyframes = [
+                        { transform: 'translateX(0)', offset: 0 },
+                        { transform: 'translateX(0)', offset: 0.1 },
+                        { transform: `translateX(-${scrollDistance}px)`, offset: 0.9 },
+                        { transform: `translateX(-${scrollDistance}px)`, offset: 1 }
+                      ];
+                    } else {
+                      keyframes = [
+                        { transform: 'translateX(0)', offset: 0 },
+                        { transform: 'translateX(0)', offset: offset1 }, // Pause at start
+                        { transform: `translateX(-${scrollDistance}px)`, offset: offset2 }, // Scroll to end
+                        { transform: `translateX(-${scrollDistance}px)`, offset: offset3 } // Pause at end
+                      ];
+                    }
                     
                     const animationOptions = {
                       duration: animationDuration,
@@ -526,9 +548,9 @@ function Feed({ feeds, settings }) {
                       scrollDistance: `${scrollDistance}px`,
                       duration: `${animationDuration}ms`,
                       feedDuration: `${feedDuration}s`,
-                      scrollSpeed: `${targetScrollSpeed}px/s`,
-                      calculatedScrollTime: `${scrollTimeMs}ms`,
-                      actualScrollTime: `${totalScrollTime}ms`,
+                      actualScrollSpeed: `${actualScrollSpeed.toFixed(1)}px/s`,
+                      finalScrollSpeed: `${finalScrollSpeed.toFixed(1)}px/s`,
+                      totalScrollTime: `${totalScrollTime}ms`,
                       pauseTime: `${pauseTime}ms`
                     });
                   } else {

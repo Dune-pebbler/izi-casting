@@ -43,6 +43,7 @@ The izi-casting application now includes a device refresh feature that allows ad
    - Command is sent to Firebase device document
    - Display device detects the command via real-time listener
    - Slides are restarted from the beginning
+   - Browser is force reloaded after 2 seconds
    - Command is automatically cleared after 5 seconds
 
 3. **Display Response**:
@@ -50,6 +51,7 @@ The izi-casting application now includes a device refresh feature that allows ad
    - `slideProgress` is reset to 0
    - `currentFeedIndex` is reset to 0
    - Visual feedback is shown to the user
+   - Browser performs a complete reload after 2 seconds
 
 ### User Workflow
 
@@ -93,6 +95,7 @@ The izi-casting application now includes a device refresh feature that allows ad
 - **Content Testing**: Test slide changes by restarting from the beginning
 - **Troubleshooting**: Reset displays that may be stuck or out of sync
 - **Presentation Control**: Restart presentations for new audiences
+- **Complete Reset**: Force browser reload ensures all cached content is refreshed
 
 ### For System Management
 - **Real-time Control**: Immediate response without physical access to displays

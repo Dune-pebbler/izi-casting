@@ -28,7 +28,7 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import SlideList from './admin/SlideList';
 import EditModal from './admin/EditModal';
-import Sidebar from './admin/Sidebar';
+import Sidebar from './admin/sidebar/Sidebar';
 
 function AdminView() {
   const [playlists, setPlaylists] = useState([]);

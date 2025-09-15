@@ -6,10 +6,10 @@ function TextEditor({ content, onContentChange }) {
     height: '100%',
     menubar: false,
     plugins: [
-      'anchor', 'autolink', 'charmap', 'codesample', 'emoticons', 'lists', 'searchreplace', 'table', 'visualblocks', 'wordcount',
-      'checklist', 'casechange', 'formatpainter', 'tinymcespellchecker', 'permanentpen', 'powerpaste', 'advtable', 'advcode', 'advtemplate', 'mentions', 'tableofcontents', 'footnotes', 'autocorrect', 'inlinecss', 'markdown','importword', 'exportword', 'exportpdf'
+      'anchor', 'autolink', 'charmap', 'codesample', 'emoticons', 'lists', 'searchreplace', 'table', 'visualblocks', 'wordcount'
     ],
-    toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | forecolor backcolor | table | spellcheckdialog | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
+    toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | forecolor backcolor | table | align lineheight | numlist bullist indent outdent | emoticons charmap | removeformat',
+    font_family_formats: 'Arial=arial,helvetica,sans-serif; Comic Neue=Comic Neue,cursive; Comic Sans MS=comic sans ms,cursive; Courier New=courier new,courier,monospace; Georgia=georgia,palatino,serif; Helvetica=helvetica,arial,sans-serif; Impact=impact,chicago; Lato=Lato,sans-serif; Montserrat=Montserrat,sans-serif; Nunito=Nunito,sans-serif; Open Sans=Open Sans,sans-serif; Poppins=Poppins,sans-serif; Roboto=Roboto,sans-serif; Source Sans Pro=Source Sans Pro,sans-serif; Times New Roman=times new roman,times,serif; Trebuchet MS=trebuchet ms,geneva; Verdana=verdana,geneva;',
     textcolor_map: [
       '000000', 'Black',
       '4D4D4D', 'Dim Gray',
@@ -35,7 +35,7 @@ function TextEditor({ content, onContentChange }) {
     textcolor_rows: 3,
     content_style: `
       body { 
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; 
+        font-family: 'Roboto', Arial, Helvetica, sans-serif; 
         font-size: 16px; 
         line-height: 1.6; 
         margin: 0; 
@@ -172,7 +172,7 @@ function TextEditor({ content, onContentChange }) {
         border: 1px solid #e1e5e9;
         border-radius: 4px;
         overflow-x: auto;
-        font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+        font-family: 'Courier New', Courier, monospace;
         font-size: 14px;
         line-height: 1.4;
         color: #333;
@@ -182,7 +182,7 @@ function TextEditor({ content, onContentChange }) {
         background-color: #f8f9fa;
         padding: 0.2em 0.4em;
         border-radius: 3px;
-        font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+        font-family: 'Courier New', Courier, monospace;
         font-size: 0.9em;
         color: #e83e8c;
       }

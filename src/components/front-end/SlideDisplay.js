@@ -1,7 +1,13 @@
 import React from "react";
 import { sanitizeHTMLContent } from "../../utils/sanitize";
+import TextPagination from "./TextPagination";
+import { getTextPaginationConfig } from "../../config/textPagination";
 
 function SlideDisplay({ currentSlide, slideType, slideLayout }) {
+  // Get configuration for the current layout
+  const textConfig = getTextPaginationConfig(slideLayout);
+  const shouldUsePagination = textConfig !== null;
+
   if (!currentSlide) {
     return (
       <div className="display-container">
@@ -14,10 +20,8 @@ function SlideDisplay({ currentSlide, slideType, slideLayout }) {
 
   return (
     <div className="display-content">
-      {/* Layout-specific display */}
       {slideLayout === "side-by-side" && (
         <>
-          {/* Left side - Image */}
           <div className="display-left">
             {slideType === "image" && currentSlide.imageUrl ? (
               <div className="display-image-container">
@@ -47,16 +51,26 @@ function SlideDisplay({ currentSlide, slideType, slideLayout }) {
             )}
           </div>
 
-          {/* Right side - Text */}
+
           <div className="display-right">
             <div className="display-text-container">
               {currentSlide.text ? (
-                <div
-                  className="display-text"
-                  dangerouslySetInnerHTML={{
-                    __html: sanitizeHTMLContent(currentSlide.text),
-                  }}
-                />
+                shouldUsePagination ? (
+                  <TextPagination
+                    text={currentSlide.text}
+                    maxHeight={textConfig.maxHeight}
+                    readTimePerPage={textConfig.readTimePerPage}
+                    scrollStepRatio={textConfig.scrollStepRatio}
+                    className="display-text"
+                  />
+                ) : (
+                  <div
+                    className="display-text"
+                    dangerouslySetInnerHTML={{
+                      __html: sanitizeHTMLContent(currentSlide.text),
+                    }}
+                  />
+                )
               ) : (
                 <div className="display-text-placeholder">
                   <div className="placeholder-text">No Text Content</div>
@@ -79,11 +93,10 @@ function SlideDisplay({ currentSlide, slideType, slideLayout }) {
                   objectPosition: currentSlide.imagePosition || "center",
                 }}
                 onLoad={() => {
-                  // Throttle console logging to prevent spam
+
                   if (Date.now() % 10000 < 100) {
                     // Only log every ~10 seconds
                     console.log(
-                      "Image loaded with position:",
                       currentSlide.imagePosition || "center"
                     );
                   }
@@ -111,7 +124,6 @@ function SlideDisplay({ currentSlide, slideType, slideLayout }) {
                     objectPosition: currentSlide.imagePosition || "center",
                   }}
                   onLoad={() => {
-                    // Throttle console logging to prevent spam
                     if (Date.now() % 10000 < 100) {
                       // Only log every ~10 seconds
                       console.log(
@@ -150,12 +162,22 @@ function SlideDisplay({ currentSlide, slideType, slideLayout }) {
         <div className="display-text-only">
           <div className="display-text-container-full">
             {currentSlide.text ? (
-              <div
-                className="display-text-full"
-                dangerouslySetInnerHTML={{
-                  __html: sanitizeHTMLContent(currentSlide.text),
-                }}
-              />
+              shouldUsePagination ? (
+                <TextPagination
+                  text={currentSlide.text}
+                  maxHeight={textConfig.maxHeight}
+                  readTimePerPage={textConfig.readTimePerPage}
+                  scrollStepRatio={textConfig.scrollStepRatio}
+                  className="display-text-full"
+                />
+              ) : (
+                <div
+                  className="display-text-full"
+                  dangerouslySetInnerHTML={{
+                    __html: sanitizeHTMLContent(currentSlide.text),
+                  }}
+                />
+              )
             ) : (
               <div className="display-text-placeholder-full">
                 <div className="placeholder-text">No Text Content</div>

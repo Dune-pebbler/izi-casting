@@ -11,7 +11,7 @@ import {
   getDownloadURL,
   deleteObject,
 } from "firebase/storage";
-import { db, storage } from "../../firebase";
+import { db, storage } from "../../../firebase";
 import { toast } from "sonner";
 
 function Settings() {
@@ -24,6 +24,7 @@ function Settings() {
     backgroundColor: "#FAFAFA",
     foregroundColor: "#212121",
     feedUrl: "",
+    showClock: true,
   });
 
   // Load settings on component mount
@@ -32,9 +33,12 @@ function Settings() {
       try {
         const settingsDoc = await getDoc(doc(db, "display", "settings"));
         if (settingsDoc.exists()) {
+          const loadedSettings = settingsDoc.data();
           setSettings(prev => ({
             ...prev,
-            ...settingsDoc.data()
+            ...loadedSettings,
+            // Ensure showClock is always present, default to true if missing
+            showClock: loadedSettings.showClock !== undefined ? loadedSettings.showClock : true
           }));
         }
       } catch (error) {
@@ -44,6 +48,7 @@ function Settings() {
 
     loadSettings();
   }, []);
+
 
   // Handle input changes
   const handleInputChange = (field, value) => {
@@ -262,6 +267,24 @@ function Settings() {
                       )}
                     </div>
                   )}
+                </div>
+              </div>
+
+              {/* Display Settings Section */}
+              <div className="settings-section">
+                <h3>Display Settings</h3>
+                <div className="checkbox-setting">
+                  <label className="checkbox-label">
+                    <input
+                      type="checkbox"
+                      checked={settings.showClock}
+                      onChange={(e) =>
+                        handleInputChange("showClock", e.target.checked)
+                      }
+                      className="checkbox-input"
+                    />
+                    <span className="checkbox-text">Show Clock</span>
+                  </label>
                 </div>
               </div>
 

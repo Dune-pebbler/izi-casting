@@ -10,16 +10,16 @@ import {
   where,
   onSnapshot,
 } from "firebase/firestore";
-import { db } from "../../firebase";
+import { db } from "../../../firebase";
 import { toast } from "sonner";
-import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import { 
   setLinkedDevices, 
   setShowPairingForm, 
   setIsPairing, 
   setPairingError, 
   clearPairingError 
-} from "../../store/slices/deviceSlice";
+} from "../../../store/slices/deviceSlice";
 
 function Devices({ setDeviceToDelete, deleteDevice }) {
   // Redux state

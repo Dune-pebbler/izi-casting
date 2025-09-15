@@ -2,17 +2,20 @@
 .display-progress-bar {
   position: fixed;
   margin: $spacing-md;
+  height:8px;
   width: calc(100% - $spacing-md * 2);
   bottom: 20vh;
-  min-height: 3px;
+  min-height: 8px;
   background-color: rgba(255, 255, 255, 0.2);
-  z-index: 5;
+  z-index: 4;
   transition: height 0.3s ease;
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
 }
 
 .display-progress-fill {
   height: 100%;
   background-color: $primary-color;
-  transition: width 0.1s ease;
+  transition: width 0.25s ease-out;
   border-radius: 0 2px 2px 0;
 }
