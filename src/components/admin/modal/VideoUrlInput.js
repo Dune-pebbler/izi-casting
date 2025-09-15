@@ -160,85 +160,9 @@ function VideoUrlInput({ videoUrl, onVideoUrlChange, onRemoveVideo, onDurationCh
 
   return (
     <div className="video-url-input">
-      <div className="video-input-header">
-        <label htmlFor="video-url" className="video-input-label">
-          <Play size={16} />
-          Video URL (YouTube or Vimeo)
-        </label>
-        {isValid && (
-          <button
-            type="button"
-            onClick={handleRemove}
-            className="btn btn-sm btn-danger remove-video-btn"
-            title="Remove video"
-          >
-            Remove
-          </button>
-        )}
-      </div>
-
       <div className="video-input-container">
-        <input
-          id="video-url"
-          type="url"
-          className={`video-url-field ${isValid ? 'valid' : url ? 'invalid' : ''}`}
-          value={url}
-          onChange={handleUrlChange}
-          placeholder="https://www.youtube.com/watch?v=... or https://vimeo.com/..."
-        />
-        
-        {url && (
-          <div className="video-validation">
-            {isLoadingMetadata ? (
-              <div className="validation-loading">
-                <Loader2 size={16} className="animate-spin" />
-                <span>Loading video information...</span>
-              </div>
-            ) : isValid ? (
-              <div className="validation-success">
-                <CheckCircle size={16} />
-                <span>
-                  {videoType === 'youtube' ? 'YouTube' : 'Vimeo'} video detected
-                </span>
-                {videoMetadata && (
-                  <div className="video-metadata-info">
-                    {videoMetadata.title && (
-                      <div className="video-title">
-                        <strong>Title:</strong> {videoMetadata.title}
-                      </div>
-                    )}
-                    {videoMetadata.duration && (
-                      <div className="video-duration">
-                        <Clock size={14} />
-                        <strong>Duration:</strong> {formatDuration(videoMetadata.duration)}
-                      </div>
-                    )}
-                  </div>
-                )}
-                {metadataError && (
-                  <div className="metadata-warning">
-                    <AlertCircle size={14} />
-                    <span>Could not fetch video details, using estimated duration</span>
-                  </div>
-                )}
-                {videoMetadata && !videoMetadata.duration && videoType === 'youtube' && (
-                  <div className="metadata-info">
-                    <Clock size={14} />
-                    <span>Duration estimated from title. You can adjust it manually in the duration field above.</span>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div className="validation-error">
-                <AlertCircle size={16} />
-                <span>Please enter a valid YouTube or Vimeo URL</span>
-              </div>
-            )}
-          </div>
-        )}
-
-        {isValid && videoId && (
-          <div className="video-preview">
+        {isValid && videoId ? (
+          <div className="video-preview-large">
             <div className="video-preview-container">
               <img
                 src={getVideoPreviewUrl()}
@@ -249,25 +173,177 @@ function VideoUrlInput({ videoUrl, onVideoUrlChange, onRemoveVideo, onDurationCh
                 }}
               />
               <div className="video-preview-overlay">
-                <Play size={24} />
+                <Play size={32} />
               </div>
             </div>
-            <div className="video-info">
-              <div className="video-type">
-                {videoType === 'youtube' ? 'YouTube' : 'Vimeo'}
+            
+            <div className="video-overlay">
+              <div className="overlay-content">
+                <div className="overlay-header">
+                  <label htmlFor="video-url" className="overlay-label">
+                    <Play size={16} />
+                    Video URL (YouTube or Vimeo)
+                  </label>
+                  {isValid && (
+                    <button
+                      type="button"
+                      onClick={handleRemove}
+                      className="btn btn-sm btn-danger remove-video-btn"
+                      title="Remove video"
+                    >
+                      Remove
+                    </button>
+                  )}
+                </div>
+                
+                <input
+                  id="video-url"
+                  type="url"
+                  className={`video-url-field overlay-input ${isValid ? 'valid' : url ? 'invalid' : ''}`}
+                  value={url}
+                  onChange={handleUrlChange}
+                  placeholder="https://www.youtube.com/watch?v=... or https://vimeo.com/..."
+                />
+                
+                {url && (
+                  <div className="video-validation overlay-validation">
+                    {isLoadingMetadata ? (
+                      <div className="validation-loading">
+                        <Loader2 size={16} className="animate-spin" />
+                        <span>Loading video information...</span>
+                      </div>
+                    ) : isValid ? (
+                      <div className="validation-success">
+                        <CheckCircle size={16} />
+                        <span>
+                          {videoType === 'youtube' ? 'YouTube' : 'Vimeo'} video detected
+                        </span>
+                        {videoMetadata && (
+                          <div className="video-metadata-info">
+                            {videoMetadata.title && (
+                              <div className="video-title">
+                                <strong>Title:</strong> {videoMetadata.title}
+                              </div>
+                            )}
+                            {videoMetadata.duration && (
+                              <div className="video-duration">
+                                <Clock size={14} />
+                                <strong>Duration:</strong> {formatDuration(videoMetadata.duration)}
+                              </div>
+                            )}
+                          </div>
+                        )}
+                        {metadataError && (
+                          <div className="metadata-warning">
+                            <AlertCircle size={14} />
+                            <span>Could not fetch video details, using estimated duration</span>
+                          </div>
+                        )}
+                        {videoMetadata && !videoMetadata.duration && videoType === 'youtube' && (
+                          <div className="metadata-info">
+                            <Clock size={14} />
+                            <span>Duration estimated from title. You can adjust it manually in the duration field above.</span>
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="validation-error">
+                        <AlertCircle size={16} />
+                        <span>Please enter a valid YouTube or Vimeo URL</span>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                <div className="video-help overlay-help">
+                  <p>Supported formats:</p>
+                  <ul>
+                    <li>YouTube: youtube.com/watch?v=..., youtu.be/..., youtube.com/embed/...</li>
+                    <li>Vimeo: vimeo.com/..., player.vimeo.com/video/...</li>
+                  </ul>
+                </div>
               </div>
-              <div className="video-id">ID: {videoId}</div>
+            </div>
+          </div>
+        ) : (
+          <div className="video-input-fallback">
+            <div className="fallback-content">
+              <div className="fallback-header">
+                <label htmlFor="video-url" className="fallback-label">
+                  <Play size={16} />
+                  Video URL (YouTube or Vimeo)
+                </label>
+              </div>
+              
+              <input
+                id="video-url"
+                type="url"
+                className={`video-url-field ${isValid ? 'valid' : url ? 'invalid' : ''}`}
+                value={url}
+                onChange={handleUrlChange}
+                placeholder="https://www.youtube.com/watch?v=... or https://vimeo.com/..."
+              />
+              
+              {url && (
+                <div className="video-validation">
+                  {isLoadingMetadata ? (
+                    <div className="validation-loading">
+                      <Loader2 size={16} className="animate-spin" />
+                      <span>Loading video information...</span>
+                    </div>
+                  ) : isValid ? (
+                    <div className="validation-success">
+                      <CheckCircle size={16} />
+                      <span>
+                        {videoType === 'youtube' ? 'YouTube' : 'Vimeo'} video detected
+                      </span>
+                      {videoMetadata && (
+                        <div className="video-metadata-info">
+                          {videoMetadata.title && (
+                            <div className="video-title">
+                              <strong>Title:</strong> {videoMetadata.title}
+                            </div>
+                          )}
+                          {videoMetadata.duration && (
+                            <div className="video-duration">
+                              <Clock size={14} />
+                              <strong>Duration:</strong> {formatDuration(videoMetadata.duration)}
+                            </div>
+                          )}
+                        </div>
+                      )}
+                      {metadataError && (
+                        <div className="metadata-warning">
+                          <AlertCircle size={14} />
+                          <span>Could not fetch video details, using estimated duration</span>
+                        </div>
+                      )}
+                      {videoMetadata && !videoMetadata.duration && videoType === 'youtube' && (
+                        <div className="metadata-info">
+                          <Clock size={14} />
+                          <span>Duration estimated from title. You can adjust it manually in the duration field above.</span>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="validation-error">
+                      <AlertCircle size={16} />
+                      <span>Please enter a valid YouTube or Vimeo URL</span>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              <div className="video-help">
+                <p>Supported formats:</p>
+                <ul>
+                  <li>YouTube: youtube.com/watch?v=..., youtu.be/..., youtube.com/embed/...</li>
+                  <li>Vimeo: vimeo.com/..., player.vimeo.com/video/...</li>
+                </ul>
+              </div>
             </div>
           </div>
         )}
-      </div>
-
-      <div className="video-help">
-        <p>Supported formats:</p>
-        <ul>
-          <li>YouTube: youtube.com/watch?v=..., youtu.be/..., youtube.com/embed/...</li>
-          <li>Vimeo: vimeo.com/..., player.vimeo.com/video/...</li>
-        </ul>
       </div>
     </div>
   );

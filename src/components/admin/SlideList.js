@@ -1,6 +1,7 @@
 import React, { useMemo, useCallback } from 'react';
-import { Copy, GripVertical, Eye, EyeOff, Plus, ChevronsUpDown } from 'lucide-react';
+import { Copy, GripVertical, Eye, EyeOff, Plus, ChevronsUpDown, Play } from 'lucide-react';
 import { sanitizeHTMLContent } from '../../utils/sanitize';
+import { extractVideoInfo } from '../../utils/videoMetadata';
 import {
   DndContext,
   closestCenter,
@@ -182,6 +183,48 @@ function SlideList({
                 <div className="preview-placeholder">
                   <div className="placeholder-icon">🖼️</div>
                   <span>No image</span>
+                </div>
+              )}
+            </div>
+          );
+
+        case 'video':
+          const videoInfo = slide.videoUrl ? extractVideoInfo(slide.videoUrl) : null;
+          const getVideoThumbnailUrl = () => {
+            if (!videoInfo) return '';
+            if (videoInfo.type === 'youtube') {
+              return `https://img.youtube.com/vi/${videoInfo.id}/maxresdefault.jpg`;
+            } else if (videoInfo.type === 'vimeo') {
+              return `https://vumbnail.com/${videoInfo.id}.jpg`;
+            }
+            return '';
+          };
+
+          return (
+            <div className="slide-preview-video">
+              {slide.videoUrl && videoInfo ? (
+                <div className="preview-video-container">
+                  <img 
+                    src={getVideoThumbnailUrl()} 
+                    alt="Video thumbnail" 
+                    className="preview-video-thumbnail"
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                    }}
+                  />
+                  <div className="preview-video-overlay">
+                    <Play size={24} />
+                  </div>
+                  <div className="preview-video-info">
+                    <span className={`video-platform ${videoInfo.type === 'vimeo' ? 'vimeo' : ''}`}>
+                      {videoInfo.type === 'youtube' ? 'YouTube' : 'Vimeo'}
+                    </span>
+                  </div>
+                </div>
+              ) : (
+                <div className="preview-placeholder">
+                  <div className="placeholder-icon">🎥</div>
+                  <span>No video URL</span>
                 </div>
               )}
             </div>
