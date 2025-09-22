@@ -13,22 +13,24 @@ import {
 import { db } from "../../../firebase";
 import { toast } from "sonner";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
-import { 
-  setLinkedDevices, 
-  setShowPairingForm, 
-  setIsPairing, 
-  setPairingError, 
-  clearPairingError 
+import {
+  setLinkedDevices,
+  setShowPairingForm,
+  setIsPairing,
+  setPairingError,
+  clearPairingError,
 } from "../../../store/slices/deviceSlice";
 
 function Devices({ setDeviceToDelete, deleteDevice }) {
   // Redux state
   const dispatch = useAppDispatch();
   const linkedDevices = useAppSelector((state) => state.device.linkedDevices);
-  const showPairingForm = useAppSelector((state) => state.device.showPairingForm);
+  const showPairingForm = useAppSelector(
+    (state) => state.device.showPairingForm
+  );
   const isPairing = useAppSelector((state) => state.device.isPairing);
   const pairingError = useAppSelector((state) => state.device.pairingError);
-  
+
   // Local state (component-specific)
   const [enteredPairingCode, setEnteredPairingCode] = useState("");
   const [editingDeviceId, setEditingDeviceId] = useState(null);
@@ -42,34 +44,43 @@ function Devices({ setDeviceToDelete, deleteDevice }) {
     const unsubscribe = onSnapshot(
       query(collection(db, "devices"), where("isLinked", "==", true)),
       (snapshot) => {
-        const devices = snapshot.docs.map(doc => {
+        const devices = snapshot.docs.map((doc) => {
           const data = doc.data();
-          
+
           // Convert Firebase Timestamps to strings to avoid serialization errors
           const serializedData = { ...data };
-          
+
           // Convert refreshCommand timestamp if it exists
-          if (serializedData.refreshCommand && serializedData.refreshCommand.timestamp) {
+          if (
+            serializedData.refreshCommand &&
+            serializedData.refreshCommand.timestamp
+          ) {
             serializedData.refreshCommand = {
               ...serializedData.refreshCommand,
-              timestamp: serializedData.refreshCommand.timestamp.toDate ? 
-                serializedData.refreshCommand.timestamp.toDate().toISOString() : 
-                serializedData.refreshCommand.timestamp
+              timestamp: serializedData.refreshCommand.timestamp.toDate
+                ? serializedData.refreshCommand.timestamp.toDate().toISOString()
+                : serializedData.refreshCommand.timestamp,
             };
           }
-          
+
           // Convert other timestamps
           if (serializedData.lastSeen && serializedData.lastSeen.toDate) {
-            serializedData.lastSeen = serializedData.lastSeen.toDate().toISOString();
+            serializedData.lastSeen = serializedData.lastSeen
+              .toDate()
+              .toISOString();
           }
-          
-          if (serializedData.pairingCodeGenerated && serializedData.pairingCodeGenerated.toDate) {
-            serializedData.pairingCodeGenerated = serializedData.pairingCodeGenerated.toDate().toISOString();
+
+          if (
+            serializedData.pairingCodeGenerated &&
+            serializedData.pairingCodeGenerated.toDate
+          ) {
+            serializedData.pairingCodeGenerated =
+              serializedData.pairingCodeGenerated.toDate().toISOString();
           }
-          
+
           return {
             id: doc.id,
-            ...serializedData
+            ...serializedData,
           };
         });
         console.log("Devices loaded:", devices); // Debug log
@@ -180,23 +191,23 @@ function Devices({ setDeviceToDelete, deleteDevice }) {
 
   // Handle device refresh
   const handleRefreshDevice = async (deviceId) => {
-    setRefreshingDevices(prev => new Set(prev).add(deviceId));
-    
+    setRefreshingDevices((prev) => new Set(prev).add(deviceId));
+
     try {
       // Send refresh command to device_commands collection
       await setDoc(doc(db, "device_commands", deviceId), {
         command: "refresh",
         action: "restart_slides",
         timestamp: new Date(),
-        processed: false
+        processed: false,
       });
-      
+
       toast.success("Scherm is herstart!");
     } catch (error) {
       console.error("Error sending refresh command:", error);
       toast.error("Fout bij verzenden van refresh commando");
     } finally {
-      setRefreshingDevices(prev => {
+      setRefreshingDevices((prev) => {
         const newSet = new Set(prev);
         newSet.delete(deviceId);
         return newSet;
@@ -211,29 +222,129 @@ function Devices({ setDeviceToDelete, deleteDevice }) {
 
   const isDeviceOnline = (lastSeen) => {
     if (!lastSeen) return false;
-    const lastSeenDate = lastSeen.toDate ? lastSeen.toDate() : new Date(lastSeen);
+    const lastSeenDate = lastSeen.toDate
+      ? lastSeen.toDate()
+      : new Date(lastSeen);
     const now = new Date();
     const diffInMinutes = (now - lastSeenDate) / (1000 * 60);
     return diffInMinutes < 5; // Consider device online if seen in last 5 minutes
   };
 
-  const formatLastSeen = (lastSeen) => {
-    if (!lastSeen) return "Nooit";
-    const lastSeenDate = lastSeen.toDate ? lastSeen.toDate() : new Date(lastSeen);
-    const now = new Date();
-    const diffInMinutes = Math.floor((now - lastSeenDate) / (1000 * 60));
-    
-    if (diffInMinutes < 1) return "Zojuist";
-    if (diffInMinutes < 60) return `${diffInMinutes} minuten geleden`;
-    if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)} uur geleden`;
-    return `${Math.floor(diffInMinutes / 1440)} dagen geleden`;
-  };
+  // Count online devices
+  const onlineDevices = linkedDevices.filter(
+    (device) => device.isPaired && isDeviceOnline(device.lastSeen)
+  );
 
   return (
     <div className="sidebar-devices">
-      <h2>Schermen ({linkedDevices.length})</h2>
+      <h2>Schermen ({onlineDevices.length})</h2>
       <div className="devices-content">
         {/* Pairing Section */}
+
+        {/* Devices List */}
+        {linkedDevices.length > 0 && (
+          <div className="devices-list">
+            {linkedDevices
+              .filter(
+                (device) => device.isPaired && isDeviceOnline(device.lastSeen)
+              ) // Only show paired and online devices
+              .map((device) => (
+                <div key={device.id} className="device-item">
+                  <div className="device-header">
+                    {editingDeviceId === device.id ? (
+                      <div className="device-name-edit">
+                        <input
+                          type="text"
+                          value={editingDeviceName}
+                          onChange={(e) => setEditingDeviceName(e.target.value)}
+                          className="device-name-input"
+                          placeholder="Voer display naam in..."
+                          maxLength={30}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              handleSaveName(device.id);
+                            } else if (e.key === "Escape") {
+                              handleCancelEdit();
+                            }
+                          }}
+                          autoFocus
+                        />
+                        <div className="device-name-edit-actions">
+                          <button
+                            onClick={() => handleSaveName(device.id)}
+                            className="device-name-save-btn"
+                            title="Opslaan"
+                          >
+                            <Check size={14} />
+                          </button>
+                          <button
+                            onClick={handleCancelEdit}
+                            className="device-name-cancel-btn"
+                            title="Annuleren"
+                          >
+                            <XIcon size={14} />
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="device-name-display">
+                        <strong>{getDisplayName(device)}</strong>
+                        <button
+                          onClick={() => handleEditName(device)}
+                          className="device-name-edit-btn"
+                          title="Naam bewerken"
+                        >
+                          <Edit2 size={14} />
+                        </button>
+                      </div>
+                    )}
+                    <div className="device-header-right">
+                      <span
+                        className={`device-status ${
+                          isDeviceOnline(device.lastSeen) ? "online" : "offline"
+                        }`}
+                      >
+                        {isDeviceOnline(device.lastSeen) ? "Online" : "Offline"}
+                      </span>
+                      <button
+                        onClick={() => handleRefreshDevice(device.id)}
+                        className="device-refresh-btn"
+                        title="Slides opnieuw starten"
+                        disabled={refreshingDevices.has(device.id)}
+                      >
+                        <RotateCcw
+                          size={14}
+                          className={
+                            refreshingDevices.has(device.id) ? "rotating" : ""
+                          }
+                        />
+                      </button>
+                      <button
+                        onClick={() => setDeviceToDelete(device)}
+                        className="device-delete-btn"
+                        title="Apparaat ontkoppelen"
+                      >
+                        <XIcon size={14} />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+          </div>
+        )}
+
+        {/* Extra Screen Button - only show when devices are connected and not showing pairing form */}
+        {onlineDevices.length > 0 && !showPairingForm && (
+          <div className="extra-screen-section">
+            <button
+              onClick={() => dispatch(setShowPairingForm(true))}
+              className="btn btn-primary btn-sm"
+            >
+              Extra scherm toevoegen
+            </button>
+          </div>
+        )}
+
         <div className="pairing-section">
           {(linkedDevices.length === 0 || showPairingForm) && (
             <div className="pairing-form-display">
@@ -253,7 +364,8 @@ function Devices({ setDeviceToDelete, deleteDevice }) {
               </div>
               <div className="pairing-form-content">
                 <p className="pairing-instructions">
-                  Voer de koppelcode in die op het display apparaat wordt getoond
+                  Voer de koppelcode in die op het display apparaat wordt
+                  getoond
                 </p>
                 <div className="pairing-code-inputs">
                   {[0, 1, 2, 3, 4].map((index) => (
@@ -332,150 +444,11 @@ function Devices({ setDeviceToDelete, deleteDevice }) {
           )}
         </div>
 
-        {/* Devices List */}
-        {linkedDevices.length > 0 && (
-          <div className="devices-list">
-            {linkedDevices
-              .filter(device => device.isPaired) // Only show paired devices
-              .map((device) => (
-              <div key={device.id} className="device-item">
-                <div className="device-header">
-                  {editingDeviceId === device.id ? (
-                    <div className="device-name-edit">
-                      <input
-                        type="text"
-                        value={editingDeviceName}
-                        onChange={(e) => setEditingDeviceName(e.target.value)}
-                        className="device-name-input"
-                        placeholder="Voer display naam in..."
-                        maxLength={30}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") {
-                            handleSaveName(device.id);
-                          } else if (e.key === "Escape") {
-                            handleCancelEdit();
-                          }
-                        }}
-                        autoFocus
-                      />
-                      <div className="device-name-edit-actions">
-                        <button
-                          onClick={() => handleSaveName(device.id)}
-                          className="device-name-save-btn"
-                          title="Opslaan"
-                        >
-                          <Check size={14} />
-                        </button>
-                        <button
-                          onClick={handleCancelEdit}
-                          className="device-name-cancel-btn"
-                          title="Annuleren"
-                        >
-                          <XIcon size={14} />
-                        </button>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="device-name-display">
-                      <strong>{getDisplayName(device)}</strong>
-                      <button
-                        onClick={() => handleEditName(device)}
-                        className="device-name-edit-btn"
-                        title="Naam bewerken"
-                      >
-                        <Edit2 size={14} />
-                      </button>
-                    </div>
-                  )}
-                  <div className="device-header-right">
-                    <span
-                      className={`device-status ${
-                        isDeviceOnline(device.lastSeen) ? "online" : "offline"
-                      }`}
-                    >
-                      {isDeviceOnline(device.lastSeen) ? "Online" : "Offline"}
-                    </span>
-                    <button
-                      onClick={() => handleRefreshDevice(device.id)}
-                      className="device-refresh-btn"
-                      title="Slides opnieuw starten"
-                      disabled={refreshingDevices.has(device.id)}
-                    >
-                      <RotateCcw
-                        size={14}
-                        className={
-                          refreshingDevices.has(device.id) ? "rotating" : ""
-                        }
-                      />
-                    </button>
-                    <button
-                      onClick={() => setDeviceToDelete(device)}
-                      className="device-delete-btn"
-                      title="Apparaat ontkoppelen"
-                    >
-                      <XIcon size={14} />
-                    </button>
-                  </div>
-                </div>
-                <div className="device-info">
-                  <div className="device-resolution">
-                    {device.deviceInfo?.screenResolution || "Onbekend"}
-                  </div>
-                  <div className="device-last-seen">
-                    Laatst gezien: {formatLastSeen(device.lastSeen)}
-                  </div>
-                                </div>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* Unpaired Devices - Waiting for Pairing */}
-        {linkedDevices.filter(device => !device.isPaired).length > 0 && (
-          <div className="unpaired-devices">
-            <h3>Apparaten wachten op koppeling</h3>
-            {linkedDevices
-              .filter(device => !device.isPaired)
-              .map((device) => (
-                <div key={device.id} className="unpaired-device-item">
-                  <div className="unpaired-device-header">
-                    <span className="device-name">{getDisplayName(device)}</span>
-                    <span className="device-id">ID: {device.id}</span>
-                  </div>
-                  <div className="unpaired-device-info">
-                    <span className="pairing-status needs-pairing">
-                      Wacht op koppeling
-                    </span>
-                    {device.lastSeen && (
-                      <span className="device-last-seen">
-                        Laatst gezien: {formatLastSeen(device.lastSeen)}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              ))}
-          </div>
-        )}
-
-        {/* Extra Screen Button - only show when devices are connected and not showing pairing form */}
-        {linkedDevices.length > 0 && !showPairingForm && (
-          <div className="extra-screen-section">
-            <button
-              onClick={() => dispatch(setShowPairingForm(true))}
-              className="btn btn-primary btn-sm"
-            >
-              Extra scherm toevoegen
-            </button>
-          </div>
-        )}
-
         {/* No Devices Message */}
-        {linkedDevices.length === 0 && !showPairingForm && (
+        {onlineDevices.length === 0 && !showPairingForm && (
           <div className="no-devices">
             <p>Geen apparaten gekoppeld</p>
-            <p className="device-help">
-              Koppel een apparaat om te beginnen
-            </p>
+            <p className="device-help">Koppel een apparaat om te beginnen</p>
           </div>
         )}
       </div>

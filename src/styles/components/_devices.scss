@@ -143,14 +143,15 @@
       .device-item {
         margin-bottom: $spacing-sm;
         padding: $spacing-sm;
-        border: 1px solid $border-color;
-        border-radius: $border-radius-sm;
-        background-color: $surface;
+        border: 1px solid $success;
+        border-radius: $border-radius-lg;
+        background-color: rgba($success, 0.1);
+        color: $success;
         transition: $transition-base;
 
         &:hover {
-          border-color: $gray-300;
-          background-color: $gray-50;
+          border-color: darken($success, 10%);
+          background-color: rgba($success, 0.15);
         }
 
         .device-header {
@@ -275,16 +276,12 @@
               border-radius: $border-radius-sm;
               font-weight: $font-weight-medium;
 
-              &.online {
-                border: 1px solid $success;
-                color: $success;
-              }
-
               &.offline {
                 background-color: $gray-400;
                 color: $surface;
               }
             }
+
 
             .device-pairing-status {
               font-size: 0.75rem;
@@ -368,81 +365,10 @@
           .device-resolution {
             margin-bottom: 2px;
           }
-
-          .device-last-seen {
-            font-style: italic;
-          }
         }
       }
     }
 
-    // Unpaired Devices Section (at same level as devices-list)
-    .unpaired-devices {
-      margin-top: $spacing-md;
-      border-top: 1px solid $border-color;
-      padding-top: $spacing-md;
-
-      h3 {
-        margin: 0 0 $spacing-sm 0;
-        font-size: 0.875rem;
-        font-weight: $font-weight-semibold;
-        color: $text-primary;
-      }
-
-      .unpaired-device-item {
-        background-color: $surface;
-        border: 1px solid $border-color;
-        border-radius: $border-radius-md;
-        padding: $spacing-sm;
-        margin-bottom: $spacing-xs;
-        transition: $transition-base;
-
-        &:hover {
-          border-color: $primary;
-        }
-
-        .unpaired-device-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-bottom: $spacing-xs;
-
-          .device-name {
-            font-weight: $font-weight-semibold;
-            color: $text-primary;
-          }
-
-          .device-id {
-            font-size: 0.75rem;
-            color: $text-secondary;
-            font-family: monospace;
-          }
-        }
-
-        .unpaired-device-info {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-
-          .pairing-status {
-            font-size: 0.75rem;
-            padding: 2px 6px;
-            border-radius: $border-radius-sm;
-            font-weight: $font-weight-medium;
-
-            &.needs-pairing {
-              background-color: $warning;
-              color: $surface;
-            }
-          }
-
-          .device-last-seen {
-            font-size: 0.75rem;
-            color: $text-secondary;
-          }
-        }
-      }
-    }
 
     // Extra Screen Section
     .extra-screen-section {
