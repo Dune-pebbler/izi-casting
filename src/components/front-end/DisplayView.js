@@ -693,8 +693,27 @@ function DisplayView() {
             layout: slide.layout,
             duration: slide.duration
           });
+          
+          // Log image URL and slide layout for each slide
+          if (slide.imageUrl) {
+            console.log(`🖼️ Slide ${slideIndex + 1} Image URL:`, slide.imageUrl);
+            console.log(`📐 Slide ${slideIndex + 1} Layout:`, slide.layout || 'default');
+          }
         });
       }
+    });
+
+    // Log image URLs and slide layouts for all flattened slides
+    console.log("🎬 All flattened slides with image URLs and layouts:");
+    allSlides.forEach((slide, index) => {
+      console.log(`📄 Flattened Slide ${index + 1}:`, {
+        id: slide.id,
+        name: slide.name,
+        layout: slide.layout || 'default',
+        imageUrl: slide.imageUrl || 'No image',
+        videoUrl: slide.videoUrl || 'No video',
+        duration: slide.duration
+      });
     });
 
     // Throttle console logging to prevent spam
@@ -726,6 +745,17 @@ function DisplayView() {
     const rotateSlides = () => {
       const currentSlide = slides[currentIndex];
       const slideDuration = (currentSlide?.duration || 5) * 1000; // Convert to milliseconds
+
+      // Log current slide details including image URL and layout
+      console.log("🎠 Current slide details:", {
+        index: currentIndex,
+        name: currentSlide?.name,
+        layout: currentSlide?.layout || 'default',
+        imageUrl: currentSlide?.imageUrl || 'No image',
+        videoUrl: currentSlide?.videoUrl || 'No video',
+        duration: currentSlide?.duration,
+        calculatedDurationMs: slideDuration
+      });
 
       // Throttle console logging to prevent spam
       if (Date.now() % 5000 < 100) {
@@ -954,7 +984,6 @@ function DisplayView() {
   }
 
   const currentSlide = slides[currentSlideIndex];
-  const slideType = currentSlide?.type || "text"; // Default to text for backward compatibility
   const slideLayout = currentSlide?.layout || "side-by-side"; // Default to side-by-side for backward compatibility
 
   return (
@@ -973,7 +1002,6 @@ function DisplayView() {
       
       <SlideDisplay
         currentSlide={currentSlide}
-        slideType={slideType}
         slideLayout={slideLayout}
       />
 

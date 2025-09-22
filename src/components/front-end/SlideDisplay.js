@@ -4,7 +4,7 @@ import TextPagination from "./TextPagination";
 import VideoPlayer from "./VideoPlayer";
 import { getTextPaginationConfig } from "../../config/textPagination";
 
-function SlideDisplay({ currentSlide, slideType, slideLayout }) {
+function SlideDisplay({ currentSlide, slideLayout }) {
   // Get configuration for the current layout
   const textConfig = getTextPaginationConfig(slideLayout);
   const shouldUsePagination = textConfig !== null;
@@ -14,13 +14,11 @@ function SlideDisplay({ currentSlide, slideType, slideLayout }) {
     currentSlide: currentSlide ? {
       id: currentSlide.id,
       name: currentSlide.name,
-      type: currentSlide.type,
       layout: currentSlide.layout,
       hasText: !!currentSlide.text,
       hasImageUrl: !!currentSlide.imageUrl,
       hasVideoUrl: !!currentSlide.videoUrl
     } : null,
-    slideType,
     slideLayout
   });
 
@@ -39,7 +37,7 @@ function SlideDisplay({ currentSlide, slideType, slideLayout }) {
       {slideLayout === "side-by-side" && (
         <>
           <div className="display-left">
-            {slideType === "image" && currentSlide.imageUrl ? (
+            {currentSlide.imageUrl ? (
               <div className="display-image-container">
                 <img
                   src={currentSlide.imageUrl}
@@ -99,7 +97,7 @@ function SlideDisplay({ currentSlide, slideType, slideLayout }) {
 
       {slideLayout === "image-only" && (
         <div className="display-full-image">
-          {slideType === "image" && currentSlide.imageUrl ? (
+          {currentSlide.imageUrl ? (
             <div className="display-image-container-full">
               <img
                 src={currentSlide.imageUrl}
@@ -130,7 +128,7 @@ function SlideDisplay({ currentSlide, slideType, slideLayout }) {
       {slideLayout === "text-over-image" && (
         <div className="display-text-over-image">
           <div className="display-image-background">
-            {slideType === "image" && currentSlide.imageUrl ? (
+            {currentSlide.imageUrl ? (
               <div className="display-image-container-overlay">
                 <img
                   src={currentSlide.imageUrl}

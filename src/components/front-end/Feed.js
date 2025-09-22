@@ -623,13 +623,13 @@ function Feed({ feeds, settings }) {
                       }, 100);
                     }
                     
-                    console.log(`🎬 Scrolling animation started:`, {
-                      scrollDistance: `${scrollDistance}px`,
-                      duration: `${totalAnimationDuration}ms`,
-                      feedDuration: `${currentItem?.dynamicDuration || 10}s`,
-                      scrollSpeed: `${consistentScrollSpeed}px/s`,
-                      pauseTime: `${pauseTime}ms`
-                    });
+                    // console.log(`🎬 Scrolling animation started:`, {
+                    //   scrollDistance: `${scrollDistance}px`,
+                    //   duration: `${totalAnimationDuration}ms`,
+                    //   feedDuration: `${currentItem?.dynamicDuration || 10}s`,
+                    //   scrollSpeed: `${consistentScrollSpeed}px/s`,
+                    //   pauseTime: `${pauseTime}ms`
+                    // });
                   } else {
                     el.classList.remove('scrolling-text');
                     // Stop any existing animation
