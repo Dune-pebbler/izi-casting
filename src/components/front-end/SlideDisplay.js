@@ -36,7 +36,7 @@ function SlideDisplay({ currentSlide, slideLayout }) {
     <div className="display-content">
       {slideLayout === "side-by-side" && (
         <>
-          <div className="display-left">
+          <div className={`display-left ${currentSlide.imageSide === 'right' ? 'flipped' : ''}`}>
             {currentSlide.imageUrl ? (
               <div className="display-image-container">
                 <img
@@ -65,8 +65,7 @@ function SlideDisplay({ currentSlide, slideLayout }) {
             )}
           </div>
 
-
-          <div className="display-right">
+          <div className={`display-right ${currentSlide.imageSide === 'right' ? 'flipped' : ''}`}>
             <div className="display-text-container">
               {currentSlide.text ? (
                 shouldUsePagination ? (

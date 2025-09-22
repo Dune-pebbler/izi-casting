@@ -41,6 +41,7 @@ function AdminView() {
   const [modalSlideDuration, setModalSlideDuration] = useState(5);
   const [modalShowBar, setModalShowBar] = useState(true);
   const [modalVideoUrl, setModalVideoUrl] = useState('');
+  const [modalImageSide, setModalImageSide] = useState('left');
   const [currentEditingPlaylistId, setCurrentEditingPlaylistId] = useState(null);
 
   // Playlist editing state
@@ -187,7 +188,7 @@ function AdminView() {
       imageName: '',
       imagePosition: 'center',
       layout: 'side-by-side',
-      isVisible: true,
+      isVisible: false,
       showBar: true
     };
     
@@ -277,6 +278,7 @@ function AdminView() {
     setModalSlideDuration(slide.duration || 5);
     setModalShowBar(slide.showBar !== false);
     setModalVideoUrl(slide.videoUrl || '');
+    setModalImageSide(slide.imageSide || 'left');
   };
 
   const closeEditModal = () => {
@@ -354,6 +356,7 @@ function AdminView() {
               videoUrl: modalVideoUrl,
               type: modalVideoUrl ? 'video' : (modalImageUrl ? 'image' : 'text'),
               imagePosition: imagePosition,
+              imageSide: modalImageSide,
               layout: slideLayout,
               duration: modalSlideDuration === '' ? 5 : modalSlideDuration,
               showBar: modalShowBar
@@ -726,6 +729,8 @@ function AdminView() {
           onShowBarChange={setModalShowBar}
           videoUrl={modalVideoUrl}
           onVideoUrlChange={setModalVideoUrl}
+          imageSide={modalImageSide}
+          onImageSideChange={setModalImageSide}
         />
       )}
 

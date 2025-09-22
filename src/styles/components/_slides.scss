@@ -514,6 +514,11 @@
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  transition: all 0.3s ease;
+  
+  &.flipped {
+    order: 2;
+  }
 }
 
 .modal-right {
@@ -522,6 +527,41 @@
   display: flex;
   flex-direction: column;
   background-color: $surface;
+  transition: all 0.3s ease;
+  
+  &.flipped {
+    order: 1;
+  }
+}
+
+// Flip button for side-by-side layout
+.flip-layout-btn {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  background-color: $primary-color;
+  border: 8px solid $surface;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background-color: darken($primary-color, 10%);
+    transform: translate(-50%, -50%) scale(1.1);
+    // box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
+  
+  &:active {
+    transform: translate(-50%, -50%) scale(0.95);
+  }
 }
 
 .image-upload-section {
@@ -1145,7 +1185,7 @@
 }
 
 .slide-preview-container {
-  height: 180px;
+  height: 200px;
   overflow: hidden;
   position: relative;
 }
@@ -1210,6 +1250,11 @@
   .preview-left {
     width: 50%;
     height: 100%;
+    transition: all 0.3s ease;
+    
+    &.flipped {
+      order: 2;
+    }
     
     .preview-image {
       width: 100%;
@@ -1226,6 +1271,11 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: all 0.3s ease;
+    
+    &.flipped {
+      order: 1;
+    }
   }
 }
 

@@ -1,6 +1,6 @@
 import React from "react";
 import { Editor } from "@tinymce/tinymce-react";
-import { Trash2, Clock, Maximize2, Layout } from "lucide-react";
+import { Trash2, Clock, Maximize2, Layout, ArrowLeftRight } from "lucide-react";
 import LayoutSelector from "./modal/LayoutSelector";
 import ImageUpload from "./modal/ImageUpload";
 import PositionSelector from "./modal/PositionSelector";
@@ -18,6 +18,7 @@ function EditModal({
   slideDuration,
   showBar,
   videoUrl,
+  imageSide,
   onClose,
   onSave,
   onDelete,
@@ -29,6 +30,7 @@ function EditModal({
   onDurationChange,
   onShowBarChange,
   onVideoUrlChange,
+  onImageSideChange,
 }) {
   const renderLayoutContent = () => {
     switch (slideLayout) {
@@ -36,7 +38,7 @@ function EditModal({
         return (
           <>
             {/* Left side - Display Preview (50% width, full height) */}
-            <div className="modal-left">
+            <div className={`modal-left ${imageSide === 'right' ? 'flipped' : ''}`}>
               <ImageUpload
                 imageUrl={modalImageUrl}
                 uploadingImage={uploadingImage}
@@ -48,8 +50,17 @@ function EditModal({
               />
             </div>
 
+            {/* Flip Button - Positioned absolutely in the center */}
+            <button
+              className="flip-layout-btn"
+              onClick={() => onImageSideChange(imageSide === 'left' ? 'right' : 'left')}
+              title="Flip image and text positions"
+            >
+              <ArrowLeftRight size={20} />
+            </button>
+
             {/* Right side - Controls and Text input */}
-            <div className="modal-right">
+            <div className={`modal-right ${imageSide === 'right' ? 'flipped' : ''}`}>
               <div className="text-input-section">
                 <TextEditor
                   content={modalTinyMCEContent}

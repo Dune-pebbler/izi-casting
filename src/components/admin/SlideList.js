@@ -248,7 +248,7 @@ function SlideList({
         default:
           return (
             <div className="slide-preview-side-by-side">
-              <div className="preview-left">
+              <div className={`preview-left ${slide.imageSide === 'right' ? 'flipped' : ''}`}>
                 {slide.imageUrl ? (
                   <img 
                     src={slide.imageUrl} 
@@ -264,7 +264,7 @@ function SlideList({
                   </div>
                 )}
               </div>
-              <div className="preview-right">
+              <div className={`preview-right ${slide.imageSide === 'right' ? 'flipped' : ''}`}>
                 {slide.text || slide.tinyMCEContent ? (
                   <div 
                     className="preview-text-content"
