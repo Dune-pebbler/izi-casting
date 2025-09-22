@@ -163,14 +163,6 @@
   max-width: 100%;
 }
 
-.preview-image {
-  max-width: 200px;
-  object-fit: contain;
-  border-radius: $border-radius-sm;
-  border: 1px solid $border-color;
-  background-color: $surface;
-  padding: $spacing-sm;
-}
 
 .remove-image-btn {
   position: absolute;
@@ -1153,7 +1145,7 @@
 }
 
 .slide-preview-container {
-  height: 160px;
+  height: 180px;
   overflow: hidden;
   position: relative;
 }

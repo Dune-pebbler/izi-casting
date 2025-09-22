@@ -131,7 +131,14 @@ function SlideList({
           return (
             <div className="slide-preview-image-only">
               {slide.imageUrl ? (
-                <img src={slide.imageUrl} alt="Slide" className="preview-image" />
+                <img 
+                  src={slide.imageUrl} 
+                  alt="Slide" 
+                  className="preview-image"
+                  style={{
+                    objectPosition: slide.imagePosition || "center",
+                  }}
+                />
               ) : (
                 <div className="preview-placeholder">
                   <div className="placeholder-icon">🖼️</div>
@@ -165,7 +172,14 @@ function SlideList({
             <div className="slide-preview-text-over-image">
               {slide.imageUrl ? (
                 <div className="preview-image-background">
-                  <img src={slide.imageUrl} alt="Slide" className="preview-image" />
+                  <img 
+                    src={slide.imageUrl} 
+                    alt="Slide" 
+                    className="preview-image"
+                    style={{
+                      objectPosition: slide.imagePosition || "center",
+                    }}
+                  />
                   <div className="preview-text-overlay">
                     {slide.text || slide.tinyMCEContent ? (
                       <div 
@@ -236,7 +250,14 @@ function SlideList({
             <div className="slide-preview-side-by-side">
               <div className="preview-left">
                 {slide.imageUrl ? (
-                  <img src={slide.imageUrl} alt="Slide" className="preview-image" />
+                  <img 
+                    src={slide.imageUrl} 
+                    alt="Slide" 
+                    className="preview-image"
+                    style={{
+                      objectPosition: slide.imagePosition || "center",
+                    }}
+                  />
                 ) : (
                   <div className="preview-placeholder">
                     <div className="placeholder-icon">🖼️</div>
