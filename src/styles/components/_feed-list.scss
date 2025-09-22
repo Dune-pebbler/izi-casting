@@ -3,16 +3,13 @@
 
 .feed-list {
   margin-bottom: $spacing-lg;
-  background-color: $surface;
   display: flex;
   flex-direction: column;
-  border-radius: $border-radius-md;
 
   .settings-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: $spacing-md;
     padding-bottom: $spacing-sm;
 
     h2 {
@@ -28,12 +25,14 @@
     border: 1px solid $border-color;
     border-radius: $border-radius-lg;
     background-color: $surface;
+    box-shadow: $shadow-sm;
     transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     overflow: hidden;
 
     &:hover {
       box-shadow: $shadow-md;
-      border-color: rgba($primary, 0.2);
+      border-color: rgba($gray-400, 0.3);
+      transform: translateY(-1px);
     }
 
     &.dragging {
@@ -41,7 +40,6 @@
       transform: rotate(1deg) scale(1.02);
       box-shadow: $shadow-lg;
     }
-
   }
 
   // Feed Header
@@ -51,18 +49,19 @@
     justify-content: space-between;
     padding: $spacing-sm;
     cursor: pointer;
-    transition: background-color 0.2s ease;
+    transition: all 0.2s ease;
     min-height: 64px;
 
     &:hover {
-      background-color: rgba($primary, 0.03);
+      background-color: rgba($gray-100, 0.5);
     }
   }
 
   .feed-header-left {
     display: flex;
     align-items: center;
-    gap: $spacing-sm;
+    gap: $spacing-md;
+    flex: 1;
   }
 
   .feed-drag-handle {
@@ -102,12 +101,10 @@
   .feed-max-posts {
     display: flex;
     align-items: center;
-    gap: $spacing-xs;
+    gap: $spacing-sm;
     font-size: 0.95rem;
-    background-color: rgba($primary, 0.05);
-    padding: $spacing-xs $spacing-sm;
-    border-radius: $border-radius-sm;
-    border: 1px solid rgba($primary, 0.1);
+    margin-left: auto;
+    margin-right: auto;
 
     .max-posts-label {
       color: $text-secondary;
@@ -115,83 +112,49 @@
     }
 
     .max-posts-value {
-      color: $primary;
+      color: $text-primary;
       font-weight: $font-weight-semibold;
+      font-size: 1.1rem;
 
       &.max-posts-editable {
         cursor: pointer;
-        padding: 2px 4px;
-        border-radius: 3px;
+        padding: $spacing-xs $spacing-md;
+        border-radius: $border-radius-md;
         transition: all 0.2s ease;
+        border: 1px solid transparent;
+        background-color: #F7F7F7;
+        min-width: 40px;
+        min-height: 36px;
+        text-align: center;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
 
         &:hover {
-          background-color: rgba($primary, 0.1);
-          transform: scale(1.05);
+          background-color: #F0F0F0;
+          border-color: rgba($gray-300, 0.5);
+          transform: scale(1.02);
         }
       }
     }
 
-    .max-posts-edit-container {
-      display: flex;
-      align-items: center;
-      gap: $spacing-xs;
-    }
-
     .max-posts-input {
-      width: 50px;
-      padding: 2px 4px;
-      border: 1px solid $primary;
-      border-radius: 3px;
-      font-size: 0.9rem;
+      width: 60px;
+      min-height: 36px;
+      padding: $spacing-sm $spacing-md;
+      border: 1px solid $border-color;
+      border-radius: $border-radius-md;
+      font-size: 1.1rem;
       text-align: center;
-      background-color: $white;
+      background-color: #F7F7F7;
       color: $text-primary;
+      font-weight: $font-weight-semibold;
 
       &:focus {
         outline: none;
         border-color: $primary;
         box-shadow: 0 0 0 2px rgba($primary, 0.2);
-      }
-    }
-
-    .max-posts-edit-actions {
-      display: flex;
-      gap: 2px;
-    }
-
-    .max-posts-save-btn,
-    .max-posts-cancel-btn {
-      width: 20px;
-      height: 20px;
-      border: none;
-      border-radius: 3px;
-      font-size: 12px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.2s ease;
-
-      &:hover {
-        transform: scale(1.1);
-      }
-    }
-
-    .max-posts-save-btn {
-      background-color: $success;
-      color: $white;
-
-      &:hover {
-        background-color: darken($success, 10%);
-      }
-    }
-
-    .max-posts-cancel-btn {
-      background-color: $error;
-      color: $white;
-
-      &:hover {
-        background-color: darken($error, 10%);
+        background-color: $surface;
       }
     }
   }
@@ -254,20 +217,20 @@
   }
 
   .feed-details {
-    padding: $spacing-sm;
+    padding: $spacing-md;
     display: flex;
     flex-direction: column;
-    gap: $spacing-sm;
+    gap: $spacing-md;
+    background-color: rgba($gray-50, 0.3);
+    padding-top: 0;
   }
 
   .feed-url {
-    display: flex;
-    align-items: center;
-    gap: $spacing-sm;
-    font-size: 0.95rem;
-    padding: $spacing-sm;
-    background-color: $surface;
-    border-radius: $border-radius-sm;
+
+    &:hover {
+      border-color: rgba($gray-400, 0.5);
+      box-shadow: 0 2px 4px rgba($gray-300, 0.2);
+    }
 
     .url-label {
       color: $text-secondary;
@@ -278,84 +241,36 @@
     .url-value {
       color: $text-primary;
       flex: 1;
-      font-family: $font-family-mono;
-      font-size: 0.9rem;
 
       &.url-editable {
         cursor: pointer;
-        padding: $spacing-xs;
+        padding: $spacing-sm;
         border-radius: $border-radius-sm;
         transition: all 0.2s ease;
-        border: 1px solid transparent;
+        background-color: #F7F7F7;
 
         &:hover {
-          background-color: rgba($primary, 0.05);
-          border-color: rgba($primary, 0.2);
+          background-color: rgba($gray-100, 0.5);
+          border-color: rgba($gray-300, 0.5);
         }
       }
     }
 
-    .url-edit-container {
-      display: flex;
-      align-items: center;
-      gap: $spacing-xs;
-      flex: 1;
+    .url-input {
+      width: 100%;
+      padding: $spacing-sm;
+      border: 1px solid $border-color;
+      border-radius: $border-radius-sm;
+      font-family: $font-family-mono;
+      font-size: 0.9rem;
+      background-color: $surface;
+      color: $text-primary;
+      transition: all 0.2s ease;
 
-      .url-input {
-        flex: 1;
-        padding: $spacing-xs;
-        border: 1px solid $primary;
-        border-radius: $border-radius-sm;
-        font-family: $font-family-mono;
-        font-size: 0.9rem;
-        background-color: $surface;
-        color: $text-primary;
-        transition: border-color 0.2s ease;
-
-        &:focus {
-          outline: none;
-          border-color: $primary;
-          box-shadow: 0 0 0 2px rgba($primary, 0.2);
-        }
-      }
-
-      .url-edit-actions {
-        display: flex;
-        gap: $spacing-xs;
-
-        .url-save-btn,
-        .url-cancel-btn {
-          padding: $spacing-xs;
-          border: none;
-          border-radius: $border-radius-sm;
-          cursor: pointer;
-          font-size: 0.8rem;
-          font-weight: $font-weight-semibold;
-          transition: all 0.2s ease;
-          min-width: 24px;
-          min-height: 24px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-
-        .url-save-btn {
-          background-color: $success;
-          color: white;
-
-          &:hover {
-            background-color: darken($success, 10%);
-          }
-        }
-
-        .url-cancel-btn {
-          background-color: $danger;
-          color: white;
-
-          &:hover {
-            background-color: darken($danger, 10%);
-          }
-        }
+      &:focus {
+        outline: none;
+        border-color: $primary;
+        box-shadow: 0 0 0 2px rgba($primary, 0.2);
       }
     }
   }
@@ -363,9 +278,10 @@
   // Inline Edit Form
   .feed-edit-form {
     padding: $spacing-lg;
-    border-top: 1px solid rgba($primary, 0.2);
-    background-color: rgba($primary, 0.03);
+    border-top: 1px solid rgba($gray-300, 0.5);
+    background-color: rgba($gray-50, 0.3);
     border-radius: 0 0 $border-radius-lg $border-radius-lg;
+    box-shadow: inset 0 1px 3px rgba($gray-200, 0.3);
 
     .form-group {
       margin-bottom: $spacing-md;
@@ -384,18 +300,24 @@
 
       .form-input {
         width: 100%;
-        padding: $spacing-sm;
+        padding: $spacing-md;
         border: 1px solid $border-color;
-        border-radius: $border-radius-sm;
-        font-size: 1rem; // Increased from 0.875rem
+        border-radius: $border-radius-md;
+        font-size: 1rem;
         background-color: $surface;
         color: $text-primary;
-        transition: border-color 0.2s ease;
+        transition: all 0.2s ease;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 
         &:focus {
           outline: none;
           border-color: $primary;
-          box-shadow: 0 0 0 2px rgba($primary, 0.2);
+          box-shadow: 0 0 0 3px rgba($primary, 0.1), 0 2px 4px rgba($primary, 0.1);
+          transform: translateY(-1px);
+        }
+
+        &:hover {
+          border-color: rgba($gray-400, 0.5);
         }
       }
 
@@ -435,34 +357,44 @@
       display: flex;
       gap: $spacing-sm;
       justify-content: flex-end;
-      margin-top: $spacing-md;
-      padding-top: $spacing-md;
-      border-top: 1px solid $border-color;
+      margin-top: $spacing-lg;
+      padding-top: $spacing-lg;
+      border-top: 1px solid rgba($border-color, 0.5);
 
       .btn {
-        padding: $spacing-md $spacing-lg; // Increased padding
-        border: none;
-        border-radius: $border-radius-sm;
-        font-size: 1rem; // Increased from 0.875rem
+        padding: $spacing-md $spacing-lg;
+        border: 1px solid transparent;
+        border-radius: $border-radius-md;
+        font-size: 1rem;
         font-weight: $font-weight-medium;
         cursor: pointer;
         transition: all 0.2s ease;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+
+        &:hover {
+          transform: translateY(-1px);
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
 
         &.btn-primary {
           background-color: $primary;
           color: white;
+          border-color: $primary;
 
           &:hover {
-            background-color: darken($primary, 10%);
+            background-color: darken($primary, 8%);
+            border-color: darken($primary, 8%);
           }
         }
 
         &.btn-secondary {
-          background-color: $gray-200;
+          background-color: $surface;
           color: $text-primary;
+          border-color: $border-color;
 
           &:hover {
-            background-color: $gray-300;
+            background-color: $gray-50;
+            border-color: $gray-300;
           }
         }
       }
@@ -495,7 +427,6 @@
 
   // Add Feed Button
   .add-feed-button {
-    margin-top: $spacing-md;
     padding: $spacing-md;
     border: 2px dashed $border-color;
     border-radius: $border-radius-md;

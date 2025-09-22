@@ -21,21 +21,25 @@
       .pairing-form-display {
         border-radius: $border-radius-md;
         overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: $spacing-md;
 
         .pairing-form-header {
           display: flex;
           justify-content: center;
           align-items: center;
           padding: $spacing-md;
-
-          h3 {
-            margin: 0;
-            font-size: 1rem;
-            font-weight: $font-weight-semibold;
-            color: $text-primary;
+          position: relative;
+          h2 {
+            font-size: 32px;
           }
 
           button {
+            position: absolute;
+            right: -22px;
             background: none;
             border: none;
             color: $text-secondary;
@@ -64,18 +68,18 @@
 
           .pairing-code-inputs {
             display: flex;
-            gap: $spacing-xs;
+            gap: $spacing-sm;
             justify-content: center;
             margin-bottom: $spacing-md;
 
             .pairing-code-input {
-              width: 52px;
-              height: 66px;
+              width: 66px;
+              height: 84px;
               text-align: center;
-              font-size: 1.2rem;
+              font-size: 2rem;
               font-weight: $font-weight-bold;
               border: 2px solid $border-color;
-              border-radius: $border-radius-md;
+              border-radius: $border-radius-xxl;
               color: $text-primary;
               transition: $transition-base;
 
@@ -103,7 +107,7 @@
             &.btn-primary {
               background-color: $primary;
               color: $surface;
-
+              border-radius: $border-radius-lg;
               &:hover:not(:disabled) {
                 background-color: darken($primary, 8%);
               }
@@ -142,7 +146,7 @@
 
       .device-item {
         margin-bottom: $spacing-sm;
-        padding: $spacing-sm;
+        padding: $spacing-md;
         border: 1px solid $success;
         border-radius: $border-radius-lg;
         background-color: rgba($success, 0.1);
@@ -154,206 +158,124 @@
           background-color: rgba($success, 0.15);
         }
 
+        &:has(.device-delete-btn:hover) {
+          border-color: $error;
+          background-color: rgba($error, 0.1);
+          color: $error;
+        }
+
         .device-header {
           display: flex;
           justify-content: space-between;
           align-items: center;
           margin-bottom: $spacing-xs;
 
-          .device-name-display {
+          .device-header-left {
             display: flex;
             align-items: center;
             gap: $spacing-sm;
-
-            strong {
-              color: $text-primary;
-              font-size: 0.875rem;
-              font-weight: $font-weight-medium;
-            }
-
-            .device-name-edit-btn {
-              border: none;
-              color: $text-secondary;
-              cursor: pointer;
-              padding: 2px;
-              border-radius: $border-radius-sm;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              transition: $transition-base;
-              padding: $spacing-xs;
-
-              &:hover {
-                background-color: $primary;
-                color: $surface;
-              }
-
-              &:focus {
-                outline: none;
-                box-shadow: 0 0 0 2px rgba($primary, 0.2);
-              }
-            }
-          }
-
-          .device-name-edit {
-            display: flex;
-            align-items: center;
-            gap: $spacing-xs;
             flex: 1;
-            margin-right: $spacing-sm;
-
-            .device-name-input {
-              flex: 1;
-              padding: 4px 8px;
-              border: 1px solid $primary;
-              border-radius: $border-radius-sm;
-              font-size: 0.875rem;
-              font-weight: $font-weight-medium;
-              color: $text-primary;
-              background-color: $surface;
-              min-width: 120px;
-
-              &:focus {
-                outline: none;
-                box-shadow: 0 0 0 2px rgba($primary, 0.2);
-              }
-
-              &::placeholder {
-                color: $text-tertiary;
-              }
-            }
-
-            .device-name-edit-actions {
-              display: flex;
-              gap: 2px;
-
-              .device-name-save-btn,
-              .device-name-cancel-btn {
-                background: none;
-                border: none;
-                cursor: pointer;
-                padding: 4px;
-                border-radius: $border-radius-sm;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                transition: $transition-base;
-
-                &:focus {
-                  outline: none;
-                  box-shadow: 0 0 0 2px rgba($primary, 0.2);
-                }
-              }
-
-              .device-name-save-btn {
-                color: $success;
-
-                &:hover {
-                  background-color: $success;
-                  color: $surface;
-                }
-              }
-
-              .device-name-cancel-btn {
-                color: $error;
-
-                &:hover {
-                  background-color: $error;
-                  color: $surface;
-                }
-              }
-            }
+            min-width: 0;
           }
 
           .device-header-right {
             display: flex;
             align-items: center;
             gap: $spacing-xs;
+          }
 
-            .device-status {
-              font-size: 0.75rem;
-              padding: 2px 6px;
-              border-radius: $border-radius-sm;
-              font-weight: $font-weight-medium;
+          .device-name-display {
+            display: flex;
+            align-items: center;
+            gap: $spacing-sm;
 
-              &.offline {
-                background-color: $gray-400;
-                color: $surface;
-              }
-            }
-
-
-            .device-pairing-status {
-              font-size: 0.75rem;
-              padding: 2px 6px;
-              border-radius: $border-radius-sm;
-              font-weight: $font-weight-medium;
-              margin-left: 4px;
-
-              &.paired {
-                background-color: $primary;
-                color: $surface;
-              }
-
-              &.needs-pairing {
-                background-color: $warning;
-                color: $surface;
-              }
-            }
-
-            .device-refresh-btn {
-              background: none;
-              border: none;
-              color: $text-secondary;
+            .device-name-title {
+              color: $text-primary;
+              font-size: 0.875rem;
+              font-weight: $font-weight-semibold;
               cursor: pointer;
-              padding: 2px;
+              padding: $spacing-xs $spacing-sm;
               border-radius: $border-radius-sm;
-              display: flex;
-              align-items: center;
-              justify-content: center;
               transition: $transition-base;
 
               &:hover {
-                background-color: $primary;
-                color: $surface;
+                background-color: $gray-100;
               }
+            }
+          }
 
-              &:focus {
-                outline: none;
-                box-shadow: 0 0 0 2px rgba($primary, 0.2);
-              }
+          .device-name-input {
+            width: 100%;
+            max-width: 300px;
+            padding: $spacing-xs $spacing-sm;
+            border: 1px solid $border-color;
+            border-radius: $border-radius-sm;
+            font-size: 0.875rem;
+            font-weight: $font-weight-semibold;
+            color: $text-primary;
+            background-color: $surface;
+            transition: $transition-base;
 
-              &:disabled {
-                cursor: not-allowed;
-                opacity: 0.6;
-              }
+            &:focus {
+              outline: none;
+              border-color: $border-color-focus;
+              box-shadow: 0 0 0 1px $border-color-focus;
+            }
 
-              .rotating {
-                animation: rotate 1s linear infinite;
+            &::placeholder {
+              color: $gray-400;
+              font-weight: $font-weight-normal;
+            }
+          }
+
+          .device-refresh-btn {
+            background: none;
+            border: none;
+            color: $text-secondary;
+            cursor: pointer;
+            padding: $spacing-xs;
+            border-radius: $border-radius-sm;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: $transition-base;
+
+            &:hover {
+              svg {
+                animation: rotate-reverse 1s linear infinite;
               }
             }
 
-            .device-delete-btn {
-              background: none;
-              border: none;
-              color: $text-secondary;
-              cursor: pointer;
-              padding: 2px;
-              border-radius: $border-radius-sm;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              transition: $transition-base;
+            &:focus {
+              outline: none;
+              box-shadow: 0 0 0 2px rgba($primary, 0.2);
+            }
 
-              &:hover {
-                background-color: $error;
-                color: $surface;
-              }
+            &:disabled {
+              cursor: not-allowed;
+              opacity: 0.6;
+            }
 
-              &:focus {
-                outline: none;
-                box-shadow: 0 0 0 2px rgba($error, 0.2);
-              }
+            .rotating {
+              animation: rotate 1s linear infinite;
+            }
+          }
+
+          .device-delete-btn {
+            background: none;
+            border: none;
+            color: $error;
+            cursor: pointer;
+            padding: $spacing-xs;
+            border-radius: $border-radius-sm;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: $transition-base;
+
+            &:focus {
+              outline: none;
+              box-shadow: 0 0 0 2px rgba($error, 0.2);
             }
           }
         }
@@ -370,10 +292,52 @@
     }
 
 
-    // Extra Screen Section
-    .extra-screen-section {
+    // Extra Screen Button
+    .extra-screen-button {
+      border-radius: $border-radius-lg;
       margin-top: $spacing-md;
-      text-align: center;
+      background-color: transparent !important;
+      border: 2px dashed $border-color;
+      position: relative;
+      cursor: pointer;
+      transition: $transition-base;
+
+      &:hover {
+        border-color: $primary;
+        background-color: rgba($primary, 0.05);
+      }
+
+      &:active {
+        transform: translateY(1px);
+      }
+
+      .extra-screen-content {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: $spacing-md;
+        color: $primary;
+        background-color: transparent !important;
+        transition: $transition-base;
+        gap: $spacing-xs;
+
+        svg {
+          transition: $transition-base;
+        }
+
+        span {
+          font-size: $font-size-base;
+          font-weight: $font-weight-semibold;
+        }
+      }
+
+      &:hover .extra-screen-content {
+        color: $primary;
+
+        svg {
+          transform: scale(1.1);
+        }
+      }
     }
 
     // No Devices Message
@@ -400,6 +364,15 @@
   }
   to {
     transform: rotate(360deg);
+  }
+}
+
+@keyframes rotate-reverse {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(-360deg);
   }
 }
 

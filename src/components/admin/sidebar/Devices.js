@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Edit2, Check, X as XIcon, RotateCcw } from "lucide-react";
+import { Edit2, Check, X as XIcon, RotateCcw, Plus } from "lucide-react";
 import {
   doc,
   getDoc,
@@ -237,7 +237,7 @@ function Devices({ setDeviceToDelete, deleteDevice }) {
 
   return (
     <div className="sidebar-devices">
-      <h2>Schermen ({onlineDevices.length})</h2>
+      <h3>Schermen ({onlineDevices.length})</h3>
       <div className="devices-content">
         {/* Pairing Section */}
 
@@ -251,80 +251,60 @@ function Devices({ setDeviceToDelete, deleteDevice }) {
               .map((device) => (
                 <div key={device.id} className="device-item">
                   <div className="device-header">
-                    {editingDeviceId === device.id ? (
-                      <div className="device-name-edit">
+                    <div className="device-header-left">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleRefreshDevice(device.id);
+                        }}
+                        className="device-refresh-btn"
+                        title="Slides opnieuw starten"
+                        disabled={refreshingDevices.has(device.id)}
+                      >
+                        <RotateCcw
+                          size={18}
+                          className={
+                            refreshingDevices.has(device.id) ? "rotating" : ""
+                          }
+                        />
+                      </button>
+                      {editingDeviceId === device.id ? (
                         <input
                           type="text"
                           value={editingDeviceName}
                           onChange={(e) => setEditingDeviceName(e.target.value)}
-                          className="device-name-input"
-                          placeholder="Voer display naam in..."
-                          maxLength={30}
-                          onKeyDown={(e) => {
+                          onBlur={() => handleSaveName(device.id)}
+                          onKeyPress={(e) => {
                             if (e.key === "Enter") {
                               handleSaveName(device.id);
                             } else if (e.key === "Escape") {
                               handleCancelEdit();
                             }
                           }}
+                          onClick={(e) => e.stopPropagation()}
+                          className="device-name-input"
+                          placeholder="Voer display naam in..."
+                          maxLength={30}
                           autoFocus
                         />
-                        <div className="device-name-edit-actions">
-                          <button
-                            onClick={() => handleSaveName(device.id)}
-                            className="device-name-save-btn"
-                            title="Opslaan"
+                      ) : (
+                        <div className="device-name-display">
+                          <strong
+                            className="device-name-title"
+                            onClick={() => handleEditName(device)}
                           >
-                            <Check size={14} />
-                          </button>
-                          <button
-                            onClick={handleCancelEdit}
-                            className="device-name-cancel-btn"
-                            title="Annuleren"
-                          >
-                            <XIcon size={14} />
-                          </button>
+                            {getDisplayName(device)}
+                          </strong>
                         </div>
-                      </div>
-                    ) : (
-                      <div className="device-name-display">
-                        <strong>{getDisplayName(device)}</strong>
-                        <button
-                          onClick={() => handleEditName(device)}
-                          className="device-name-edit-btn"
-                          title="Naam bewerken"
-                        >
-                          <Edit2 size={14} />
-                        </button>
-                      </div>
-                    )}
+                      )}
+                    </div>
                     <div className="device-header-right">
-                      <span
-                        className={`device-status ${
-                          isDeviceOnline(device.lastSeen) ? "online" : "offline"
-                        }`}
-                      >
-                        {isDeviceOnline(device.lastSeen) ? "Online" : "Offline"}
-                      </span>
-                      <button
-                        onClick={() => handleRefreshDevice(device.id)}
-                        className="device-refresh-btn"
-                        title="Slides opnieuw starten"
-                        disabled={refreshingDevices.has(device.id)}
-                      >
-                        <RotateCcw
-                          size={14}
-                          className={
-                            refreshingDevices.has(device.id) ? "rotating" : ""
-                          }
-                        />
-                      </button>
                       <button
                         onClick={() => setDeviceToDelete(device)}
                         className="device-delete-btn"
                         title="Apparaat ontkoppelen"
                       >
-                        <XIcon size={14} />
+                        <XIcon size={18} />
                       </button>
                     </div>
                   </div>
@@ -335,22 +315,20 @@ function Devices({ setDeviceToDelete, deleteDevice }) {
 
         {/* Extra Screen Button - only show when devices are connected and not showing pairing form */}
         {onlineDevices.length > 0 && !showPairingForm && (
-          <div className="extra-screen-section">
-            <button
-              onClick={() => dispatch(setShowPairingForm(true))}
-              className="btn btn-primary btn-sm"
-            >
-              Extra scherm toevoegen
-            </button>
+          <div className="extra-screen-button" onClick={() => dispatch(setShowPairingForm(true))}>
+            <div className="extra-screen-content">
+              <Plus size={24} />
+              <span>Extra scherm toevoegen</span>
+            </div>
           </div>
         )}
 
         <div className="pairing-section">
-          {(linkedDevices.length === 0 || showPairingForm) && (
+          {(onlineDevices.length === 0 || showPairingForm) && (
             <div className="pairing-form-display">
               <div className="pairing-form-header">
-                <h3>Apparaat koppelen</h3>
-                {linkedDevices.length > 0 && (
+                <h2>Apparaat koppelen</h2>
+                {onlineDevices.length > 0 && (
                   <button
                     onClick={() => {
                       dispatch(setShowPairingForm(false));
@@ -358,14 +336,13 @@ function Devices({ setDeviceToDelete, deleteDevice }) {
                     }}
                     className="btn btn-outline btn-sm"
                   >
-                    <XIcon size={14} />
+                    <XIcon size={20} />
                   </button>
                 )}
               </div>
               <div className="pairing-form-content">
                 <p className="pairing-instructions">
-                  Voer de koppelcode in die op het display apparaat wordt
-                  getoond
+                  Voer de koppelcode in die op het scherm wordt getoond
                 </p>
                 <div className="pairing-code-inputs">
                   {[0, 1, 2, 3, 4].map((index) => (
@@ -444,13 +421,6 @@ function Devices({ setDeviceToDelete, deleteDevice }) {
           )}
         </div>
 
-        {/* No Devices Message */}
-        {onlineDevices.length === 0 && !showPairingForm && (
-          <div className="no-devices">
-            <p>Geen apparaten gekoppeld</p>
-            <p className="device-help">Koppel een apparaat om te beginnen</p>
-          </div>
-        )}
       </div>
     </div>
   );

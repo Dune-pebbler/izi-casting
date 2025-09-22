@@ -388,63 +388,33 @@ function FeedList() {
             <div className="feed-drag-handle" {...attributes} {...listeners}>
               <GripVertical size={18} />
             </div>
+            <div className="feed-max-posts">
+              <span className="max-posts-label">Aantal berichten:</span>
+              {editingMaxPosts === feed.id ? (
+                <input
+                  type="number"
+                  value={tempMaxPosts}
+                  onChange={(e) => setTempMaxPosts(e.target.value)}
+                  onKeyDown={(e) => handleMaxPostsKeyPress(e, feed.id)}
+                  onBlur={() => saveMaxPostsEdit(feed.id)}
+                  className="max-posts-input"
+                  min="1"
+                  max="50"
+                  autoFocus
+                />
+              ) : (
+                <span 
+                  className="max-posts-value max-posts-editable" 
+                  title="Klik om aantal berichten te bewerken"
+                  onClick={() => startMaxPostsEdit(feed)}
+                >
+                  {feed.maxPosts}
+                </span>
+              )}
+            </div>
           </div>
           <div className="feed-actions" onClick={(e) => e.stopPropagation()}>
-            <div className="feed-info">
-              <div className="feed-max-posts">
-                <span className="max-posts-label">Max Posts:</span>
-                {editingMaxPosts === feed.id ? (
-                  <div className="max-posts-edit-container">
-                    <input
-                      type="number"
-                      value={tempMaxPosts}
-                      onChange={(e) => setTempMaxPosts(e.target.value)}
-                      onKeyDown={(e) => handleMaxPostsKeyPress(e, feed.id)}
-                      onBlur={() => saveMaxPostsEdit(feed.id)}
-                      className="max-posts-input"
-                      min="1"
-                      max="50"
-                      autoFocus
-                    />
-                    <div className="max-posts-edit-actions">
-                      <button
-                        onClick={() => saveMaxPostsEdit(feed.id)}
-                        className="max-posts-save-btn"
-                        title="Save max posts"
-                      >
-                        ✓
-                      </button>
-                      <button
-                        onClick={cancelMaxPostsEdit}
-                        className="max-posts-cancel-btn"
-                        title="Cancel"
-                      >
-                        ✕
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <span 
-                    className="max-posts-value max-posts-editable" 
-                    title="Click to edit max posts"
-                    onClick={() => startMaxPostsEdit(feed)}
-                  >
-                    {feed.maxPosts}
-                  </span>
-                )}
-              </div>
-            </div>
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                toggleFeedEnabled(feed.id);
-              }}
-              className={`visibility-btn ${feed.isEnabled && feed.isVisible ? 'enabled' : 'disabled'}`}
-              title={feed.isEnabled && feed.isVisible ? 'Disable feed' : 'Enable feed'}
-            >
-              {feed.isEnabled && feed.isVisible ? <Eye size={18} /> : <EyeOff size={18} />}
-            </button>
-            <button
+            {/* <button
               onClick={(e) => {
                 e.stopPropagation();
                 copyFeed(feed);
@@ -453,7 +423,7 @@ function FeedList() {
               title="Copy feed"
             >
               <Copy size={18} />
-            </button>
+            </button> */}
             <button
               onClick={(e) => {
                 e.stopPropagation();
@@ -464,6 +434,16 @@ function FeedList() {
             >
               <Trash2 size={18} />
             </button>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                toggleFeedEnabled(feed.id);
+              }}
+              className={`visibility-btn ${feed.isEnabled && feed.isVisible ? 'enabled' : 'disabled'}`}
+              title={feed.isEnabled && feed.isVisible ? 'Disable feed' : 'Enable feed'}
+            >
+              {feed.isEnabled && feed.isVisible ? <Eye size={18} /> : <EyeOff size={18} />}
+            </button>
           </div>
         </div>
 
@@ -471,34 +451,16 @@ function FeedList() {
         <div className="feed-details">
           <div className="feed-url">
             {editingUrl === feed.id ? (
-              <div className="url-edit-container">
-                <input
-                  type="url"
-                  value={tempUrl}
-                  onChange={(e) => setTempUrl(e.target.value)}
-                  onKeyDown={(e) => handleUrlKeyPress(e, feed.id)}
-                  onBlur={() => saveUrlEdit(feed.id)}
-                  className="url-input"
-                  placeholder="Enter feed URL"
-                  autoFocus
-                />
-                <div className="url-edit-actions">
-                  <button
-                    onClick={() => saveUrlEdit(feed.id)}
-                    className="url-save-btn"
-                    title="Save URL"
-                  >
-                    ✓
-                  </button>
-                  <button
-                    onClick={cancelUrlEdit}
-                    className="url-cancel-btn"
-                    title="Cancel"
-                  >
-                    ✕
-                  </button>
-                </div>
-              </div>
+              <input
+                type="url"
+                value={tempUrl}
+                onChange={(e) => setTempUrl(e.target.value)}
+                onKeyDown={(e) => handleUrlKeyPress(e, feed.id)}
+                onBlur={() => saveUrlEdit(feed.id)}
+                className="url-input"
+                placeholder="Enter feed URL"
+                autoFocus
+              />
             ) : (
               <div 
                 className="url-value url-editable" 
@@ -658,7 +620,7 @@ function FeedList() {
   return (
     <div className="feed-list">
       <div className="settings-header">
-        <h2>Feed configuratie ({feeds.length})</h2>
+        <h3>Feed configuratie ({feeds.length})</h3>
       </div>
 
       {/* Feeds */}
@@ -683,10 +645,10 @@ function FeedList() {
         
         {/* Add Feed Button */}
         <div className="add-feed-button" onClick={addFeed}>
-        <div className="add-feed-content">
-          <Plus size={20} />
-          <span>Add Feed</span>
-        </div>
+          <div className="add-feed-content">
+            <Plus size={20} />
+            <span>Feed toevoegen</span>
+          </div>
         </div>
       </DndContext>
 
