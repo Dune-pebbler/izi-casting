@@ -1,0 +1,383 @@
+// Playlist Component Styles
+// All playlist-related styling moved from _admin.scss
+
+.admin-content-wrapper {
+  border-radius: $border-radius-lg;
+  margin-bottom: $spacing-md;
+  background-color: $surface;
+  border: 1px solid $border-color;
+  position: relative;
+  &:last-child {
+    margin-bottom: 0;
+  }
+  &.expanded {
+    border-bottom: none;
+    margin-bottom: 0;
+    border-radius: $border-radius-lg $border-radius-lg 0 0;
+    background-color: #fafbfb;
+  }
+}
+
+.playlist-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: $spacing-md;
+  border-radius: $border-radius-lg;
+  cursor: pointer;
+  transition: $transition-base;
+
+  &:hover {
+    background-color: $gray-50;
+  }
+
+  // Remove border-bottom when playlist is expanded
+}
+
+.playlist-header-left {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  flex: 1;
+  min-width: 0;
+}
+
+.playlist-drag-handle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: $gray-400;
+  flex-shrink: 0;
+  cursor: grab;
+  user-select: none;
+  padding: $spacing-xs;
+  border-radius: $border-radius-sm;
+  transition: $transition-base;
+
+  &:hover {
+    color: $gray-600;
+    background-color: $gray-100;
+  }
+
+  &:active {
+    cursor: grabbing;
+    color: $primary;
+    background-color: rgba($primary, 0.1);
+  }
+}
+
+.playlist-expand-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  color: $gray-500;
+  transition: $transition-base;
+  margin-left: $spacing-sm;
+}
+
+.expand-arrow {
+  transition: transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
+  &.expanded {
+    transform: rotate(180deg);
+  }
+}
+
+.playlist-title {
+  color: $text-primary;
+  font-weight: $font-weight-semibold;
+  font-size: $font-size-base;
+  margin: 0;
+  cursor: pointer;
+  padding: $spacing-xs $spacing-sm;
+  border-radius: $border-radius-sm;
+  transition: $transition-base;
+
+  &:hover {
+    background-color: $gray-100;
+  }
+}
+
+.playlist-title-input {
+  width: 100%;
+  max-width: 300px;
+  padding: $spacing-xs $spacing-sm;
+  border: 1px solid $border-color;
+  border-radius: $border-radius-sm;
+  font-size: $font-size-base;
+  font-weight: $font-weight-semibold;
+  color: $text-primary;
+  background-color: $surface;
+  transition: $transition-base;
+
+  &:focus {
+    outline: none;
+    border-color: $border-color-focus;
+    box-shadow: 0 0 0 1px $border-color-focus;
+  }
+
+  &::placeholder {
+    color: $gray-400;
+    font-weight: $font-weight-normal;
+  }
+}
+
+.playlist-actions {
+  display: flex;
+  gap: $spacing-sm;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.playlist-info {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  margin-right: $spacing-sm;
+}
+
+.playlist-duration {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+
+  .duration-label {
+    font-size: $font-size-sm;
+    color: $text-secondary;
+    font-weight: $font-weight-medium;
+  }
+
+  .duration-value {
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+    font-size: $font-size-base;
+    color: $primary;
+    font-weight: $font-weight-medium;
+  }
+}
+
+.playlist-slide-count {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+
+  .slide-count-value {
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+    font-size: $font-size-base;
+    color: $primary;
+    font-weight: $font-weight-medium;
+  }
+}
+
+.playlist-repeat-count {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+
+  .repeat-label {
+    font-size: $font-size-sm;
+    color: $text-secondary;
+    font-weight: $font-weight-medium;
+  }
+
+  .repeat-count-display {
+    font-size: $font-size-base;
+    color: $text-primary;
+    font-weight: $font-weight-medium;
+    background-color: $gray-100;
+    padding: 2px 6px;
+    border-radius: $border-radius-sm;
+    cursor: pointer;
+    transition: $transition-base;
+
+    &:hover {
+      background-color: $gray-200;
+    }
+  }
+
+  .repeat-count-input {
+    width: 50px;
+    font-size: $font-size-sm;
+    color: $text-primary;
+    font-weight: $font-weight-medium;
+    background-color: $surface;
+    padding: 2px 6px;
+    border: 1px solid $border-color;
+    border-radius: $border-radius-sm;
+    text-align: center;
+
+    &:focus {
+      outline: none;
+      border-color: $border-color-focus;
+      box-shadow: 0 0 0 1px $border-color-focus;
+    }
+  }
+}
+
+.copy-playlist-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: $icon-button-size;
+  height: $icon-button-size;
+  background: none;
+  border: 1px solid $border-color;
+  border-radius: $border-radius-sm;
+  color: $text-secondary;
+  cursor: pointer;
+  transition: $transition-base;
+
+  &:hover {
+    background-color: $gray-50;
+    color: $text-primary;
+    border-color: $gray-300;
+  }
+
+  &:active {
+    background-color: $gray-100;
+  }
+}
+
+.delete-playlist-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: $icon-button-size;
+  height: $icon-button-size;
+  background: none;
+  border: 1px solid $border-color;
+  border-radius: $border-radius-sm;
+  color: $text-secondary;
+  cursor: pointer;
+  transition: $transition-base;
+
+  &:hover {
+    background-color: rgba($error, 0.1);
+    color: $error;
+    border-color: $error;
+  }
+
+  &:active {
+    background-color: rgba($error, 0.2);
+  }
+}
+
+.playlist-toggle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: $icon-button-size;
+  height: $icon-button-size;
+  background: none;
+  border: 1px solid $border-color;
+  border-radius: $border-radius-sm;
+  color: $text-secondary;
+  cursor: pointer;
+  transition: $transition-base;
+
+  &:hover {
+    background-color: $gray-50;
+    color: $text-primary;
+    border-color: $gray-300;
+  }
+
+  &.enabled {
+    color: $success;
+    border-color: $success;
+
+    &:hover {
+      background-color: rgba($success, 0.1);
+    }
+  }
+
+  &.disabled {
+    color: $gray-400;
+
+    &:hover {
+      color: $text-secondary;
+    }
+  }
+}
+
+.playlist-slides-container {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(-8px);
+  transition: max-height 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    opacity 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
+  &.expanded {
+    max-height: 2000px;
+    opacity: 1;
+    transform: translateY(0);
+    margin-top: 0;
+    overflow: visible;
+    padding: $spacing-md;
+    background-color: white;
+    border-radius: $border-radius-lg;
+    border: 1px solid $gray-200;
+    margin-bottom: $spacing-md;
+  }
+}
+
+.admin-content-wrapper.dragging {
+  z-index: 1000;
+  transform: rotate(1deg);
+  box-shadow: $shadow-lg;
+  border-color: $primary;
+}
+
+/* Add Playlist Button Styles */
+.add-playlist-button {
+  border-radius: $border-radius-lg;
+  margin-bottom: $spacing-md;
+  background-color: transparent !important;
+  border: 2px dashed $border-color;
+  position: relative;
+  cursor: pointer;
+  transition: $transition-base;
+
+  &:hover {
+    border-color: $primary;
+    background-color: rgba($primary, 0.05);
+  }
+
+  &:active {
+    transform: translateY(1px);
+  }
+
+  .add-playlist-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: $spacing-md; /* Match playlist-header padding */
+    color: #f07167;
+    background-color: transparent !important;
+    transition: $transition-base;
+    gap: $spacing-xs;
+
+    svg {
+      transition: $transition-base;
+    }
+
+    span {
+      font-size: $font-size-base;
+      font-weight: $font-weight-semibold;
+    }
+  }
+
+  &:hover .add-playlist-content {
+    color: $primary;
+
+    svg {
+      transform: scale(1.1);
+    }
+  }
+}

@@ -1,284 +1,388 @@
 // Settings Component Styles
-// Mirrors the HTML structure from Settings.js
+// Follows the same design patterns as other sidebar components
 
-.sidebar-section {
+.settings-container {
   margin-bottom: $spacing-lg;
   display: flex;
   flex-direction: column;
-  border-radius: $border-radius-md;
 
+  // Settings Header - matches feed-list and devices patterns
   .settings-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: $spacing-md;
     padding-bottom: $spacing-sm;
-    border-bottom: 1px solid $border-color;
 
-    h2 {
-      margin: 0;
-      font-size: 1.125rem;
+    .settings-toggle-btn {
+      display: flex;
+      align-items: center;
+      gap: $spacing-sm;
+      width: 100%;
+
+      border: 0px;
+      border-radius: $border-radius-lg;
       color: $text-primary;
-    }
-  }
-
-  // Advanced Settings Toggle
-  .advanced-settings-toggle {
-
-    .advanced-settings-btn {
-      display: flex;
-      align-items: center;
-      gap: $spacing-xs;
-      padding: $spacing-xs;
       cursor: pointer;
-      border-radius: $border-radius-sm;
       transition: $transition-base;
-      color: $text-secondary;
+      font-size: $font-size-base;
       font-weight: $font-weight-medium;
-
+      background: transparent;
       &:hover {
-        background-color: $gray-100;
-        color: $text-primary;
+ 
+        transform: translateY(-1px);
+    
       }
 
-    }
-  }
-
-  // Advanced Settings Content
-  .advanced-settings-content {
-    .settings-section {
-      margin-bottom: $spacing-lg;
-
-      h3 {
-        margin: 0 0 $spacing-sm 0;
-        font-size: 1rem;
-        color: $text-primary;
-      }
-
-      // Logo Upload Section
-      .logo-upload-area {
-        .logo-preview {
-          text-align: center;
-          margin-bottom: $spacing-md;
-
-          .logo-image-container {
-            position: relative;
-            display: inline-block;
-            margin-bottom: $spacing-sm;
-
-            .logo-image {
-              width: 80px;
-              height: 80px;
-              object-fit: contain;
-              border-radius: $border-radius-sm;
-              border: 1px solid $border-color;
-              background-color: $surface;
-            }
-
-            .logo-remove-btn {
-              position: absolute;
-              top: -8px;
-              right: -8px;
-              width: 24px;
-              height: 24px;
-              background-color: $error;
-              color: $surface;
-              border: none;
-              border-radius: 50%;
-              cursor: pointer;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              transition: $transition-base;
-
-              &:hover {
-                background-color: darken($error, 8%);
-                transform: scale(1.1);
-              }
-
-              &:disabled {
-                opacity: 0.6;
-                cursor: not-allowed;
-              }
-            }
-          }
-
-          .logo-change-text {
-            display: block;
-            color: $primary;
-            cursor: pointer;
-            font-size: 0.875rem;
-            text-decoration: underline;
-
-            &:hover {
-              color: darken($primary, 8%);
-            }
-
-            input {
-              display: none;
-            }
-          }
-        }
-
-        .logo-upload-placeholder {
-          text-align: center;
-          padding: $spacing-lg;
-          border: 2px dashed $border-color;
-          border-radius: $border-radius-md;
-          background-color: $gray-50;
-
-          .logo-upload-label {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: $spacing-sm;
-            cursor: pointer;
-            color: $text-secondary;
-
-            .upload-icon {
-              width: 48px;
-              height: 48px;
-              color: $gray-400;
-            }
-
-            span {
-              font-size: 0.875rem;
-              font-weight: $font-weight-medium;
-            }
-
-            input {
-              display: none;
-            }
-          }
-
-          .upload-status {
-            margin-top: $spacing-sm;
-            font-size: 0.75rem;
-            color: $text-secondary;
-            font-style: italic;
-          }
-        }
-      }
-
-      // Color Settings Section
-      .color-settings {
-        .color-input-group {
-          margin-bottom: $spacing-md;
-
-          label {
-            display: block;
-            margin-bottom: $spacing-xs;
-            font-weight: $font-weight-medium;
-            color: $text-primary;
-            font-size: 0.875rem;
-          }
-
-          .color-input-wrapper {
-            display: flex;
-            gap: $spacing-sm;
-            align-items: center;
-
-            .color-picker {
-              width: 40px;
-              height: 40px;
-              border: none;
-              border-radius: $border-radius-sm;
-              cursor: pointer;
-              background: none;
-
-              &::-webkit-color-swatch-wrapper {
-                padding: 0;
-              }
-
-              &::-webkit-color-swatch {
-                border: 1px solid $border-color;
-                border-radius: $border-radius-sm;
-              }
-            }
-
-            .color-text-input {
-              flex: 1;
-              padding: $spacing-sm;
-              border: 1px solid $border-color;
-              border-radius: $border-radius-sm;
-              font-size: 0.875rem;
-              font-family: monospace;
-              color: $text-primary;
-              background-color: $surface;
-
-              &:focus {
-                outline: none;
-                border-color: $primary;
-                box-shadow: 0 0 0 2px rgba($primary, 0.2);
-              }
-
-              &::placeholder {
-                color: $text-tertiary;
-              }
-            }
-          }
-        }
-      }
-    }
-
-    // Settings Actions
-    .settings-actions {
-      margin-top: $spacing-lg;
-      text-align: center;
-
-      .btn {
-        padding: $spacing-sm $spacing-lg;
-        border-radius: $border-radius-sm;
-        font-weight: $font-weight-medium;
-        cursor: pointer;
-        transition: $transition-base;
-        border: none;
-        font-size: 0.875rem;
-
-        &.btn-primary {
-          background-color: $primary;
-          color: $surface;
-
-          &:hover:not(:disabled) {
-            background-color: darken($primary, 8%);
-          }
-
-          &:disabled {
-            background-color: $gray-400;
-            cursor: not-allowed;
-            opacity: 0.6;
-          }
-        }
-      }
-    }
-  }
-
-  // Compact Settings (collapsed state)
-  .compact-settings {
-    .compact-settings-header {
-      display: flex;
-      align-items: center;
-      gap: $spacing-xs;
-      padding: $spacing-xs;
-      cursor: pointer;
-      border-radius: $border-radius-sm;
-      transition: $transition-base;
-      color: $text-secondary;
-      font-weight: $font-weight-medium;
-
-      &:hover {
-        background-color: $gray-100;
-        color: $text-primary;
+      &:active {
+        transform: translateY(0);
       }
 
       svg {
-        flex-shrink: 0;
+        color: $text-secondary;
+        transition: $transition-base;
       }
 
-      span {
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
+      &:hover svg {
+        color: $primary;
+      }
+    }
+  }
+
+  // Settings Content - matches feed-list content styling
+  .settings-content {
+    margin-top: $spacing-sm;
+    border: 1px solid $border-color;
+    border-radius: $border-radius-lg;
+    background-color: $surface;
+
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    overflow: hidden;
+
+    &:hover {
+      box-shadow: $shadow-md;
+      border-color: rgba($gray-400, 0.3);
+    }
+  }
+
+  // Settings Sections - matches form styling patterns
+  .settings-section {
+    padding: $spacing-lg;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    // Row layout for logo and display settings
+    &.settings-row {
+      display: flex;
+      gap: $spacing-lg;
+      align-items: flex-start;
+
+      .logo-section {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .display-section {
+        flex: 0 0 auto;
+        min-width: 200px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+    }
+
+    h3 {
+      margin: 0 0 $spacing-md 0;
+      font-size: $font-size-lg;
+      font-weight: $font-weight-semibold;
+      color: $text-primary;
+    }
+
+    // Logo Upload Section
+    .logo-upload-area {
+      .logo-preview {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: $spacing-sm;
+
+        .logo-image-container {
+          position: relative;
+          display: inline-block;
+
+          .logo-image {
+            max-width: 120px;
+            max-height: 80px;
+            border-radius: $border-radius-sm;
+            border: 1px solid $border-color;
+          }
+
+          .logo-remove-btn {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: $red-500;
+            color: white;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: $transition-base;
+
+            &:hover {
+              background-color: $red-600;
+            }
+
+            &:disabled {
+              opacity: 0.5;
+              cursor: not-allowed;
+            }
+          }
+        }
+
+        .logo-change-text {
+          color: $primary;
+          font-size: $font-size-sm;
+          cursor: pointer;
+          text-decoration: underline;
+          transition: $transition-base;
+
+          &:hover {
+            color: $primary-dark;
+          }
+
+          input {
+            display: none;
+          }
+        }
+      }
+
+      .logo-upload-placeholder {
+        border: 2px dashed $border-color;
+        border-radius: $border-radius-md;
+        padding: $spacing-lg;
+        text-align: center;
+        transition: $transition-base;
+
+        &:hover {
+          border-color: $primary;
+          background-color: rgba($primary, 0.05);
+        }
+
+        .logo-upload-label {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: $spacing-sm;
+          cursor: pointer;
+
+          .upload-icon {
+            color: $gray-400;
+            width: 48px;
+            height: 48px;
+          }
+
+          span {
+            color: $text-secondary;
+            font-size: $font-size-sm;
+            font-weight: $font-weight-medium;
+          }
+
+          input {
+            display: none;
+          }
+        }
+
+        .upload-status {
+          margin-top: $spacing-sm;
+          color: $text-secondary;
+          font-size: $font-size-xs;
+          font-style: italic;
+        }
+      }
+    }
+
+    // Checkbox Setting - matches form styling
+    .checkbox-setting {
+      .checkbox-label {
+        display: flex;
+        align-items: center;
+        gap: $spacing-sm;
+        cursor: pointer;
+        font-size: $font-size-base;
+        font-weight: $font-weight-medium;
+
+        .checkbox-input {
+          width: 18px;
+          height: 18px;
+          cursor: pointer;
+          appearance: none;
+          border: 2px solid $border-color;
+          border-radius: $border-radius-sm;
+          background-color: $surface;
+          transition: $transition-base;
+          position: relative;
+
+          &:hover {
+            border-color: $primary;
+          }
+
+          &:checked {
+            background-color: $primary;
+            border-color: $primary;
+            
+            &::after {
+              content: "✓";
+              position: absolute;
+              top: 50%;
+              left: 50%;
+              transform: translate(-50%, -50%);
+              color: white;
+              font-weight: bold;
+              font-size: 12px;
+              line-height: 1;
+            }
+          }
+
+          &:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba($primary, 0.2);
+          }
+        }
+
+        .checkbox-text {
+          color: $text-primary;
+        }
+      }
+    }
+
+    // Color Settings - matches form input styling
+    .color-settings {
+      display: flex;
+      flex-direction: row;
+      gap: $spacing-lg;
+
+      .color-input-group {
+        flex: 1;
+        min-width: 0;
+
+        label {
+          display: block;
+          margin-bottom: $spacing-xs;
+          font-size: $font-size-sm;
+          font-weight: $font-weight-medium;
+          color: $text-primary;
+        }
+
+        .color-input-wrapper {
+          display: flex;
+          gap: $spacing-sm;
+          align-items: center;
+
+          .color-picker {
+            width: 40px;
+            height: 40px;
+            border: 1px solid $border-color;
+            border-radius: $border-radius-sm;
+            cursor: pointer;
+            padding: 0;
+            transition: $transition-base;
+
+            &:hover {
+              border-color: $gray-400;
+            }
+
+            &:focus {
+              outline: none;
+              border-color: $primary;
+              box-shadow: 0 0 0 2px rgba($primary, 0.2);
+            }
+
+            &::-webkit-color-swatch-wrapper {
+              padding: 0;
+            }
+
+            &::-webkit-color-swatch {
+              border: none;
+              border-radius: $border-radius-sm;
+            }
+          }
+
+          .color-text-input {
+            flex: 1;
+            padding: $spacing-sm $spacing-md;
+            border: 1px solid $border-color;
+            border-radius: $border-radius-sm;
+            font-size: $font-size-sm;
+            font-family: $font-family-mono;
+            background-color: $surface;
+            color: $text-primary;
+            transition: $transition-base;
+
+            &:focus {
+              outline: none;
+              border-color: $primary;
+              box-shadow: 0 0 0 2px rgba($primary, 0.2);
+            }
+
+            &:hover {
+              border-color: $gray-400;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Settings Actions - matches button styling patterns
+  .settings-actions {
+    padding: $spacing-lg;
+    background-color: rgba($gray-50, 0.3);
+    display: flex;
+    justify-content: center;
+
+    .btn {
+      width: auto;
+      padding: $spacing-sm $spacing-lg;
+      border: 1px solid transparent;
+      border-radius: $border-radius-md;
+      font-size: $font-size-sm;
+      font-weight: $font-weight-medium;
+      cursor: pointer;
+      transition: $transition-base;
+      box-shadow: $shadow-sm;
+
+      &:hover {
+        transform: translateY(-1px);
+        box-shadow: $shadow-md;
+      }
+
+      &:active {
+        transform: translateY(0);
+      }
+
+      &.btn-primary {
+        background-color: $primary;
+        color: white;
+        border-color: $primary;
+
+        &:hover:not(:disabled) {
+          background-color: darken($primary, 8%);
+          border-color: darken($primary, 8%);
+        }
+
+        &:disabled {
+          background-color: $gray-400;
+          border-color: $gray-400;
+          cursor: not-allowed;
+          transform: none;
+          box-shadow: none;
+        }
       }
     }
   }

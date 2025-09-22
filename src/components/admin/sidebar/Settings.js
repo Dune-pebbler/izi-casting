@@ -63,7 +63,7 @@ function Settings() {
     if (!file) return;
 
     setUploadingLogo(true);
-    const loadingToast = toast.loading("Uploading logo...");
+    const loadingToast = toast.loading("Logo uploaden...");
 
     try {
       const logoName = `logo_${Date.now()}_${file.name}`;
@@ -87,13 +87,13 @@ function Settings() {
 
       // Dismiss loading toast and show success
       toast.dismiss(loadingToast);
-      toast.success("Logo uploaded successfully!");
+      toast.success("Logo succesvol geüpload!");
     } catch (error) {
       console.error("Error uploading logo:", error);
 
       // Dismiss loading toast and show error
       toast.dismiss(loadingToast);
-      toast.error("Error uploading logo: " + error.message);
+      toast.error("Fout bij uploaden logo: " + error.message);
     } finally {
       setUploadingLogo(false);
     }
@@ -102,7 +102,7 @@ function Settings() {
   // Remove logo
   const removeLogo = async () => {
     // Show loading toast
-    const loadingToast = toast.loading("Removing logo...");
+    const loadingToast = toast.loading("Logo verwijderen...");
 
     try {
       if (settings.logoName) {
@@ -129,13 +129,13 @@ function Settings() {
 
       // Dismiss loading toast and show success
       toast.dismiss(loadingToast);
-      toast.success("Logo removed successfully!");
+      toast.success("Logo succesvol verwijderd!");
     } catch (error) {
       console.error("Error removing logo:", error);
 
       // Dismiss loading toast and show error
       toast.dismiss(loadingToast);
-      toast.error("Error removing logo: " + error.message);
+      toast.error("Fout bij verwijderen logo: " + error.message);
     }
   };
 
@@ -144,7 +144,7 @@ function Settings() {
     setIsSaving(true);
 
     // Show loading toast
-    const loadingToast = toast.loading("Saving settings...");
+    const loadingToast = toast.loading("Instellingen opslaan...");
 
     try {
       const settingsDocRef = doc(db, "display", "settings");
@@ -152,13 +152,13 @@ function Settings() {
 
       // Dismiss loading toast and show success
       toast.dismiss(loadingToast);
-      toast.success("Settings saved successfully!");
+      toast.success("Instellingen succesvol opgeslagen!");
     } catch (error) {
       console.error("Error saving settings:", error);
 
       // Dismiss loading toast and show error
       toast.dismiss(loadingToast);
-      toast.error("Error saving settings: " + error.message);
+      toast.error("Fout bij opslaan instellingen: " + error.message);
     } finally {
       setIsSaving(false);
     }
@@ -166,33 +166,26 @@ function Settings() {
 
   return (
     <div className="sidebar-section">
-      
-      {isAdvancedSettingsExpanded ? (
-        <div className="compact-settings">
-          {/* Advanced Settings Toggle */}
-          <div className="compact-settings-header">
-            <button
-              className="advanced-settings-btn"
-              onClick={() =>
-                setIsAdvancedSettingsExpanded(!isAdvancedSettingsExpanded)
-              }
-            >
-              <SettingsIcon size={16} />
-              <span>Geavanceerde instellingen</span>
-              {isAdvancedSettingsExpanded ? (
-                <ChevronUp size={16} />
-              ) : (
-                <ChevronDown size={16} />
-              )}
-            </button>
-          </div>
+      <div className="settings-container">
+        <div className="settings-header">
+          <button
+            className="settings-toggle-btn"
+            onClick={() =>
+              setIsAdvancedSettingsExpanded(!isAdvancedSettingsExpanded)
+            }
+          >
+            <SettingsIcon size={16} />
+            <span>Geavanceerde instellingen</span>
+            {isAdvancedSettingsExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+          </button>
+        </div>
 
-          {/* Advanced Settings Content */}
-          {isAdvancedSettingsExpanded && (
-            <div className="advanced-settings-content">
-              {/* Logo Upload Section */}
-              <div className="settings-section">
-                <h3>Logo</h3>
+        {isAdvancedSettingsExpanded && (
+          <div className="settings-content">
+              {/* Logo and Display Settings Row */}
+              <div className="settings-section settings-row">
+                {/* Logo Upload */}
+                <div className="logo-section">
                 <div className="logo-upload-area">
                   {settings.logoUrl ? (
                     <div className="logo-preview">
@@ -222,7 +215,7 @@ function Settings() {
                         </button>
                       </div>
                       <label className="logo-change-text">
-                        Change Logo
+                        Logo Wijzigen
                         <input
                           type="file"
                           accept="image/*"
@@ -251,7 +244,7 @@ function Settings() {
                             <line x1="12" y1="15" x2="12" y2="3"></line>
                           </svg>
                         </div>
-                        <span>Upload Logo</span>
+                        <span>Logo Uploaden</span>
                         <input
                           type="file"
                           accept="image/*"
@@ -263,17 +256,16 @@ function Settings() {
                         />
                       </label>
                       {uploadingLogo && (
-                        <div className="upload-status">Uploading...</div>
+                        <div className="upload-status">Uploaden...</div>
                       )}
                     </div>
                   )}
                 </div>
-              </div>
+                </div>
 
-              {/* Display Settings Section */}
-              <div className="settings-section">
-                <h3>Display Settings</h3>
-                <div className="checkbox-setting">
+                {/* Display Settings */}
+                <div className="display-section">
+                  <div className="checkbox-setting">
                   <label className="checkbox-label">
                     <input
                       type="checkbox"
@@ -283,17 +275,17 @@ function Settings() {
                       }
                       className="checkbox-input"
                     />
-                    <span className="checkbox-text">Show Clock</span>
+                    <span className="checkbox-text">Klok Tonen</span>
                   </label>
+                  </div>
                 </div>
               </div>
 
-              {/* Color Settings Section */}
+              {/* Color Settings Row */}
               <div className="settings-section">
-                <h3>Colors</h3>
                 <div className="color-settings">
                   <div className="color-input-group">
-                    <label htmlFor="backgroundColor">Background Color</label>
+                    <label htmlFor="backgroundColor">Achtergrond Kleur</label>
                     <div className="color-input-wrapper">
                       <input
                         type="color"
@@ -317,7 +309,7 @@ function Settings() {
                   </div>
 
                   <div className="color-input-group">
-                    <label htmlFor="foregroundColor">Foreground Color</label>
+                    <label htmlFor="foregroundColor">Tekst Kleur</label>
                     <div className="color-input-wrapper">
                       <input
                         type="color"
@@ -349,23 +341,12 @@ function Settings() {
                   className="btn btn-primary"
                   disabled={isSaving}
                 >
-                  {isSaving ? "Saving..." : "Save Settings"}
+                  {isSaving ? "Opslaan..." : "Instellingen Opslaan"}
                 </button>
               </div>
-            </div>
-          )}
-        </div>
-      ) : (
-        <div className="compact-settings">
-          <div
-            className="compact-settings-header"
-            onClick={() => setIsAdvancedSettingsExpanded(true)}
-          >
-            <SettingsIcon size={16} />
-            <span>Geavanceerde instellingen</span>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }

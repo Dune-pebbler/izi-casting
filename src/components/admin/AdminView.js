@@ -653,13 +653,13 @@ function AdminView() {
             <div className="admin-stats">
               <div className="admin-slide-count">
                 <span className="admin-stat-value">
-                  <Monitor size={16} />
+                  <Monitor size={20} />
                   <span>{totalStats.activeSlides}/{totalStats.totalSlides}</span>
                 </span>
               </div>
               <div className="admin-duration">
                 <span className="admin-stat-value">
-                  <Clock size={16} />
+                  <Clock size={20} />
                   <span>{totalStats.totalDuration}s</span>
                 </span>
               </div>
