@@ -85,7 +85,6 @@
     }
   }
 
-
   .feed-actions {
     display: flex;
     align-items: center;
@@ -122,7 +121,7 @@
         border-radius: $border-radius-md;
         transition: all 0.2s ease;
         border: 1px solid transparent;
-        background-color: #F7F7F7;
+        background-color: #f7f7f7;
         min-width: 40px;
         min-height: 36px;
         text-align: center;
@@ -131,7 +130,7 @@
         justify-content: center;
 
         &:hover {
-          background-color: #F0F0F0;
+          background-color: #f0f0f0;
           border-color: rgba($gray-300, 0.5);
           transform: scale(1.02);
         }
@@ -146,7 +145,7 @@
       border-radius: $border-radius-md;
       font-size: 1.1rem;
       text-align: center;
-      background-color: #F7F7F7;
+      background-color: #f7f7f7;
       color: $text-primary;
       font-weight: $font-weight-semibold;
 
@@ -192,7 +191,7 @@
     &.enabled {
       color: $success;
       background-color: rgba($success, 0.1);
-      
+
       &:hover {
         background-color: rgba($success, 0.15);
         color: darken($success, 10%);
@@ -201,7 +200,7 @@
 
     &.disabled {
       color: $text-secondary;
-      
+
       &:hover {
         background-color: rgba($text-secondary, 0.1);
         color: $text-primary;
@@ -226,7 +225,6 @@
   }
 
   .feed-url {
-
     &:hover {
       border-color: rgba($gray-400, 0.5);
       box-shadow: 0 2px 4px rgba($gray-300, 0.2);
@@ -247,7 +245,7 @@
         padding: $spacing-sm;
         border-radius: $border-radius-sm;
         transition: all 0.2s ease;
-        background-color: #F7F7F7;
+        background-color: #f7f7f7;
 
         &:hover {
           background-color: rgba($gray-100, 0.5);
@@ -312,7 +310,8 @@
         &:focus {
           outline: none;
           border-color: $primary;
-          box-shadow: 0 0 0 3px rgba($primary, 0.1), 0 2px 4px rgba($primary, 0.1);
+          box-shadow: 0 0 0 3px rgba($primary, 0.1),
+            0 2px 4px rgba($primary, 0.1);
           transform: translateY(-1px);
         }
 
@@ -436,7 +435,6 @@
 
     &:hover {
       border-color: $primary;
-      background-color: rgba($primary, 0.05);
     }
 
     .add-feed-content {
@@ -444,10 +442,9 @@
       align-items: center;
       justify-content: center;
       gap: $spacing-sm;
-      color: $text-secondary;
       font-size: 1rem; // Increased from 0.875rem
       font-weight: $font-weight-medium;
-
+      color: $primary;
       &:hover {
         color: $primary;
       }

@@ -476,68 +476,7 @@
   }
 }
 
-/* Advanced Settings Styles */
-.advanced-settings-toggle {
-  margin: $spacing-md 0;
 
-  .advanced-settings-btn {
-    display: flex;
-    align-items: center;
-    gap: $spacing-sm;
-    width: 100%;
-    padding: $spacing-sm $spacing-md;
-    background: none;
-    border: 1px solid $border-color;
-    border-radius: $border-radius-md;
-    cursor: pointer;
-    transition: $transition-base;
-    color: $text-primary;
-    font-size: $font-size-sm;
-    font-weight: 500;
-
-    &:hover {
-      background-color: $gray-50;
-      border-color: $gray-300;
-    }
-
-    &:active {
-      background-color: $gray-100;
-    }
-
-    svg {
-      color: $gray-500;
-      flex-shrink: 0;
-    }
-
-    span {
-      flex: 1;
-      text-align: left;
-    }
-  }
-}
-
-.advanced-settings-content {
-  margin-top: $spacing-md;
-  padding: $spacing-md;
-  background-color: $gray-50;
-  border-radius: $border-radius-md;
-  border: 1px solid $border-color;
-
-  .settings-section {
-    margin-bottom: $spacing-lg;
-
-    &:last-child {
-      margin-bottom: 0;
-    }
-
-    h3 {
-      margin: 0 0 $spacing-sm 0;
-      font-size: $font-size-sm;
-      font-weight: 600;
-      color: $text-primary;
-    }
-  }
-}
 
 /* Logo Upload Styles */
 .logo-upload-area {

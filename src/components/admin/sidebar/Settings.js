@@ -168,9 +168,9 @@ function Settings() {
     <div className="sidebar-section">
       
       {isAdvancedSettingsExpanded ? (
-        <div>
+        <div className="compact-settings">
           {/* Advanced Settings Toggle */}
-          <div className="advanced-settings-toggle">
+          <div className="compact-settings-header">
             <button
               className="advanced-settings-btn"
               onClick={() =>

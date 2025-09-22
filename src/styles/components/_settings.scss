@@ -3,7 +3,6 @@
 
 .sidebar-section {
   margin-bottom: $spacing-lg;
-  background-color: $surface;
   display: flex;
   flex-direction: column;
   border-radius: $border-radius-md;
@@ -25,32 +24,23 @@
 
   // Advanced Settings Toggle
   .advanced-settings-toggle {
-    margin-bottom: $spacing-md;
 
     .advanced-settings-btn {
-      width: 100%;
       display: flex;
       align-items: center;
-      justify-content: center;
-      gap: $spacing-sm;
-      background: none;
-      border: 1px solid $border-color;
-      border-radius: $border-radius-sm;
-      color: $text-secondary;
+      gap: $spacing-xs;
+      padding: $spacing-xs;
       cursor: pointer;
+      border-radius: $border-radius-sm;
       transition: $transition-base;
-      font-size: 0.875rem;
+      color: $text-secondary;
+      font-weight: $font-weight-medium;
 
       &:hover {
         background-color: $gray-100;
         color: $text-primary;
-        border-color: $gray-300;
       }
 
-      &:focus {
-        outline: none;
-        box-shadow: 0 0 0 2px rgba($primary, 0.2);
-      }
     }
   }
 
@@ -265,9 +255,6 @@
 
   // Compact Settings (collapsed state)
   .compact-settings {
-    padding: $spacing-sm;
-    background-color: $surface;
-
     .compact-settings-header {
       display: flex;
       align-items: center;
@@ -277,7 +264,6 @@
       border-radius: $border-radius-sm;
       transition: $transition-base;
       color: $text-secondary;
-      font-size: 0.75rem;
       font-weight: $font-weight-medium;
 
       &:hover {
