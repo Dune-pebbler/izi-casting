@@ -2,24 +2,24 @@
   // Base styles for the sidebar container
   width: $sidebar-width;
   color: $text-primary;
-  padding: $spacing-md;
+  padding: $spacing-lg;
   display: flex;
   flex-direction: column;
   overflow: auto;
   position: fixed;
   top: 0;
   left: 0;
-  height: 100vh;
+  max-height: 100vh;
   gap: $spacing-md;
   background-color: $surface;
   // border: 1px solid $border-color;
-  background-color: #f7f7f7;
+  background-color: #f7f7f7bf;
   font-family: $font-family-base;
   transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   z-index: 1000;
   margin: $spacing-md;
-  border-radius: $border-radius-xl;
-
+  border-radius: 2em;
+  backdrop-filter: blur(10px);
   // Custom scrollbar styling
   &::-webkit-scrollbar {
     width: 6px;
@@ -47,7 +47,7 @@
     height: 40px;
     background-color: white;
     border: 2px solid #f7f7f7;
-    border-radius: 6px;
+    border-radius:200px;
     display: flex;
     align-items: center;
     justify-content: center;

@@ -3,11 +3,11 @@
   align-items: center;
   justify-content: center;
   gap: $spacing-sm;
-  padding: $spacing-sm $spacing-md;
+  padding: $spacing-sm $spacing-lg;
   font-size: $font-size-base;
   font-weight: $font-weight-medium;
   border: none;
-  border-radius: $border-radius-md;
+  border-radius: 200px;
   cursor: pointer;
   text-decoration: none;
   transition: $transition-base;

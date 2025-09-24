@@ -1,19 +1,10 @@
-// Font face declarations for local Mona Sans
+// Font face declarations for local Manrope
 @font-face {
-  font-family: "Mona Sans";
-  src: url("../../public/fonts/MonaSans-VariableFont_wdth,wght.ttf")
+  font-family: "Manrope";
+  src: url("../../public/fonts/Manrope-VariableFont_wght.ttf")
     format("truetype-variations");
-  font-weight: 200 900;
+  font-weight: 200 800;
   font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Mona Sans";
-  src: url("../../public/fonts/MonaSans-Italic-VariableFont_wdth,wght.ttf")
-    format("truetype-variations");
-  font-weight: 200 900;
-  font-style: italic;
   font-display: swap;
 }
 
@@ -24,7 +15,7 @@
 
 // Global font fallbacks for smart TV compatibility
 * {
-  font-family: inherit, 'Roboto', Arial, Helvetica, sans-serif;
+  font-family: inherit, "Roboto", Arial, Helvetica, sans-serif;
 }
 
 body {
@@ -35,7 +26,25 @@ body {
   font-weight: $font-weight-normal;
   line-height: $line-height-base;
   color: $text-primary;
-  // background-color: #f7f7f7;
+  background: #E3E5E6;
+  background: linear-gradient(113deg, rgba(227, 229, 230, 1) 5%, rgba(240, 113, 103, 0.09) 100%);
+  position: relative;
+  
+  &::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url("../../public/noise_pattern.jpg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0.01;
+    z-index: -1;
+    pointer-events: none;
+  }
 }
 
 // App container
@@ -58,7 +67,7 @@ h6 {
 }
 
 h1 {
-  font-size:40px;
+  font-size: 40px;
 }
 
 h2 {
@@ -69,7 +78,7 @@ h3 {
   font-size: 20px;
 }
 
-p{
+p {
   margin: 0 0 $spacing-md 0;
   color: $text-primary;
 }
@@ -94,4 +103,3 @@ a {
   font-size: $font-size-lg;
   color: $text-secondary;
 }
-

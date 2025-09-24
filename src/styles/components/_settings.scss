@@ -24,7 +24,7 @@
       color: $text-primary;
       cursor: pointer;
       transition: $transition-base;
-      font-size: $font-size-base;
+      font-size: $font-size-lg;
       font-weight: $font-weight-medium;
       background: transparent;
       &:hover {
@@ -51,9 +51,8 @@
   // Settings Content - matches feed-list content styling
   .settings-content {
     margin-top: $spacing-sm;
-    border: 1px solid $border-color;
-    border-radius: $border-radius-lg;
-    background-color: $surface;
+    border-radius: 1em;
+    background-color: white;
 
     transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     overflow: hidden;
@@ -315,7 +314,7 @@
 
           .color-text-input {
             flex: 1;
-            padding: $spacing-sm $spacing-md;
+            padding: 0.6em;
             border: 1px solid $border-color;
             border-radius: $border-radius-sm;
             font-size: $font-size-sm;
@@ -347,15 +346,6 @@
     justify-content: center;
 
     .btn {
-      width: auto;
-      padding: $spacing-sm $spacing-lg;
-      border: 1px solid transparent;
-      border-radius: $border-radius-md;
-      font-size: $font-size-sm;
-      font-weight: $font-weight-medium;
-      cursor: pointer;
-      transition: $transition-base;
-      box-shadow: $shadow-sm;
 
       &:hover {
         transform: translateY(-1px);

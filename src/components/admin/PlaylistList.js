@@ -1,5 +1,5 @@
-import React, { useState, useMemo, useCallback } from 'react';
-import { Plus } from 'lucide-react';
+import React, { useState, useMemo, useCallback } from "react";
+import { Plus } from "lucide-react";
 import {
   DndContext,
   closestCenter,
@@ -7,15 +7,15 @@ import {
   PointerSensor,
   useSensor,
   useSensors,
-} from '@dnd-kit/core';
+} from "@dnd-kit/core";
 import {
   arrayMove,
   SortableContext,
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
-} from '@dnd-kit/sortable';
-import PlaylistHeader from './PlaylistHeader';
-import SlideList from './SlideList';
+} from "@dnd-kit/sortable";
+import PlaylistHeader from "./PlaylistHeader";
+import SlideList from "./SlideList";
 
 const PlaylistList = ({
   playlists,
@@ -52,7 +52,7 @@ const PlaylistList = ({
   onStartEditingPlaylistRepeatCount,
   onSavePlaylistRepeatCount,
   onCancelEditingPlaylistRepeatCount,
-  onPlaylistRepeatCountKeyPress
+  onPlaylistRepeatCountKeyPress,
 }) => {
   // Drag and drop sensors
   const sensors = useSensors(
@@ -66,25 +66,35 @@ const PlaylistList = ({
     })
   );
 
-  const playlistIds = useMemo(() => playlists.map(playlist => playlist.id), [playlists]);
+  const playlistIds = useMemo(
+    () => playlists.map((playlist) => playlist.id),
+    [playlists]
+  );
 
-  const handlePlaylistDragEnd = useCallback((event) => {
-    const { active, over } = event;
-    console.log('Playlist drag end:', { active, over });
+  const handlePlaylistDragEnd = useCallback(
+    (event) => {
+      const { active, over } = event;
+      console.log("Playlist drag end:", { active, over });
 
-    if (active.id !== over?.id) {
-      const oldIndex = playlists.findIndex(playlist => playlist.id === active.id);
-      const newIndex = playlists.findIndex(playlist => playlist.id === over.id);
-      
-      if (oldIndex !== -1 && newIndex !== -1) {
-        const newPlaylists = arrayMove(playlists, oldIndex, newIndex);
-        onReorderPlaylists(newPlaylists);
+      if (active.id !== over?.id) {
+        const oldIndex = playlists.findIndex(
+          (playlist) => playlist.id === active.id
+        );
+        const newIndex = playlists.findIndex(
+          (playlist) => playlist.id === over.id
+        );
+
+        if (oldIndex !== -1 && newIndex !== -1) {
+          const newPlaylists = arrayMove(playlists, oldIndex, newIndex);
+          onReorderPlaylists(newPlaylists);
+        }
       }
-    }
-  }, [playlists, onReorderPlaylists]);
+    },
+    [playlists, onReorderPlaylists]
+  );
 
   const handlePlaylistDragStart = useCallback((event) => {
-    console.log('Playlist drag start:', event);
+    console.log("Playlist drag start:", event);
   }, []);
 
   return (
@@ -99,7 +109,7 @@ const PlaylistList = ({
         strategy={verticalListSortingStrategy}
       >
         {playlists.map((playlist, index) => (
-          <div key={playlist.id}>
+          <div key={playlist.id} className="playlist-container">
             <PlaylistHeader
               playlist={playlist}
               isExpanded={expandedPlaylists.has(playlist.id)}
@@ -123,18 +133,30 @@ const PlaylistList = ({
             />
 
             {/* Collapsible Slides Container */}
-            <div className={`playlist-slides-container ${expandedPlaylists.has(playlist.id) ? 'expanded' : ''}`}>
-              <SlideList 
+            <div
+              className={`playlist-slides-container ${
+                expandedPlaylists.has(playlist.id) ? "expanded" : ""
+              }`}
+            >
+              <SlideList
                 slides={playlist.slides}
                 onEditSlide={(slide) => onEditSlide(slide, playlist.id)}
-                onUpdateSlideType={(slideId, type) => onUpdateSlideType(playlist.id, slideId, type)}
-                onToggleSlideVisibility={(slideId) => onToggleSlideVisibility(playlist.id, slideId)}
+                onUpdateSlideType={(slideId, type) =>
+                  onUpdateSlideType(playlist.id, slideId, type)
+                }
+                onToggleSlideVisibility={(slideId) =>
+                  onToggleSlideVisibility(playlist.id, slideId)
+                }
                 onRemoveSlide={(slideId) => onRemoveSlide(playlist.id, slideId)}
-                onImageUpload={(slideId, file) => onImageUpload(playlist.id, slideId, file)}
+                onImageUpload={(slideId, file) =>
+                  onImageUpload(playlist.id, slideId, file)
+                }
                 onRemoveImage={(slideId) => onRemoveImage(playlist.id, slideId)}
                 uploadingImage={uploadingImage}
                 onCopySlide={(slide) => onCopySlide(slide, playlist.id)}
-                onReorderSlides={(newSlides) => onReorderSlides(playlist.id, newSlides)}
+                onReorderSlides={(newSlides) =>
+                  onReorderSlides(playlist.id, newSlides)
+                }
                 onAddSlide={() => onAddSlide(playlist.id)}
                 onMoveSlide={(slide) => onMoveSlide(slide, playlist.id)}
               />
@@ -142,7 +164,7 @@ const PlaylistList = ({
           </div>
         ))}
       </SortableContext>
-      
+
       {/* Add Playlist Button */}
       <div className="add-playlist-button" onClick={onAddPlaylist}>
         <div className="add-playlist-content">

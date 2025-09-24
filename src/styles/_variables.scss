@@ -4,8 +4,8 @@ $primary-dark: #e05a50; // Darker shade of primary
 $secondary: #5c6ac4; // Shopify blue
 $background: #f6f6f7; // Shopify light gray background
 $surface: #ffffff;
-$text-primary: #202223; // Shopify dark text
-$text-secondary: #6d7175; // Shopify secondary text
+$text-primary: #000000; // Shopify dark text
+$text-secondary: #323232; // Shopify secondary text
 $text-tertiary: #6d7175; // Shopify secondary text
 
 $success: #50b83c; // Shopify green
@@ -64,9 +64,9 @@ $sidebar-text: $text-primary;
 $sidebar-border: $gray-200;
 $sidebar-hover: $gray-50;
 
-// Typography - Keep existing fonts
-$font-family-base: "Mona Sans", -apple-system, BlinkMacSystemFont, sans-serif;
-$font-family-heading: "Mona Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+// Typography - Using Manrope font
+$font-family-base: "Manrope", -apple-system, BlinkMacSystemFont, sans-serif;
+$font-family-heading: "Manrope", -apple-system, BlinkMacSystemFont, sans-serif;
 $font-family-mono: "SF Mono", Monaco, Inconsolata, "Roboto Mono", monospace;
 $font-size-base: 14px;
 $font-size-sm: 12px;
