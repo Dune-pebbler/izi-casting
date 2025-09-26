@@ -54,6 +54,8 @@ $gray-700: #4a4d50;
 $gray-800: #2c2f32;
 $gray-900: #202223;
 
+$gray-bg: #f7f7f7;
+
 // Border colors - Shopify style
 $border-color: $gray-200;
 $border-color-focus: $primary;
@@ -104,7 +106,7 @@ $shadow-md: 0 2px 6px rgba(0, 0, 0, 0.15);
 $shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.2);
 
 // Layout
-$sidebar-width: 520px; // Shopify sidebar width
+$sidebar-width: 480px; // Shopify sidebar width
 $container-max-width: 1200px;
 
 // Transitions - Shopify style

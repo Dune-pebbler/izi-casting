@@ -344,17 +344,18 @@ function DisplayView() {
   }, [isFullscreen]);
 
   // Automatic fullscreen when device is paired and content is ready
-  useEffect(() => {
-    if (isPaired && fullscreenSupported && !isFullscreen && slides.length > 0) {
-      // Add a small delay to ensure the display is fully rendered
-      const autoFullscreenTimer = setTimeout(() => {
-        console.log("Automatically requesting fullscreen...");
-        requestFullscreen();
-      }, 2000); // 2 second delay
+  // TEMPORARILY DISABLED - Auto fullscreen is driving me mad!
+  // useEffect(() => {
+  //   if (isPaired && fullscreenSupported && !isFullscreen && slides.length > 0) {
+  //     // Add a small delay to ensure the display is fully rendered
+  //     const autoFullscreenTimer = setTimeout(() => {
+  //       console.log("Automatically requesting fullscreen...");
+  //       requestFullscreen();
+  //     }, 2000); // 2 second delay
 
-      return () => clearTimeout(autoFullscreenTimer);
-    }
-  }, [isPaired, fullscreenSupported, isFullscreen, slides.length]);
+  //     return () => clearTimeout(autoFullscreenTimer);
+  //   }
+  // }, [isPaired, fullscreenSupported, isFullscreen, slides.length]);
 
   // Update device last seen timestamp
   useEffect(() => {

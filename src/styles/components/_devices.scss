@@ -147,16 +147,11 @@
       .device-item {
         margin-bottom: $spacing-sm;
         padding: $spacing-md;
-        border: 1px solid  rgba($success, 0.5);
+        border: 1px solid #50b83c;
         border-radius: 1em;
         background-color: rgba($success, 0.05);
         color: $success;
         transition: $transition-base;
-
-        &:hover {
-          border-color: darken($success, 10%);
-          background-color: rgba($success, 0.15);
-        }
 
         &:has(.device-delete-btn:hover) {
           border-color: $error;
@@ -188,16 +183,14 @@
             display: flex;
             align-items: center;
             gap: $spacing-sm;
-
             .device-name-title {
-              color: $text-primary;
+              color: black;
               font-size: 0.875rem;
               font-weight: $font-weight-semibold;
               cursor: pointer;
-              padding: $spacing-xs $spacing-sm;
-              border-radius: $border-radius-sm;
+              padding: $spacing-sm $spacing-md;
+              border-radius: 200px;
               transition: $transition-base;
-
               &:hover {
                 background-color: $gray-100;
               }

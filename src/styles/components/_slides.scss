@@ -222,9 +222,8 @@
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    border-radius: $border-radius-lg;
     box-shadow: $shadow-lg;
-    border: 1px solid $border-color;
+    border-radius: 2em 2em 0 0;
   }
 }
 
@@ -248,7 +247,7 @@
 
   .modal-header-actions {
     display: flex;
-    gap: $spacing-sm;
+    gap: 4px;
     align-items: center;
 
     .delete-slide-btn {
@@ -281,19 +280,19 @@
     display: flex;
     align-items: center;
     gap: $spacing-md;
-
+    height: 100%;
     .slide-name-input-container {
       .slide-name-input {
         width: 260px;
         padding: $spacing-sm $spacing-md;
-        border: 1px solid $border-color;
-        border-radius: $border-radius-md;
+        border: none;
+        background-color: #f6f6f7;
+        border-radius: 1em;
         font-size: $font-size-base;
         font-weight: $font-weight-semibold;
         color: $text-primary;
-        background-color: $surface;
         transition: $transition-base;
-
+        height: 100%;
         &:focus {
           outline: none;
           border-color: $border-color-focus;
@@ -311,7 +310,7 @@
       display: flex;
       align-items: center;
       gap: $spacing-sm;
-
+      height: 100%;
       label {
         font-size: $font-size-base;
         color: $text-secondary;
@@ -322,20 +321,21 @@
       .duration-input-wrapper {
         position: relative;
         display: inline-block;
+        height: 100%;
       }
 
       .slide-duration-input {
         width: 120px;
         padding: $spacing-sm $spacing-md;
         padding-right: 30px;
-        border: 1px solid $border-color;
-        border-radius: $border-radius-md;
+        border: none;
+        background-color: #f6f6f7;
+        border-radius: 100px;
         font-size: $font-size-base;
         font-weight: $font-weight-semibold;
         color: $text-primary;
-        background-color: $surface;
         transition: $transition-base;
-
+        height: 100%;
         &:focus {
           outline: none;
           border-color: $border-color-focus;
@@ -359,18 +359,18 @@
       display: flex;
       align-items: center;
       gap: $spacing-sm;
-
+      height: 100%;
       .show-bar-slider {
         position: relative;
-        width: 72px;
+        width: 74px;
         height: 36px;
         background-color: $gray-100;
-        border-radius: $border-radius-lg;
+        border-radius: 200px;
         cursor: pointer;
         transition: $transition-base;
         overflow: hidden;
         border: 1px solid $border-color;
-
+        height: 100%;
         &:hover {
           background-color: $gray-200;
         }
@@ -381,7 +381,6 @@
           left: 0;
           right: 0;
           bottom: 0;
-          border-radius: $border-radius-lg;
           overflow: hidden;
         }
 
@@ -392,9 +391,9 @@
           width: 32px;
           height: 32px;
           background-color: $primary;
-          border-radius: $border-radius-md;
           transition: transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
           z-index: 1;
+          border-radius: 200px;
         }
 
         .slider-icons {
@@ -406,7 +405,9 @@
           display: flex;
           align-items: center;
           justify-content: space-between;
-          padding: 0 10px;
+          padding: 0px;
+          padding-left: 10px;
+          padding-right: 10px;
           z-index: 2;
           pointer-events: none;
 
@@ -450,7 +451,7 @@
     display: flex;
     gap: $spacing-xs;
     background-color: $gray-50;
-    border-radius: $border-radius-md;
+    border-radius: 200px;
     padding: $spacing-xs;
     border: 1px solid $border-color;
   }
@@ -462,17 +463,16 @@
     padding: $spacing-sm;
     border: none;
     background: none;
-    border-radius: $border-radius-sm;
+    border-radius: 200px;
     cursor: pointer;
     transition: $transition-base;
     width: 36px;
     height: 36px;
     color: $text-secondary;
     position: relative;
-    border-radius: $border-radius-md;
+    border: 1px solid transparent;
     &:hover {
-      background-color: $gray-100;
-      color: $text-primary;
+      background:white;
     }
 
     &.active {
@@ -971,7 +971,7 @@
 // 4-Column Grid Layout
 .slides-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(auto-fit, 350px);
   gap: $spacing-md;
 }
 
@@ -1090,99 +1090,111 @@
 .slide-header-actions {
   display: flex;
   align-items: center;
-  gap: $spacing-sm;
+  gap: 4px;
   flex-shrink: 0;
   z-index: 10;
   padding: $spacing-sm $spacing-md;
   padding-right: 6px;
+  padding-left: 0;
 }
 
 .status-toggle-btn {
+  padding: $spacing-sm;
+  border: none;
+  border-radius: 0.8em;
+  background-color: transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: $icon-button-size;
-  height: $icon-button-size;
-  background: none;
-  border: 1px solid $border-color;
-  border-radius: $border-radius-sm;
-  color: $text-secondary;
-  cursor: pointer;
-  transition: $transition-base;
+  min-width: 36px;
+  min-height: 36px;
   position: relative;
+  color: black;
   z-index: 20;
 
   &:hover {
-    background-color: $gray-50;
-    color: $text-primary;
-    border-color: $gray-300;
+    background-color: rgba($primary, 0.08);
+    color: $primary;
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
   }
 
   &.visible {
     color: $success;
-    border-color: $success;
+    background-color: rgba($success, 0.1);
 
     &:hover {
-      background-color: rgba($success, 0.1);
+      background-color: rgba($success, 0.15);
+      color: darken($success, 10%);
     }
   }
 
   &.hidden {
-    color: $gray-400;
+    color: $text-secondary;
 
     &:hover {
-      color: $text-secondary;
+      background-color: rgba($text-secondary, 0.1);
+      color: $text-primary;
     }
   }
 }
 
 .move-slide-btn {
-  background: none;
+  padding: $spacing-sm;
   border: none;
+  border-radius: 0.8em;
+  background-color: transparent;
   cursor: pointer;
-  padding: 4px;
-  border-radius: $border-radius-sm;
   transition: all 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: $gray-500;
+  min-width: 36px;
+  min-height: 36px;
   position: relative;
+  color: black;
   z-index: 20;
 
   &:hover {
     background-color: $gray-100;
-    color: $primary-color;
-    transform: scale(1.1);
+    color: black;
+    transform: translateY(-1px);
   }
 
   &:active {
-    transform: scale(0.95);
+    transform: translateY(0);
   }
 }
 
 .copy-slide-btn {
-  background: none;
+  padding: $spacing-sm;
   border: none;
+  border-radius: 0.8em;
+  background-color: transparent;
   cursor: pointer;
-  padding: 4px;
-  border-radius: $border-radius-sm;
   transition: all 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: $gray-500;
+  min-width: 36px;
+  min-height: 36px;
   position: relative;
+  color: black;
   z-index: 20;
 
   &:hover {
     background-color: $gray-100;
-    color: $primary-color;
-    transform: scale(1.1);
+    color: black;
+    transform: translateY(-1px);
   }
 
   &:active {
-    transform: scale(0.95);
+    transform: translateY(0);
   }
 }
 
@@ -1800,24 +1812,24 @@
   }
 }
 
-// Responsive Design
-@media (max-width: 1200px) {
-  .slides-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
+// // Responsive Design
+// @media (max-width: 1550px) {
+//   .slides-grid {
+//     grid-template-columns: repeat(3, 1fr);
+//   }
+// }
 
-@media (max-width: 900px) {
-  .slides-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
+// @media (max-width: 1200px) {
+//   .slides-grid {
+//     grid-template-columns: repeat(2, 1fr);
+//   }
+// }
 
-@media (max-width: 600px) {
-  .slides-grid {
-    grid-template-columns: 1fr;
-  }
-}
+// @media (max-width: 600px) {
+//   .slides-grid {
+//     grid-template-columns: 1fr;
+//   }
+// }
 
 /* Add Slide Button Styles */
 .add-slide-button {

@@ -5,10 +5,9 @@
   margin-bottom: $spacing-md;
   transition: $transition-base;
   border-radius: 2em;
-  background-color: rgba(247, 247, 247, 0.7490196078);
+  background-color: #f7f7f7;
 }
-.admin-content-wrapper {
-}
+// Admin content wrapper styles are handled by the component
 
 .playlist-header {
   display: flex;
@@ -117,7 +116,7 @@
 
 .playlist-actions {
   display: flex;
-  gap: $spacing-sm;
+  gap: 4px;
   align-items: center;
   justify-content: flex-end;
 }
@@ -211,86 +210,98 @@
 }
 
 .copy-playlist-btn {
+  padding: $spacing-sm;
+  border: none;
+  border-radius: 0.8em;
+  background-color: transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: $icon-button-size;
-  height: $icon-button-size;
-  background: none;
-  border: 1px solid $border-color;
-  border-radius: $border-radius-sm;
-  color: $text-secondary;
-  cursor: pointer;
-  transition: $transition-base;
+  min-width: 36px;
+  min-height: 36px;
+  position: relative;
+  color: black;
 
   &:hover {
-    background-color: $gray-50;
-    color: $text-primary;
-    border-color: $gray-300;
+    background-color: $gray-100;
+    color: black;
+    transform: translateY(-1px);
   }
 
   &:active {
-    background-color: $gray-100;
+    transform: translateY(0);
   }
 }
 
 .delete-playlist-btn {
+  padding: $spacing-sm;
+  border: none;
+  border-radius: 0.8em;
+  background-color: transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: $icon-button-size;
-  height: $icon-button-size;
-  background: none;
-  border: 1px solid $border-color;
-  border-radius: $border-radius-sm;
-  color: $text-secondary;
-  cursor: pointer;
-  transition: $transition-base;
+  min-width: 36px;
+  min-height: 36px;
+  position: relative;
+  color: black;
 
   &:hover {
-    background-color: rgba($error, 0.1);
-    color: $error;
-    border-color: $error;
+    background-color: rgba($danger, 0.1);
+    color: $danger;
+    transform: translateY(-1px);
   }
 
   &:active {
-    background-color: rgba($error, 0.2);
+    transform: translateY(0);
   }
 }
 
 .playlist-toggle-btn {
+  padding: $spacing-sm;
+  border: none;
+  border-radius: 0.8em;
+  background-color: transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: $icon-button-size;
-  height: $icon-button-size;
-  background: none;
-  border: 1px solid $border-color;
-  border-radius: $border-radius-sm;
-  color: $text-secondary;
-  cursor: pointer;
-  transition: $transition-base;
+  min-width: 36px;
+  min-height: 36px;
+  position: relative;
+  color: black;
 
   &:hover {
-    background-color: $gray-50;
-    color: $text-primary;
-    border-color: $gray-300;
+    background-color: rgba($primary, 0.08);
+    color: $primary;
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
   }
 
   &.enabled {
     color: $success;
-    border-color: $success;
+    background-color: rgba($success, 0.1);
 
     &:hover {
-      background-color: rgba($success, 0.1);
+      background-color: rgba($success, 0.15);
+      color: darken($success, 10%);
     }
   }
 
   &.disabled {
-    color: $gray-400;
+    color: $text-secondary;
 
     &:hover {
-      color: $text-secondary;
+      background-color: rgba($text-secondary, 0.1);
+      color: $text-primary;
     }
   }
 }
