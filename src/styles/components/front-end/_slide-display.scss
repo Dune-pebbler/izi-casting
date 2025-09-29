@@ -798,3 +798,157 @@
   background-color: $gray-100;
   border: 2px dashed $gray-300;
 }
+
+// Pre-rendered next slide styles
+.next-slide-prerender {
+  position: absolute;
+  top: -9999px;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  visibility: hidden;
+  pointer-events: none;
+  
+  // Ensure all content inside is also hidden
+  * {
+    visibility: hidden;
+    pointer-events: none;
+  }
+}
+
+// Slide transition animations
+.display-content {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  height: 100vh;
+}
+
+// Slide transition keyframes
+@keyframes slideLeftOut {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+@keyframes slideLeftIn {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+// Transition classes
+.slide-transition {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.slide-current {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  z-index: 1;
+  
+  .display-content {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    flex: 1;
+  }
+}
+
+.slide-next {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  z-index: 2;
+  
+  .display-content {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    flex: 1;
+  }
+}
+
+// Slide-left transition
+.slide-left-transition {
+  .slide-current {
+    animation: slideLeftOut 0.5s ease-in-out forwards;
+  }
+  
+  .slide-next {
+    animation: slideLeftIn 0.5s ease-in-out forwards;
+  }
+}
+
+// Additional transition keyframes for future use
+@keyframes slideRightOut {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes slideRightIn {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeOut {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+// Additional transition classes for future use
+.slide-right-transition {
+  .slide-current {
+    animation: slideRightOut 0.5s ease-in-out forwards;
+  }
+  
+  .slide-next {
+    animation: slideRightIn 0.5s ease-in-out forwards;
+  }
+}
+
+.fade-transition {
+  .slide-current {
+    animation: fadeOut 0.5s ease-in-out forwards;
+  }
+  
+  .slide-next {
+    animation: fadeIn 0.5s ease-in-out forwards;
+  }
+}
