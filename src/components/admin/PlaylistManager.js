@@ -88,7 +88,7 @@ export const usePlaylistManager = () => {
       id: `playlist_${Date.now()}`,
       name: `Afspeellijst ${playlists.length + 1}`,
       slides: [],
-      isEnabled: true,
+      isEnabled: false,
       repeatCount: 1,
       totalDuration: 0
     };
