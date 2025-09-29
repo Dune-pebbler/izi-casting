@@ -169,7 +169,7 @@ const PlaylistList = ({
       <div className="add-playlist-button" onClick={onAddPlaylist}>
         <div className="add-playlist-content">
           <Plus size={24} />
-          <span>Playlist toevoegen</span>
+          <span>Playlist toevoegen </span>
         </div>
       </div>
     </DndContext>
