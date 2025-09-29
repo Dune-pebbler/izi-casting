@@ -5,7 +5,6 @@
   margin-bottom: $spacing-lg;
   display: flex;
   flex-direction: column;
-
   // Settings Header - matches feed-list and devices patterns
   .settings-header {
     display: flex;
@@ -28,9 +27,7 @@
       font-weight: $font-weight-medium;
       background: transparent;
       &:hover {
- 
         transform: translateY(-1px);
-    
       }
 
       &:active {
@@ -45,6 +42,9 @@
       &:hover svg {
         color: $primary;
       }
+      &:hover {
+        color: $primary;
+      }
     }
   }
 
@@ -53,7 +53,7 @@
     margin-top: $spacing-sm;
     border-radius: 1em;
     background-color: white;
-
+    border: 1px solid $gray-200;
     transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     overflow: hidden;
 
@@ -71,13 +71,13 @@
       border-bottom: none;
     }
 
-    // Row layout for logo and display settings
+    // Row layout for bar style and clock settings
     &.settings-row {
       display: flex;
       gap: $spacing-lg;
       align-items: flex-start;
 
-      .logo-section {
+      .bar-style-settings {
         flex: 1;
         min-width: 0;
       }
@@ -87,7 +87,8 @@
         min-width: 200px;
         display: flex;
         align-items: center;
-        justify-content: center;
+        justify-content: flex-start;
+        height: 100%;
       }
     }
 
@@ -98,7 +99,11 @@
       color: $text-primary;
     }
 
-    // Logo Upload Section
+    // Logo Upload Section - Full Width
+    .logo-section {
+      width: 100%;
+    }
+
     .logo-upload-area {
       .logo-preview {
         display: flex;
@@ -111,18 +116,18 @@
           display: inline-block;
 
           .logo-image {
-            max-width: 120px;
-            max-height: 80px;
-            border-radius: $border-radius-sm;
+            max-width: 200px;
+            max-height: 120px;
+            border-radius: 1em;
             border: 1px solid $border-color;
           }
 
           .logo-remove-btn {
             position: absolute;
-            top: -8px;
-            right: -8px;
-            width: 20px;
-            height: 20px;
+            top: -12px;
+            right: -12px;
+            width: 28px;
+            height: 28px;
             border-radius: 50%;
             background-color: $red-500;
             color: white;
@@ -134,7 +139,7 @@
             transition: $transition-base;
 
             &:hover {
-              background-color: $red-600;
+              background-color: darken($red-500, 10%);
             }
 
             &:disabled {
@@ -144,29 +149,18 @@
           }
         }
 
-        .logo-change-text {
-          color: $primary;
-          font-size: $font-size-sm;
-          cursor: pointer;
-          text-decoration: underline;
-          transition: $transition-base;
-
-          &:hover {
-            color: $primary-dark;
-          }
-
-          input {
-            display: none;
-          }
-        }
       }
 
       .logo-upload-placeholder {
         border: 2px dashed $border-color;
-        border-radius: $border-radius-md;
-        padding: $spacing-lg;
+        border-radius: 1em;
+        padding: $spacing-xl;
         text-align: center;
         transition: $transition-base;
+        min-height: 120px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
 
         &:hover {
           border-color: $primary;
@@ -188,7 +182,7 @@
 
           span {
             color: $text-secondary;
-            font-size: $font-size-sm;
+            font-size: 1rem;
             font-weight: $font-weight-medium;
           }
 
@@ -222,7 +216,7 @@
           cursor: pointer;
           appearance: none;
           border: 2px solid $border-color;
-          border-radius: $border-radius-sm;
+          border-radius: 1em;
           background-color: $surface;
           transition: $transition-base;
           position: relative;
@@ -234,7 +228,7 @@
           &:checked {
             background-color: $primary;
             border-color: $primary;
-            
+
             &::after {
               content: "✓";
               position: absolute;
@@ -256,6 +250,7 @@
 
         .checkbox-text {
           color: $text-primary;
+          font-size: 1rem;
         }
       }
     }
@@ -273,7 +268,7 @@
         label {
           display: block;
           margin-bottom: $spacing-xs;
-          font-size: $font-size-sm;
+          font-size: 1rem;
           font-weight: $font-weight-medium;
           color: $text-primary;
         }
@@ -287,7 +282,7 @@
             width: 40px;
             height: 40px;
             border: 1px solid $border-color;
-            border-radius: $border-radius-sm;
+            border-radius: 1em;
             cursor: pointer;
             padding: 0;
             transition: $transition-base;
@@ -308,20 +303,22 @@
 
             &::-webkit-color-swatch {
               border: none;
-              border-radius: $border-radius-sm;
+              border-radius: 1em;
             }
           }
 
           .color-text-input {
-            flex: 1;
+            width: 75%;
+            height: 40px;
             padding: 0.6em;
             border: 1px solid $border-color;
-            border-radius: $border-radius-sm;
+            border-radius: 1em;
             font-size: $font-size-sm;
             font-family: $font-family-mono;
             background-color: $surface;
             color: $text-primary;
             transition: $transition-base;
+            text-align: center;
 
             &:focus {
               outline: none;
@@ -343,7 +340,7 @@
         label {
           display: block;
           margin-bottom: $spacing-xs;
-          font-size: $font-size-sm;
+          font-size: 1rem;
           font-weight: $font-weight-medium;
           color: $text-primary;
         }
@@ -352,7 +349,7 @@
           width: 100%;
           padding: 0.6em;
           border: 1px solid $border-color;
-          border-radius: $border-radius-sm;
+          border-radius: 1em;
           font-size: $font-size-sm;
           background-color: $surface;
           color: $text-primary;
@@ -386,7 +383,6 @@
     justify-content: center;
 
     .btn {
-
       &:hover {
         transform: translateY(-1px);
         box-shadow: $shadow-md;

@@ -1,0 +1,349 @@
+// Modal Base Styles - Scoped to specific components only
+.feed-edit-modal,
+.move-slide-modal {
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: $spacing-lg;
+  }
+
+  .modal-content {
+    background-color: $surface;
+    border-radius: $border-radius-lg;
+    box-shadow: $shadow-lg;
+    width: 100%;
+    max-width: 500px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: modalSlideIn 0.2s ease-out;
+  }
+
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: $spacing-lg;
+    border-bottom: 1px solid $border-color;
+    background-color: $surface;
+
+    h2, h3 {
+      margin: 0;
+      font-size: $font-size-lg;
+      font-weight: $font-weight-semibold;
+      color: $text-primary;
+      font-family: $font-family-heading;
+    }
+
+    .modal-close-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border: none;
+      background: none;
+      border-radius: $border-radius-md;
+      color: $text-secondary;
+      cursor: pointer;
+      transition: $transition-base;
+
+      &:hover {
+        background-color: $gray-50;
+        color: $text-primary;
+      }
+
+      &:focus {
+        outline: none;
+        box-shadow: 0 0 0 2px $border-color-focus;
+      }
+    }
+  }
+
+  .modal-body {
+    padding: $spacing-lg;
+    flex: 1;
+    overflow-y: auto;
+  }
+
+  .modal-footer {
+    display: flex;
+    gap: $spacing-md;
+    padding: $spacing-lg;
+    border-top: 1px solid $border-color;
+    background-color: $gray-50;
+    justify-content: flex-end;
+  }
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+// Feed Edit Modal Specific Styles
+.feed-edit-modal {
+  .modal-content {
+    max-width: 600px;
+  }
+
+  .form-group {
+    margin-bottom: $spacing-lg;
+
+    label {
+      display: block;
+      margin-bottom: $spacing-sm;
+      font-weight: $font-weight-medium;
+      color: $text-primary;
+      font-size: $font-size-base;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: $spacing-sm $spacing-md;
+      font-size: $font-size-base;
+      font-weight: $font-weight-normal;
+      color: $text-primary;
+      border: 1px solid $border-color;
+      border-radius: $border-radius-md;
+      background-color: $surface;
+      font-family: inherit;
+      transition: $transition-base;
+      min-height: 36px;
+
+      &:focus {
+        outline: none;
+        border-color: $border-color-focus;
+        box-shadow: 0 0 0 1px $border-color-focus;
+      }
+
+      &::placeholder {
+        color: $text-secondary;
+      }
+    }
+
+    .input-help {
+      display: block;
+      margin-top: $spacing-xs;
+      font-size: $font-size-sm;
+      color: $text-secondary;
+      line-height: 1.4;
+    }
+  }
+
+  .popular-feeds {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: $spacing-sm;
+    margin-top: $spacing-sm;
+
+    .popular-feed-btn {
+      padding: $spacing-sm $spacing-md;
+      border: 1px solid $border-color;
+      border-radius: $border-radius-md;
+      background-color: $surface;
+      color: $text-primary;
+      font-size: $font-size-sm;
+      font-weight: $font-weight-normal;
+      cursor: pointer;
+      transition: $transition-base;
+      text-align: center;
+
+      &:hover {
+        border-color: $primary;
+        color: $primary;
+        background-color: rgba($primary, 0.05);
+      }
+
+      &:focus {
+        outline: none;
+        border-color: $border-color-focus;
+        box-shadow: 0 0 0 1px $border-color-focus;
+      }
+    }
+  }
+
+  .checkbox-group {
+    .checkbox-label {
+      display: flex;
+      align-items: center;
+      gap: $spacing-sm;
+      cursor: pointer;
+      font-size: $font-size-base;
+      color: $text-primary;
+
+      input[type="checkbox"] {
+        width: 16px;
+        height: 16px;
+        border: 1px solid $border-color;
+        border-radius: $border-radius-sm;
+        background-color: $surface;
+        cursor: pointer;
+        transition: $transition-base;
+        appearance: none;
+        position: relative;
+
+        &:checked {
+          background-color: $primary;
+          border-color: $primary;
+          background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='m12.207 4.793-1.414-1.414L6.5 7.086 5.207 5.793l-1.414 1.414L6.5 9.914z'/%3e%3c/svg%3e");
+          background-size: 12px 12px;
+          background-position: center;
+          background-repeat: no-repeat;
+        }
+
+        &:focus {
+          outline: none;
+          border-color: $border-color-focus;
+          box-shadow: 0 0 0 1px $border-color-focus;
+        }
+
+        &:hover:not(:checked) {
+          border-color: $gray-400;
+        }
+      }
+
+      .checkbox-text {
+        font-weight: $font-weight-normal;
+      }
+    }
+  }
+}
+
+// Move Slide Modal Specific Styles
+.move-slide-modal {
+  .modal-content {
+    max-width: 400px;
+  }
+
+  .modal-description {
+    margin: 0 0 $spacing-lg 0;
+    color: $text-secondary;
+    font-size: $font-size-base;
+    line-height: 1.5;
+
+    strong {
+      color: $text-primary;
+      font-weight: $font-weight-semibold;
+    }
+  }
+
+  .form-group {
+    margin-bottom: 0;
+
+    label {
+      display: block;
+      margin-bottom: $spacing-sm;
+      font-weight: $font-weight-medium;
+      color: $text-primary;
+      font-size: $font-size-base;
+    }
+
+    .form-select {
+      width: 100%;
+      padding: $spacing-sm $spacing-md;
+      font-size: $font-size-base;
+      font-weight: $font-weight-normal;
+      color: $text-primary;
+      border: 1px solid $border-color;
+      border-radius: $border-radius-md;
+      background-color: $surface;
+      font-family: inherit;
+      transition: $transition-base;
+      min-height: 36px;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+      background-position: right $spacing-sm center;
+      background-repeat: no-repeat;
+      background-size: 16px 12px;
+      padding-right: $spacing-xl;
+
+      &:focus {
+        outline: none;
+        border-color: $border-color-focus;
+        box-shadow: 0 0 0 1px $border-color-focus;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23f07167' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+      }
+    }
+  }
+}
+
+// Slide Delete Modal Specific Styles
+.slide-delete-modal {
+  .modal-content {
+    max-width: 400px;
+  }
+
+  .modal-description {
+    margin: 0 0 $spacing-lg 0;
+    color: $text-secondary;
+    font-size: $font-size-base;
+    line-height: 1.5;
+
+    strong {
+      color: $text-primary;
+      font-weight: $font-weight-semibold;
+    }
+  }
+
+  .delete-warning {
+    margin: 0;
+    color: $error;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+    background-color: rgba($error, 0.1);
+    padding: $spacing-sm $spacing-md;
+    border-radius: $border-radius-md;
+    border-left: 3px solid $error;
+  }
+}
+
+// Responsive Design - Scoped to these specific modals
+@media (max-width: 768px) {
+  .feed-edit-modal,
+  .move-slide-modal,
+  .slide-delete-modal {
+    .modal-overlay {
+      padding: $spacing-md;
+    }
+
+    .modal-content {
+      max-width: 100%;
+      margin: 0;
+    }
+
+    .modal-header,
+    .modal-body,
+    .modal-footer {
+      padding: $spacing-md;
+    }
+
+    .modal-footer {
+      flex-direction: column-reverse;
+      gap: $spacing-sm;
+
+      .btn {
+        width: 100%;
+      }
+    }
+  }
+
+  .feed-edit-modal .popular-feeds {
+    grid-template-columns: 1fr;
+  }
+}

@@ -55,7 +55,6 @@
       height: 100%;
       width: auto;
       object-fit: contain;
-      filter: brightness(0) invert(1); // Make logo white
       transition: opacity 0.3s ease;
 
       &:hover {

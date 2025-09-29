@@ -8,10 +8,10 @@ import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { setDeviceToDelete, clearDeviceToDelete, setIsSidebarCollapsed } from '../../store/slices/deviceSlice';
 import { usePlaylistManager } from './PlaylistManager';
 import PlaylistList from './PlaylistList';
-import EditModal from './EditModal';
-import MoveSlideModal from './modal/MoveSlideModal';
+import EditModal from './slide-edit/EditModal';
+import MoveSlideModal from './MoveSlideModal';
 import Sidebar from './sidebar/Sidebar';
-import { Monitor, Clock } from 'lucide-react';
+import { Monitor, Clock, X } from 'lucide-react';
 
 function AdminView() {
   // Playlist management hook
@@ -44,6 +44,7 @@ function AdminView() {
   const [modalImageSide, setModalImageSide] = useState('left');
   const [modalSlideTransition, setModalSlideTransition] = useState('fade');
   const [currentEditingPlaylistId, setCurrentEditingPlaylistId] = useState(null);
+  const [slideToDelete, setSlideToDelete] = useState(null);
 
   // Playlist editing state
   const [editingPlaylistNameId, setEditingPlaylistNameId] = useState(null);
@@ -231,10 +232,15 @@ function AdminView() {
   };
 
   const deleteSlide = async (slideId, playlistId) => {
+    console.log('deleteSlide called with:', { slideId, playlistId });
     const playlist = playlists.find(p => p.id === playlistId);
-    if (!playlist) return;
+    if (!playlist) {
+      console.log('Playlist not found');
+      return;
+    }
 
     const slideToDelete = playlist.slides.find(s => s.id === slideId);
+    console.log('Slide to delete found:', slideToDelete);
     const slideName = slideToDelete?.name || 'Slide';
 
     const loadingToast = toast.loading(`Deleting ${slideName}...`);
@@ -722,7 +728,7 @@ function AdminView() {
           showBar={modalShowBar}
           onClose={closeEditModal}
           onSave={saveModalChanges}
-          onDelete={() => deleteSlide(editingSlide.id, currentEditingPlaylistId)}
+          onDelete={() => setSlideToDelete({ slide: editingSlide, playlistId: currentEditingPlaylistId })}
           onImageUpload={handleModalImageUpload}
           onPositionChange={setImagePosition}
           onLayoutChange={setSlideLayout}
@@ -822,7 +828,7 @@ function AdminView() {
           slideTransition={modalSlideTransition}
           onClose={closeEditModal}
           onSave={saveModalChanges}
-          onDelete={deleteSlide}
+          onDelete={() => setSlideToDelete({ slide: editingSlide, playlistId: currentEditingPlaylistId })}
           onImageUpload={handleModalImageUpload}
           onPositionChange={setImagePosition}
           onLayoutChange={setSlideLayout}
@@ -834,6 +840,52 @@ function AdminView() {
           onImageSideChange={setModalImageSide}
           onTransitionChange={setModalSlideTransition}
         />
+      )}
+
+      {/* Slide Delete Confirmation Modal */}
+      {slideToDelete && (
+        <div className="modal-overlay" onClick={() => setSlideToDelete(null)}>
+          <div className="modal-content slide-delete-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>Slide verwijderen</h3>
+              <button 
+                onClick={() => setSlideToDelete(null)}
+                className="modal-close-btn"
+                title="Close"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            
+            <div className="modal-body">
+              <p className="modal-description">
+                Weet je zeker dat je <strong>{slideToDelete.slide.name || 'Slide'}</strong> wilt verwijderen?
+              </p>
+              <p className="delete-warning">
+                Deze actie kan niet ongedaan worden gemaakt.
+              </p>
+            </div>
+            
+            <div className="modal-footer">
+              <button
+                onClick={() => setSlideToDelete(null)}
+                className="btn btn-secondary"
+              >
+                Annuleren
+              </button>
+              <button
+                onClick={() => {
+                  deleteSlide(slideToDelete.slide.id, slideToDelete.playlistId);
+                  setSlideToDelete(null);
+                  closeEditModal();
+                }}
+                className="btn btn-danger"
+              >
+                Verwijderen
+              </button>
+            </div>
+          </div>
+        </div>
       )}
       
     </div>

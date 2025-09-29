@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Settings as SettingsIcon, ChevronDown, ChevronUp } from "lucide-react";
+import { Settings as SettingsIcon, ChevronDown, ChevronUp, X } from "lucide-react";
 import {
   doc,
   getDoc,
@@ -184,101 +184,61 @@ function Settings() {
 
         {isAdvancedSettingsExpanded && (
           <div className="settings-content">
-              {/* Logo and Display Settings Row */}
-              <div className="settings-section settings-row">
-                {/* Logo Upload */}
+              {/* Logo Section - Full Width */}
+              <div className="settings-section">
                 <div className="logo-section">
-                <div className="logo-upload-area">
-                  {settings.logoUrl ? (
-                    <div className="logo-preview">
-                      <div className="logo-image-container">
-                        <img
-                          src={settings.logoUrl}
-                          alt="Logo"
-                          className="logo-image"
-                        />
+                  <div className="logo-upload-area">
+                    {settings.logoUrl ? (
+                      <div className="logo-preview">
+                        <div className="logo-image-container">
+                          <img
+                            src={settings.logoUrl}
+                            alt="Logo"
+                            className="logo-image"
+                          />
                         <button
                           onClick={removeLogo}
                           className="logo-remove-btn"
                           disabled={uploadingLogo}
                           title="Remove Logo"
                         >
-                          <svg
-                            width="16"
-                            height="16"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                          >
-                            <line x1="18" y1="6" x2="6" y2="18"></line>
-                            <line x1="6" y1="6" x2="18" y2="18"></line>
-                          </svg>
+                          <X size={20} />
                         </button>
-                      </div>
-                      <label className="logo-change-text">
-                        Logo Wijzigen
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={(e) =>
-                            handleLogoUpload(e.target.files[0])
-                          }
-                          style={{ display: "none" }}
-                          disabled={uploadingLogo}
-                        />
-                      </label>
-                    </div>
-                  ) : (
-                    <div className="logo-upload-placeholder">
-                      <label className="logo-upload-label">
-                        <div className="upload-icon">
-                          <svg
-                            width="24"
-                            height="24"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                          >
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                            <polyline points="7,10 12,15 17,10"></polyline>
-                            <line x1="12" y1="15" x2="12" y2="3"></line>
-                          </svg>
                         </div>
-                        <span>Logo Uploaden</span>
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={(e) =>
-                            handleLogoUpload(e.target.files[0])
-                          }
-                          style={{ display: "none" }}
-                          disabled={uploadingLogo}
-                        />
-                      </label>
-                      {uploadingLogo && (
-                        <div className="upload-status">Uploaden...</div>
-                      )}
-                    </div>
-                  )}
-                </div>
-                </div>
-
-                {/* Display Settings */}
-                <div className="display-section">
-                  <div className="checkbox-setting">
-                  <label className="checkbox-label">
-                    <input
-                      type="checkbox"
-                      checked={settings.showClock}
-                      onChange={(e) =>
-                        handleInputChange("showClock", e.target.checked)
-                      }
-                      className="checkbox-input"
-                    />
-                    <span className="checkbox-text">Klok Tonen</span>
-                  </label>
+                      </div>
+                    ) : (
+                      <div className="logo-upload-placeholder">
+                        <label className="logo-upload-label">
+                          <div className="upload-icon">
+                            <svg
+                              width="24"
+                              height="24"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                            >
+                              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                              <polyline points="7,10 12,15 17,10"></polyline>
+                              <line x1="12" y1="15" x2="12" y2="3"></line>
+                            </svg>
+                          </div>
+                          <span>Logo Uploaden</span>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) =>
+                              handleLogoUpload(e.target.files[0])
+                            }
+                            style={{ display: "none" }}
+                            disabled={uploadingLogo}
+                          />
+                        </label>
+                        {uploadingLogo && (
+                          <div className="upload-status">Uploaden...</div>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -336,8 +296,8 @@ function Settings() {
                 </div>
               </div>
 
-              {/* Bar Style Settings */}
-              <div className="settings-section">
+              {/* Bar Style and Clock Settings Row */}
+              <div className="settings-section settings-row">
                 <div className="bar-style-settings">
                   <div className="bar-style-input-group">
                     <label htmlFor="barStyle">Balk Stijl</label>
@@ -355,7 +315,22 @@ function Settings() {
                       <option value="transparant boven">Transparant Boven</option>
                     </select>
                   </div>
-                  
+                </div>
+
+                <div className="display-section">
+                  <div className="checkbox-setting">
+                    <label className="checkbox-label">
+                      <input
+                        type="checkbox"
+                        checked={settings.showClock}
+                        onChange={(e) =>
+                          handleInputChange("showClock", e.target.checked)
+                        }
+                        className="checkbox-input"
+                      />
+                      <span className="checkbox-text">Klok Tonen</span>
+                    </label>
+                  </div>
                 </div>
               </div>
 

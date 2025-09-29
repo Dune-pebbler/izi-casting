@@ -21,7 +21,7 @@ import {
   useSortable,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-// import FeedEditModal from './modal/FeedEditModal'; // No longer needed for inline editing
+// import FeedEditModal from '../FeedEditModal'; // No longer needed for inline editing
 
 function FeedList() {
   const [feeds, setFeeds] = useState([]);

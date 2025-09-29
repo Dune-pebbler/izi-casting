@@ -1,11 +1,11 @@
 import React from "react";
 import { Editor } from "@tinymce/tinymce-react";
 import { Trash2, Clock, Maximize2, Layout, ArrowLeftRight, Zap } from "lucide-react";
-import LayoutSelector from "./modal/LayoutSelector";
-import ImageUpload from "./modal/ImageUpload";
-import PositionSelector from "./modal/PositionSelector";
-import TextEditor from "./modal/TextEditor";
-import VideoUrlInput from "./modal/VideoUrlInput";
+import LayoutSelector from "./LayoutSelector";
+import ImageUpload from "./ImageUpload";
+import PositionSelector from "./PositionSelector";
+import TextEditor from "./TextEditor";
+import VideoUrlInput from "./VideoUrlInput";
 
 function EditModal({
   slide,
@@ -234,7 +234,10 @@ function EditModal({
 
           <div className="modal-header-actions">
             <button
-              onClick={onDelete}
+              onClick={() => {
+                console.log('Delete button clicked');
+                onDelete();
+              }}
               className="btn btn-danger delete-slide-btn"
               title="Delete slide"
             >
