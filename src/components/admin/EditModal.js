@@ -1,6 +1,6 @@
 import React from "react";
 import { Editor } from "@tinymce/tinymce-react";
-import { Trash2, Clock, Maximize2, Layout, ArrowLeftRight } from "lucide-react";
+import { Trash2, Clock, Maximize2, Layout, ArrowLeftRight, Zap } from "lucide-react";
 import LayoutSelector from "./modal/LayoutSelector";
 import ImageUpload from "./modal/ImageUpload";
 import PositionSelector from "./modal/PositionSelector";
@@ -19,6 +19,7 @@ function EditModal({
   showBar,
   videoUrl,
   imageSide,
+  slideTransition,
   onClose,
   onSave,
   onDelete,
@@ -31,13 +32,13 @@ function EditModal({
   onShowBarChange,
   onVideoUrlChange,
   onImageSideChange,
+  onTransitionChange,
 }) {
   const renderLayoutContent = () => {
     switch (slideLayout) {
       case "side-by-side":
         return (
           <>
-            {/* Left side - Display Preview (50% width, full height) */}
             <div className={`modal-left ${imageSide === 'right' ? 'flipped' : ''}`}>
               <ImageUpload
                 imageUrl={modalImageUrl}
@@ -50,7 +51,6 @@ function EditModal({
               />
             </div>
 
-            {/* Flip Button - Positioned absolutely in the center */}
             <button
               className="flip-layout-btn"
               onClick={() => onImageSideChange(imageSide === 'left' ? 'right' : 'left')}
@@ -59,7 +59,6 @@ function EditModal({
               <ArrowLeftRight size={20} />
             </button>
 
-            {/* Right side - Controls and Text input */}
             <div className={`modal-right ${imageSide === 'right' ? 'flipped' : ''}`}>
               <div className="text-input-section">
                 <TextEditor
@@ -200,6 +199,29 @@ function EditModal({
                   <Layout size={16} className="icon-layout" />
                 </div>
               </div>
+            </div>
+            <div className="slide-transition-container">
+              <label htmlFor="slide-transition">
+                <Zap size={16} />
+              </label>
+              <select
+                id="slide-transition"
+                className="slide-transition-select"
+                value={slideTransition || 'fade'}
+                onChange={(e) => onTransitionChange(e.target.value)}
+                title="Select slide transition effect"
+              >
+                <option value="fade">Fade</option>
+                <option value="slide-left">Slide Left</option>
+                <option value="slide-right">Slide Right</option>
+                <option value="slide-up">Slide Up</option>
+                <option value="slide-down">Slide Down</option>
+                <option value="zoom-in">Zoom In</option>
+                <option value="zoom-out">Zoom Out</option>
+                <option value="flip-horizontal">Flip Horizontal</option>
+                <option value="flip-vertical">Flip Vertical</option>
+                <option value="none">None</option>
+              </select>
             </div>
           </div>
 

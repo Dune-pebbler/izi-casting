@@ -42,6 +42,7 @@ function AdminView() {
   const [modalShowBar, setModalShowBar] = useState(true);
   const [modalVideoUrl, setModalVideoUrl] = useState('');
   const [modalImageSide, setModalImageSide] = useState('left');
+  const [modalSlideTransition, setModalSlideTransition] = useState('fade');
   const [currentEditingPlaylistId, setCurrentEditingPlaylistId] = useState(null);
 
   // Playlist editing state
@@ -279,6 +280,7 @@ function AdminView() {
     setModalShowBar(slide.showBar !== false);
     setModalVideoUrl(slide.videoUrl || '');
     setModalImageSide(slide.imageSide || 'left');
+    setModalSlideTransition(slide.transition || 'fade');
   };
 
   const closeEditModal = () => {
@@ -359,7 +361,8 @@ function AdminView() {
               imageSide: modalImageSide,
               layout: slideLayout,
               duration: modalSlideDuration === '' ? 5 : modalSlideDuration,
-              showBar: modalShowBar
+              showBar: modalShowBar,
+              transition: modalSlideTransition
             };
 
             // Debug logging for slide updates
@@ -801,6 +804,37 @@ function AdminView() {
         currentPlaylistId={currentPlaylistId}
         onMoveSlide={moveSlide}
       />
+
+      {/* Edit Slide Modal */}
+      {editingSlide && (
+        <EditModal
+          slide={editingSlide}
+          modalImageUrl={modalImageUrl}
+          modalTinyMCEContent={modalTinyMCEContent}
+          imagePosition={imagePosition}
+          slideLayout={slideLayout}
+          uploadingImage={uploadingImage}
+          slideName={modalSlideName}
+          slideDuration={modalSlideDuration}
+          showBar={modalShowBar}
+          videoUrl={modalVideoUrl}
+          imageSide={modalImageSide}
+          slideTransition={modalSlideTransition}
+          onClose={closeEditModal}
+          onSave={saveModalChanges}
+          onDelete={deleteSlide}
+          onImageUpload={handleModalImageUpload}
+          onPositionChange={setImagePosition}
+          onLayoutChange={setSlideLayout}
+          onContentChange={setModalTinyMCEContent}
+          onSlideNameChange={setModalSlideName}
+          onDurationChange={setModalSlideDuration}
+          onShowBarChange={setModalShowBar}
+          onVideoUrlChange={setModalVideoUrl}
+          onImageSideChange={setModalImageSide}
+          onTransitionChange={setModalSlideTransition}
+        />
+      )}
       
     </div>
   );
