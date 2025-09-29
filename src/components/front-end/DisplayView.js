@@ -15,7 +15,7 @@ import {
 import PairingScreen from "./PairingScreen";
 import SlideDisplay from "./SlideDisplay";
 import ProgressBar from "./ProgressBar";
-import BottomBar from "./BottomBar";
+import StatusBar from "./StatusBar/StatusBar";
 import FullscreenIndicator from "./FullscreenIndicator";
 
 function DisplayView() {
@@ -1019,7 +1019,7 @@ function DisplayView() {
         progressBarRef={progressBarRef}
       />
 
-      <BottomBar
+      <StatusBar
         currentSlide={currentSlide}
         settings={settings}
         feeds={feeds}
