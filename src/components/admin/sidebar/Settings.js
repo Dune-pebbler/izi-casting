@@ -49,7 +49,6 @@ function Settings() {
     loadSettings();
   }, []);
 
-
   // Handle input changes
   const handleInputChange = (field, value) => {
     setSettings(prev => ({
@@ -175,7 +174,7 @@ function Settings() {
             }
           >
             <SettingsIcon size={16} />
-            <span>Geavanceerde instellingen</span>
+            <span>Balk instellingen</span>
             {isAdvancedSettingsExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
           </button>
         </div>

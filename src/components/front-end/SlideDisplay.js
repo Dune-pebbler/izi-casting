@@ -20,7 +20,14 @@ function SlideDisplay({ currentSlide, slideLayout, nextSlide, nextSlideLayout })
     if (currentSlide && currentSlide.id !== displaySlide?.id) {
       const transition = currentSlide.transition || 'slide-left';
       
-      if ((transition === 'slide-left' || transition === 'slide-right' || transition === 'fade') && nextSlide) {
+      // Define all supported transition types
+      const supportedTransitions = [
+        'slide-left', 'slide-right', 'slide-up', 'slide-down',
+        'fade', 'zoom-in', 'zoom-out', 
+        'flip-horizontal', 'flip-vertical'
+      ];
+      
+      if (supportedTransitions.includes(transition) && nextSlide) {
         // Start transition
         setIsTransitioning(true);
         setTransitionType(transition);

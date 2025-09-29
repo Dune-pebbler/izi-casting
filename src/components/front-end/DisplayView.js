@@ -995,10 +995,6 @@ function DisplayView() {
   return (
     <div
       className="display-container"
-      style={{
-        backgroundColor: settings.backgroundColor,
-        color: settings.foregroundColor,
-      }}
     >
       <FullscreenIndicator
         isFullscreen={isFullscreen}

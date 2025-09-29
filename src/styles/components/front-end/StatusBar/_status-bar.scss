@@ -15,6 +15,7 @@
   border-bottom-left-radius: $border-radius-md;
   border-bottom-right-radius: $border-radius-md;
   box-shadow: $shadow-lg;
+  z-index: 5; // Higher than progress bar (z-index: 4) to stay above slide transitions
   .display-bottom-clock {
     display: flex;
     align-items: center;

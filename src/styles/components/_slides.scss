@@ -355,6 +355,46 @@
       }
     }
 
+    .slide-transition-container {
+      display: flex;
+      align-items: center;
+      gap: $spacing-sm;
+      height: 100%;
+      label {
+        font-size: $font-size-base;
+        color: $text-secondary;
+        font-weight: $font-weight-medium;
+        white-space: nowrap;
+        display: flex;
+        align-items: center;
+        gap: $spacing-xs;
+      }
+
+      .slide-transition-select {
+        width: 140px;
+        padding: $spacing-sm $spacing-md;
+        border: none;
+        background-color: #f6f6f7;
+        border-radius: 100px;
+        font-size: $font-size-base;
+        font-weight: $font-weight-semibold;
+        color: $text-primary;
+        transition: $transition-base;
+        height: 100%;
+        cursor: pointer;
+        
+        &:focus {
+          outline: none;
+          border-color: $border-color-focus;
+          box-shadow: 0 0 0 1px $border-color-focus;
+        }
+
+        &:hover {
+          background-color: #f0f0f1;
+        }
+      }
+    }
+
     .show-bar-checkbox-container {
       display: flex;
       align-items: center;
