@@ -37,5 +37,10 @@ export const auth = getAuth(app);
 
 // Initialize Google Auth Provider
 export const googleProvider = new GoogleAuthProvider();
+googleProvider.addScope('email');
+googleProvider.addScope('profile');
+
+// Debug: Log Google provider configuration
+console.log('Google Provider configured with scopes:', googleProvider.getScopes());
 
 export default app;
