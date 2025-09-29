@@ -39,7 +39,8 @@ function DisplayView() {
     backgroundColor: "#FAFAFA",
     foregroundColor: "#212121",
     feedUrl: "", 
-    showClock: true, 
+    showClock: true,
+    barStyle: "onder",
   });
   const [feeds, setFeeds] = useState([]);
   
@@ -602,7 +603,8 @@ function DisplayView() {
           backgroundColor: data.backgroundColor || "#FAFAFA",
           foregroundColor: data.foregroundColor || "#212121",
           feedUrl: data.feedUrl || "", 
-          showClock: data.showClock !== undefined ? data.showClock : true, 
+          showClock: data.showClock !== undefined ? data.showClock : true,
+          barStyle: data.barStyle || "onder",
         });
         
         
@@ -992,6 +994,7 @@ function DisplayView() {
   const nextSlide = slides[nextSlideIndex];
   const nextSlideLayout = nextSlide?.layout || "side-by-side"; 
 
+
   return (
     <div
       className="display-container"
@@ -1013,6 +1016,7 @@ function DisplayView() {
         currentSlide={currentSlide}
         slideProgress={slideProgress}
         progressBarRef={progressBarRef}
+        barStyle={settings.barStyle}
       />
 
       <StatusBar

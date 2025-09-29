@@ -336,6 +336,46 @@
         }
       }
     }
+
+    // Bar Style Settings - matches form input styling
+    .bar-style-settings {
+      .bar-style-input-group {
+        label {
+          display: block;
+          margin-bottom: $spacing-xs;
+          font-size: $font-size-sm;
+          font-weight: $font-weight-medium;
+          color: $text-primary;
+        }
+
+        .bar-style-select {
+          width: 100%;
+          padding: 0.6em;
+          border: 1px solid $border-color;
+          border-radius: $border-radius-sm;
+          font-size: $font-size-sm;
+          background-color: $surface;
+          color: $text-primary;
+          transition: $transition-base;
+          cursor: pointer;
+
+          &:focus {
+            outline: none;
+            border-color: $primary;
+            box-shadow: 0 0 0 2px rgba($primary, 0.2);
+          }
+
+          &:hover {
+            border-color: $gray-400;
+          }
+
+          option {
+            background-color: $surface;
+            color: $text-primary;
+          }
+        }
+      }
+    }
   }
 
   // Settings Actions - matches button styling patterns

@@ -25,6 +25,7 @@ function Settings() {
     foregroundColor: "#212121",
     feedUrl: "",
     showClock: true,
+    barStyle: "onder",
   });
 
   // Load settings on component mount
@@ -38,7 +39,9 @@ function Settings() {
             ...prev,
             ...loadedSettings,
             // Ensure showClock is always present, default to true if missing
-            showClock: loadedSettings.showClock !== undefined ? loadedSettings.showClock : true
+            showClock: loadedSettings.showClock !== undefined ? loadedSettings.showClock : true,
+            // Ensure barStyle is always present, default to "onder" if missing
+            barStyle: loadedSettings.barStyle || "onder",
           }));
         }
       } catch (error) {
@@ -330,6 +333,29 @@ function Settings() {
                       />
                     </div>
                   </div>
+                </div>
+              </div>
+
+              {/* Bar Style Settings */}
+              <div className="settings-section">
+                <div className="bar-style-settings">
+                  <div className="bar-style-input-group">
+                    <label htmlFor="barStyle">Balk Stijl</label>
+                    <select
+                      id="barStyle"
+                      value={settings.barStyle}
+                      onChange={(e) =>
+                        handleInputChange("barStyle", e.target.value)
+                      }
+                      className="bar-style-select"
+                    >
+                      <option value="onder">Onder</option>
+                      <option value="boven">Boven</option>
+                      <option value="transparant onder">Transparant Onder</option>
+                      <option value="transparant boven">Transparant Boven</option>
+                    </select>
+                  </div>
+                  
                 </div>
               </div>
 

@@ -799,23 +799,6 @@
   border: 2px dashed $gray-300;
 }
 
-// Pre-rendered next slide styles
-.next-slide-prerender {
-  position: absolute;
-  top: -9999px;
-  left: -9999px;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  visibility: hidden;
-  pointer-events: none;
-  
-  // Ensure all content inside is also hidden
-  * {
-    visibility: hidden;
-    pointer-events: none;
-  }
-}
 
 // Slide transition animations
 .display-content {

@@ -524,7 +524,12 @@ function Feed({ feeds, settings }) {
   if (rssFeed.length === 0) {
     return (
       <div className="feed-container">
-        <div className="rss-placeholder">RSS feeds aan het laden...</div>
+        <div 
+          className="rss-placeholder"
+          style={{ color: settings.foregroundColor }}
+        >
+          RSS feeds aan het laden...
+        </div>
       </div>
     );
   }
@@ -534,12 +539,16 @@ function Feed({ feeds, settings }) {
   return (
     <div className="feed-container">
       <div className="rss-item">
-        <div className="rss-title">
+        <div 
+          className="rss-title"
+          style={{ color: settings.foregroundColor }}
+        >
           {currentItem?.title || "No title"}
         </div>
         <div className="rss-description-container">
           <div 
             className="rss-description"
+            style={{ color: settings.foregroundColor }}
             ref={(el) => {
               if (el && currentItem?.description) {
                 // Use requestAnimationFrame to defer the measurement to avoid render loops

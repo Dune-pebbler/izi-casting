@@ -2,13 +2,12 @@
 .display-progress-bar {
   position: fixed;
   margin: $spacing-md;
-  height:8px;
+  height: 8px;
   width: calc(100% - $spacing-md * 2);
-  bottom: 20vh;
   min-height: 8px;
   background-color: rgba(255, 255, 255, 0.2);
   z-index: 4;
-  transition: height 0.3s ease;
+  transition: all 0.3s ease;
   border-top-left-radius: 4px;
   border-top-right-radius: 4px;
 }
