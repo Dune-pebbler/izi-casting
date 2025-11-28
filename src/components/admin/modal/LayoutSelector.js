@@ -1,11 +1,10 @@
 import React from 'react';
-import {
-  LayoutGrid,
-  Image,
-  FileText,
+import { 
+  LayoutGrid, 
+  Image, 
+  FileText, 
   Type,
-  Play,
-  Tv
+  Play
 } from 'lucide-react';
 
 function LayoutSelector({ currentLayout, onLayoutChange }) {
@@ -39,12 +38,6 @@ function LayoutSelector({ currentLayout, onLayoutChange }) {
       label: 'Video',
       icon: Play,
       title: 'Video Player (YouTube/Vimeo)'
-    },
-    {
-      id: 'teletekst',
-      label: 'Teletekst',
-      icon: Tv,
-      title: 'NOS Teletekst Display'
     }
   ];
 

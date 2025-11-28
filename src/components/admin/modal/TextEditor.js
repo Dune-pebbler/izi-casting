@@ -1,33 +1,7 @@
 import React from 'react';
 import { Editor } from '@tinymce/tinymce-react';
 
-// Available fonts mapping
-const AVAILABLE_FONTS = {
-  'Arial': 'Arial=arial,helvetica,sans-serif',
-  'Comic Neue': 'Comic Neue=Comic Neue,cursive',
-  'Comic Sans MS': 'Comic Sans MS=comic sans ms,cursive',
-  'Courier New': 'Courier New=courier new,courier,monospace',
-  'Georgia': 'Georgia=georgia,palatino,serif',
-  'Helvetica': 'Helvetica=helvetica,arial,sans-serif',
-  'Impact': 'Impact=impact,chicago',
-  'Lato': 'Lato=Lato,sans-serif',
-  'Montserrat': 'Montserrat=Montserrat,sans-serif',
-  'Nunito': 'Nunito=Nunito,sans-serif',
-  'Open Sans': 'Open Sans=Open Sans,sans-serif',
-  'Poppins': 'Poppins=Poppins,sans-serif',
-  'Roboto': 'Roboto=Roboto,sans-serif',
-  'Source Sans Pro': 'Source Sans Pro=Source Sans Pro,sans-serif',
-  'Times New Roman': 'Times New Roman=times new roman,times,serif',
-  'Trebuchet MS': 'Trebuchet MS=trebuchet ms,geneva',
-  'Verdana': 'Verdana=verdana,geneva',
-};
-
-function TextEditor({ content, onContentChange, enabledFonts }) {
-  // Build font_family_formats string from enabled fonts
-  const fontFormats = (enabledFonts && enabledFonts.length > 0)
-    ? enabledFonts.map(fontName => AVAILABLE_FONTS[fontName]).filter(Boolean).join('; ')
-    : Object.values(AVAILABLE_FONTS).join('; ');
-
+function TextEditor({ content, onContentChange }) {
   const editorConfig = {
     height: '100%',
     menubar: false,
@@ -35,7 +9,7 @@ function TextEditor({ content, onContentChange, enabledFonts }) {
       'anchor', 'autolink', 'charmap', 'codesample', 'emoticons', 'lists', 'searchreplace', 'table', 'visualblocks', 'wordcount'
     ],
     toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | forecolor backcolor | table | align lineheight | numlist bullist indent outdent | emoticons charmap | removeformat',
-    font_family_formats: fontFormats,
+    font_family_formats: 'Arial=arial,helvetica,sans-serif; Comic Neue=Comic Neue,cursive; Comic Sans MS=comic sans ms,cursive; Courier New=courier new,courier,monospace; Georgia=georgia,palatino,serif; Helvetica=helvetica,arial,sans-serif; Impact=impact,chicago; Lato=Lato,sans-serif; Montserrat=Montserrat,sans-serif; Nunito=Nunito,sans-serif; Open Sans=Open Sans,sans-serif; Poppins=Poppins,sans-serif; Roboto=Roboto,sans-serif; Source Sans Pro=Source Sans Pro,sans-serif; Times New Roman=times new roman,times,serif; Trebuchet MS=trebuchet ms,geneva; Verdana=verdana,geneva;',
     textcolor_map: [
       '000000', 'Black',
       '4D4D4D', 'Dim Gray',
@@ -312,7 +286,6 @@ function TextEditor({ content, onContentChange, enabledFonts }) {
 
   return (
     <Editor
-      key={fontFormats} // Force re-render when fonts change
       apiKey='l1htx10scfunizdawurrb9j2njqukthv8eb30m6rr0r64177'
       value={content}
       onEditorChange={onContentChange}

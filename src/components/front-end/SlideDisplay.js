@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { sanitizeHTMLContent } from "../../utils/sanitize";
 import TextPagination from "./TextPagination";
 import VideoPlayer from "./VideoPlayer";
+import TeletekstDisplay from "./TeletekstDisplay";
 import { getTextPaginationConfig } from "../../config/textPagination";
 
 function SlideDisplay({ currentSlide, slideLayout, nextSlide, nextSlideLayout }) {
@@ -258,6 +259,21 @@ function SlideDisplay({ currentSlide, slideLayout, nextSlide, nextSlideLayout })
             ) : (
               <div className="display-video-placeholder">
                 <div className="placeholder-text">No Video URL</div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {layout === "teletekst" && (
+          <div className="display-teletekst">
+            {slide.teletekstChannel ? (
+              <TeletekstDisplay
+                channel={slide.teletekstChannel}
+                theme={slide.teletekstTheme || 'classic'}
+              />
+            ) : (
+              <div className="display-teletekst-placeholder">
+                <div className="placeholder-text">Geen Teletekst Kanaal</div>
               </div>
             )}
           </div>

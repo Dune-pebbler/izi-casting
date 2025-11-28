@@ -29,8 +29,9 @@ const MoveSlideModal = ({
   };
 
   return (
-    <div className="modal-overlay" onClick={handleClose}>
-      <div className="modal-content move-slide-modal" onClick={(e) => e.stopPropagation()}>
+    <div className="move-slide-modal">
+      <div className="modal-overlay" onClick={handleClose}>
+        <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <h3>Move to other playlist</h3>
           <button 
@@ -79,6 +80,7 @@ const MoveSlideModal = ({
           >
             Move Slide
           </button>
+        </div>
         </div>
       </div>
     </div>

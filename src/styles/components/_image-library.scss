@@ -1,0 +1,363 @@
+// Image Library Modal Styles
+
+.image-library-modal-wrapper {
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1100; // Higher than edit modal (1000)
+    padding: $spacing-lg;
+  }
+
+  .image-library-modal {
+    background-color: $surface;
+    border-radius: $border-radius-lg;
+    box-shadow: $shadow-lg;
+    max-width: 900px;
+    width: 90%;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: modalSlideIn 0.2s ease-out;
+  }
+}
+
+.image-library-modal {
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: $spacing-lg;
+    border-bottom: 1px solid $border-color;
+    background-color: $surface;
+
+    .modal-header-left {
+      display: flex;
+      flex-direction: column;
+      gap: $spacing-xs;
+
+      h2 {
+        margin: 0;
+        font-size: 1.5rem;
+        font-weight: 600;
+      }
+
+      .image-count {
+        font-size: 0.875rem;
+        color: $text-tertiary;
+      }
+    }
+
+    .btn-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border: none;
+      background: none;
+      border-radius: $border-radius-md;
+      color: $text-secondary;
+      cursor: pointer;
+      transition: $transition-base;
+
+      &:hover {
+        background-color: $gray-50;
+        color: $text-primary;
+      }
+
+      &:focus {
+        outline: none;
+        box-shadow: 0 0 0 2px $border-color-focus;
+      }
+    }
+  }
+
+  .modal-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: $spacing-lg;
+  }
+
+  .modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: $spacing-md;
+    padding: $spacing-lg;
+    border-top: 1px solid $border-color;
+    background-color: $gray-50;
+  }
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+// Image Library Search
+.image-library-search {
+  position: relative;
+  margin-bottom: $spacing-lg;
+
+  svg {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: $text-tertiary;
+    pointer-events: none;
+  }
+
+  .search-input {
+    width: 100%;
+    padding: 10px 12px 10px 40px;
+    border: 1px solid $border-color;
+    border-radius: 6px;
+    font-size: 0.9375rem;
+    transition: border-color 0.2s;
+
+    &:focus {
+      outline: none;
+      border-color: $primary;
+    }
+  }
+}
+
+// Image Library States
+.image-library-loading,
+.image-library-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-xl * 2;
+  color: $text-tertiary;
+
+  svg {
+    margin-bottom: $spacing-lg;
+    opacity: 0.5;
+  }
+
+  p {
+    margin: 0;
+    font-size: 1rem;
+
+    &.empty-hint {
+      font-size: 0.875rem;
+      margin-top: $spacing-xs;
+    }
+  }
+}
+
+// Image Library Grid
+.image-library-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: $spacing-md;
+
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: $spacing-sm;
+  }
+}
+
+// Image Library Item
+.image-library-item {
+  position: relative;
+  border: 2px solid $border-color;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: $surface;
+
+  &:hover {
+    border-color: darken($border-color, 10%);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  &.selected {
+    border-color: $primary;
+    box-shadow: 0 0 0 3px rgba($primary, 0.1);
+  }
+}
+
+.image-library-thumbnail {
+  position: relative;
+  width: 100%;
+  padding-top: 75%; // 4:3 aspect ratio
+  background: $background;
+  overflow: hidden;
+
+  img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .image-delete-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.6);
+    border: none;
+    border-radius: 4px;
+    color: white;
+    cursor: pointer;
+    opacity: 0;
+    transition: all 0.2s;
+    z-index: 2;
+
+    &:hover {
+      background: $error;
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  .image-library-item:hover & .image-delete-btn {
+    opacity: 1;
+  }
+}
+
+.image-library-info {
+  padding: $spacing-sm;
+  background: $surface;
+
+  .image-name {
+    margin: 0 0 4px 0;
+    font-size: 0.875rem;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .image-meta {
+    margin: 0;
+    font-size: 0.75rem;
+    color: $text-tertiary;
+  }
+
+  .image-date {
+    margin: 4px 0 0 0;
+    font-size: 0.75rem;
+    color: $text-tertiary;
+  }
+}
+
+.selected-indicator {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  width: 28px;
+  height: 28px;
+  background: $primary;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  z-index: 2;
+}
+
+// Image Upload Container with Library Button
+.image-upload-container {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.image-upload-divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 0;
+
+  &::before,
+  &::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid $border-color;
+  }
+
+  span {
+    padding: 0 $spacing-md;
+    color: $text-tertiary;
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+}
+
+.image-library-button {
+  background: transparent;
+  border: 2px dashed $border-color;
+  transition: all 0.2s;
+
+  &:hover:not(:disabled) {
+    border-color: $primary;
+    background: rgba($primary, 0.05);
+
+    .upload-icon {
+      color: $primary;
+      transform: scale(1.05);
+    }
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .upload-icon {
+    transition: all 0.2s;
+  }
+}
+
+// Mobile responsiveness
+@media (max-width: 768px) {
+  .image-library-modal-wrapper {
+    .modal-overlay {
+      padding: $spacing-md;
+    }
+
+    .image-library-modal {
+      width: 95%;
+      max-height: 90vh;
+
+      .modal-header,
+      .modal-body,
+      .modal-footer {
+        padding: $spacing-md;
+      }
+    }
+  }
+
+  .image-library-grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  }
+}

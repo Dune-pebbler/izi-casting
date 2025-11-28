@@ -657,7 +657,9 @@ function DisplayView() {
             ((slide.type === "text" && slide.text && slide.text.trim()) ||
               (slide.type === "image" && slide.imageUrl) ||
               (slide.type === "video" && slide.videoUrl) ||
-              (!slide.type && slide.text && slide.text.trim())) 
+              (slide.type === "teletekst" && slide.teletekstChannel) ||
+              (slide.layout === "teletekst" && slide.teletekstChannel) ||
+              (!slide.type && slide.text && slide.text.trim()))
         );
 
         
@@ -693,6 +695,8 @@ function DisplayView() {
             hasText: !!slide.text,
             hasImageUrl: !!slide.imageUrl,
             hasVideoUrl: !!slide.videoUrl,
+            hasTeletekstChannel: !!slide.teletekstChannel,
+            teletekstChannel: slide.teletekstChannel,
             layout: slide.layout,
             duration: slide.duration
           });

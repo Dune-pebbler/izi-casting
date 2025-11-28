@@ -17,7 +17,7 @@ function Sidebar({
         onClick={onToggleCollapse}
         title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
       >
-        {isCollapsed ? <ChevronRight size={24} /> : <ChevronLeft size={24} />}
+        {isCollapsed ? <ChevronLeft size={24} /> : <ChevronRight size={24} />}
       </button>
       <div className="sidebar-logo">
         <img

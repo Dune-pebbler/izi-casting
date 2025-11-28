@@ -181,8 +181,9 @@
 
           .device-name-display {
             display: flex;
-            align-items: center;
-            gap: $spacing-sm;
+            flex-direction: column;
+            gap: 4px;
+
             .device-name-title {
               color: black;
               font-size: 0.875rem;
@@ -191,9 +192,18 @@
               padding: $spacing-sm $spacing-md;
               border-radius: 200px;
               transition: $transition-base;
+              align-self: flex-start;
+
               &:hover {
                 background-color: $gray-100;
               }
+            }
+
+            .device-last-seen {
+              font-size: 0.75rem;
+              color: $text-secondary;
+              padding-left: $spacing-md;
+              font-weight: $font-weight-normal;
             }
           }
 
@@ -222,18 +232,24 @@
           }
 
           .device-refresh-btn {
-            background: none;
-            border: none;
-            color: $text-secondary;
+            background-color: white;
+            border: 1px solid $gray-200;
+            color: $text-primary;
             cursor: pointer;
-            padding: $spacing-xs;
-            border-radius: $border-radius-sm;
+            padding: $spacing-sm $spacing-md;
+            border-radius: 0.8em;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: $transition-base;
+            gap: $spacing-xs;
+            transition: all 0.2s ease;
+            font-size: 0.875rem;
+            font-weight: $font-weight-medium;
 
             &:hover {
+              background-color: $gray-100;
+              transform: scale(1.02);
+
               svg {
                 animation: rotate-reverse 1s linear infinite;
               }

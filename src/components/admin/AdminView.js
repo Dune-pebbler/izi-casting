@@ -1,5 +1,5 @@
-import React, { useState, useMemo } from 'react';
-import { doc, setDoc } from 'firebase/firestore';
+import React, { useState, useMemo, useEffect } from 'react';
+import { doc, setDoc, getDoc, addDoc, collection } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import { db, storage } from '../../firebase';
 import { sanitizeHTMLContent } from '../../utils/sanitize';
@@ -10,8 +10,9 @@ import { usePlaylistManager } from './PlaylistManager';
 import PlaylistList from './PlaylistList';
 import EditModal from './slide-edit/EditModal';
 import MoveSlideModal from './MoveSlideModal';
+import ImageLibraryModal from './modal/ImageLibraryModal';
 import Sidebar from './sidebar/Sidebar';
-import { Monitor, Clock, X } from 'lucide-react';
+import { Monitor, Clock, X, Settings } from 'lucide-react';
 
 function AdminView() {
   // Playlist management hook
@@ -43,8 +44,12 @@ function AdminView() {
   const [modalVideoUrl, setModalVideoUrl] = useState('');
   const [modalImageSide, setModalImageSide] = useState('left');
   const [modalSlideTransition, setModalSlideTransition] = useState('fade');
+  const [modalTeletekstChannel, setModalTeletekstChannel] = useState('101');
+  const [modalTeletekstTheme, setModalTeletekstTheme] = useState('classic');
   const [currentEditingPlaylistId, setCurrentEditingPlaylistId] = useState(null);
   const [slideToDelete, setSlideToDelete] = useState(null);
+  const [defaultSlideTransition, setDefaultSlideTransition] = useState('fade');
+  const [enabledFonts, setEnabledFonts] = useState([]);
 
   // Playlist editing state
   const [editingPlaylistNameId, setEditingPlaylistNameId] = useState(null);
@@ -58,11 +63,32 @@ function AdminView() {
   const [moveSlideModalOpen, setMoveSlideModalOpen] = useState(false);
   const [slideToMove, setSlideToMove] = useState(null);
   const [currentPlaylistId, setCurrentPlaylistId] = useState(null);
+
+  // Image library modal state
+  const [imageLibraryModalOpen, setImageLibraryModalOpen] = useState(false);
   
   // Redux hooks
   const dispatch = useAppDispatch();
   const deviceToDelete = useAppSelector((state) => state.device.deviceToDelete);
   const isSidebarCollapsed = useAppSelector((state) => state.device.isSidebarCollapsed);
+
+  // Load default slide transition and enabled fonts from settings
+  useEffect(() => {
+    const loadSettings = async () => {
+      try {
+        const settingsDoc = await getDoc(doc(db, "display", "settings"));
+        if (settingsDoc.exists()) {
+          const settings = settingsDoc.data();
+          setDefaultSlideTransition(settings.defaultSlideTransition || 'fade');
+          setEnabledFonts(settings.enabledFonts || []);
+        }
+      } catch (error) {
+        console.error("Error loading settings:", error);
+      }
+    };
+
+    loadSettings();
+  }, []);
 
   // Calculate total statistics across all playlists
   const totalStats = useMemo(() => {
@@ -181,6 +207,22 @@ function AdminView() {
     const playlist = playlists.find(p => p.id === playlistId);
     if (!playlist) return;
 
+    // Fetch the latest settings (default transition and enabled fonts)
+    let currentDefaultTransition = defaultSlideTransition;
+    let currentEnabledFonts = enabledFonts;
+    try {
+      const settingsDoc = await getDoc(doc(db, "display", "settings"));
+      if (settingsDoc.exists()) {
+        const settings = settingsDoc.data();
+        currentDefaultTransition = settings.defaultSlideTransition || 'fade';
+        currentEnabledFonts = settings.enabledFonts || [];
+        setDefaultSlideTransition(currentDefaultTransition);
+        setEnabledFonts(currentEnabledFonts);
+      }
+    } catch (error) {
+      console.error("Error loading settings:", error);
+    }
+
     const newSlide = {
       id: Date.now(),
       name: `Slide ${playlist.slides.length + 1}`,
@@ -191,7 +233,8 @@ function AdminView() {
       imagePosition: 'center',
       layout: 'side-by-side',
       isVisible: false,
-      showBar: true
+      showBar: true,
+      transition: currentDefaultTransition
     };
     
     const updatedPlaylists = playlists.map(p => {
@@ -287,6 +330,8 @@ function AdminView() {
     setModalVideoUrl(slide.videoUrl || '');
     setModalImageSide(slide.imageSide || 'left');
     setModalSlideTransition(slide.transition || 'fade');
+    setModalTeletekstChannel(slide.teletekstChannel || '101');
+    setModalTeletekstTheme(slide.teletekstTheme || 'classic');
   };
 
   const closeEditModal = () => {
@@ -299,6 +344,7 @@ function AdminView() {
     setModalSlideName('');
     setModalSlideDuration(5);
     setModalShowBar(true);
+    setModalTeletekstChannel('101');
   };
 
   const handleContentChange = (content) => {
@@ -312,19 +358,19 @@ function AdminView() {
     }
 
     if (!file.type.startsWith('image/')) {
-      toast.error('Please select a valid image file.');
+      toast.error('Selecteer een geldig afbeeldingsbestand.');
       return;
     }
 
     const maxSize = 5 * 1024 * 1024;
     if (file.size > maxSize) {
-      toast.error('Image file size must be less than 5MB.');
+      toast.error('Afbeelding moet kleiner zijn dan 5MB.');
       return;
     }
 
     setUploadingImage(true);
-    const loadingToast = toast.loading('Uploading image...');
-    
+    const loadingToast = toast.loading('Afbeelding uploaden...');
+
     try {
       const timestamp = Date.now();
       const fileName = `${timestamp}_${file.name}`;
@@ -333,17 +379,51 @@ function AdminView() {
       const snapshot = await uploadBytes(storageRef, file);
       const downloadURL = await getDownloadURL(snapshot.ref);
 
+      // Get image dimensions
+      const img = new Image();
+      const dimensionsPromise = new Promise((resolve) => {
+        img.onload = () => {
+          resolve({ width: img.width, height: img.height });
+        };
+        img.onerror = () => {
+          resolve({ width: null, height: null });
+        };
+      });
+      img.src = downloadURL;
+      const { width, height } = await dimensionsPromise;
+
+      // Save to media library
+      await addDoc(collection(db, 'mediaLibrary'), {
+        name: file.name,
+        url: downloadURL,
+        storagePath: `slides/${fileName}`,
+        size: file.size,
+        type: file.type,
+        width,
+        height,
+        uploadedAt: new Date()
+      });
+
       setModalImageUrl(downloadURL);
-      
+
       toast.dismiss(loadingToast);
-      toast.success('Image uploaded successfully!');
+      toast.success('Afbeelding succesvol geüpload!');
     } catch (error) {
       console.error('Error uploading image:', error);
       toast.dismiss(loadingToast);
-      toast.error('Error uploading image: ' + error.message);
+      toast.error('Fout bij uploaden: ' + error.message);
     } finally {
       setUploadingImage(false);
     }
+  };
+
+  const handleSelectImageFromLibrary = (image) => {
+    setModalImageUrl(image.url);
+    toast.success('Afbeelding geselecteerd uit bibliotheek');
+  };
+
+  const handleOpenImageLibrary = () => {
+    setImageLibraryModalOpen(true);
   };
 
   const saveModalChanges = async () => {
@@ -362,7 +442,9 @@ function AdminView() {
               tinyMCEContent: modalTinyMCEContent,
               imageUrl: modalImageUrl,
               videoUrl: modalVideoUrl,
-              type: modalVideoUrl ? 'video' : (modalImageUrl ? 'image' : 'text'),
+              teletekstChannel: modalTeletekstChannel,
+              teletekstTheme: modalTeletekstTheme,
+              type: slideLayout === 'teletekst' ? 'teletekst' : (modalVideoUrl ? 'video' : (modalImageUrl ? 'image' : 'text')),
               imagePosition: imagePosition,
               imageSide: modalImageSide,
               layout: slideLayout,
@@ -487,18 +569,18 @@ function AdminView() {
     if (!file) return;
 
     if (!file.type.startsWith('image/')) {
-      toast.error('Please select a valid image file.');
+      toast.error('Selecteer een geldig afbeeldingsbestand.');
       return;
     }
 
     const maxSize = 5 * 1024 * 1024;
     if (file.size > maxSize) {
-      toast.error('Image file size must be less than 5MB.');
+      toast.error('Afbeelding moet kleiner zijn dan 5MB.');
       return;
     }
 
     setUploadingImage(true);
-    const loadingToast = toast.loading('Uploading image...');
+    const loadingToast = toast.loading('Afbeelding uploaden...');
     
     try {
       const timestamp = Date.now();
@@ -525,13 +607,13 @@ function AdminView() {
       });
       setPlaylists(updatedPlaylists);
       await savePlaylistsToFirebase(updatedPlaylists);
-      
+
       toast.dismiss(loadingToast);
-      toast.success('Image uploaded successfully!');
+      toast.success('Afbeelding succesvol geüpload!');
     } catch (error) {
       console.error('Error uploading image:', error);
       toast.dismiss(loadingToast);
-      toast.error('Error uploading image: ' + error.message);
+      toast.error('Fout bij uploaden: ' + error.message);
     } finally {
       setUploadingImage(false);
     }
@@ -540,17 +622,17 @@ function AdminView() {
   const removeImage = async (playlistId, slideId) => {
     const playlist = playlists.find(p => p.id === playlistId);
     const slide = playlist?.slides.find(slide => slide.id === slideId);
-    
+
     if (slide && slide.imageUrl && slide.imageName) {
-      const loadingToast = toast.loading('Removing image...');
-      
+      const loadingToast = toast.loading('Afbeelding verwijderen...');
+
       try {
         const imageRef = ref(storage, `slides/${slide.imageName}`);
         await deleteObject(imageRef);
-        
+
         const updatedPlaylists = playlists.map(playlist => {
           if (playlist.id === playlistId) {
-            const updatedSlides = playlist.slides.map(s => 
+            const updatedSlides = playlist.slides.map(s =>
               s.id === slideId ? { ...s, imageUrl: '', imageName: '', type: 'text' } : s
             );
             return { ...playlist, slides: updatedSlides };
@@ -559,13 +641,13 @@ function AdminView() {
         });
         setPlaylists(updatedPlaylists);
         await savePlaylistsToFirebase(updatedPlaylists);
-        
+
         toast.dismiss(loadingToast);
-        toast.success('Image removed successfully!');
+        toast.success('Afbeelding succesvol verwijderd!');
       } catch (error) {
         console.error('Error removing image:', error);
         toast.dismiss(loadingToast);
-        toast.error('Error removing image: ' + error.message);
+        toast.error('Fout bij verwijderen: ' + error.message);
       }
     }
   };
@@ -673,6 +755,13 @@ function AdminView() {
                 </span>
               </div>
             </div>
+            <button
+              className="admin-settings-btn"
+              onClick={toggleSidebarCollapse}
+              title={isSidebarCollapsed ? "Open settings" : "Close settings"}
+            >
+              <Settings size={24} />
+            </button>
           </div>
         </div>
 
@@ -740,6 +829,14 @@ function AdminView() {
           onVideoUrlChange={setModalVideoUrl}
           imageSide={modalImageSide}
           onImageSideChange={setModalImageSide}
+          slideTransition={modalSlideTransition}
+          onTransitionChange={setModalSlideTransition}
+          enabledFonts={enabledFonts}
+          teletekstChannel={modalTeletekstChannel}
+          teletekstTheme={modalTeletekstTheme}
+          onTeletekstChannelChange={setModalTeletekstChannel}
+          onTeletekstThemeChange={setModalTeletekstTheme}
+          onOpenLibrary={handleOpenImageLibrary}
         />
       )}
 
@@ -811,41 +908,18 @@ function AdminView() {
         onMoveSlide={moveSlide}
       />
 
-      {/* Edit Slide Modal */}
-      {editingSlide && (
-        <EditModal
-          slide={editingSlide}
-          modalImageUrl={modalImageUrl}
-          modalTinyMCEContent={modalTinyMCEContent}
-          imagePosition={imagePosition}
-          slideLayout={slideLayout}
-          uploadingImage={uploadingImage}
-          slideName={modalSlideName}
-          slideDuration={modalSlideDuration}
-          showBar={modalShowBar}
-          videoUrl={modalVideoUrl}
-          imageSide={modalImageSide}
-          slideTransition={modalSlideTransition}
-          onClose={closeEditModal}
-          onSave={saveModalChanges}
-          onDelete={() => setSlideToDelete({ slide: editingSlide, playlistId: currentEditingPlaylistId })}
-          onImageUpload={handleModalImageUpload}
-          onPositionChange={setImagePosition}
-          onLayoutChange={setSlideLayout}
-          onContentChange={setModalTinyMCEContent}
-          onSlideNameChange={setModalSlideName}
-          onDurationChange={setModalSlideDuration}
-          onShowBarChange={setModalShowBar}
-          onVideoUrlChange={setModalVideoUrl}
-          onImageSideChange={setModalImageSide}
-          onTransitionChange={setModalSlideTransition}
-        />
-      )}
+      {/* Image Library Modal */}
+      <ImageLibraryModal
+        isOpen={imageLibraryModalOpen}
+        onClose={() => setImageLibraryModalOpen(false)}
+        onSelectImage={handleSelectImageFromLibrary}
+      />
 
       {/* Slide Delete Confirmation Modal */}
       {slideToDelete && (
-        <div className="modal-overlay" onClick={() => setSlideToDelete(null)}>
-          <div className="modal-content slide-delete-modal" onClick={(e) => e.stopPropagation()}>
+        <div className="slide-delete-modal-wrapper">
+          <div className="modal-overlay" onClick={() => setSlideToDelete(null)}>
+            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h3>Slide verwijderen</h3>
               <button 
@@ -885,9 +959,10 @@ function AdminView() {
               </button>
             </div>
           </div>
+          </div>
         </div>
       )}
-      
+
     </div>
   );
 }

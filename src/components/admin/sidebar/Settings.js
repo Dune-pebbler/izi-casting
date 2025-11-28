@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Settings as SettingsIcon, ChevronDown, ChevronUp, X } from "lucide-react";
+import { Settings as SettingsIcon, ChevronDown, ChevronUp, X, Type } from "lucide-react";
 import {
   doc,
   getDoc,
@@ -14,8 +14,30 @@ import {
 import { db, storage } from "../../../firebase";
 import { toast } from "sonner";
 
+// Available fonts list
+const AVAILABLE_FONTS = [
+  { name: 'Arial', value: 'Arial=arial,helvetica,sans-serif' },
+  { name: 'Comic Neue', value: 'Comic Neue=Comic Neue,cursive' },
+  { name: 'Comic Sans MS', value: 'Comic Sans MS=comic sans ms,cursive' },
+  { name: 'Courier New', value: 'Courier New=courier new,courier,monospace' },
+  { name: 'Georgia', value: 'Georgia=georgia,palatino,serif' },
+  { name: 'Helvetica', value: 'Helvetica=helvetica,arial,sans-serif' },
+  { name: 'Impact', value: 'Impact=impact,chicago' },
+  { name: 'Lato', value: 'Lato=Lato,sans-serif' },
+  { name: 'Montserrat', value: 'Montserrat=Montserrat,sans-serif' },
+  { name: 'Nunito', value: 'Nunito=Nunito,sans-serif' },
+  { name: 'Open Sans', value: 'Open Sans=Open Sans,sans-serif' },
+  { name: 'Poppins', value: 'Poppins=Poppins,sans-serif' },
+  { name: 'Roboto', value: 'Roboto=Roboto,sans-serif' },
+  { name: 'Source Sans Pro', value: 'Source Sans Pro=Source Sans Pro,sans-serif' },
+  { name: 'Times New Roman', value: 'Times New Roman=times new roman,times,serif' },
+  { name: 'Trebuchet MS', value: 'Trebuchet MS=trebuchet ms,geneva' },
+  { name: 'Verdana', value: 'Verdana=verdana,geneva' },
+];
+
 function Settings() {
   const [isAdvancedSettingsExpanded, setIsAdvancedSettingsExpanded] = useState(false);
+  const [isFontsExpanded, setIsFontsExpanded] = useState(false);
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [settings, setSettings] = useState({
@@ -26,6 +48,8 @@ function Settings() {
     feedUrl: "",
     showClock: true,
     barStyle: "onder",
+    defaultSlideTransition: "fade",
+    enabledFonts: AVAILABLE_FONTS.map(f => f.name), // All fonts enabled by default
   });
 
   // Load settings on component mount
@@ -42,6 +66,10 @@ function Settings() {
             showClock: loadedSettings.showClock !== undefined ? loadedSettings.showClock : true,
             // Ensure barStyle is always present, default to "onder" if missing
             barStyle: loadedSettings.barStyle || "onder",
+            // Ensure defaultSlideTransition is always present, default to "fade" if missing
+            defaultSlideTransition: loadedSettings.defaultSlideTransition || "fade",
+            // Ensure enabledFonts is always present, default to all fonts if missing
+            enabledFonts: loadedSettings.enabledFonts || AVAILABLE_FONTS.map(f => f.name),
           }));
         }
       } catch (error) {
@@ -58,6 +86,28 @@ function Settings() {
       ...prev,
       [field]: value
     }));
+  };
+
+  // Toggle font selection
+  const toggleFont = (fontName) => {
+    setSettings(prev => {
+      const enabledFonts = prev.enabledFonts || [];
+      const isEnabled = enabledFonts.includes(fontName);
+
+      if (isEnabled) {
+        // Remove font
+        return {
+          ...prev,
+          enabledFonts: enabledFonts.filter(f => f !== fontName)
+        };
+      } else {
+        // Add font
+        return {
+          ...prev,
+          enabledFonts: [...enabledFonts, fontName]
+        };
+      }
+    });
   };
 
   // Handle logo upload
@@ -177,7 +227,7 @@ function Settings() {
             }
           >
             <SettingsIcon size={16} />
-            <span>Balk instellingen</span>
+            <span>Admin instellingen</span>
             {isAdvancedSettingsExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
           </button>
         </div>
@@ -331,6 +381,64 @@ function Settings() {
                       <span className="checkbox-text">Klok Tonen</span>
                     </label>
                   </div>
+                </div>
+              </div>
+
+              {/* Default Slide Transition */}
+              <div className="settings-section">
+                <div className="bar-style-settings">
+                  <div className="bar-style-input-group">
+                    <label htmlFor="defaultSlideTransition">Standaard slide transitie</label>
+                    <select
+                      id="defaultSlideTransition"
+                      value={settings.defaultSlideTransition}
+                      onChange={(e) =>
+                        handleInputChange("defaultSlideTransition", e.target.value)
+                      }
+                      className="bar-style-select"
+                    >
+                      <option value="fade">Fade</option>
+                      <option value="slide-left">Slide Left</option>
+                      <option value="slide-right">Slide Right</option>
+                      <option value="slide-up">Slide Up</option>
+                      <option value="slide-down">Slide Down</option>
+                      <option value="zoom-in">Zoom In</option>
+                      <option value="zoom-out">Zoom Out</option>
+                      <option value="flip-horizontal">Flip Horizontal</option>
+                      <option value="flip-vertical">Flip Vertical</option>
+                      <option value="none">None</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              {/* Font Selection */}
+              <div className="settings-section">
+                <div className="fonts-section">
+                  <button
+                    className="fonts-toggle-btn"
+                    onClick={() => setIsFontsExpanded(!isFontsExpanded)}
+                  >
+                    <Type size={16} />
+                    <span>Beschikbare lettertypen</span>
+                    {isFontsExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                  </button>
+
+                  {isFontsExpanded && (
+                    <div className="fonts-list">
+                      {AVAILABLE_FONTS.map(font => (
+                        <label key={font.name} className="font-checkbox-label">
+                          <input
+                            type="checkbox"
+                            checked={settings.enabledFonts?.includes(font.name) ?? true}
+                            onChange={() => toggleFont(font.name)}
+                            className="font-checkbox"
+                          />
+                          <span className="font-name">{font.name}</span>
+                        </label>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
 

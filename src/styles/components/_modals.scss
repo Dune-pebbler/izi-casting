@@ -1,6 +1,7 @@
 // Modal Base Styles - Scoped to specific components only
 .feed-edit-modal,
-.move-slide-modal {
+.move-slide-modal,
+.slide-delete-modal-wrapper {
   .modal-overlay {
     position: fixed;
     top: 0;
@@ -73,6 +74,7 @@
     padding: $spacing-lg;
     flex: 1;
     overflow-y: auto;
+    width: 100%;
   }
 
   .modal-footer {
@@ -284,7 +286,7 @@
 }
 
 // Slide Delete Modal Specific Styles
-.slide-delete-modal {
+.slide-delete-modal-wrapper {
   .modal-content {
     max-width: 400px;
   }
@@ -317,7 +319,7 @@
 @media (max-width: 768px) {
   .feed-edit-modal,
   .move-slide-modal,
-  .slide-delete-modal {
+  .slide-delete-modal-wrapper {
     .modal-overlay {
       padding: $spacing-md;
     }

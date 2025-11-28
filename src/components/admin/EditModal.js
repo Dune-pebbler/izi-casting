@@ -1,12 +1,11 @@
 import React from "react";
 import { Editor } from "@tinymce/tinymce-react";
-import { Trash2, Clock, Maximize2, Layout, ArrowLeftRight, Zap } from "lucide-react";
-import LayoutSelector from "./LayoutSelector";
-import ImageUpload from "./ImageUpload";
-import PositionSelector from "./PositionSelector";
-import TextEditor from "./TextEditor";
-import VideoUrlInput from "./VideoUrlInput";
-import TeletekstInput from "./TeletekstInput";
+import { Trash2, Clock, Maximize2, Layout, ArrowLeftRight } from "lucide-react";
+import LayoutSelector from "./modal/LayoutSelector";
+import ImageUpload from "./modal/ImageUpload";
+import PositionSelector from "./modal/PositionSelector";
+import TextEditor from "./modal/TextEditor";
+import VideoUrlInput from "./modal/VideoUrlInput";
 
 function EditModal({
   slide,
@@ -20,10 +19,6 @@ function EditModal({
   showBar,
   videoUrl,
   imageSide,
-  slideTransition,
-  enabledFonts,
-  teletekstChannel,
-  teletekstTheme,
   onClose,
   onSave,
   onDelete,
@@ -36,16 +31,13 @@ function EditModal({
   onShowBarChange,
   onVideoUrlChange,
   onImageSideChange,
-  onTransitionChange,
-  onTeletekstChannelChange,
-  onTeletekstThemeChange,
-  onOpenLibrary,
 }) {
   const renderLayoutContent = () => {
     switch (slideLayout) {
       case "side-by-side":
         return (
           <>
+            {/* Left side - Display Preview (50% width, full height) */}
             <div className={`modal-left ${imageSide === 'right' ? 'flipped' : ''}`}>
               <ImageUpload
                 imageUrl={modalImageUrl}
@@ -55,10 +47,10 @@ function EditModal({
                 showPositionSelector={true}
                 imagePosition={imagePosition}
                 onPositionChange={onPositionChange}
-                onOpenLibrary={onOpenLibrary}
               />
             </div>
 
+            {/* Flip Button - Positioned absolutely in the center */}
             <button
               className="flip-layout-btn"
               onClick={() => onImageSideChange(imageSide === 'left' ? 'right' : 'left')}
@@ -67,12 +59,12 @@ function EditModal({
               <ArrowLeftRight size={20} />
             </button>
 
+            {/* Right side - Controls and Text input */}
             <div className={`modal-right ${imageSide === 'right' ? 'flipped' : ''}`}>
               <div className="text-input-section">
                 <TextEditor
                   content={modalTinyMCEContent}
                   onContentChange={onContentChange}
-                  enabledFonts={enabledFonts}
                 />
               </div>
             </div>
@@ -91,7 +83,6 @@ function EditModal({
               imagePosition={imagePosition}
               onPositionChange={onPositionChange}
               fullWidth={true}
-              onOpenLibrary={onOpenLibrary}
             />
           </div>
         );
@@ -109,7 +100,6 @@ function EditModal({
                 imagePosition={imagePosition}
                 onPositionChange={onPositionChange}
                 asBackground={true}
-                onOpenLibrary={onOpenLibrary}
               />
             </div>
 
@@ -118,7 +108,6 @@ function EditModal({
                 <TextEditor
                   content={modalTinyMCEContent}
                   onContentChange={onContentChange}
-                  enabledFonts={enabledFonts}
                 />
               </div>
             </div>
@@ -132,7 +121,6 @@ function EditModal({
               <TextEditor
                 content={modalTinyMCEContent}
                 onContentChange={onContentChange}
-                enabledFonts={enabledFonts}
               />
             </div>
           </div>
@@ -147,20 +135,6 @@ function EditModal({
                 onVideoUrlChange={onVideoUrlChange}
                 onRemoveVideo={() => onVideoUrlChange('')}
                 onDurationChange={onDurationChange}
-              />
-            </div>
-          </div>
-        );
-
-      case "teletekst":
-        return (
-          <div className="modal-teletekst">
-            <div className="teletekst-input-section">
-              <TeletekstInput
-                channel={teletekstChannel}
-                theme={teletekstTheme}
-                onChannelChange={onTeletekstChannelChange}
-                onThemeChange={onTeletekstThemeChange}
               />
             </div>
           </div>
@@ -227,29 +201,6 @@ function EditModal({
                 </div>
               </div>
             </div>
-            <div className="slide-transition-container">
-              <label htmlFor="slide-transition">
-                <Zap size={16} />
-              </label>
-              <select
-                id="slide-transition"
-                className="slide-transition-select"
-                value={slideTransition || 'fade'}
-                onChange={(e) => onTransitionChange(e.target.value)}
-                title="Select slide transition effect"
-              >
-                <option value="fade">Fade</option>
-                <option value="slide-left">Slide Left</option>
-                <option value="slide-right">Slide Right</option>
-                <option value="slide-up">Slide Up</option>
-                <option value="slide-down">Slide Down</option>
-                <option value="zoom-in">Zoom In</option>
-                <option value="zoom-out">Zoom Out</option>
-                <option value="flip-horizontal">Flip Horizontal</option>
-                <option value="flip-vertical">Flip Vertical</option>
-                <option value="none">None</option>
-              </select>
-            </div>
           </div>
 
           <div className="modal-header-center">
@@ -261,10 +212,7 @@ function EditModal({
 
           <div className="modal-header-actions">
             <button
-              onClick={() => {
-                console.log('Delete button clicked');
-                onDelete();
-              }}
+              onClick={onDelete}
               className="btn btn-danger delete-slide-btn"
               title="Delete slide"
             >

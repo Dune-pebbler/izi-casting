@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(lsof:*)",
+      "Bash(xargs kill:*)",
+      "Bash(npm start)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebFetch(domain:codeberg.org)",
+      "Bash(curl:*)",
+      "WebSearch"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

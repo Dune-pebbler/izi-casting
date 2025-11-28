@@ -36,8 +36,17 @@ function Devices({ setDeviceToDelete, deleteDevice }) {
   const [editingDeviceId, setEditingDeviceId] = useState(null);
   const [editingDeviceName, setEditingDeviceName] = useState("");
   const [refreshingDevices, setRefreshingDevices] = useState(new Set());
+  const [, setLastSeenUpdate] = useState(Date.now());
 
   console.log("Linked devices:", linkedDevices);
+
+  // Update "last seen" display every minute
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setLastSeenUpdate(Date.now());
+    }, 60000); // Update every 60 seconds
+    return () => clearInterval(interval);
+  }, []);
 
   // Listen for linked devices
   useEffect(() => {
@@ -230,6 +239,31 @@ function Devices({ setDeviceToDelete, deleteDevice }) {
     return diffInMinutes < 5; // Consider device online if seen in last 5 minutes
   };
 
+  const formatLastSeen = (lastSeen) => {
+    if (!lastSeen) return "Nooit";
+
+    const lastSeenDate = lastSeen.toDate
+      ? lastSeen.toDate()
+      : new Date(lastSeen);
+    const now = new Date();
+    const diffInSeconds = Math.floor((now - lastSeenDate) / 1000);
+
+    if (diffInSeconds < 60) return "Zojuist";
+
+    const diffInMinutes = Math.floor(diffInSeconds / 60);
+    if (diffInMinutes < 60) {
+      return `${diffInMinutes} ${diffInMinutes === 1 ? 'minuut' : 'minuten'} geleden`;
+    }
+
+    const diffInHours = Math.floor(diffInMinutes / 60);
+    if (diffInHours < 24) {
+      return `${diffInHours} ${diffInHours === 1 ? 'uur' : 'uur'} geleden`;
+    }
+
+    const diffInDays = Math.floor(diffInHours / 24);
+    return `${diffInDays} ${diffInDays === 1 ? 'dag' : 'dagen'} geleden`;
+  };
+
   // Count online devices
   const onlineDevices = linkedDevices.filter(
     (device) => device.isPaired && isDeviceOnline(device.lastSeen)
@@ -262,11 +296,12 @@ function Devices({ setDeviceToDelete, deleteDevice }) {
                         disabled={refreshingDevices.has(device.id)}
                       >
                         <RotateCcw
-                          size={18}
+                          size={16}
                           className={
                             refreshingDevices.has(device.id) ? "rotating" : ""
                           }
                         />
+                        <span>Ververs</span>
                       </button>
                       {editingDeviceId === device.id ? (
                         <input
@@ -295,6 +330,9 @@ function Devices({ setDeviceToDelete, deleteDevice }) {
                           >
                             {getDisplayName(device)}
                           </strong>
+                          <div className="device-last-seen">
+                            Laatst gezien: {formatLastSeen(device.lastSeen)}
+                          </div>
                         </div>
                       )}
                     </div>

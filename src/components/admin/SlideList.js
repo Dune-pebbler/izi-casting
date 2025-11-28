@@ -1,5 +1,5 @@
 import React, { useMemo, useCallback } from 'react';
-import { Copy, GripVertical, Eye, EyeOff, Plus, ChevronsUpDown, Play } from 'lucide-react';
+import { Copy, GripVertical, Eye, EyeOff, Plus, ChevronsUpDown, Play, Tv } from 'lucide-react';
 import { sanitizeHTMLContent } from '../../utils/sanitize';
 import { extractVideoInfo } from '../../utils/videoMetadata';
 import {
@@ -218,9 +218,9 @@ function SlideList({
             <div className="slide-preview-video">
               {slide.videoUrl && videoInfo ? (
                 <div className="preview-video-container">
-                  <img 
-                    src={getVideoThumbnailUrl()} 
-                    alt="Video thumbnail" 
+                  <img
+                    src={getVideoThumbnailUrl()}
+                    alt="Video thumbnail"
                     className="preview-video-thumbnail"
                     onError={(e) => {
                       e.target.style.display = 'none';
@@ -239,6 +239,28 @@ function SlideList({
                 <div className="preview-placeholder">
                   <div className="placeholder-icon">🎥</div>
                   <span>No video URL</span>
+                </div>
+              )}
+            </div>
+          );
+
+        case 'teletekst':
+          return (
+            <div className="slide-preview-teletekst">
+              {slide.teletekstChannel ? (
+                <div className="preview-teletekst-container">
+                  <div className="preview-teletekst-icon">
+                    <Tv size={48} />
+                  </div>
+                  <div className="preview-teletekst-info">
+                    <span className="teletekst-label">NOS Teletekst</span>
+                    <span className="teletekst-channel">Pagina {slide.teletekstChannel}</span>
+                  </div>
+                </div>
+              ) : (
+                <div className="preview-placeholder">
+                  <div className="placeholder-icon"><Tv size={24} /></div>
+                  <span>No teletekst channel</span>
                 </div>
               )}
             </div>
