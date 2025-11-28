@@ -21,6 +21,7 @@ const PlaylistList = ({
   playlists,
   expandedPlaylists,
   onToggleExpansion,
+  globalLayout,
   onAddPlaylist,
   onReorderPlaylists,
   onUpdatePlaylistName,
@@ -31,6 +32,7 @@ const PlaylistList = ({
   onEditSlide,
   onUpdateSlideType,
   onToggleSlideVisibility,
+  onConfirmDeleteSlide,
   onRemoveSlide,
   onImageUpload,
   onRemoveImage,
@@ -108,7 +110,8 @@ const PlaylistList = ({
         items={playlistIds}
         strategy={verticalListSortingStrategy}
       >
-        {playlists.map((playlist, index) => (
+        {playlists.map((playlist, index) => {
+          return (
           <div key={playlist.id} className="playlist-container">
             <PlaylistHeader
               playlist={playlist}
@@ -140,6 +143,7 @@ const PlaylistList = ({
             >
               <SlideList
                 slides={playlist.slides}
+                layout={globalLayout}
                 onEditSlide={(slide) => onEditSlide(slide, playlist.id)}
                 onUpdateSlideType={(slideId, type) =>
                   onUpdateSlideType(playlist.id, slideId, type)
@@ -147,6 +151,7 @@ const PlaylistList = ({
                 onToggleSlideVisibility={(slideId) =>
                   onToggleSlideVisibility(playlist.id, slideId)
                 }
+                onConfirmDeleteSlide={(slide) => onConfirmDeleteSlide(slide, playlist.id)}
                 onRemoveSlide={(slideId) => onRemoveSlide(playlist.id, slideId)}
                 onImageUpload={(slideId, file) =>
                   onImageUpload(playlist.id, slideId, file)
@@ -162,7 +167,8 @@ const PlaylistList = ({
               />
             </div>
           </div>
-        ))}
+        );
+        })}
       </SortableContext>
 
       {/* Add Playlist Button */}

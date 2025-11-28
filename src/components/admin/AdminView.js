@@ -12,7 +12,7 @@ import EditModal from './slide-edit/EditModal';
 import MoveSlideModal from './MoveSlideModal';
 import ImageLibraryModal from './modal/ImageLibraryModal';
 import Sidebar from './sidebar/Sidebar';
-import { Monitor, Clock, X, Settings } from 'lucide-react';
+import { Monitor, Clock, X, Settings, LayoutGrid, List } from 'lucide-react';
 
 function AdminView() {
   // Playlist management hook
@@ -58,6 +58,7 @@ function AdminView() {
   const [editingPlaylistRepeatCount, setEditingPlaylistRepeatCount] = useState(1);
   const [editingPlaylistRepeatCountId, setEditingPlaylistRepeatCountId] = useState(null);
   const [playlistToDelete, setPlaylistToDelete] = useState(null);
+  const [globalLayout, setGlobalLayout] = useState('grid'); // 'grid' or 'list'
   
   // Move slide modal state
   const [moveSlideModalOpen, setMoveSlideModalOpen] = useState(false);
@@ -179,6 +180,10 @@ function AdminView() {
       newExpanded.add(playlistId);
     }
     setExpandedPlaylists(newExpanded);
+  };
+
+  const toggleGlobalLayout = () => {
+    setGlobalLayout(prevLayout => prevLayout === 'grid' ? 'list' : 'grid');
   };
 
   const handleAddPlaylist = async () => {
@@ -514,11 +519,15 @@ function AdminView() {
     await savePlaylistsToFirebase(updatedPlaylists);
   };
 
+  const confirmDeleteSlide = (slide, playlistId) => {
+    setSlideToDelete({ slide, playlistId });
+  };
+
   const removeSlide = async (playlistId, slideId) => {
     const playlist = playlists.find(p => p.id === playlistId);
     const slideToRemove = playlist?.slides.find(slide => slide.id === slideId);
     const slideName = slideToRemove?.name || 'Slide';
-    
+
     const loadingToast = toast.loading(`Removing ${slideName}...`);
 
     try {
@@ -530,7 +539,7 @@ function AdminView() {
           console.error('Error deleting image:', error);
         }
       }
-      
+
       const updatedPlaylists = playlists.map(playlist => {
         if (playlist.id === playlistId) {
           const newSlides = playlist.slides.filter(slide => slide.id !== slideId);
@@ -541,7 +550,7 @@ function AdminView() {
       });
       setPlaylists(updatedPlaylists);
       await savePlaylistsToFirebase(updatedPlaylists);
-      
+
       toast.dismiss(loadingToast);
       toast.success(`${slideName} removed successfully!`);
     } catch (error) {
@@ -756,6 +765,13 @@ function AdminView() {
               </div>
             </div>
             <button
+              className="admin-layout-btn"
+              onClick={toggleGlobalLayout}
+              title={globalLayout === 'grid' ? 'Switch to list view' : 'Switch to grid view'}
+            >
+              {globalLayout === 'grid' ? <List size={24} /> : <LayoutGrid size={24} />}
+            </button>
+            <button
               className="admin-settings-btn"
               onClick={toggleSidebarCollapse}
               title={isSidebarCollapsed ? "Open settings" : "Close settings"}
@@ -769,6 +785,7 @@ function AdminView() {
           playlists={playlists}
           expandedPlaylists={expandedPlaylists}
           onToggleExpansion={togglePlaylistExpansion}
+          globalLayout={globalLayout}
           onAddPlaylist={handleAddPlaylist}
           onReorderPlaylists={reorderPlaylists}
           onUpdatePlaylistName={updatePlaylistName}
@@ -779,6 +796,7 @@ function AdminView() {
           onEditSlide={openEditModal}
           onUpdateSlideType={updateSlideType}
           onToggleSlideVisibility={toggleSlideVisibility}
+          onConfirmDeleteSlide={confirmDeleteSlide}
           onRemoveSlide={removeSlide}
           onImageUpload={handleImageUpload}
           onRemoveImage={removeImage}

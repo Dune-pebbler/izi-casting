@@ -1,5 +1,5 @@
 import React, { useMemo, useCallback } from 'react';
-import { Copy, GripVertical, Eye, EyeOff, Plus, ChevronsUpDown, Play, Tv } from 'lucide-react';
+import { Copy, GripVertical, Eye, EyeOff, Plus, ChevronsUpDown, Play, Tv, Trash2 } from 'lucide-react';
 import { sanitizeHTMLContent } from '../../utils/sanitize';
 import { extractVideoInfo } from '../../utils/videoMetadata';
 import {
@@ -21,14 +21,16 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
-function SlideList({ 
-  slides, 
-  onEditSlide, 
-  onUpdateSlideType, 
-  onToggleSlideVisibility, 
-  onRemoveSlide, 
-  onImageUpload, 
-  onRemoveImage, 
+function SlideList({
+  slides,
+  layout = 'grid',
+  onEditSlide,
+  onUpdateSlideType,
+  onToggleSlideVisibility,
+  onConfirmDeleteSlide,
+  onRemoveSlide,
+  onImageUpload,
+  onRemoveImage,
   uploadingImage,
   onCopySlide,
   onReorderSlides,
@@ -346,6 +348,16 @@ function SlideList({
             <button
               onClick={(e) => {
                 e.stopPropagation();
+                onConfirmDeleteSlide(slide);
+              }}
+              className="btn btn-danger delete-slide-btn"
+              title="Delete slide"
+            >
+              <Trash2 size={16} />
+            </button>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
                 onToggleSlideVisibility(slide.id);
               }}
               className={`status-toggle-btn ${slide.isVisible ? 'visible' : 'hidden'}`}
@@ -358,6 +370,107 @@ function SlideList({
         
         <div className="slide-preview-container">
           {renderSlidePreview(slide)}
+        </div>
+      </div>
+    );
+  };
+
+  // SortableSlideRow component for list view
+  const SortableSlideRow = ({ slide, index }) => {
+    const {
+      attributes,
+      listeners,
+      setNodeRef,
+      transform,
+      transition,
+      isDragging,
+    } = useSortable({ id: slide.id });
+
+    const style = {
+      transform: CSS.Transform.toString(transform),
+      transition,
+      opacity: isDragging ? 0.5 : 1,
+    };
+
+    const getSlideTypeLabel = (slide) => {
+      const layout = slide.layout || 'side-by-side';
+      switch (layout) {
+        case 'image-only':
+          return 'Image Only';
+        case 'text-only':
+          return 'Text Only';
+        case 'text-over-image':
+          return 'Text Over Image';
+        case 'video':
+          return 'Video';
+        case 'teletekst':
+          return `Teletekst ${slide.teletekstChannel || ''}`;
+        case 'side-by-side':
+        default:
+          return 'Side by Side';
+      }
+    };
+
+    return (
+      <div
+        ref={setNodeRef}
+        style={style}
+        className={`slide-row ${isDragging ? 'dragging' : ''}`}
+        onClick={() => onEditSlide(slide)}
+      >
+        <div className="slide-row-left" {...attributes} {...listeners}>
+          <div className="drag-handle">
+            <GripVertical size={18} />
+          </div>
+        </div>
+        <div className="slide-row-content">
+          <h4 className="slide-row-title">{slide.name || `Slide ${index + 1}`}</h4>
+          <div className="slide-row-info">
+            <span className="slide-row-type">{getSlideTypeLabel(slide)}</span>
+            <span className="slide-row-duration">{slide.duration || 5}s</span>
+          </div>
+        </div>
+        <div className="slide-row-actions">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onMoveSlide(slide);
+            }}
+            className="move-slide-btn"
+            title="Move to other playlist"
+          >
+            <ChevronsUpDown size={16} />
+          </button>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onCopySlide(slide);
+            }}
+            className="copy-slide-btn"
+            title="Copy slide"
+          >
+            <Copy size={16} />
+          </button>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onConfirmDeleteSlide(slide);
+            }}
+            className="btn btn-danger delete-slide-btn"
+            title="Delete slide"
+          >
+            <Trash2 size={16} />
+          </button>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onToggleSlideVisibility(slide.id);
+            }}
+            className={`status-toggle-btn ${slide.isVisible ? 'visible' : 'hidden'}`}
+            title={slide.isVisible ? 'Hide slide' : 'Show slide'}
+          >
+            {slide.isVisible ? <Eye size={16} /> : <EyeOff size={16} />}
+          </button>
         </div>
       </div>
     );
@@ -403,21 +516,39 @@ function SlideList({
       onDragEnd={handleDragEnd}
     >
       <SortableContext items={slideIds} strategy={verticalListSortingStrategy}>
-        <div className="slides-grid">
-          {slides.map((slide, index) => (
-            <SortableSlideCard key={slide.id} slide={slide} index={index} />
-          ))}
-          
-          {/* Add Slide Button */}
-          {onAddSlide && (
-            <div className="add-slide-button" onClick={onAddSlide}>
-              <div className="add-slide-content">
-                <Plus size={24} />
-                <span>Add Slide</span>
+        {layout === 'list' ? (
+          <div className="slides-list">
+            {slides.map((slide, index) => (
+              <SortableSlideRow key={slide.id} slide={slide} index={index} />
+            ))}
+
+            {/* Add Slide Button */}
+            {onAddSlide && (
+              <div className="add-slide-button list-add" onClick={onAddSlide}>
+                <div className="add-slide-content">
+                  <Plus size={24} />
+                  <span>Add Slide</span>
+                </div>
               </div>
-            </div>
-          )}
-        </div>
+            )}
+          </div>
+        ) : (
+          <div className="slides-grid">
+            {slides.map((slide, index) => (
+              <SortableSlideCard key={slide.id} slide={slide} index={index} />
+            ))}
+
+            {/* Add Slide Button */}
+            {onAddSlide && (
+              <div className="add-slide-button" onClick={onAddSlide}>
+                <div className="add-slide-content">
+                  <Plus size={24} />
+                  <span>Add Slide</span>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
       </SortableContext>
     </DndContext>
   );
