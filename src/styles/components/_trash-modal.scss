@@ -1,0 +1,391 @@
+.trash-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  padding: 2rem;
+
+  .trash-modal-content {
+    background: $surface;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 1200px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  }
+
+  .trash-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+    h2 {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin: 0;
+      font-size: 1.5rem;
+      color: $text-primary;
+    }
+
+    .trash-modal-header-actions {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .modal-close-btn {
+      background: transparent;
+      border: none;
+      color: $text-secondary;
+      cursor: pointer;
+      padding: 0.5rem;
+      border-radius: 6px;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.1);
+        color: $text-primary;
+      }
+    }
+  }
+
+  .trash-modal-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 2rem;
+  }
+
+  .trash-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 2rem;
+    color: $text-secondary;
+    gap: 1rem;
+
+    p {
+      font-size: 1.1rem;
+      margin: 0;
+    }
+  }
+
+  .trash-slides-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .trash-slide-card {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.2s ease;
+
+    &:hover {
+      border-color: rgba(255, 255, 255, 0.2);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+  }
+
+  .trash-slide-preview-container {
+    width: 100%;
+    height: 150px;
+    background: rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+  }
+
+  .trash-slide-preview {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &.image-only,
+    &.side-by-side .preview-left {
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+    }
+
+    &.side-by-side {
+      display: flex;
+      flex-direction: row;
+
+      .preview-left,
+      .preview-right {
+        width: 50%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .preview-text {
+        padding: 0.5rem;
+        font-size: 0.75rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+
+    &.text-only,
+    &.video {
+      padding: 1rem;
+      text-align: center;
+    }
+
+    .preview-text {
+      color: $text-secondary;
+      font-size: 0.85rem;
+      line-height: 1.4;
+    }
+
+    .video-preview {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+
+      .video-icon {
+        font-size: 2rem;
+      }
+
+      .video-platform {
+        font-size: 0.85rem;
+        color: $text-secondary;
+      }
+    }
+
+    .preview-placeholder {
+      font-size: 2rem;
+      opacity: 0.3;
+    }
+  }
+
+  .trash-slide-info {
+    padding: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+    h4 {
+      margin: 0 0 0.5rem 0;
+      font-size: 1rem;
+      color: $text-primary;
+    }
+
+    .trash-slide-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+
+      span {
+        font-size: 0.75rem;
+        color: $text-secondary;
+      }
+
+      .original-playlist {
+        color: $primary;
+      }
+    }
+  }
+
+  .trash-slide-actions {
+    padding: 1rem;
+    display: flex;
+    gap: 0.5rem;
+
+    .btn {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      font-size: 0.85rem;
+      padding: 0.5rem 1rem;
+    }
+  }
+}
+
+// Restore Modal
+.restore-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10001;
+  padding: 2rem;
+
+  .restore-modal-content {
+    background: $surface;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 500px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  }
+
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+    h3 {
+      margin: 0;
+      font-size: 1.25rem;
+      color: $text-primary;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+  }
+
+  .modal-body {
+    padding: 2rem;
+
+    p {
+      margin: 0 0 1.5rem 0;
+      color: $text-secondary;
+      line-height: 1.6;
+    }
+
+    .playlist-select {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 6px;
+      color: $text-primary;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      &:hover {
+        border-color: rgba(255, 255, 255, 0.3);
+      }
+
+      &:focus {
+        outline: none;
+        border-color: $primary;
+        box-shadow: 0 0 0 3px rgba($primary, 0.2);
+      }
+
+      option {
+        background: $surface;
+        color: $text-primary;
+      }
+    }
+  }
+
+  .modal-footer {
+    padding: 1rem 2rem 1.5rem;
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+
+    .btn {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+  }
+}
+
+// Delete Confirm Modal
+.delete-confirm-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10001;
+  padding: 2rem;
+
+  .delete-confirm-modal-content {
+    background: $surface;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 500px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  }
+
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+    h3 {
+      margin: 0;
+      font-size: 1.25rem;
+      color: $danger-color;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+  }
+
+  .modal-body {
+    padding: 2rem;
+
+    p {
+      margin: 0 0 1rem 0;
+      color: $text-secondary;
+      line-height: 1.6;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+
+    .delete-warning {
+      color: $danger-color;
+      font-weight: 500;
+      background: rgba($danger-color, 0.1);
+      padding: 1rem;
+      border-radius: 6px;
+      border-left: 3px solid $danger-color;
+    }
+  }
+
+  .modal-footer {
+    padding: 1rem 2rem 1.5rem;
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+
+    .btn {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+  }
+}

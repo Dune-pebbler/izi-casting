@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { doc, setDoc, getDoc, addDoc, collection } from 'firebase/firestore';
+import { doc, setDoc, getDoc, addDoc, collection, getDocs, deleteDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import { db, storage } from '../../firebase';
 import { sanitizeHTMLContent } from '../../utils/sanitize';
@@ -11,6 +11,7 @@ import PlaylistList from './PlaylistList';
 import EditModal from './slide-edit/EditModal';
 import MoveSlideModal from './MoveSlideModal';
 import ImageLibraryModal from './modal/ImageLibraryModal';
+import TrashModal from './TrashModal';
 import Sidebar from './sidebar/Sidebar';
 import { Monitor, Clock, X, Settings, LayoutGrid, List } from 'lucide-react';
 
@@ -67,7 +68,11 @@ function AdminView() {
 
   // Image library modal state
   const [imageLibraryModalOpen, setImageLibraryModalOpen] = useState(false);
-  
+
+  // Trash modal state
+  const [trashModalOpen, setTrashModalOpen] = useState(false);
+  const [trashedSlides, setTrashedSlides] = useState([]);
+
   // Redux hooks
   const dispatch = useAppDispatch();
   const deviceToDelete = useAppSelector((state) => state.device.deviceToDelete);
@@ -89,6 +94,24 @@ function AdminView() {
     };
 
     loadSettings();
+  }, []);
+
+  // Load trashed slides from Firebase
+  useEffect(() => {
+    const loadTrashedSlides = async () => {
+      try {
+        const trashSnapshot = await getDocs(collection(db, 'trash'));
+        const trashData = trashSnapshot.docs.map(doc => ({
+          trashId: doc.id,
+          ...doc.data()
+        }));
+        setTrashedSlides(trashData);
+      } catch (error) {
+        console.error("Error loading trash:", error);
+      }
+    };
+
+    loadTrashedSlides();
   }, []);
 
   // Calculate total statistics across all playlists
@@ -279,6 +302,48 @@ function AdminView() {
     toast.success('Slide copied successfully! (Disabled by default)');
   };
 
+  const moveSlideToTrash = async (slide, playlistId) => {
+    const playlist = playlists.find(p => p.id === playlistId);
+    if (!playlist) return;
+
+    const slideName = slide?.name || 'Slide';
+    const loadingToast = toast.loading(`${slideName} verplaatsen naar prullenbak...`);
+
+    try {
+      // Create trash entry
+      const trashData = {
+        ...slide,
+        originalPlaylistId: playlistId,
+        originalPlaylistName: playlist.name,
+        deletedAt: new Date().toISOString(),
+      };
+
+      // Add to trash collection
+      const trashDocRef = await addDoc(collection(db, 'trash'), trashData);
+
+      // Update local trash state
+      setTrashedSlides(prev => [...prev, { trashId: trashDocRef.id, ...trashData }]);
+
+      // Remove from playlist
+      const updatedPlaylists = playlists.map(p =>
+        p.id === playlistId
+          ? { ...p, slides: p.slides.filter(s => s.id !== slide.id) }
+          : p
+      );
+      setPlaylists(updatedPlaylists);
+      await savePlaylistsToFirebase(updatedPlaylists);
+
+      toast.dismiss(loadingToast);
+      toast.success(`${slideName} verplaatst naar prullenbak`);
+
+      closeEditModal();
+    } catch (error) {
+      console.error('Error moving slide to trash:', error);
+      toast.dismiss(loadingToast);
+      toast.error(`Fout bij verplaatsen van ${slideName} naar prullenbak: ` + error.message);
+    }
+  };
+
   const deleteSlide = async (slideId, playlistId) => {
     console.log('deleteSlide called with:', { slideId, playlistId });
     const playlist = playlists.find(p => p.id === playlistId);
@@ -289,36 +354,9 @@ function AdminView() {
 
     const slideToDelete = playlist.slides.find(s => s.id === slideId);
     console.log('Slide to delete found:', slideToDelete);
-    const slideName = slideToDelete?.name || 'Slide';
 
-    const loadingToast = toast.loading(`Deleting ${slideName}...`);
-
-    try {
-      if (slideToDelete && slideToDelete.imageUrl && slideToDelete.imageName) {
-        try {
-          const imageRef = ref(storage, `slides/${slideToDelete.imageName}`);
-          await deleteObject(imageRef);
-        } catch (error) {
-          console.error('Error deleting image:', error);
-        }
-      }
-      
-      const updatedPlaylists = playlists.map(p => 
-        p.id === playlistId 
-          ? { ...p, slides: p.slides.filter(s => s.id !== slideId) }
-          : p
-      );
-      setPlaylists(updatedPlaylists);
-      await savePlaylistsToFirebase(updatedPlaylists);
-      
-      toast.dismiss(loadingToast);
-      toast.success(`${slideName} deleted successfully!`);
-      
-      closeEditModal();
-    } catch (error) {
-      console.error('Error deleting slide:', error);
-      toast.dismiss(loadingToast);
-      toast.error(`Error deleting ${slideName}: ` + error.message);
+    if (slideToDelete) {
+      await moveSlideToTrash(slideToDelete, playlistId);
     }
   };
 
@@ -526,37 +564,9 @@ function AdminView() {
   const removeSlide = async (playlistId, slideId) => {
     const playlist = playlists.find(p => p.id === playlistId);
     const slideToRemove = playlist?.slides.find(slide => slide.id === slideId);
-    const slideName = slideToRemove?.name || 'Slide';
 
-    const loadingToast = toast.loading(`Removing ${slideName}...`);
-
-    try {
-      if (slideToRemove && slideToRemove.imageUrl && slideToRemove.imageName) {
-        try {
-          const imageRef = ref(storage, `slides/${slideToRemove.imageName}`);
-          await deleteObject(imageRef);
-        } catch (error) {
-          console.error('Error deleting image:', error);
-        }
-      }
-
-      const updatedPlaylists = playlists.map(playlist => {
-        if (playlist.id === playlistId) {
-          const newSlides = playlist.slides.filter(slide => slide.id !== slideId);
-          const totalDuration = calculatePlaylistDuration(newSlides);
-          return { ...playlist, slides: newSlides, totalDuration };
-        }
-        return playlist;
-      });
-      setPlaylists(updatedPlaylists);
-      await savePlaylistsToFirebase(updatedPlaylists);
-
-      toast.dismiss(loadingToast);
-      toast.success(`${slideName} removed successfully!`);
-    } catch (error) {
-      console.error('Error removing slide:', error);
-      toast.dismiss(loadingToast);
-      toast.error(`Error removing ${slideName}: ` + error.message);
+    if (slideToRemove) {
+      await moveSlideToTrash(slideToRemove, playlistId);
     }
   };
 
@@ -702,6 +712,113 @@ function AdminView() {
     setCurrentPlaylistId(null);
   };
 
+  // Trash functionality
+  const openTrashModal = () => {
+    setTrashModalOpen(true);
+  };
+
+  const closeTrashModal = () => {
+    setTrashModalOpen(false);
+  };
+
+  const restoreSlideFromTrash = async (trashedSlide, targetPlaylistId) => {
+    const loadingToast = toast.loading(`${trashedSlide.name || 'slide'} herstellen...`);
+
+    try {
+      // Create a new slide object without trash metadata
+      const { trashId, originalPlaylistId, originalPlaylistName, deletedAt, ...slideData } = trashedSlide;
+
+      // Add to target playlist
+      const updatedPlaylists = playlists.map(playlist => {
+        if (playlist.id === targetPlaylistId) {
+          const newSlides = [...playlist.slides, slideData];
+          const totalDuration = calculatePlaylistDuration(newSlides);
+          return { ...playlist, slides: newSlides, totalDuration };
+        }
+        return playlist;
+      });
+
+      setPlaylists(updatedPlaylists);
+      await savePlaylistsToFirebase(updatedPlaylists);
+
+      // Remove from trash
+      await deleteDoc(doc(db, 'trash', trashId));
+
+      // Update local trash state
+      setTrashedSlides(prev => prev.filter(slide => slide.trashId !== trashId));
+
+      toast.dismiss(loadingToast);
+      toast.success(`${trashedSlide.name || 'Slide'} succesvol hersteld!`);
+    } catch (error) {
+      console.error('Error restoring slide:', error);
+      toast.dismiss(loadingToast);
+      toast.error(`Fout bij herstellen van slide: ` + error.message);
+    }
+  };
+
+  const permanentDeleteSlide = async (trashedSlide) => {
+    const loadingToast = toast.loading(`${trashedSlide.name || 'slide'} permanent verwijderen...`);
+
+    try {
+      // Delete image from storage if exists
+      if (trashedSlide.imageUrl && trashedSlide.imageName) {
+        try {
+          const imageRef = ref(storage, `slides/${trashedSlide.imageName}`);
+          await deleteObject(imageRef);
+        } catch (error) {
+          console.error('Error deleting image:', error);
+        }
+      }
+
+      // Remove from trash collection
+      await deleteDoc(doc(db, 'trash', trashedSlide.trashId));
+
+      // Update local trash state
+      setTrashedSlides(prev => prev.filter(slide => slide.trashId !== trashedSlide.trashId));
+
+      toast.dismiss(loadingToast);
+      toast.success(`${trashedSlide.name || 'Slide'} permanent verwijderd`);
+    } catch (error) {
+      console.error('Error permanently deleting slide:', error);
+      toast.dismiss(loadingToast);
+      toast.error(`Fout bij permanent verwijderen: ` + error.message);
+    }
+  };
+
+  const emptyTrash = async () => {
+    const loadingToast = toast.loading(`Prullenbak legen...`);
+
+    try {
+      // Delete all images from storage
+      for (const slide of trashedSlides) {
+        if (slide.imageUrl && slide.imageName) {
+          try {
+            const imageRef = ref(storage, `slides/${slide.imageName}`);
+            await deleteObject(imageRef);
+          } catch (error) {
+            console.error('Error deleting image:', error);
+          }
+        }
+      }
+
+      // Delete all trash documents
+      const deletePromises = trashedSlides.map(slide =>
+        deleteDoc(doc(db, 'trash', slide.trashId))
+      );
+      await Promise.all(deletePromises);
+
+      // Clear local trash state
+      setTrashedSlides([]);
+
+      toast.dismiss(loadingToast);
+      toast.success(`Prullenbak succesvol geleegd`);
+    } catch (error) {
+      console.error('Error emptying trash:', error);
+      toast.dismiss(loadingToast);
+      toast.error(`Fout bij legen van prullenbak: ` + error.message);
+    }
+  };
+
   const moveSlide = async (slide, fromPlaylistId, toPlaylistId) => {
     if (!slide || !fromPlaylistId || !toPlaylistId) return;
 
@@ -738,11 +855,13 @@ function AdminView() {
   return (
     <div className={`admin-layout ${isSidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
       {/* Fixed Left Sidebar */}
-      <Sidebar 
+      <Sidebar
         setDeviceToDelete={(device) => dispatch(setDeviceToDelete(device))}
         deleteDevice={deleteDevice}
         isCollapsed={isSidebarCollapsed}
         onToggleCollapse={toggleSidebarCollapse}
+        onOpenTrash={openTrashModal}
+        trashedSlidesCount={trashedSlides.length}
       />
 
       {/* Main Content Area */}
@@ -933,6 +1052,17 @@ function AdminView() {
         onSelectImage={handleSelectImageFromLibrary}
       />
 
+      {/* Trash Modal */}
+      <TrashModal
+        isOpen={trashModalOpen}
+        onClose={closeTrashModal}
+        trashedSlides={trashedSlides}
+        playlists={playlists}
+        onRestoreSlide={restoreSlideFromTrash}
+        onPermanentDelete={permanentDeleteSlide}
+        onEmptyTrash={emptyTrash}
+      />
+
       {/* Slide Delete Confirmation Modal */}
       {slideToDelete && (
         <div className="slide-delete-modal-wrapper">
@@ -954,7 +1084,7 @@ function AdminView() {
                 Weet je zeker dat je <strong>{slideToDelete.slide.name || 'Slide'}</strong> wilt verwijderen?
               </p>
               <p className="delete-warning">
-                Deze actie kan niet ongedaan worden gemaakt.
+                De slide wordt verplaatst naar de prullenbak en kan later worden hersteld.
               </p>
             </div>
             
