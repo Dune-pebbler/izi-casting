@@ -1,10 +1,8 @@
-// Feed List Component Styles
-// Mirrors the HTML structure from FeedList.js
+// Feed List Component Styles - Simplified & Streamlined
 
 .feed-list {
   margin-bottom: $spacing-lg;
-  display: flex;
-  flex-direction: column;
+  font-size: 14px;
 
   .settings-header {
     display: flex;
@@ -14,20 +12,15 @@
 
     h2 {
       margin: 0;
-      font-size: 1rem; // Reduced from 1.25rem
-      color: $text-primary;
     }
   }
 
-  // Feed Content Wrapper
   .feed-content-wrapper {
     margin-bottom: $spacing-md;
-    border-radius: 1em;
+    border-radius: $corner-rounding;
     background-color: $surface;
-    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    overflow: hidden;
-    border: 1px solid $gray-200;
-
+    transition: $transition-base;
+    border: 1px solid $border-color;
 
     &.dragging {
       opacity: 0.6;
@@ -36,15 +29,13 @@
     }
   }
 
-  // Feed Header
   .feed-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: $spacing-sm;
     cursor: pointer;
-    transition: all 0.2s ease;
-    min-height: 64px;
+    transition: $transition-base;
 
     &:hover {
       background-color: rgba($gray-100, 0.5);
@@ -54,37 +45,28 @@
   .feed-header-left {
     display: flex;
     align-items: center;
-    gap: $spacing-md;
+    gap: $spacing-sm;
     flex: 1;
   }
 
   .feed-drag-handle {
     cursor: grab;
-    color: $text-secondary;
     padding: $spacing-sm;
-    border-radius: $border-radius-sm;
-    transition: all 0.2s ease;
+    border-radius: $corner-rounding;
+    transition: $transition-base;
     display: flex;
     align-items: center;
-    justify-content: center;
 
     &:hover {
-      color: $text-primary;
       background-color: rgba($primary, 0.08);
     }
 
     &:active {
       cursor: grabbing;
-      background-color: rgba($primary, 0.15);
     }
   }
 
-  .feed-actions {
-    display: flex;
-    align-items: center;
-    gap: $spacing-xs;
-  }
-
+  .feed-actions,
   .feed-info {
     display: flex;
     align-items: center;
@@ -95,53 +77,30 @@
     display: flex;
     align-items: center;
     gap: $spacing-sm;
-    font-size: 0.95rem;
     margin-left: auto;
     margin-right: auto;
 
-    .max-posts-label {
-      color: $text-secondary;
-      font-weight: $font-weight-medium;
-    }
+    .max-posts-value.max-posts-editable {
+      cursor: pointer;
+      padding: $spacing-sm;
+      border-radius: $corner-rounding;
+      transition: $transition-base;
+      border: 1px solid transparent;
+      background-color: $gray-100;
+      min-width: 40px;
 
-    .max-posts-value {
-      color: $text-primary;
-      font-weight: $font-weight-semibold;
-      font-size: 1rem;
-
-      &.max-posts-editable {
-        cursor: pointer;
-        padding: $spacing-xs $spacing-md;
-        border-radius: 0.8em;
-        transition: all 0.2s ease;
-        border: 1px solid transparent;
-        background-color: #f7f7f7;
-        min-width: 40px;
-        min-height: 36px;
-        text-align: center;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-
-        &:hover {
-          background-color: #f0f0f0;
-          border-color: rgba($gray-300, 0.5);
-          transform: scale(1.02);
-        }
+      &:hover {
+        background-color: $gray-200;
       }
     }
 
     .max-posts-input {
       width: 60px;
-      min-height: 36px;
-      padding: $spacing-sm $spacing-md;
+      padding: $spacing-sm;
       border: 1px solid $border-color;
-      border-radius: $border-radius-md;
-      font-size: 1.1rem;
+      border-radius: $corner-rounding;
       text-align: center;
-      background-color: #f7f7f7;
-      color: $text-primary;
-      font-weight: $font-weight-semibold;
+      background-color: $gray-100;
 
       &:focus {
         outline: none;
@@ -158,273 +117,147 @@
   .delete-feed-btn {
     padding: $spacing-sm;
     border: none;
-    border-radius: 0.8em;
+    border-radius: $corner-rounding;
     background-color: transparent;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: $transition-base;
     display: flex;
     align-items: center;
-    justify-content: center;
     min-width: 36px;
     min-height: 36px;
-    position: relative;
-    color:black;
+
     &:hover {
       background-color: rgba($primary, 0.08);
-      color: $primary;
       transform: translateY(-1px);
     }
-
-    &:active {
-      transform: translateY(0);
-    }
   }
 
-  .visibility-btn {
-    &.enabled {
-      color: $success;
-      background-color: rgba($success, 0.1);
+  .visibility-btn.enabled {
+    background-color: rgba($success, 0.1);
 
-      &:hover {
-        background-color: rgba($success, 0.15);
-        color: darken($success, 10%);
-      }
-    }
-
-    &.disabled {
-      color: $text-secondary;
-
-      &:hover {
-        background-color: rgba($text-secondary, 0.1);
-        color: $text-primary;
-      }
-    }
-  }
-
-  .delete-feed-btn {
     &:hover {
-      background-color: rgba($danger, 0.1);
-      color: $danger;
+      background-color: rgba($success, 0.15);
     }
+  }
+
+  .delete-feed-btn:hover {
+    background-color: rgba($danger, 0.1);
   }
 
   .feed-details {
     padding: $spacing-md;
-    display: flex;
-    flex-direction: column;
-    gap: $spacing-md;
     background-color: rgba($gray-50, 0.3);
-    padding-top: 0;
   }
 
-  .feed-url {
-    &:hover {
-      border-color: rgba($gray-400, 0.5);
-      box-shadow: 0 2px 4px rgba($gray-300, 0.2);
+  .feed-edit-form {
+    padding: $spacing-md;
+    border-top: 1px solid $border-color;
+    background-color: rgba($gray-50, 0.3);
+  }
+
+  // Form Styles
+  .form-group,
+  .feed-input-group {
+    margin-bottom: $spacing-md;
+
+    label {
+      display: block;
+      margin-bottom: $spacing-sm;
     }
 
-    .url-label {
-      color: $text-secondary;
-      font-weight: $font-weight-semibold;
-      min-width: 40px;
-    }
-
-    .url-value {
-      color: $text-primary;
-      flex: 1;
-
-      &.url-editable {
-        cursor: pointer;
-        padding: $spacing-sm;
-        border-radius: 2em;
-        transition: all 0.2s ease;
-        background-color: #f7f7f7;
-
-        &:hover {
-          background-color: rgba($gray-100, 0.5);
-          border-color: rgba($gray-300, 0.5);
-        }
-      }
-    }
-
+    .form-input,
+    .feed-url-input,
     .url-input {
       width: 100%;
       padding: $spacing-sm;
       border: 1px solid $border-color;
-      border-radius: $border-radius-sm;
-      font-family: $font-family-mono;
-      font-size: 0.9rem;
+      border-radius: $corner-rounding;
       background-color: $surface;
-      color: $text-primary;
-      transition: all 0.2s ease;
+      transition: $transition-base;
 
       &:focus {
         outline: none;
         border-color: $primary;
-        box-shadow: 0 0 0 2px rgba($primary, 0.2);
+        box-shadow: 0 0 0 2px rgba($primary, 0.1);
       }
+    }
+
+    .input-help {
+      display: block;
+      margin-top: $spacing-xs;
+      opacity: 0.7;
     }
   }
 
-  // Inline Edit Form
-  .feed-edit-form {
-    padding: $spacing-lg;
-    border-top: 1px solid rgba($gray-300, 0.5);
-    background-color: rgba($gray-50, 0.3);
-    border-radius: 0 0 $border-radius-lg $border-radius-lg;
-    box-shadow: inset 0 1px 3px rgba($gray-200, 0.3);
+  .form-actions {
+    display: flex;
+    gap: $spacing-sm;
+    justify-content: flex-end;
+    margin-top: $spacing-md;
+    padding-top: $spacing-md;
+    border-top: 1px solid $border-color;
 
-    .form-group {
-      margin-bottom: $spacing-md;
+    .btn {
+      padding: $spacing-sm $spacing-md;
+      border: 1px solid transparent;
+      border-radius: $corner-rounding;
+      cursor: pointer;
+      transition: $transition-base;
 
-      &:last-child {
-        margin-bottom: 0;
+      &:hover {
+        transform: translateY(-1px);
       }
 
-      label {
-        display: block;
-        margin-bottom: $spacing-xs;
-        font-weight: $font-weight-medium;
-        color: $text-primary;
-        font-size: 1rem; // Increased from 0.875rem
+      &.btn-primary {
+        background-color: $primary;
+        color: white;
+
+        &:hover {
+          background-color: darken($primary, 8%);
+        }
       }
 
-      .form-input {
-        width: 100%;
-        padding: $spacing-md;
-        border: 1px solid $border-color;
-        border-radius: $border-radius-md;
-        font-size: 1rem;
+      &.btn-secondary {
         background-color: $surface;
-        color: $text-primary;
-        transition: all 0.2s ease;
-        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-
-        &:focus {
-          outline: none;
-          border-color: $primary;
-          box-shadow: 0 0 0 3px rgba($primary, 0.1),
-            0 2px 4px rgba($primary, 0.1);
-          transform: translateY(-1px);
-        }
+        border-color: $border-color;
 
         &:hover {
-          border-color: rgba($gray-400, 0.5);
-        }
-      }
-
-      .input-help {
-        display: block;
-        color: $text-secondary;
-        font-size: 0.75rem;
-        margin-top: $spacing-xs;
-      }
-
-      .checkbox-group {
-        display: flex;
-        align-items: center;
-        gap: $spacing-sm;
-
-        .checkbox-label {
-          display: flex;
-          align-items: center;
-          gap: $spacing-xs;
-          cursor: pointer;
-          font-size: 1rem; // Increased from 0.875rem
-
-          input[type="checkbox"] {
-            width: 18px; // Increased from 16px
-            height: 18px; // Increased from 16px
-            cursor: pointer;
-          }
-
-          .checkbox-text {
-            color: $text-primary;
-          }
-        }
-      }
-    }
-
-    .form-actions {
-      display: flex;
-      gap: $spacing-sm;
-      justify-content: flex-end;
-      margin-top: $spacing-lg;
-      padding-top: $spacing-lg;
-      border-top: 1px solid rgba($border-color, 0.5);
-
-      .btn {
-        padding: $spacing-md $spacing-lg;
-        border: 1px solid transparent;
-        border-radius: $border-radius-md;
-        font-size: 1rem;
-        font-weight: $font-weight-medium;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-
-        &:hover {
-          transform: translateY(-1px);
-          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        &.btn-primary {
-          background-color: $primary;
-          color: white;
-          border-color: $primary;
-
-          &:hover {
-            background-color: darken($primary, 8%);
-            border-color: darken($primary, 8%);
-          }
-        }
-
-        &.btn-secondary {
-          background-color: $surface;
-          color: $text-primary;
-          border-color: $border-color;
-
-          &:hover {
-            background-color: $gray-50;
-            border-color: $gray-300;
-          }
+          background-color: $gray-50;
         }
       }
     }
   }
 
-  // Popular Feeds
-  .popular-feeds {
+  // Popular/Example Feeds
+  .popular-feeds,
+  .feed-examples {
     display: flex;
     gap: $spacing-xs;
     flex-wrap: wrap;
     margin-top: $spacing-xs;
 
-    .popular-feed-btn {
-      padding: $spacing-sm $spacing-md; // Increased padding
+    .popular-feed-btn,
+    .feed-example-btn {
+      padding: $spacing-sm;
       background-color: $gray-100;
       border: 1px solid $border-color;
-      border-radius: $border-radius-sm;
-      font-size: 0.875rem; // Increased from 0.75rem
-      color: $text-secondary;
+      border-radius: $corner-rounding;
       cursor: pointer;
       transition: $transition-base;
 
       &:hover {
         background-color: $gray-200;
-        color: $text-primary;
       }
     }
   }
 
-  // Add Feed Button
   .add-feed-button {
-    padding: $spacing-md;
-    border: 2px dashed $border-color;
-    border-radius: 1em;
+    padding: $spacing-sm;
+    border: 1px dashed $border-color;
+    border-radius: $corner-rounding;
     background-color: transparent;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: $transition-base;
 
     &:hover {
       border-color: $primary;
@@ -435,77 +268,6 @@
       align-items: center;
       justify-content: center;
       gap: $spacing-sm;
-      font-size: 1rem; // Increased from 0.875rem
-      font-weight: $font-weight-medium;
-      color: $primary;
-      &:hover {
-        color: $primary;
-      }
-    }
-  }
-
-  .settings-section {
-    margin-bottom: $spacing-lg;
-
-    h3 {
-      margin: 0 0 $spacing-sm 0;
-      font-size: 1rem;
-      color: $text-primary;
-    }
-
-    .feed-input-group {
-      margin-bottom: $spacing-md;
-
-      label {
-        display: block;
-        margin-bottom: $spacing-xs;
-        font-weight: $font-weight-medium;
-        color: $text-primary;
-      }
-
-      .feed-url-input {
-        width: 100%;
-        padding: $spacing-sm;
-        border: 1px solid $border-color;
-        border-radius: $border-radius-sm;
-        font-size: 0.875rem;
-        margin-bottom: $spacing-xs;
-
-        &:focus {
-          outline: none;
-          border-color: $primary;
-          box-shadow: 0 0 0 2px rgba($primary, 0.2);
-        }
-      }
-
-      .input-help {
-        display: block;
-        color: $text-secondary;
-        font-size: 0.75rem;
-        margin-bottom: $spacing-sm;
-      }
-
-      .feed-examples {
-        display: flex;
-        gap: $spacing-xs;
-        flex-wrap: wrap;
-
-        .feed-example-btn {
-          padding: $spacing-xs $spacing-sm;
-          background-color: $gray-100;
-          border: 1px solid $border-color;
-          border-radius: $border-radius-sm;
-          font-size: 0.75rem;
-          color: $text-secondary;
-          cursor: pointer;
-          transition: $transition-base;
-
-          &:hover {
-            background-color: $gray-200;
-            color: $text-primary;
-          }
-        }
-      }
     }
   }
 }

@@ -5,7 +5,8 @@ import {
   FileText,
   Type,
   Play,
-  Tv
+  Tv,
+  Globe
 } from 'lucide-react';
 
 function LayoutSelector({ currentLayout, onLayoutChange }) {
@@ -45,6 +46,12 @@ function LayoutSelector({ currentLayout, onLayoutChange }) {
       label: 'Teletekst',
       icon: Tv,
       title: 'NOS Teletekst Display'
+    },
+    {
+      id: 'iframe',
+      label: 'Website',
+      icon: Globe,
+      title: 'Website Weergeven (iframe)'
     }
   ];
 

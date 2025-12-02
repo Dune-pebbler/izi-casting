@@ -11,15 +11,11 @@
   right: 0;
   max-height: 100vh;
   gap: $spacing-md;
-  // border: 1px solid $border-color;
-  background-color: #ffffff78;
+  background: rgb(255, 255, 255);
   font-family: $font-family-base;
   transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.7);
   z-index: 1000;
-  margin: $spacing-md;
-  border-radius: 2em;
   backdrop-filter: blur(10px);
-  border: 1px solid $gray-200;
   // Custom scrollbar styling
   &::-webkit-scrollbar {
     width: 6px;
@@ -32,7 +28,7 @@
   &::-webkit-scrollbar-thumb {
     background-color: $gray-300;
     border-radius: 3px;
-    
+
     &:hover {
       background-color: $gray-400;
     }
@@ -41,14 +37,14 @@
   // Toggle button
   .sidebar-toggle-btn {
     position: absolute;
-    top: $spacing-md;
-    left: 12px;
+    top: 24px;
+    left: 24px;
     width: 40px;
     height: 40px;
     background-color: white;
     border: 1px solid $gray-200;
 
-    border-radius:1em;
+    border-radius: 1em;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -79,7 +75,6 @@
         display: block;
       }
     }
-
 
     // Show all content when collapsed (it will be off-screen anyway)
     .sidebar-section {
@@ -206,46 +201,5 @@
   // Add bottom padding to ensure content doesn't get cut off when scrolling
   .sidebar-section:last-child {
     margin-bottom: $spacing-xl;
-  }
-
-  // Trash button
-  .sidebar-trash-btn {
-    width: 100%;
-    padding: $spacing-md;
-    background: rgba(255, 255, 255, 0.6);
-    border: 1px solid $gray-200;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    gap: $spacing-sm;
-    cursor: pointer;
-    color: $text-primary;
-    font-size: 1rem;
-    font-weight: 500;
-    transition: all 0.2s ease;
-    position: relative;
-
-    &:hover {
-      background: rgba(255, 255, 255, 0.9);
-      border-color: $gray-300;
-      transform: translateY(-1px);
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    }
-
-    &:active {
-      transform: translateY(0);
-    }
-
-    .trash-count-badge {
-      margin-left: auto;
-      background: $danger-color;
-      color: white;
-      padding: 2px 8px;
-      border-radius: 12px;
-      font-size: 0.75rem;
-      font-weight: 600;
-      min-width: 20px;
-      text-align: center;
-    }
   }
 }

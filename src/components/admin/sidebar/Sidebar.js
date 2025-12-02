@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ChevronLeft, ChevronRight, Trash2 } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import Devices from "./Devices";
 import FeedList from "./FeedList";
 import Settings from "./Settings";
@@ -34,18 +34,10 @@ function Sidebar({
       />
       <FeedList />
 
-      {/* Trash Button */}
-      <div className="sidebar-section">
-        <button className="sidebar-trash-btn" onClick={onOpenTrash} title="Prullenbak openen">
-          <Trash2 size={20} />
-          <span>Prullenbak</span>
-          {trashedSlidesCount > 0 && (
-            <span className="trash-count-badge">{trashedSlidesCount}</span>
-          )}
-        </button>
-      </div>
-
-      <Settings />
+      <Settings
+        onOpenTrash={onOpenTrash}
+        trashedSlidesCount={trashedSlidesCount}
+      />
     </div>
   );
 }

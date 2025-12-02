@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sportlink API Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        h1 {
+            color: #333;
+        }
+        .test-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .raw-data {
+            background: #f8f8f8;
+            padding: 15px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+        .raw-data pre {
+            margin: 0;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .loading {
+            color: #666;
+            font-style: italic;
+        }
+    </style>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+
+    <!-- Sportlink Feed Parser -->
+    <script src="https://dexels.github.io/navajofeeds-json-parser/js/dist/feed-0.0.1.js"></script>
+</head>
+<body>
+    <h1>Sportlink API Test</h1>
+
+    <div class="test-container">
+        <h2>Club Gegevens</h2>
+        <p class="loading">Loading data from Sportlink API...</p>
+
+        <!-- Sportlink data container -->
+        <div
+            id="sportlink-data"
+            data-article="clubgegevens"
+            data-fields="gegevens.thuisshirtkleur,gegevens.thuisbroekkleur,gegevens.thuissokkenkleur,gegevens.uitshirtkleur,gegevens.uitbroekkleur,gegevens.uitsokkenkleur,gegevens.clubcode,gegevens.clubnaam,gegevens.informatie,gegevens.privacystatementclub,gegevens.oprichtingsdatum,gegevens.oprichtingsdatetime,gegevens.telefoonnummer,gegevens.fax,gegevens.email,gegevens.website,gegevens.facebook,gegevens.instagram,gegevens.twitter,gegevens.youtube,gegevens.straatnaam,gegevens.huisnummer,gegevens.nummertoevoeging,gegevens.postcode,gegevens.plaats,gegevens.banknummer,gegevens.tennamevan,gegevens.tennamevanplaats,gegevens.naamsecretaris,gegevens.kvknummer,gegevens.logo,gegevens.kleinlogo,bezoekadres.naam,bezoekadres.straatnaam,bezoekadres.huisnummer,bezoekadres.nummertoevoeging,bezoekadres.postcode,bezoekadres.plaats,bezoekadres.route"
+        ></div>
+    </div>
+
+    <div class="test-container">
+        <h2>Raw Data (for debugging)</h2>
+        <div class="raw-data">
+            <pre id="raw-output">Waiting for data...</pre>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Sportlink feed
+        feed.init({
+            clientId: "CHc9kMgbAe"
+        });
+
+        // Log to console for debugging
+        console.log('Sportlink feed initialized with clientId: CHc9kMgbAe');
+
+        // Wait a bit and check if data was loaded
+        setTimeout(function() {
+            var dataContainer = document.getElementById('sportlink-data');
+            var innerHTML = dataContainer.innerHTML;
+
+            // Display the rendered data
+            if (innerHTML && innerHTML.trim() !== '') {
+                document.querySelector('.loading').textContent = 'Data loaded successfully!';
+                document.getElementById('raw-output').textContent = innerHTML;
+            } else {
+                document.querySelector('.loading').textContent = 'No data received. Check console for errors.';
+                document.getElementById('raw-output').textContent = 'No data in container. Check browser console for API errors.';
+            }
+
+            // Also log the entire element
+            console.log('Data container content:', innerHTML);
+        }, 3000);
+    </script>
+</body>
+</html>

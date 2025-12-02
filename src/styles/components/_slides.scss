@@ -116,7 +116,7 @@
   padding: $spacing-lg;
   border: 2px dashed $border-color;
   border-radius: $border-radius-md;
-  background-color: $surface;
+
   transition: $transition-base;
   min-width: 200px;
   min-height: 100px;
@@ -530,7 +530,6 @@
     width: 50%;
     height: 100%;
     position: relative;
-    background-color: $gray-900;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1001,7 +1000,7 @@
 
 .slide-card {
   background: white;
-  border-radius: 1em;
+  border-radius: 0.6em;
   overflow: hidden;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -1030,12 +1029,8 @@
   min-width: 0; // Allow text truncation
   cursor: grab;
   user-select: none;
-  padding: $spacing-sm $spacing-md;
-  padding-left: 6px;
-  border-radius: $border-radius-sm;
   transition: all 0.2s ease;
   pointer-events: auto;
-
   &:hover {
     background-color: rgba($primary-color, 0.05);
   }
@@ -1075,7 +1070,7 @@
   background: white;
   border-radius: 1em;
   border: 1px solid $gray-200;
-  padding: $spacing-md;
+  padding: $spacing-sm;
   cursor: pointer;
   transition: all 0.2s ease;
   gap: $spacing-md;
@@ -1167,13 +1162,11 @@
   .duration-value {
     font-size: 14px;
     color: $primary;
-    font-weight: $font-weight-semibold;
   }
 }
 
 .slide-title {
   font-size: 14px;
-  font-weight: $font-weight-semibold;
   color: #757575;
   margin: 0;
   white-space: nowrap;
@@ -1201,7 +1194,6 @@
   gap: 4px;
   flex-shrink: 0;
   z-index: 10;
-  padding: $spacing-sm $spacing-md;
   padding-right: 6px;
   padding-left: 0;
 }
@@ -1460,6 +1452,106 @@
         &.vimeo {
           color: #1ab7ea; // Vimeo blue
         }
+      }
+    }
+  }
+}
+
+.slide-preview-teletekst {
+  width: 100%;
+  height: 100%;
+  position: relative;
+
+  .preview-teletekst-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+    border-radius: $border-radius-sm;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: $spacing-sm;
+
+    .preview-teletekst-icon {
+      color: white;
+      margin-bottom: $spacing-xs;
+      opacity: 0.9;
+    }
+
+    .preview-teletekst-info {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+
+      .teletekst-label {
+        color: white;
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .teletekst-channel {
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 9px;
+        font-weight: 500;
+      }
+    }
+  }
+}
+
+.slide-preview-iframe {
+  width: 100%;
+  height: 100%;
+  position: relative;
+
+  .preview-iframe-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+    border-radius: $border-radius-sm;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: $spacing-sm;
+
+    .preview-iframe-icon {
+      color: white;
+      margin-bottom: $spacing-xs;
+      opacity: 0.9;
+    }
+
+    .preview-iframe-info {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      width: 100%;
+
+      .iframe-label {
+        color: white;
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .iframe-url {
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 8px;
+        font-weight: 500;
+        max-width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        text-align: center;
       }
     }
   }

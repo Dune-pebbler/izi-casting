@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Settings as SettingsIcon, ChevronDown, ChevronUp, X, Type } from "lucide-react";
+import { Settings as SettingsIcon, ChevronDown, ChevronUp, X, Type, Trash2 } from "lucide-react";
 import {
   doc,
   getDoc,
@@ -35,7 +35,7 @@ const AVAILABLE_FONTS = [
   { name: 'Verdana', value: 'Verdana=verdana,geneva' },
 ];
 
-function Settings() {
+function Settings({ onOpenTrash, trashedSlidesCount = 0 }) {
   const [isAdvancedSettingsExpanded, setIsAdvancedSettingsExpanded] = useState(false);
   const [isFontsExpanded, setIsFontsExpanded] = useState(false);
   const [uploadingLogo, setUploadingLogo] = useState(false);
@@ -440,6 +440,17 @@ function Settings() {
                     </div>
                   )}
                 </div>
+              </div>
+
+              {/* Trash Button */}
+              <div className="settings-section">
+                <button className="sidebar-trash-btn" onClick={onOpenTrash} title="Prullenbak openen">
+                  <Trash2 size={20} />
+                  <span>Prullenbak</span>
+                  {trashedSlidesCount > 0 && (
+                    <span className="trash-count-badge">{trashedSlidesCount}</span>
+                  )}
+                </button>
               </div>
 
               {/* Save Button */}

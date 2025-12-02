@@ -1,0 +1,140 @@
+// =============================================================================
+// DESIGN TOKENS - Essential variables only
+// =============================================================================
+
+// -----------------------------------------------------------------------------
+// Colors
+// -----------------------------------------------------------------------------
+
+// Light mode
+$color-primary: #030213;
+$color-primary-foreground: #ffffff;
+$color-secondary: #ececf0;
+$color-secondary-foreground: #030213;
+$color-accent: #e9ebef;
+$color-accent-foreground: #030213;
+$color-muted: #ececf0;
+$color-muted-foreground: #717182;
+$color-destructive: #d4183d;
+$color-destructive-foreground: #ffffff;
+$color-success: #34d399;
+$color-success-foreground: #ffffff;
+$color-warning: #fbbf24;
+$color-warning-foreground: #030213;
+$color-info: #3b82f6;
+$color-info-foreground: #ffffff;
+$color-background: #F9FAFB;
+$color-foreground: #030213;
+$color-card: #ffffff;
+$color-card-foreground: #030213;
+$color-border: rgba(0, 0, 0, 0.1);
+$color-input-background: #f3f3f5;
+$color-input: #f3f3f5;
+$color-popover: #ffffff;
+$color-popover-foreground: #030213;
+
+// Dark mode
+$color-dark-background: #1e1e1e;
+$color-dark-foreground: #f5f5f5;
+$color-dark-card: #2d2d2d;
+$color-dark-card-foreground: #f5f5f5;
+$color-dark-primary: #f5f5f5;
+$color-dark-primary-foreground: #1e1e1e;
+$color-dark-secondary: #3d3d3d;
+$color-dark-secondary-foreground: #f5f5f5;
+$color-dark-muted: #3d3d3d;
+$color-dark-muted-foreground: #a0a0a0;
+$color-dark-accent: #3d3d3d;
+$color-dark-accent-foreground: #f5f5f5;
+$color-dark-border: #404040;
+$color-dark-input: #404040;
+$color-dark-popover: #2d2d2d;
+$color-dark-popover-foreground: #f5f5f5;
+
+// -----------------------------------------------------------------------------
+// Border
+// -----------------------------------------------------------------------------
+
+$border-width: 1px;
+$border-radius-sm: 0.375rem;  // 6px
+$border-radius-md: 0.5rem;     // 8px
+$border-radius-lg: 0.75rem;    // 12px
+$border-radius-full: 9999px;
+
+// -----------------------------------------------------------------------------
+// Shadows
+// -----------------------------------------------------------------------------
+
+$shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+$shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+$shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+$shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+
+// -----------------------------------------------------------------------------
+// Transitions
+// -----------------------------------------------------------------------------
+
+$transition-fast: 150ms ease-in-out;
+$transition-base: 200ms ease-in-out;
+$transition-slow: 300ms ease-in-out;
+
+// -----------------------------------------------------------------------------
+// Typography
+// -----------------------------------------------------------------------------
+
+$font-size-xs: 12px;
+$font-size-sm: 14px;
+$font-size-base: 14px;
+$font-size-md: 16px;
+$font-size-lg: 18px;
+$font-size-xl: 20px;
+$font-size-2xl: 24px;
+$font-size-3xl: 30px;
+
+$font-weight-normal: 400;
+$font-weight-medium: 500;
+$font-weight-semibold: 600;
+$font-weight-bold: 700;
+
+$line-height-normal: 1.5;
+$line-height-tight: 1.25;
+$line-height-loose: 1.75;
+
+// -----------------------------------------------------------------------------
+// Breakpoints
+// -----------------------------------------------------------------------------
+
+$breakpoint-mobile: 640px;
+$breakpoint-tablet: 768px;
+$breakpoint-desktop: 1024px;
+$breakpoint-wide: 1280px;
+
+// -----------------------------------------------------------------------------
+// Spacing
+// -----------------------------------------------------------------------------
+
+$spacing-xs: 4px;
+$spacing-sm: 8px;
+$spacing-md: 16px;
+$spacing-lg: 24px;
+$spacing-xl: 32px;
+$spacing-2xl: 48px;
+
+// -----------------------------------------------------------------------------
+// Container
+// -----------------------------------------------------------------------------
+
+$container-max-width: 1280px;
+$container-padding: 24px;
+
+// -----------------------------------------------------------------------------
+// Z-index
+// -----------------------------------------------------------------------------
+
+$z-index-dropdown: 1000;
+$z-index-sticky: 1020;
+$z-index-fixed: 1030;
+$z-index-modal-backdrop: 1040;
+$z-index-modal: 1050;
+$z-index-popover: 1060;
+$z-index-tooltip: 1070;

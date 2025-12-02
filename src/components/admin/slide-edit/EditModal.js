@@ -7,6 +7,7 @@ import PositionSelector from "./PositionSelector";
 import TextEditor from "./TextEditor";
 import VideoUrlInput from "./VideoUrlInput";
 import TeletekstInput from "./TeletekstInput";
+import IframeUrlInput from "./IframeUrlInput";
 
 function EditModal({
   slide,
@@ -24,6 +25,7 @@ function EditModal({
   enabledFonts,
   teletekstChannel,
   teletekstTheme,
+  iframeUrl,
   onClose,
   onSave,
   onDelete,
@@ -39,6 +41,7 @@ function EditModal({
   onTransitionChange,
   onTeletekstChannelChange,
   onTeletekstThemeChange,
+  onIframeUrlChange,
   onOpenLibrary,
 }) {
   const renderLayoutContent = () => {
@@ -161,6 +164,19 @@ function EditModal({
                 theme={teletekstTheme}
                 onChannelChange={onTeletekstChannelChange}
                 onThemeChange={onTeletekstThemeChange}
+              />
+            </div>
+          </div>
+        );
+
+      case "iframe":
+        return (
+          <div className="modal-iframe">
+            <div className="iframe-input-section">
+              <IframeUrlInput
+                iframeUrl={iframeUrl}
+                onIframeUrlChange={onIframeUrlChange}
+                onRemoveIframe={() => onIframeUrlChange('')}
               />
             </div>
           </div>

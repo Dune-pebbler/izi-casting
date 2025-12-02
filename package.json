@@ -38,5 +38,9 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@xmldom/xmldom": "^0.8.11",
+    "node-fetch": "^2.7.0"
   }
 }

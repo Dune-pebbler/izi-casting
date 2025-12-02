@@ -1,5 +1,5 @@
 import React, { useMemo, useCallback } from 'react';
-import { Copy, GripVertical, Eye, EyeOff, Plus, ChevronsUpDown, Play, Tv, Trash2 } from 'lucide-react';
+import { Copy, GripVertical, Eye, EyeOff, Plus, ChevronsUpDown, Play, Tv, Trash2, Globe } from 'lucide-react';
 import { sanitizeHTMLContent } from '../../utils/sanitize';
 import { extractVideoInfo } from '../../utils/videoMetadata';
 import {
@@ -268,6 +268,28 @@ function SlideList({
             </div>
           );
 
+        case 'iframe':
+          return (
+            <div className="slide-preview-iframe">
+              {slide.iframeUrl ? (
+                <div className="preview-iframe-container">
+                  <div className="preview-iframe-icon">
+                    <Globe size={48} />
+                  </div>
+                  <div className="preview-iframe-info">
+                    <span className="iframe-label">Website</span>
+                    <span className="iframe-url">{slide.iframeUrl}</span>
+                  </div>
+                </div>
+              ) : (
+                <div className="preview-placeholder">
+                  <div className="placeholder-icon"><Globe size={24} /></div>
+                  <span>Geen website URL</span>
+                </div>
+              )}
+            </div>
+          );
+
         case 'side-by-side':
         default:
           return (
@@ -405,6 +427,8 @@ function SlideList({
           return 'Video';
         case 'teletekst':
           return `Teletekst ${slide.teletekstChannel || ''}`;
+        case 'iframe':
+          return 'Website';
         case 'side-by-side':
         default:
           return 'Side by Side';

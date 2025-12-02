@@ -47,6 +47,7 @@ function AdminView() {
   const [modalSlideTransition, setModalSlideTransition] = useState('fade');
   const [modalTeletekstChannel, setModalTeletekstChannel] = useState('101');
   const [modalTeletekstTheme, setModalTeletekstTheme] = useState('classic');
+  const [modalIframeUrl, setModalIframeUrl] = useState('');
   const [currentEditingPlaylistId, setCurrentEditingPlaylistId] = useState(null);
   const [slideToDelete, setSlideToDelete] = useState(null);
   const [defaultSlideTransition, setDefaultSlideTransition] = useState('fade');
@@ -375,6 +376,7 @@ function AdminView() {
     setModalSlideTransition(slide.transition || 'fade');
     setModalTeletekstChannel(slide.teletekstChannel || '101');
     setModalTeletekstTheme(slide.teletekstTheme || 'classic');
+    setModalIframeUrl(slide.iframeUrl || '');
   };
 
   const closeEditModal = () => {
@@ -388,6 +390,7 @@ function AdminView() {
     setModalSlideDuration(5);
     setModalShowBar(true);
     setModalTeletekstChannel('101');
+    setModalIframeUrl('');
   };
 
   const handleContentChange = (content) => {
@@ -487,7 +490,8 @@ function AdminView() {
               videoUrl: modalVideoUrl,
               teletekstChannel: modalTeletekstChannel,
               teletekstTheme: modalTeletekstTheme,
-              type: slideLayout === 'teletekst' ? 'teletekst' : (modalVideoUrl ? 'video' : (modalImageUrl ? 'image' : 'text')),
+              iframeUrl: modalIframeUrl,
+              type: slideLayout === 'iframe' ? 'iframe' : (slideLayout === 'teletekst' ? 'teletekst' : (modalVideoUrl ? 'video' : (modalImageUrl ? 'image' : 'text'))),
               imagePosition: imagePosition,
               imageSide: modalImageSide,
               layout: slideLayout,
@@ -872,13 +876,13 @@ function AdminView() {
             <div className="admin-stats">
               <div className="admin-slide-count">
                 <span className="admin-stat-value">
-                  <Monitor size={20} />
+                  <Monitor size={18} />
                   <span>{totalStats.activeSlides}/{totalStats.totalSlides}</span>
                 </span>
               </div>
               <div className="admin-duration">
                 <span className="admin-stat-value">
-                  <Clock size={20} />
+                  <Clock size={18} />
                   <span>{totalStats.totalDuration}s</span>
                 </span>
               </div>
@@ -888,14 +892,14 @@ function AdminView() {
               onClick={toggleGlobalLayout}
               title={globalLayout === 'grid' ? 'Switch to list view' : 'Switch to grid view'}
             >
-              {globalLayout === 'grid' ? <List size={24} /> : <LayoutGrid size={24} />}
+              {globalLayout === 'grid' ? <List size={18} /> : <LayoutGrid size={16} />}
             </button>
             <button
               className="admin-settings-btn"
               onClick={toggleSidebarCollapse}
               title={isSidebarCollapsed ? "Open settings" : "Close settings"}
             >
-              <Settings size={24} />
+              <Settings size={18} />
             </button>
           </div>
         </div>
@@ -973,6 +977,8 @@ function AdminView() {
           teletekstTheme={modalTeletekstTheme}
           onTeletekstChannelChange={setModalTeletekstChannel}
           onTeletekstThemeChange={setModalTeletekstTheme}
+          iframeUrl={modalIframeUrl}
+          onIframeUrlChange={setModalIframeUrl}
           onOpenLibrary={handleOpenImageLibrary}
         />
       )}

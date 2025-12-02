@@ -4,8 +4,8 @@
 .playlist-container {
   margin-bottom: $spacing-md;
   transition: $transition-base;
-  border-radius: 2em;
-  background-color: #ffffff85;
+  border-radius: $corner-rounding;
+  background-color: $surface;
   border: 1px solid $gray-200;
 }
 // Admin content wrapper styles are handled by the component
@@ -14,15 +14,9 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: $spacing-md;
-  border-radius: 2em;
+  padding: $spacing-sm;
   cursor: pointer;
   transition: $transition-base;
-  border: 1px solid transparent;
-
-  &:hover {
-    background-color: white;
-  }
 }
 
 .playlist-header-left {
@@ -66,6 +60,7 @@
   color: $gray-500;
   transition: $transition-base;
   margin-left: $spacing-sm;
+  pointer-events: none;
 }
 
 .expand-arrow {
@@ -78,7 +73,6 @@
 
 .playlist-title {
   color: $text-primary;
-  font-weight: $font-weight-semibold;
   font-size: $font-size-base;
   margin: 0;
   cursor: pointer;
@@ -336,14 +330,13 @@
 
 /* Add Playlist Button Styles */
 .add-playlist-button {
-  border-radius: 2em;
+  border-radius: $corner-rounding;
   margin-bottom: $spacing-md;
   background-color: transparent !important;
   border: 2px dashed #c8c8c8;
   position: relative;
   cursor: pointer;
   transition: $transition-base;
-
   &:hover {
     border-color: $primary;
     background-color: rgba($primary, 0.05);
@@ -357,7 +350,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: $spacing-md; /* Match playlist-header padding */
+    padding: $spacing-sm;
     color: #f07167;
     background-color: transparent !important;
     transition: $transition-base;
@@ -369,7 +362,6 @@
 
     span {
       font-size: $font-size-base;
-      font-weight: $font-weight-semibold;
     }
   }
 

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef, memo } from "react";
 import { sanitizeHTMLContent } from "../../utils/sanitize";
+import { parseFeed, validateFeedItems } from "../../utils/rssParser";
 
 function Feed({ feeds, settings }) {
   const [rssFeed, setRssFeed] = useState([]);
@@ -8,364 +9,141 @@ function Feed({ feeds, settings }) {
   // Fetch RSS feed and return items (for multiple feeds support)
   const fetchRssFeedItems = useCallback(async (url) => {
     if (!url) {
-      console.warn("fetchRssFeedItems: No URL provided");
+      console.warn("📋 fetchRssFeedItems: No URL provided");
       return [];
     }
 
-    console.log(`fetchRssFeedItems: Starting fetch for URL: ${url}`);
+    console.log(`📋 fetchRssFeedItems: Starting fetch for URL: ${url}`);
 
     try {
       // Try multiple CORS proxies for better reliability
+      // Ordered by reliability based on testing
       const proxies = [
-        `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`,
-        `https://corsproxy.io/?${encodeURIComponent(url)}`,
-        `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`,
-        `https://cors-anywhere.herokuapp.com/${url}`,
-        `https://thingproxy.freeboard.io/fetch/${url}`,
+        { name: 'CORSProxy.io', url: `https://corsproxy.io/?${encodeURIComponent(url)}`, extractData: (data) => data },
+        { name: 'CodeTabs', url: `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`, extractData: (data) => data },
+        { name: 'AllOrigins', url: `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`, extractData: (data) => JSON.parse(data).contents },
+        { name: 'ThingProxy', url: `https://thingproxy.freeboard.io/fetch/${url}`, extractData: (data) => data },
+        { name: 'CORS Anywhere', url: `https://cors-anywhere.herokuapp.com/${url}`, extractData: (data) => data },
       ];
 
       let feedData = null;
       let lastError = null;
       let successfulProxy = null;
 
-      for (const proxyUrl of proxies) {
+      // Try each proxy
+      for (const proxy of proxies) {
         try {
-          console.log(`fetchRssFeedItems: Trying proxy: ${proxyUrl}`);
-          const response = await fetch(proxyUrl, {
+          console.log(`  🔄 Trying ${proxy.name}...`);
+
+          // Add timeout to prevent waiting too long (15 seconds per proxy)
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 15000);
+
+          const response = await fetch(proxy.url, {
             method: "GET",
             headers: {
-              Accept: "application/rss+xml, application/xml, text/xml, */*",
+              Accept: "application/rss+xml, application/xml, text/xml, application/json, */*",
               "User-Agent": "Mozilla/5.0 (compatible; RSSReader/1.0)",
             },
+            signal: controller.signal,
           });
+
+          clearTimeout(timeoutId);
 
           if (!response.ok) {
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
           }
 
+          // Try to get content type
+          const contentType = response.headers.get('content-type') || '';
           let data;
-          if (proxyUrl.includes("allorigins.win")) {
-            const jsonData = await response.json();
-            data = jsonData.contents;
-            console.log(`fetchRssFeedItems: Got data from allorigins.win, length: ${data?.length || 0}`);
-          } else if (proxyUrl.includes("corsproxy.io")) {
-            data = await response.text();
-            console.log(`fetchRssFeedItems: Got data from corsproxy.io, length: ${data?.length || 0}`);
-          } else if (proxyUrl.includes("codetabs.com")) {
-            data = await response.text();
-            console.log(`fetchRssFeedItems: Got data from codetabs.com, length: ${data?.length || 0}`);
+
+          if (contentType.includes('application/json')) {
+            const jsonResponse = await response.json();
+            data = proxy.extractData(JSON.stringify(jsonResponse));
           } else {
             data = await response.text();
-            console.log(`fetchRssFeedItems: Got data from ${proxyUrl}, length: ${data?.length || 0}`);
+            data = proxy.extractData(data);
           }
 
           // Handle base64 data URLs (some proxies return data this way)
           if (data && data.startsWith('data:application/rss+xml;')) {
-            console.log('fetchRssFeedItems: Detected base64 data URL, decoding...');
-            try {
-              const base64Data = data.split(',')[1];
-              const decodedData = atob(base64Data);
-              data = decodedData;
-              console.log(`fetchRssFeedItems: Decoded base64 data, new length: ${data.length}`);
-            } catch (decodeError) {
-              console.error('fetchRssFeedItems: Failed to decode base64 data:', decodeError);
-              throw new Error('Failed to decode base64 RSS data');
-            }
+            console.log('  🔄 Decoding base64 data URL...');
+            const base64Data = data.split(',')[1];
+            data = atob(base64Data);
           }
 
           if (data && data.trim().length > 0) {
             feedData = data;
-            successfulProxy = proxyUrl;
-            console.log(`fetchRssFeedItems: Successfully fetched data from ${proxyUrl}`);
+            successfulProxy = proxy.name;
+            console.log(`  ✅ Successfully fetched from ${proxy.name}`);
             break;
           } else {
-            console.warn(`fetchRssFeedItems: Empty data from ${proxyUrl}`);
+            console.warn(`  ⚠️ Empty data from ${proxy.name}`);
           }
         } catch (error) {
           lastError = error;
-          console.warn(`fetchRssFeedItems: Proxy ${proxyUrl} failed:`, error.message);
+          console.warn(`  ❌ ${proxy.name} failed:`, error.message);
           continue;
         }
       }
 
+      // Try direct fetch as last resort
       if (!feedData) {
-        console.error("fetchRssFeedItems: All proxies failed. Last error:", lastError);
-        console.warn("fetchRssFeedItems: Trying direct fetch as last resort...");
-        
-        // Try direct fetch as last resort (may fail due to CORS)
+        console.warn("  🔄 All proxies failed, trying direct fetch...");
         try {
           const directResponse = await fetch(url, {
             method: "GET",
             headers: {
-              Accept: "application/rss+xml, application/xml, text/xml, */*",
+              Accept: "application/rss+xml, application/xml, text/xml, application/json, */*",
               "User-Agent": "Mozilla/5.0 (compatible; RSSReader/1.0)",
             },
           });
-          
+
           if (directResponse.ok) {
             feedData = await directResponse.text();
             successfulProxy = "direct";
-            console.log("fetchRssFeedItems: Direct fetch succeeded!");
+            console.log("  ✅ Direct fetch succeeded!");
           } else {
             throw new Error(`Direct fetch failed: ${directResponse.status}`);
           }
         } catch (directError) {
-          console.error("fetchRssFeedItems: Direct fetch also failed:", directError);
-          throw new Error(`All CORS proxies failed and direct fetch blocked by CORS. Last proxy error: ${lastError?.message || 'Unknown error'}`);
+          console.error("❌ All fetch methods failed:", lastError?.message || directError.message);
+          throw new Error(`All CORS proxies and direct fetch failed. Last error: ${lastError?.message || 'Unknown error'}`);
         }
       }
 
-      console.log(`fetchRssFeedItems: Successfully fetched data from ${successfulProxy}, parsing XML...`);
-      console.log(`fetchRssFeedItems: XML content preview (first 200 chars):`, feedData.substring(0, 200));
+      console.log(`📋 Parsing feed data (${feedData.length} bytes) from ${successfulProxy}...`);
 
-      // Check if we got HTML instead of RSS/XML
-      if (feedData.trim().toLowerCase().startsWith('<!doctype html') || 
-          feedData.trim().toLowerCase().startsWith('<html')) {
-        console.error("fetchRssFeedItems: Received HTML instead of RSS/XML feed");
-        console.error("fetchRssFeedItems: This usually means the URL is incorrect or the site doesn't provide RSS");
-        console.error("fetchRssFeedItems: Raw data preview:", feedData.substring(0, 200));
-        throw new Error("Received HTML instead of RSS/XML feed. Please check the URL.");
+      // Check if we got HTML instead of feed data
+      const trimmedData = feedData.trim().toLowerCase();
+      if (trimmedData.startsWith('<!doctype html') || trimmedData.startsWith('<html')) {
+        console.error("❌ Received HTML instead of feed data");
+        throw new Error("Received HTML instead of RSS/XML/JSON feed. Please check the URL.");
       }
 
-      // Check if the feed data is JSON or XML
-      let feedItems = [];
-      
-      try {
-        // Try to parse as JSON first
-        const jsonData = JSON.parse(feedData);
-        console.log("fetchRssFeedItems: Successfully detected JSON feed format");
-        
-        if (Array.isArray(jsonData)) {
-          feedItems = jsonData.map((item, index) => {
-            const feedItem = item.item || item; // Handle both {item: {...}} and direct item structure
-            
-            // Extract title - handle CDATA sections
-            let title = "";
-            if (feedItem.title) {
-              if (typeof feedItem.title === 'string') {
-                title = feedItem.title;
-              } else if (feedItem.title['#cdata-section']) {
-                title = feedItem.title['#cdata-section'];
-              } else if (feedItem.title.textContent) {
-                title = feedItem.title.textContent;
-              }
-            }
-            
-            // Extract description - handle CDATA sections
-            let description = "";
-            if (feedItem.description) {
-              if (typeof feedItem.description === 'string') {
-                description = feedItem.description;
-              } else if (feedItem.description['#cdata-section']) {
-                description = feedItem.description['#cdata-section'];
-              } else if (feedItem.description.textContent) {
-                description = feedItem.description.textContent;
-              }
-            }
-            
-            // Clean up HTML tags from description
-            if (description) {
-              const tempDiv = document.createElement("div");
-              tempDiv.innerHTML = description;
-              description = tempDiv.textContent || tempDiv.innerText || "";
-            }
-            
-            // Extract link - handle CDATA sections
-            let link = "";
-            if (feedItem.link) {
-              if (typeof feedItem.link === 'string') {
-                link = feedItem.link;
-              } else if (feedItem.link['#cdata-section']) {
-                link = feedItem.link['#cdata-section'];
-              } else if (feedItem.link.textContent) {
-                link = feedItem.link.textContent;
-              }
-            }
-            
-            // Extract category - handle CDATA sections
-            let category = "";
-            if (feedItem.category) {
-              if (typeof feedItem.category === 'string') {
-                category = feedItem.category;
-              } else if (feedItem.category['#cdata-section']) {
-                category = feedItem.category['#cdata-section'];
-              } else if (feedItem.category.textContent) {
-                category = feedItem.category.textContent;
-              }
-            }
-            
-            // Extract date
-            const pubDate = feedItem.pubDate || feedItem.date || "";
-            
-            const parsedItem = {
-              title: title.trim(),
-              description: description.trim(),
-              link: link.trim(),
-              category: category.trim(),
-              pubDate: pubDate.trim(),
-            };
+      // Parse feed using new robust parser
+      const { format, items } = parseFeed(feedData);
+      console.log(`✅ Detected ${format} format with ${items.length} items`);
 
-            if (index < 3) { // Log first 3 items for debugging
-              console.log(`fetchRssFeedItems: JSON Item ${index + 1}:`, {
-                title: parsedItem.title.substring(0, 50) + (parsedItem.title.length > 50 ? '...' : ''),
-                hasDescription: !!parsedItem.description,
-                hasLink: !!parsedItem.link,
-                category: parsedItem.category
-              });
-            }
+      // Validate and clean items
+      const validItems = validateFeedItems(items);
+      console.log(`✅ ${validItems.length} valid items (${items.length - validItems.length} filtered out)`);
 
-            return parsedItem;
-          }).filter((item) => item.title || item.description); // Only include items with content
-        }
-        
-        console.log(`fetchRssFeedItems: Successfully parsed ${feedItems.length} JSON feed items from ${url}`);
-        return feedItems;
-        
-      } catch (jsonError) {
-        console.log("fetchRssFeedItems: Not JSON format, trying XML parsing...");
-        
-        // Parse the XML
-        const parser = new DOMParser();
-        const xmlDoc = parser.parseFromString(feedData, "text/xml");
-
-        // Check for parsing errors
-        const parseError = xmlDoc.querySelector("parsererror");
-        if (parseError) {
-          console.error("fetchRssFeedItems: XML parsing failed. Parse error details:", parseError.textContent);
-          console.error("fetchRssFeedItems: Raw feed data (first 500 chars):", feedData.substring(0, 500));
-          throw new Error(`XML parsing failed: ${parseError.textContent}`);
-        }
-
-        // Try different RSS/Atom/RDF selectors
-        let items = xmlDoc.querySelectorAll("item");
-        let feedType = "RSS 2.0";
-        
-        if (items.length === 0) {
-          items = xmlDoc.querySelectorAll("entry"); // Atom format
-          feedType = "Atom";
-          console.log(`fetchRssFeedItems: Found ${items.length} Atom entries`);
-        } else {
-          console.log(`fetchRssFeedItems: Found ${items.length} RSS 2.0 items`);
-        }
-
-        // Try RDF/RSS 1.0 format if no items found
-        if (items.length === 0) {
-          // Try different RDF selectors
-          items = xmlDoc.querySelectorAll("rdf\\:li, li, rdf\\:item, item"); // RDF/RSS 1.0 format
-          if (items.length > 0) {
-            feedType = "RDF/RSS 1.0";
-            console.log(`fetchRssFeedItems: Found ${items.length} RDF items`);
-          }
-        }
-
-        if (items.length === 0) {
-          console.warn("fetchRssFeedItems: No RSS items, Atom entries, or RDF items found in feed");
-          console.log("fetchRssFeedItems: Available elements in XML:", Array.from(xmlDoc.documentElement.children).map(el => el.tagName));
-          console.log("fetchRssFeedItems: Root element:", xmlDoc.documentElement.tagName);
-          console.log("fetchRssFeedItems: Root namespace:", xmlDoc.documentElement.namespaceURI);
-        } else {
-          console.log(`fetchRssFeedItems: Successfully detected ${feedType} format with ${items.length} items`);
-        }
-
-        const feedItems = Array.from(items)
-          .map((item, index) => {
-            // Helper function to get text content from various selectors
-            const getTextContent = (selectors) => {
-              for (const selector of selectors) {
-                const element = item.querySelector(selector);
-                if (element && element.textContent) {
-                  return element.textContent;
-                }
-              }
-              return "";
-            };
-
-            // Try different ways to get title (support CDATA and various formats)
-            let title = getTextContent([
-              "title",
-              "name", 
-              "dc\\:title"
-            ]);
-
-            // Try different ways to get description (support CDATA and various formats)
-            let description = getTextContent([
-              "description",
-              "summary",
-              "content",
-              "dc\\:description"
-            ]);
-
-            // Clean up HTML tags from description
-            if (description) {
-              const tempDiv = document.createElement("div");
-              tempDiv.innerHTML = description;
-              description = tempDiv.textContent || tempDiv.innerText || "";
-            }
-
-            // Try different ways to get link (support various link formats)
-            let link = getTextContent([
-              "link",
-              "guid",
-              "dc\\:identifier"
-            ]);
-            
-            // Also try link href attribute
-            if (!link) {
-              const linkElement = item.querySelector("link");
-              link = linkElement?.getAttribute("href") || "";
-            }
-
-            // Try different ways to get date (support various date formats)
-            let pubDate = getTextContent([
-              "pubDate",
-              "published",
-              "updated",
-              "dc\\:date",
-              "lastBuildDate"
-            ]);
-
-            const feedItem = {
-              title: title.trim(),
-              description: description.trim(),
-              link: link.trim(),
-              pubDate: pubDate.trim(),
-            };
-
-            if (index < 3) { // Log first 3 items for debugging
-              console.log(`fetchRssFeedItems: Item ${index + 1}:`, {
-                title: feedItem.title.substring(0, 50) + (feedItem.title.length > 50 ? '...' : ''),
-                hasDescription: !!feedItem.description,
-                hasLink: !!feedItem.link
-              });
-            }
-
-            return feedItem;
-          })
-          .filter((item) => item.title || item.description); // Only include items with content
-
-        console.log(`fetchRssFeedItems: Successfully parsed ${feedItems.length} feed items from ${url}`);
-        
-        // Log detailed content of each feed item
-        feedItems.forEach((item, index) => {
-          console.log(`📄 Feed Item ${index + 1} Content:`, {
-            title: item.title,
-            titleLength: item.title?.length || 0,
-            description: item.description,
-            descriptionLength: item.description?.length || 0,
-            link: item.link,
-            pubDate: item.pubDate
-          });
+      // Log sample items for debugging
+      validItems.slice(0, 3).forEach((item, index) => {
+        console.log(`  📄 Item ${index + 1}:`, {
+          title: item.title ? item.title.substring(0, 50) + '...' : '(no title)',
+          hasDescription: !!item.description,
+          hasLink: !!item.link,
+          hasDate: !!item.pubDate
         });
-        
-        return feedItems;
-      }
-    } catch (error) {
-      console.error(`fetchRssFeedItems: Error fetching RSS feed from ${url}:`, error);
-      console.error("fetchRssFeedItems: Error details:", {
-        message: error.message,
-        stack: error.stack,
-        url: url
       });
+
+      return validItems;
+
+    } catch (error) {
+      console.error(`❌ Error fetching feed from ${url}:`, error.message);
       return [];
     }
   }, []);

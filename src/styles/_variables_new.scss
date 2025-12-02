@@ -1,0 +1,251 @@
+// ============================================================================
+// IZI-CASTING DESIGN SYSTEM
+// Shadcn-inspired semantic color system with CSS custom properties
+// ============================================================================
+
+// ----------------------------------------------------------------------------
+// SCSS COLOR DEFINITIONS (Source of Truth)
+// These are the base colors - modify these to change your theme
+// ----------------------------------------------------------------------------
+
+// Brand Colors
+$_primary: #f07167;
+$_primary-dark: #e05a50;
+$_secondary: #5c6ac4;
+$_accent: $_secondary; // Can be customized for a third accent color
+
+// Backgrounds & Surfaces
+$_background: #f6f6f7; // Page background
+$_surface: #ffffff; // Cards, panels, elevated content
+$_elevated: #ffffff; // Modals, popovers (can be brighter/darker than surface)
+
+// Text Colors
+$_foreground: #000000; // Primary text
+$_foreground-secondary: #323232; // Secondary text
+$_foreground-muted: #6d7175; // Tertiary/muted text
+
+// UI Elements
+$_border: #e1e3e5; // Default borders
+$_input: $_surface; // Input backgrounds
+$_muted: #f6f6f7; // Muted backgrounds (disabled, inactive areas)
+$_muted-foreground: #6d7175; // Text on muted backgrounds
+
+// Semantic Colors
+$_success: #50b83c;
+$_warning: #ffea8a;
+$_warning-foreground: #323232; // Dark text on warning yellow
+$_destructive: #d82c0d; // Errors, delete actions
+$_info: $_primary; // Info messages
+
+// Special States
+$_inactive: #c9cccf; // Disabled/inactive elements
+
+// ----------------------------------------------------------------------------
+// CSS CUSTOM PROPERTIES
+// These can be swapped at runtime for theming and dark mode
+// ----------------------------------------------------------------------------
+
+:root {
+  // Brand
+  --primary: #{$_primary};
+  --primary-hover: #{darken($_primary, 5%)};
+  --primary-active: #{darken($_primary, 10%)};
+  --primary-foreground: #{$_surface}; // Text on primary colored backgrounds
+
+  --secondary: #{$_secondary};
+  --secondary-hover: #{darken($_secondary, 5%)};
+  --secondary-active: #{darken($_secondary, 10%)};
+  --secondary-foreground: #{$_surface};
+
+  --accent: #{$_accent};
+  --accent-hover: #{darken($_accent, 5%)};
+  --accent-foreground: #{$_surface};
+
+  // Backgrounds & Surfaces
+  --background: #{$_background};
+  --surface: #{$_surface};
+  --elevated: #{$_elevated};
+
+  // Text
+  --foreground: #{$_foreground};
+  --foreground-secondary: #{$_foreground-secondary};
+  --foreground-muted: #{$_muted-foreground};
+
+  // UI Elements
+  --border: #{$_border};
+  --border-hover: #{darken($_border, 10%)};
+  --input: #{$_input};
+  --input-border: #{$_border};
+  --input-hover: #{darken($_input, 2%)};
+  --ring: #{rgba($_primary, 0.3)}; // Focus ring color
+
+  --muted: #{$_muted};
+  --muted-foreground: #{$_muted-foreground};
+  --muted-hover: #{darken($_muted, 3%)};
+
+  // Semantic
+  --success: #{$_success};
+  --success-hover: #{darken($_success, 5%)};
+  --success-foreground: #{$_surface};
+  --success-light: #{rgba($_success, 0.1)};
+
+  --warning: #{$_warning};
+  --warning-hover: #{darken($_warning, 5%)};
+  --warning-foreground: #{$_warning-foreground};
+  --warning-light: #{rgba($_warning, 0.15)};
+
+  --destructive: #{$_destructive};
+  --destructive-hover: #{darken($_destructive, 5%)};
+  --destructive-active: #{darken($_destructive, 10%)};
+  --destructive-foreground: #{$_surface};
+  --destructive-light: #{rgba($_destructive, 0.1)};
+
+  --info: #{$_info};
+  --info-foreground: #{$_surface};
+  --info-light: #{rgba($_info, 0.1)};
+
+  // Special States
+  --inactive: #{$_inactive};
+  --disabled: #{$_inactive};
+  --disabled-foreground: #{$_muted-foreground};
+}
+
+// ----------------------------------------------------------------------------
+// DARK MODE EXAMPLE (Optional - uncomment to enable)
+// ----------------------------------------------------------------------------
+// @media (prefers-color-scheme: dark) {
+//   :root {
+//     --background: #0a0a0a;
+//     --surface: #1a1a1a;
+//     --elevated: #2a2a2a;
+//     --foreground: #fafafa;
+//     --foreground-secondary: #e1e3e5;
+//     --foreground-muted: #8c9196;
+//     --border: #2c2f32;
+//     --muted: #1a1a1a;
+//     --muted-foreground: #8c9196;
+//   }
+// }
+
+// ----------------------------------------------------------------------------
+// LEGACY SUPPORT (For gradual migration)
+// Map old variable names to new CSS custom properties
+// ----------------------------------------------------------------------------
+
+// Direct mappings
+$primary: var(--primary);
+$primary-dark: var(--primary-hover);
+$secondary: var(--secondary);
+$background: var(--background);
+$surface: var(--surface);
+$text-primary: var(--foreground);
+$text-secondary: var(--foreground-secondary);
+$text-tertiary: var(--foreground-muted);
+
+$success: var(--success);
+$warning: var(--warning);
+$error: var(--destructive);
+$inactive: var(--inactive);
+
+// Aliases for common patterns
+$border-color: var(--border);
+$border-color-focus: var(--ring);
+
+// Sidebar (can be customized or use defaults)
+$sidebar-bg: var(--surface);
+$sidebar-text: var(--foreground);
+$sidebar-border: var(--border);
+$sidebar-hover: var(--muted-hover);
+
+// ----------------------------------------------------------------------------
+// DESIGN TOKENS
+// ----------------------------------------------------------------------------
+
+// Corner Radius
+$corner-rounding: 1em;
+$border-radius-sm: 4px;
+$border-radius-md: 6px;
+$border-radius-lg: 8px;
+$border-radius-xl: 12px;
+$border-radius-xxl: 16px;
+$border-radius-full: 9999px;
+
+// Spacing System (4px base)
+$spacing-base: 4px;
+$spacing-xs: $spacing-base * 1;   // 4px
+$spacing-sm: $spacing-base * 2;   // 8px
+$spacing-md: $spacing-base * 4;   // 16px
+$spacing-lg: $spacing-base * 6;   // 24px
+$spacing-xl: $spacing-base * 8;   // 32px
+$spacing-xxl: $spacing-base * 12; // 48px
+
+// Typography
+$font-family-base: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+$font-family-heading: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+$font-family-mono: "SF Mono", Monaco, Inconsolata, "Roboto Mono", monospace;
+
+$font-size-xs: 10px;
+$font-size-sm: 12px;
+$font-size-base: 14px;
+$font-size-lg: 16px;
+$font-size-xl: 20px;
+$font-size-2xl: 24px;
+
+$line-height-base: 1.5;
+$line-height-tight: 1.25;
+$line-height-relaxed: 1.75;
+
+$font-weight-normal: 400;
+$font-weight-medium: 500;
+$font-weight-semibold: 600;
+$font-weight-bold: 700;
+
+// Shadows
+$shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+$shadow-md: 0 2px 4px rgba(0, 0, 0, 0.1);
+$shadow-lg: 0 4px 8px rgba(0, 0, 0, 0.15);
+$shadow-xl: 0 8px 16px rgba(0, 0, 0, 0.2);
+
+// Transitions
+$transition-base: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+$transition-fast: all 0.1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+$transition-slow: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
+// Layout
+$sidebar-width: 480px;
+$container-max-width: 1200px;
+
+// Component Specific
+$content-row-min-height: 48px;
+$status-badge-size: 16px;
+$toggle-switch-width: 36px;
+$toggle-switch-height: 20px;
+$icon-button-size: 28px;
+
+// Z-Index Scale
+$z-index-base: 0;
+$z-index-dropdown: 1000;
+$z-index-sticky: 1020;
+$z-index-fixed: 1030;
+$z-index-modal-backdrop: 1040;
+$z-index-modal: 1050;
+$z-index-popover: 1060;
+$z-index-tooltip: 1070;
+
+// ----------------------------------------------------------------------------
+// UTILITY FUNCTIONS
+// ----------------------------------------------------------------------------
+
+// Add opacity to any color
+@function alpha($color, $opacity) {
+  @return rgba($color, $opacity);
+}
+
+// Accessible text color based on background
+@function text-contrast($bg-color) {
+  @if (lightness($bg-color) > 50) {
+    @return #000000;
+  } @else {
+    @return #ffffff;
+  }
+}

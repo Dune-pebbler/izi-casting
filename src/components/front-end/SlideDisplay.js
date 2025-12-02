@@ -278,6 +278,24 @@ function SlideDisplay({ currentSlide, slideLayout, nextSlide, nextSlideLayout })
             )}
           </div>
         )}
+
+        {layout === "iframe" && (
+          <div className="display-iframe">
+            {slide.iframeUrl ? (
+              <iframe
+                src={slide.iframeUrl}
+                title={slide.name || "Website"}
+                className="display-iframe-content"
+                sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
+                allow="autoplay; fullscreen"
+              />
+            ) : (
+              <div className="display-iframe-placeholder">
+                <div className="placeholder-text">Geen Website URL</div>
+              </div>
+            )}
+          </div>
+        )}
       </>
     );
   };

@@ -82,9 +82,7 @@ const PlaylistHeader = ({
               {playlist.name}
             </h2>
           )}
-        </div>
-        <div className="playlist-actions" onClick={(e) => e.stopPropagation()}>
-          <div className="playlist-info">
+          <div className="playlist-info" onClick={(e) => e.stopPropagation()}>
               <div className="playlist-slide-count">
                 <span className="slide-count-value">
                   <Monitor size={14} />
@@ -137,6 +135,8 @@ const PlaylistHeader = ({
               )}
             </div>
           </div>
+        </div>
+        <div className="playlist-actions">
           <button
             onClick={(e) => {
               e.stopPropagation();
