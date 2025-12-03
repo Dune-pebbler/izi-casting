@@ -56,13 +56,13 @@ function LayoutSelector({ currentLayout, onLayoutChange }) {
   ];
 
   return (
-    <div className="layout-selector">
+    <div className="slide-modal__layout-selector">
       {layouts.map(layout => {
         const IconComponent = layout.icon;
         return (
-          <button 
+          <button
             key={layout.id}
-            className={`layout-btn ${currentLayout === layout.id ? 'active' : ''}`}
+            className={`slide-modal__layout-btn ${currentLayout === layout.id ? 'active' : ''}`}
             onClick={() => onLayoutChange(layout.id)}
             title={layout.title}
             aria-label={layout.label}

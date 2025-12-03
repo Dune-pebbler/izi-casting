@@ -131,20 +131,20 @@ function SlideList({
       switch (layout) {
         case 'image-only':
           return (
-            <div className="slide-preview-image-only">
+            <div className="slide-preview slide-preview--image-only">
               {slide.imageUrl ? (
-                <img 
-                  src={slide.imageUrl} 
-                  alt="Slide" 
-                  className="preview-image"
+                <img
+                  src={slide.imageUrl}
+                  alt="Slide"
+                  className="slide-preview__image"
                   style={{
                     objectPosition: slide.imagePosition || "center",
                   }}
                 />
               ) : (
-                <div className="preview-placeholder">
-                  <div className="placeholder-icon">🖼️</div>
-                  <span>No image</span>
+                <div className="placeholder">
+                  <div className="placeholder__icon">🖼️</div>
+                  <span className="placeholder__text">No image</span>
                 </div>
               )}
             </div>
@@ -152,18 +152,18 @@ function SlideList({
 
         case 'text-only':
           return (
-            <div className="slide-preview-text-only">
+            <div className="slide-preview slide-preview--text-only">
               {slide.text || slide.tinyMCEContent ? (
-                <div 
+                <div
                   className="preview-text-content"
-                  dangerouslySetInnerHTML={{ 
+                  dangerouslySetInnerHTML={{
                     __html: sanitizeHTMLContent(getPreviewHTML(slide.tinyMCEContent || slide.text, 100))
                   }}
                 />
               ) : (
-                <div className="preview-placeholder">
-                  <div className="placeholder-icon">📝</div>
-                  <span>No text</span>
+                <div className="placeholder">
+                  <div className="placeholder__icon">📝</div>
+                  <span className="placeholder__text">No text</span>
                 </div>
               )}
             </div>
@@ -171,22 +171,22 @@ function SlideList({
 
         case 'text-over-image':
           return (
-            <div className="slide-preview-text-over-image">
+            <div className="slide-preview slide-preview--text-over-image">
               {slide.imageUrl ? (
                 <div className="preview-image-background">
-                  <img 
-                    src={slide.imageUrl} 
-                    alt="Slide" 
-                    className="preview-image"
+                  <img
+                    src={slide.imageUrl}
+                    alt="Slide"
+                    className="slide-preview__image"
                     style={{
                       objectPosition: slide.imagePosition || "center",
                     }}
                   />
                   <div className="preview-text-overlay">
                     {slide.text || slide.tinyMCEContent ? (
-                      <div 
+                      <div
                         className="preview-text-content"
-                        dangerouslySetInnerHTML={{ 
+                        dangerouslySetInnerHTML={{
                           __html: sanitizeHTMLContent(getPreviewHTML(slide.tinyMCEContent || slide.text, 50))
                         }}
                       />
@@ -196,9 +196,9 @@ function SlideList({
                   </div>
                 </div>
               ) : (
-                <div className="preview-placeholder">
-                  <div className="placeholder-icon">🖼️</div>
-                  <span>No image</span>
+                <div className="placeholder">
+                  <div className="placeholder__icon">🖼️</div>
+                  <span className="placeholder__text">No image</span>
                 </div>
               )}
             </div>
@@ -217,7 +217,7 @@ function SlideList({
           };
 
           return (
-            <div className="slide-preview-video">
+            <div className="slide-preview slide-preview--video">
               {slide.videoUrl && videoInfo ? (
                 <div className="preview-video-container">
                   <img
@@ -238,9 +238,9 @@ function SlideList({
                   </div>
                 </div>
               ) : (
-                <div className="preview-placeholder">
-                  <div className="placeholder-icon">🎥</div>
-                  <span>No video URL</span>
+                <div className="placeholder">
+                  <div className="placeholder__icon">🎥</div>
+                  <span className="placeholder__text">No video URL</span>
                 </div>
               )}
             </div>
@@ -248,7 +248,7 @@ function SlideList({
 
         case 'teletekst':
           return (
-            <div className="slide-preview-teletekst">
+            <div className="slide-preview slide-preview--teletekst">
               {slide.teletekstChannel ? (
                 <div className="preview-teletekst-container">
                   <div className="preview-teletekst-icon">
@@ -260,9 +260,9 @@ function SlideList({
                   </div>
                 </div>
               ) : (
-                <div className="preview-placeholder">
-                  <div className="placeholder-icon"><Tv size={24} /></div>
-                  <span>No teletekst channel</span>
+                <div className="placeholder">
+                  <div className="placeholder__icon"><Tv size={24} /></div>
+                  <span className="placeholder__text">No teletekst channel</span>
                 </div>
               )}
             </div>
@@ -270,7 +270,7 @@ function SlideList({
 
         case 'iframe':
           return (
-            <div className="slide-preview-iframe">
+            <div className="slide-preview slide-preview--iframe">
               {slide.iframeUrl ? (
                 <div className="preview-iframe-container">
                   <div className="preview-iframe-icon">
@@ -282,9 +282,9 @@ function SlideList({
                   </div>
                 </div>
               ) : (
-                <div className="preview-placeholder">
-                  <div className="placeholder-icon"><Globe size={24} /></div>
-                  <span>Geen website URL</span>
+                <div className="placeholder">
+                  <div className="placeholder__icon"><Globe size={24} /></div>
+                  <span className="placeholder__text">Geen website URL</span>
                 </div>
               )}
             </div>
@@ -293,34 +293,34 @@ function SlideList({
         case 'side-by-side':
         default:
           return (
-            <div className="slide-preview-side-by-side">
+            <div className="slide-preview slide-preview--side-by-side">
               <div className={`preview-left ${slide.imageSide === 'right' ? 'flipped' : ''}`}>
                 {slide.imageUrl ? (
-                  <img 
-                    src={slide.imageUrl} 
-                    alt="Slide" 
-                    className="preview-image"
+                  <img
+                    src={slide.imageUrl}
+                    alt="Slide"
+                    className="slide-preview__image"
                     style={{
                       objectPosition: slide.imagePosition || "center",
                     }}
                   />
                 ) : (
-                  <div className="preview-placeholder">
-                    <div className="placeholder-icon">🖼️</div>
+                  <div className="placeholder">
+                    <div className="placeholder__icon">🖼️</div>
                   </div>
                 )}
               </div>
               <div className={`preview-right ${slide.imageSide === 'right' ? 'flipped' : ''}`}>
                 {slide.text || slide.tinyMCEContent ? (
-                  <div 
+                  <div
                     className="preview-text-content"
-                    dangerouslySetInnerHTML={{ 
+                    dangerouslySetInnerHTML={{
                       __html: sanitizeHTMLContent(getPreviewHTML(slide.tinyMCEContent || slide.text, 80))
                     }}
                   />
                 ) : (
-                  <div className="preview-placeholder">
-                    <div className="placeholder-icon">📝</div>
+                  <div className="placeholder">
+                    <div className="placeholder__icon">📝</div>
                   </div>
                 )}
               </div>
@@ -330,29 +330,29 @@ function SlideList({
     };
 
     return (
-      <div 
+      <div
         ref={setNodeRef}
         style={style}
         className={`slide-card ${isDragging ? 'dragging' : ''}`}
         onClick={() => onEditSlide(slide)}
       >
-        <div className="slide-card-header">
-          <div className="slide-header-left" {...attributes} {...listeners}>
+        <div className="slide-card__header">
+          <div className="slide-card__header-left" {...attributes} {...listeners}>
             <div className="drag-handle">
               <GripVertical size={18} />
             </div>
-            <h4 className="slide-title">{slide.name || `Slide ${index + 1}`}</h4>
-            <div className="slide-duration-display">
+            <h4 className="slide-card__title">{slide.name || `Slide ${index + 1}`}</h4>
+            <div className="slide-card__duration">
               <span className="duration-value">{slide.duration || 5}s</span>
             </div>
           </div>
-          <div className="slide-header-actions">
+          <div className="slide-card__actions">
             <button
               onClick={(e) => {
                 e.stopPropagation();
                 onMoveSlide(slide);
               }}
-              className="move-slide-btn"
+              className="btn-icon"
               title="Move to other playlist"
             >
               <ChevronsUpDown size={16} />
@@ -362,7 +362,7 @@ function SlideList({
                 e.stopPropagation();
                 onCopySlide(slide);
               }}
-              className="copy-slide-btn"
+              className="btn-icon"
               title="Copy slide"
             >
               <Copy size={16} />
@@ -372,7 +372,7 @@ function SlideList({
                 e.stopPropagation();
                 onConfirmDeleteSlide(slide);
               }}
-              className="btn btn-danger delete-slide-btn"
+              className="btn-icon btn-icon--danger"
               title="Delete slide"
             >
               <Trash2 size={16} />
@@ -382,15 +382,15 @@ function SlideList({
                 e.stopPropagation();
                 onToggleSlideVisibility(slide.id);
               }}
-              className={`status-toggle-btn ${slide.isVisible ? 'visible' : 'hidden'}`}
+              className={`btn-icon ${slide.isVisible ? 'btn-icon--success' : ''}`}
               title={slide.isVisible ? 'Hide slide' : 'Show slide'}
             >
               {slide.isVisible ? <Eye size={16} /> : <EyeOff size={16} />}
             </button>
           </div>
         </div>
-        
-        <div className="slide-preview-container">
+
+        <div className="slide-card__preview">
           {renderSlidePreview(slide)}
         </div>
       </div>
@@ -442,25 +442,25 @@ function SlideList({
         className={`slide-row ${isDragging ? 'dragging' : ''}`}
         onClick={() => onEditSlide(slide)}
       >
-        <div className="slide-row-left" {...attributes} {...listeners}>
+        <div className="slide-row__left" {...attributes} {...listeners}>
           <div className="drag-handle">
             <GripVertical size={18} />
           </div>
         </div>
-        <div className="slide-row-content">
-          <h4 className="slide-row-title">{slide.name || `Slide ${index + 1}`}</h4>
-          <div className="slide-row-info">
-            <span className="slide-row-type">{getSlideTypeLabel(slide)}</span>
-            <span className="slide-row-duration">{slide.duration || 5}s</span>
+        <div className="slide-row__content">
+          <h4 className="slide-row__title">{slide.name || `Slide ${index + 1}`}</h4>
+          <div className="slide-row__info">
+            <span className="slide-row__type">{getSlideTypeLabel(slide)}</span>
+            <span className="slide-row__duration">{slide.duration || 5}s</span>
           </div>
         </div>
-        <div className="slide-row-actions">
+        <div className="slide-row__actions">
           <button
             onClick={(e) => {
               e.stopPropagation();
               onMoveSlide(slide);
             }}
-            className="move-slide-btn"
+            className="btn-icon"
             title="Move to other playlist"
           >
             <ChevronsUpDown size={16} />
@@ -470,7 +470,7 @@ function SlideList({
               e.stopPropagation();
               onCopySlide(slide);
             }}
-            className="copy-slide-btn"
+            className="btn-icon"
             title="Copy slide"
           >
             <Copy size={16} />
@@ -480,7 +480,7 @@ function SlideList({
               e.stopPropagation();
               onConfirmDeleteSlide(slide);
             }}
-            className="btn btn-danger delete-slide-btn"
+            className="btn-icon btn-icon--danger"
             title="Delete slide"
           >
             <Trash2 size={16} />
@@ -490,7 +490,7 @@ function SlideList({
               e.stopPropagation();
               onToggleSlideVisibility(slide.id);
             }}
-            className={`status-toggle-btn ${slide.isVisible ? 'visible' : 'hidden'}`}
+            className={`btn-icon ${slide.isVisible ? 'btn-icon--success' : ''}`}
             title={slide.isVisible ? 'Hide slide' : 'Show slide'}
           >
             {slide.isVisible ? <Eye size={16} /> : <EyeOff size={16} />}
@@ -548,8 +548,8 @@ function SlideList({
 
             {/* Add Slide Button */}
             {onAddSlide && (
-              <div className="add-slide-button list-add" onClick={onAddSlide}>
-                <div className="add-slide-content">
+              <div className="add-button add-button--list" onClick={onAddSlide}>
+                <div className="add-button__content">
                   <Plus size={24} />
                   <span>Add Slide</span>
                 </div>
@@ -564,8 +564,8 @@ function SlideList({
 
             {/* Add Slide Button */}
             {onAddSlide && (
-              <div className="add-slide-button" onClick={onAddSlide}>
-                <div className="add-slide-content">
+              <div className="add-button" onClick={onAddSlide}>
+                <div className="add-button__content">
                   <Plus size={24} />
                   <span>Add Slide</span>
                 </div>

@@ -60,19 +60,13 @@ function ImageUpload({
       );
     }
 
-    const uploadClass = fullWidth ? 'modal-image-upload-full' :
-                      asBackground ? 'modal-image-upload-overlay' :
-                      'modal-image-upload';
-    const labelClass = fullWidth ? 'modal-upload-label-full' :
-                     asBackground ? 'modal-upload-label-overlay' :
-                     'modal-upload-label';
-    const inputId = fullWidth ? 'modal-image-upload-full' :
-                  asBackground ? 'modal-image-upload-overlay' :
-                  'modal-image-upload';
+    const inputId = fullWidth ? 'image-upload-full' :
+                  asBackground ? 'image-upload-overlay' :
+                  'image-upload';
 
     return (
       <div className="image-upload-container">
-        <label htmlFor={inputId} className={uploadClass}>
+        <label htmlFor={inputId} className="upload-area">
           <input
             type="file"
             accept="image/*"
@@ -80,7 +74,7 @@ function ImageUpload({
             className="image-upload-input"
             id={inputId}
           />
-          <div className={labelClass}>
+          <div className="upload-label">
             {uploadingImage ? (
               <>
                 <div className="upload-icon">
@@ -115,10 +109,10 @@ function ImageUpload({
             <button
               type="button"
               onClick={onOpenLibrary}
-              className={uploadClass + ' image-library-button'}
+              className="upload-area image-library-button"
               disabled={uploadingImage}
             >
-              <div className={labelClass}>
+              <div className="upload-label">
                 <div className="upload-icon">
                   <ImageIcon size={24} />
                 </div>

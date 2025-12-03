@@ -1,0 +1,324 @@
+// =============================================================================
+// TEXT PREVIEW CONTENT - Scaled down WYSIWYG preview
+// =============================================================================
+
+.preview-text-content {
+  font-size: 4.5px !important;
+  line-height: 1.2 !important;
+  color: var(--foreground);
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 6;
+  -webkit-box-orient: vertical;
+  text-align: left;
+  width: 100%;
+  height: 100%;
+  padding: 2px;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  word-wrap: break-word;
+
+  // Override all inline styles from WYSIWYG editor
+  * {
+    font-size: inherit !important;
+    line-height: inherit !important;
+  }
+
+  // -----------------------------------------------------------------------------
+  // Headings (Scaled down proportionally)
+  // -----------------------------------------------------------------------------
+
+  // Heading sizes map
+  $heading-sizes: (
+    h1: 10.5px,
+    h2: 9px,
+    h3: 7.5px,
+    h4: 6px,
+    h5: 4.5px,
+    h6: 4.5px
+  );
+
+  // Generate heading styles
+  @each $tag, $size in $heading-sizes {
+    #{$tag} {
+      font-size: $size !important;
+      font-weight: 600;
+      margin: 0 0 1px 0;
+      line-height: 1.2 !important;
+      color: #1a1a1a;
+
+      @if $tag == h1 {
+        border-bottom: 0.5px solid #e1e5e9;
+        padding-bottom: 0.5px;
+      }
+
+      // Override inline text-align styles
+      &[style*="text-align: center"] {
+        text-align: center !important;
+      }
+
+      &[style*="text-align: right"] {
+        text-align: right !important;
+      }
+
+      &[style*="text-align: justify"] {
+        text-align: justify !important;
+      }
+
+      // Force all child elements to inherit heading styling
+      *,
+      span,
+      div,
+      strong,
+      em,
+      b,
+      i,
+      u,
+      s,
+      strike,
+      mark,
+      small,
+      big,
+      sup,
+      sub,
+      code {
+        font-size: $size !important;
+        line-height: 1.2 !important;
+      }
+    }
+  }
+
+  // -----------------------------------------------------------------------------
+  // Paragraphs & Text
+  // -----------------------------------------------------------------------------
+  p {
+    margin: 0 0 1px 0;
+    line-height: 1.2 !important;
+    font-size: 4.5px !important;
+    color: #333;
+  }
+
+  // -----------------------------------------------------------------------------
+  // Lists
+  // -----------------------------------------------------------------------------
+  ul,
+  ol {
+    margin: 0.5px 0;
+    padding-left: 3px;
+    line-height: 1.2 !important;
+  }
+
+  ul {
+    list-style-type: disc;
+  }
+
+  ol {
+    list-style-type: decimal;
+  }
+
+  li {
+    margin: 0;
+    line-height: 1.2 !important;
+    font-size: 4.5px !important;
+  }
+
+  // Nested lists
+  ul ul,
+  ol ol,
+  ul ol,
+  ol ul {
+    margin: 0;
+  }
+
+  // -----------------------------------------------------------------------------
+  // Text Formatting
+  // -----------------------------------------------------------------------------
+  strong,
+  b {
+    font-weight: 600;
+    color: #1a1a1a;
+  }
+
+  em,
+  i {
+    font-style: italic;
+  }
+
+  u {
+    text-decoration: underline;
+    text-decoration-color: #333;
+  }
+
+  s,
+  strike {
+    text-decoration: line-through;
+    text-decoration-color: #666;
+  }
+
+  // -----------------------------------------------------------------------------
+  // Spans & Divs (Override WYSIWYG styles)
+  // -----------------------------------------------------------------------------
+
+  // Only override spans not inside headings (headings have their own rules)
+  span:not(h1 span):not(h2 span):not(h3 span):not(h4 span):not(h5 span):not(h6 span) {
+    font-size: 4.5px !important;
+    line-height: 1.2 !important;
+
+    &[style*="font-size"] {
+      font-size: 4.5px !important;
+    }
+
+    &[style*="background-color"] {
+      padding: 0.5px 1px !important;
+    }
+  }
+
+  // Divs not inside headings
+  div:not(h1 div):not(h2 div):not(h3 div):not(h4 div):not(h5 div):not(h6 div) {
+    margin: 0;
+    padding: 0;
+    font-size: 4.5px !important;
+    line-height: 1.2 !important;
+  }
+
+  // -----------------------------------------------------------------------------
+  // Blockquotes
+  // -----------------------------------------------------------------------------
+  blockquote {
+    margin: 0.5px 0;
+    padding: 0.5px 1px;
+    border-left: 1px solid #0066cc;
+    background-color: #f8f9fa;
+    font-style: italic;
+    color: #555;
+
+    p {
+      margin: 0;
+    }
+  }
+
+  // -----------------------------------------------------------------------------
+  // Code Elements
+  // -----------------------------------------------------------------------------
+  code {
+    background-color: #f8f9fa;
+    padding: 0.5px 1px;
+    border-radius: 1px;
+    font-family: "Monaco", "Menlo", "Ubuntu Mono", monospace;
+    font-size: 3.75px !important;
+    color: #e83e8c;
+  }
+
+  pre {
+    background-color: #f8f9fa;
+    padding: 1px;
+    border: 0.5px solid #e1e5e9;
+    border-radius: 1px;
+    overflow-x: auto;
+    font-family: "Monaco", "Menlo", "Ubuntu Mono", monospace;
+    font-size: 3.75px !important;
+    line-height: 1.3 !important;
+    color: #333;
+    margin: 0.5px 0;
+  }
+
+  // -----------------------------------------------------------------------------
+  // Links
+  // -----------------------------------------------------------------------------
+  a {
+    color: #0066cc;
+    text-decoration: underline;
+    text-decoration-color: #0066cc;
+    font-size: 4.5px !important;
+
+    &:hover {
+      color: #0052a3;
+      text-decoration-color: #0052a3;
+    }
+  }
+
+  // -----------------------------------------------------------------------------
+  // Tables
+  // -----------------------------------------------------------------------------
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 0.5px 0;
+    font-size: 3.75px !important;
+    border: 0.5px solid #e1e5e9;
+    border-radius: 1px;
+    overflow: hidden;
+  }
+
+  th,
+  td {
+    border: 0.5px solid #e1e5e9;
+    padding: 0.5px 1px;
+    text-align: left;
+    vertical-align: top;
+    font-size: 3.75px !important;
+  }
+
+  th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+    color: #1a1a1a;
+    border-bottom: 0.5px solid #e1e5e9;
+  }
+
+  tr:nth-child(even) {
+    background-color: #fafbfc;
+  }
+
+  tr:hover {
+    background-color: #f0f2f5;
+  }
+
+  // -----------------------------------------------------------------------------
+  // Other Elements
+  // -----------------------------------------------------------------------------
+
+  // Line breaks
+  br {
+    display: block;
+    content: "";
+    margin-top: 0.5px;
+  }
+
+  // Horizontal rules
+  hr {
+    border: none;
+    border-top: 0.5px solid #e1e5e9;
+    margin: 1px 0;
+  }
+
+  // Superscript and subscript
+  sup {
+    font-size: 3.75px !important;
+    vertical-align: super;
+  }
+
+  sub {
+    font-size: 3.75px !important;
+    vertical-align: sub;
+  }
+
+  // Mark/highlight
+  mark {
+    background-color: #fff3cd;
+    padding: 0 0.5px;
+  }
+
+  // Small text
+  small {
+    font-size: 3.75px !important;
+  }
+
+  // Large text
+  big {
+    font-size: 6px !important;
+  }
+
+  // Ensure proper text wrapping
+  white-space: pre-wrap;
+}

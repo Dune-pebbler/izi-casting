@@ -172,8 +172,8 @@ const PlaylistList = ({
       </SortableContext>
 
       {/* Add Playlist Button */}
-      <div className="add-playlist-button" onClick={onAddPlaylist}>
-        <div className="add-playlist-content">
+      <div className="add-button" onClick={onAddPlaylist}>
+        <div className="add-button__content">
           <Plus size={24} />
           <span>Playlist toevoegen </span>
         </div>

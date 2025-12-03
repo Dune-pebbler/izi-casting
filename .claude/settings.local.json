@@ -19,7 +19,8 @@
       "Bash(./fix-scss-functions.sh)",
       "Bash(cd:*)",
       "Bash(./remove-legacy-variables.sh)",
-      "Bash(./fix-remaining-variables.sh)"
+      "Bash(./fix-remaining-variables.sh)",
+      "Bash(mkdir:*)"
     ],
     "deny": [],
     "ask": []

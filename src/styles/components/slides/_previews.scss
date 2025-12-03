@@ -1,0 +1,346 @@
+// =============================================================================
+// SLIDE PREVIEWS - All Layout Types
+// =============================================================================
+
+// -----------------------------------------------------------------------------
+// Base Preview Container
+// -----------------------------------------------------------------------------
+.slide-preview {
+  width: 100%;
+  height: 100%;
+  position: relative;
+
+  // Common image styles
+  &__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  // -----------------------------------------------------------------------------
+  // Image Only Layout
+  // -----------------------------------------------------------------------------
+  &--image-only {
+    width: 100%;
+    height: 100%;
+
+    .slide-preview__image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  // -----------------------------------------------------------------------------
+  // Text Only Layout
+  // -----------------------------------------------------------------------------
+  &--text-only {
+    width: 100%;
+    height: 100%;
+    padding: $spacing-sm;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--muted);
+  }
+
+  // -----------------------------------------------------------------------------
+  // Text Over Image Layout
+  // -----------------------------------------------------------------------------
+  &--text-over-image {
+    width: 100%;
+    height: 100%;
+    position: relative;
+
+    .preview-image-background {
+      width: 100%;
+      height: 100%;
+      position: relative;
+
+      .slide-preview__image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .preview-text-overlay {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
+        padding: $spacing-xs;
+        color: white;
+        font-size: 10px;
+        line-height: 1.2;
+      }
+    }
+  }
+
+  // -----------------------------------------------------------------------------
+  // Side by Side Layout
+  // -----------------------------------------------------------------------------
+  &--side-by-side {
+    display: flex;
+    width: 100%;
+    height: 100%;
+
+    .preview-left {
+      width: 50%;
+      height: 100%;
+      transition: all 0.3s ease;
+
+      &.flipped {
+        order: 2;
+      }
+
+      .slide-preview__image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+    }
+
+    .preview-right {
+      width: 50%;
+      height: 100%;
+      padding: $spacing-xs;
+      background-color: var(--muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+
+      &.flipped {
+        order: 1;
+      }
+    }
+  }
+
+  // -----------------------------------------------------------------------------
+  // Video Layout
+  // -----------------------------------------------------------------------------
+  &--video {
+    width: 100%;
+    height: 100%;
+    position: relative;
+
+    .preview-video-container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      border-radius: $border-radius-sm;
+      overflow: hidden;
+
+      .preview-video-thumbnail {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .preview-video-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        transition: background-color 0.2s ease;
+
+        &:hover {
+          background: rgba(0, 0, 0, 0.6);
+        }
+
+        svg {
+          filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+        }
+      }
+
+      .preview-video-info {
+        position: absolute;
+        bottom: 4px;
+        right: 4px;
+        background: rgba(0, 0, 0, 0.7);
+        color: white;
+        padding: 2px 6px;
+        border-radius: 3px;
+        font-size: 8px;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+
+        .video-platform {
+          color: #ff0000; // YouTube red
+
+          &.vimeo {
+            color: #1ab7ea; // Vimeo blue
+          }
+        }
+      }
+    }
+  }
+
+  // -----------------------------------------------------------------------------
+  // Teletekst Layout
+  // -----------------------------------------------------------------------------
+  &--teletekst {
+    width: 100%;
+    height: 100%;
+    position: relative;
+
+    .preview-teletekst-container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+      border-radius: $border-radius-sm;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: $spacing-sm;
+
+      .preview-teletekst-icon {
+        color: white;
+        margin-bottom: $spacing-xs;
+        opacity: 0.9;
+      }
+
+      .preview-teletekst-info {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+
+        .teletekst-label {
+          color: white;
+          font-size: 11px;
+          font-weight: 600;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+        }
+
+        .teletekst-channel {
+          color: rgba(255, 255, 255, 0.9);
+          font-size: 9px;
+          font-weight: 500;
+        }
+      }
+    }
+  }
+
+  // -----------------------------------------------------------------------------
+  // Iframe Layout
+  // -----------------------------------------------------------------------------
+  &--iframe {
+    width: 100%;
+    height: 100%;
+    position: relative;
+
+    .preview-iframe-container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+      border-radius: $border-radius-sm;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: $spacing-sm;
+
+      .preview-iframe-icon {
+        color: white;
+        margin-bottom: $spacing-xs;
+        opacity: 0.9;
+      }
+
+      .preview-iframe-info {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        width: 100%;
+
+        .iframe-label {
+          color: white;
+          font-size: 11px;
+          font-weight: 600;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+        }
+
+        .iframe-url {
+          color: rgba(255, 255, 255, 0.9);
+          font-size: 8px;
+          font-weight: 500;
+          max-width: 100%;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          text-align: center;
+        }
+      }
+    }
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Trash Modal Preview Variants (Simplified)
+// -----------------------------------------------------------------------------
+.trash-slide-preview {
+  width: 100%;
+  height: 150px;
+  overflow: hidden;
+  border-radius: $border-radius-sm;
+  background-color: var(--muted);
+
+  &.image-only,
+  &.side-by-side {
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  &.text-only {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: $spacing-sm;
+
+    .preview-text {
+      font-size: 10px;
+      line-height: 1.3;
+      color: var(--foreground);
+    }
+  }
+
+  &.text-over-image {
+    position: relative;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .preview-text-overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
+      padding: $spacing-xs;
+      color: white;
+      font-size: 8px;
+    }
+  }
+}

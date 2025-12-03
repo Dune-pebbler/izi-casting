@@ -49,7 +49,7 @@ function EditModal({
       case "side-by-side":
         return (
           <>
-            <div className={`modal-left ${imageSide === 'right' ? 'flipped' : ''}`}>
+            <div className={`slide-modal__body-left ${imageSide === 'right' ? 'flipped' : ''}`}>
               <ImageUpload
                 imageUrl={modalImageUrl}
                 uploadingImage={uploadingImage}
@@ -63,14 +63,14 @@ function EditModal({
             </div>
 
             <button
-              className="flip-layout-btn"
+              className="slide-modal__flip-btn"
               onClick={() => onImageSideChange(imageSide === 'left' ? 'right' : 'left')}
               title="Flip image and text positions"
             >
               <ArrowLeftRight size={20} />
             </button>
 
-            <div className={`modal-right ${imageSide === 'right' ? 'flipped' : ''}`}>
+            <div className={`slide-modal__body-right ${imageSide === 'right' ? 'flipped' : ''}`}>
               <div className="text-input-section">
                 <TextEditor
                   content={modalTinyMCEContent}
@@ -84,7 +84,7 @@ function EditModal({
 
       case "image-only":
         return (
-          <div className="modal-full-image">
+          <div className="slide-modal__full-image">
             <ImageUpload
               imageUrl={modalImageUrl}
               uploadingImage={uploadingImage}
@@ -101,8 +101,8 @@ function EditModal({
 
       case "text-over-image":
         return (
-          <div className="modal-text-over-image">
-            <div className="modal-image-background">
+          <div className="slide-modal__text-over-image">
+            <div className="slide-modal__image-background">
               <ImageUpload
                 imageUrl={modalImageUrl}
                 uploadingImage={uploadingImage}
@@ -116,7 +116,7 @@ function EditModal({
               />
             </div>
 
-            <div className="modal-text-overlay">
+            <div className="slide-modal__text-overlay">
               <div className="text-input-section">
                 <TextEditor
                   content={modalTinyMCEContent}
@@ -130,7 +130,7 @@ function EditModal({
 
       case "text-only":
         return (
-          <div className="modal-text-only">
+          <div className="slide-modal__text-only">
             <div className="text-input-section-full">
               <TextEditor
                 content={modalTinyMCEContent}
@@ -188,30 +188,30 @@ function EditModal({
   };
 
   return (
-    <div className="slide-edit-modal">
-      <div className="modal-overlay" onClick={onClose}>
-        <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        <div className="modal-header">
-          <div className="modal-header-left">
-            <div className="slide-name-input-container">
+    <div className="slide-modal">
+      <div className="slide-modal__overlay" onClick={onClose}>
+        <div className="slide-modal__content" onClick={(e) => e.stopPropagation()}>
+        <div className="slide-modal__header">
+          <div className="slide-modal__header-left">
+            <div className="slide-modal__name-input-container">
               <input
                 type="text"
-                className="slide-name-input"
+                className="slide-modal__name-input"
                 value={slideName || ""}
                 onChange={(e) => onSlideNameChange(e.target.value)}
                 placeholder="Enter slide name..."
                 maxLength={50}
               />
             </div>
-            <div className="slide-duration-input-container">
+            <div className="slide-modal__duration-container">
               <label htmlFor="slide-duration">
                 <Clock size={16} />
               </label>
-              <div className="duration-input-wrapper">
+              <div className="slide-modal__duration-wrapper">
                 <input
                   id="slide-duration"
                   type="number"
-                  className="slide-duration-input"
+                  className="slide-modal__duration-input"
                   value={slideDuration || ''}
                   onChange={(e) => {
                     const value = e.target.value;
@@ -225,12 +225,12 @@ function EditModal({
                   min="0"
                   step="1"
                 />
-                <span className="duration-suffix">s</span>
+                <span className="slide-modal__duration-suffix">s</span>
               </div>
             </div>
-            <div className="show-bar-checkbox-container">
-              <div 
-                className={`show-bar-slider ${showBar ? 'active' : ''}`}
+            <div className="slide-modal__showbar-container">
+              <div
+                className={`slide-modal__showbar-slider ${showBar ? 'active' : ''}`}
                 onClick={() => onShowBarChange(!showBar)}
                 title={showBar ? 'Fullscreen mode' : 'Two-bar layout mode'}
               >
@@ -243,13 +243,13 @@ function EditModal({
                 </div>
               </div>
             </div>
-            <div className="slide-transition-container">
+            <div className="slide-modal__transition-container">
               <label htmlFor="slide-transition">
                 <Zap size={16} />
               </label>
               <select
                 id="slide-transition"
-                className="slide-transition-select"
+                className="slide-modal__transition-select"
                 value={slideTransition || 'fade'}
                 onChange={(e) => onTransitionChange(e.target.value)}
                 title="Select slide transition effect"
@@ -268,20 +268,20 @@ function EditModal({
             </div>
           </div>
 
-          <div className="modal-header-center">
+          <div className="slide-modal__header-center">
             <LayoutSelector
               currentLayout={slideLayout}
               onLayoutChange={onLayoutChange}
             />
           </div>
 
-          <div className="modal-header-actions">
+          <div className="slide-modal__header-actions">
             <button
               onClick={() => {
                 console.log('Delete button clicked');
                 onDelete();
               }}
-              className="btn btn-danger delete-slide-btn"
+              className="btn-icon btn-icon--danger"
               title="Delete slide"
             >
               <Trash2 size={16} />
@@ -295,7 +295,7 @@ function EditModal({
           </div>
         </div>
 
-        <div className="modal-body">{renderLayoutContent()}</div>
+        <div className="slide-modal__body">{renderLayoutContent()}</div>
         </div>
       </div>
     </div>

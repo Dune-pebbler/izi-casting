@@ -1,0 +1,725 @@
+// =============================================================================
+// SLIDE EDIT MODAL
+// =============================================================================
+
+.slide-modal {
+  // Modal Overlay
+  &__overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: #e3e5e6;
+    background: linear-gradient(
+      113deg,
+      rgba(227, 229, 230, 0.5) 5%,
+      rgba(240, 113, 103, 0.01) 100%
+    );
+    backdrop-filter: blur(8px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    padding: $spacing-md;
+  }
+
+  // Modal Content Container
+  &__content {
+    background-color: var(--surface);
+    width: 95%;
+    height: 95%;
+    max-width: 1400px;
+    max-height: 900px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: $shadow-lg;
+    border-radius: $corner-rounding;
+  }
+
+  // -----------------------------------------------------------------------------
+  // Modal Header
+  // -----------------------------------------------------------------------------
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: $spacing-md;
+    background-color: var(--surface);
+    min-height: 64px;
+
+    h2 {
+      margin: 0;
+      color: var(--foreground);
+      font-size: $font-size-lg;
+      font-weight: $font-weight-semibold;
+    }
+  }
+
+  &__header-left {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: $spacing-lg;
+    height: 100%;
+    padding: 2px;
+  }
+
+  &__header-center {
+    flex: 2;
+    display: flex;
+    justify-content: center;
+  }
+
+  &__header-actions {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+  }
+
+  // -----------------------------------------------------------------------------
+  // Header Controls
+  // -----------------------------------------------------------------------------
+
+  // Slide Name Input
+  &__name-input-container {
+    height: 100%;
+  }
+
+  &__name-input {
+    width: 260px;
+    padding: $spacing-sm $spacing-md;
+    border: none;
+    background-color: #f6f6f7;
+    border-radius: 10em;
+    font-size: $font-size-base;
+    font-weight: $font-weight-semibold;
+    color: var(--foreground);
+    transition: $transition-base;
+    height: 100%;
+
+    &:focus {
+      outline: none;
+      border-color: var(--ring);
+      box-shadow: 0 0 0 1px var(--ring);
+    }
+
+    &::placeholder {
+      color: var(--foreground-secondary);
+      font-weight: $font-weight-normal;
+    }
+  }
+
+  // Duration Input
+  &__duration-container {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    height: 100%;
+
+    label {
+      font-size: $font-size-base;
+      color: var(--foreground-secondary);
+      font-weight: $font-weight-medium;
+      white-space: nowrap;
+    }
+  }
+
+  &__duration-wrapper {
+    position: relative;
+    display: inline-block;
+    height: 100%;
+  }
+
+  &__duration-input {
+    width: 120px;
+    padding: $spacing-sm $spacing-md;
+    padding-right: 30px;
+    border: none;
+    background-color: #f6f6f7;
+    border-radius: 100px;
+    font-size: $font-size-base;
+    font-weight: $font-weight-semibold;
+    color: var(--foreground);
+    transition: $transition-base;
+    height: 100%;
+
+    &:focus {
+      outline: none;
+      border-color: var(--ring);
+      box-shadow: 0 0 0 1px var(--ring);
+    }
+  }
+
+  &__duration-suffix {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: $font-size-base;
+    font-weight: $font-weight-semibold;
+    color: var(--foreground-secondary);
+    pointer-events: none;
+  }
+
+  // Transition Select
+  &__transition-container {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    height: 100%;
+
+    label {
+      font-size: $font-size-base;
+      color: var(--foreground-secondary);
+      font-weight: $font-weight-medium;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: $spacing-xs;
+    }
+  }
+
+  &__transition-select {
+    width: 140px;
+    padding: $spacing-sm $spacing-md;
+    border: none;
+    background-color: #f6f6f7;
+    border-radius: 1em;
+    font-size: $font-size-base;
+    font-weight: $font-weight-semibold;
+    color: var(--foreground);
+    transition: $transition-base;
+    height: 100%;
+    cursor: pointer;
+
+    &:focus {
+      outline: none;
+      border-color: var(--ring);
+      box-shadow: 0 0 0 1px var(--ring);
+    }
+
+    &:hover {
+      background-color: #f0f0f1;
+    }
+  }
+
+  // Show Bar Toggle (Slider)
+  &__showbar-container {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    height: 100%;
+  }
+
+  &__showbar-slider {
+    position: relative;
+    width: 78px;
+    height: 36px;
+    background-color: var(--muted);
+    border-radius: 200px;
+    cursor: pointer;
+    transition: $transition-base;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    height: 100%;
+
+    &:hover {
+      background-color: var(--border);
+    }
+
+    .slider-track {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      overflow: hidden;
+    }
+
+    .slider-thumb {
+      position: absolute;
+      top: 3px;
+      left: 2px;
+      width: 34px;
+      height: 34px;
+      background-color: var(--primary);
+      transition: transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      z-index: 1;
+      border-radius: 200px;
+    }
+
+    .slider-icons {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 10px 0 10px;
+      padding-right: 13px;
+      z-index: 2;
+      pointer-events: none;
+
+      .icon-fullscreen,
+      .icon-layout {
+        color: var(--foreground-secondary);
+        transition: color 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      }
+
+      .icon-fullscreen {
+        color: var(--surface);
+      }
+    }
+
+    &.active {
+      .slider-thumb {
+        transform: translateX(36px);
+      }
+
+      .slider-icons {
+        .icon-fullscreen {
+          color: var(--foreground-secondary);
+        }
+
+        .icon-layout {
+          color: var(--surface);
+        }
+      }
+    }
+  }
+
+  // -----------------------------------------------------------------------------
+  // Layout Selector
+  // -----------------------------------------------------------------------------
+  &__layout-selector {
+    display: flex;
+    gap: $spacing-xs;
+    background-color: var(--muted);
+    border-radius: 200px;
+    padding: $spacing-xs;
+    border: 1px solid var(--border);
+  }
+
+  &__layout-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: $spacing-sm;
+    border: none;
+    background: none;
+    border-radius: 200px;
+    cursor: pointer;
+    transition: $transition-base;
+    width: 36px;
+    height: 36px;
+    color: var(--foreground-secondary);
+    position: relative;
+    border: 1px solid transparent;
+
+    &:hover {
+      background: white;
+    }
+
+    &.active {
+      background-color: var(--primary);
+      color: var(--surface);
+    }
+  }
+
+  // Close Button
+  &__close-btn {
+    background: none;
+    border: none;
+    font-size: 2rem;
+    cursor: pointer;
+    color: var(--foreground-secondary);
+    padding: 0;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: $border-radius-sm;
+    transition: $transition-base;
+
+    &:hover {
+      background-color: var(--muted);
+      color: var(--foreground);
+    }
+  }
+
+  // -----------------------------------------------------------------------------
+  // Modal Body
+  // -----------------------------------------------------------------------------
+  &__body {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+    position: relative;
+  }
+
+  &__body-left {
+    width: 50%;
+    height: 100%;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    transition: all 0.3s ease;
+
+    &.flipped {
+      order: 2;
+    }
+  }
+
+  &__body-right {
+    width: 50%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--surface);
+    transition: all 0.3s ease;
+
+    &.flipped {
+      order: 1;
+    }
+  }
+
+  // Flip Layout Button (between left/right panels)
+  &__flip-btn {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+    width: 52px;
+    height: 52px;
+    border-radius: 0.5em;
+    background-color: var(--primary);
+    border: 8px solid var(--surface);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background-color: var(--primary-active);
+      transform: translate(-50%, -50%) scale(1.1);
+    }
+
+    &:active {
+      transform: translate(-50%, -50%) scale(0.95);
+    }
+  }
+
+  // -----------------------------------------------------------------------------
+  // Modal Content Areas
+  // -----------------------------------------------------------------------------
+  &__full-image {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    background-color: var(--surface);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  &__text-only {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__text-over-image {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__image-background {
+    flex: 1;
+    position: relative;
+    background-color: var(--foreground);
+    overflow: hidden;
+  }
+
+  &__text-overlay {
+    height: 200px;
+    background-color: var(--surface);
+    border-top: 1px solid var(--border);
+    padding: $spacing-lg;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Text Input Sections
+// -----------------------------------------------------------------------------
+.text-input-section {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.text-input-section-full {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  // TinyMCE Editor Container
+  .tox-tinymce {
+    flex: 1 !important;
+    height: 100% !important;
+    width: 100% !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+
+  .tox .tox-toolbar {
+    background-color: var(--surface) !important;
+    border-bottom: 1px solid var(--border) !important;
+  }
+
+  .tox .tox-edit-area {
+    background-color: var(--surface) !important;
+    flex: 1 !important;
+  }
+
+  .tox .tox-edit-area__iframe {
+    background-color: var(--surface) !important;
+    height: 100% !important;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Image & Position Components
+// -----------------------------------------------------------------------------
+.modal-image-preview {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.modal-image-container {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  position: relative;
+}
+
+.modal-image-container-full {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.modal-image-container-overlay {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.modal-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.modal-image-full {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.modal-image-overlay {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.position-selector {
+  position: absolute;
+  top: $spacing-md;
+  left: $spacing-md;
+  z-index: 10;
+}
+
+.position-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2px;
+  width: 120px;
+}
+
+.position-btn {
+  width: 36px;
+  height: 36px;
+  border: none;
+  background-color: var(--surface);
+  color: var(--foreground-secondary);
+  border-radius: $border-radius-sm;
+  cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: $transition-base;
+  border: 1px solid var(--border);
+
+  &:hover {
+    background-color: var(--muted);
+    color: var(--foreground);
+  }
+
+  &.active {
+    background-color: var(--primary);
+    color: var(--surface);
+    border-color: var(--primary);
+  }
+}
+
+.remove-modal-image {
+  position: absolute;
+  top: $spacing-md;
+  right: $spacing-md;
+  background-color: var(--surface);
+  color: var(--foreground-secondary);
+  border: 1px solid var(--border);
+  border-radius: $border-radius-sm;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: $transition-base;
+  z-index: 20;
+
+  &:hover {
+    background-color: var(--destructive);
+    color: var(--surface);
+    border-color: var(--destructive);
+  }
+}
+
+// Image upload with library button
+.image-upload-container {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+  width: 100%;
+  height: 100%;
+}
+
+.image-upload-divider {
+  text-align: center;
+  color: var(--foreground-secondary);
+  font-size: $font-size-sm;
+  position: relative;
+  margin: $spacing-sm 0;
+
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 40%;
+    height: 1px;
+    background-color: var(--border);
+  }
+
+  &::before {
+    left: 0;
+  }
+
+  &::after {
+    right: 0;
+  }
+
+  span {
+    background-color: var(--surface);
+    padding: 0 $spacing-sm;
+    position: relative;
+  }
+}
+
+.image-library-button {
+  background-color: var(--surface);
+  border: 2px solid var(--border);
+
+  &:hover {
+    border-color: var(--primary);
+    background-color: var(--muted);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.image-upload-input {
+  display: none;
+}
+
+// Textarea
+.modal-textarea {
+  width: 100%;
+  height: 100%;
+  min-height: 200px;
+  padding: $spacing-md;
+  font-size: $font-size-base;
+  border: 1px solid var(--border);
+  border-radius: $border-radius-sm;
+  resize: none;
+  font-family: inherit;
+  flex: 1;
+  background-color: var(--surface);
+  color: var(--foreground);
+
+  &:focus {
+    outline: none;
+    border-color: var(--ring);
+    box-shadow: 0 0 0 1px var(--ring);
+  }
+}
+
+.modal-textarea-overlay {
+  width: 100%;
+  height: 100%;
+  min-height: 120px;
+  padding: $spacing-md;
+  font-size: $font-size-base;
+  border: 1px solid var(--border);
+  border-radius: $border-radius-sm;
+  resize: none;
+  font-family: inherit;
+  background-color: var(--surface);
+  color: var(--foreground);
+
+  &:focus {
+    outline: none;
+    border-color: var(--ring);
+    box-shadow: 0 0 0 1px var(--ring);
+  }
+}
