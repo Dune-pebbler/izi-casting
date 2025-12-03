@@ -12,7 +12,14 @@
       "Bash(npm install:*)",
       "Bash(node test-rss-feeds.js:*)",
       "Bash(timeout 60 node test-rss-feeds.js)",
-      "Bash(open:*)"
+      "Bash(open:*)",
+      "Bash(npm run build:*)",
+      "Bash(chmod:*)",
+      "Bash(./migrate-variables.sh:*)",
+      "Bash(./fix-scss-functions.sh)",
+      "Bash(cd:*)",
+      "Bash(./remove-legacy-variables.sh)",
+      "Bash(./fix-remaining-variables.sh)"
     ],
     "deny": [],
     "ask": []

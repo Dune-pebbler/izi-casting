@@ -5,8 +5,8 @@
   width: calc(100% - $spacing-md * 2);
   bottom: 0;
   height: 20vh;
-  background-color: $gray-900;
-  border-top: 1px solid $gray-700;
+  background-color: var(--foreground);
+  border-top: 1px solid var(--foreground);
   display: flex;
   align-items: center;
   justify-content: space-between;

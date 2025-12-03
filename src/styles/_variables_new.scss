@@ -8,37 +8,43 @@
 // These are the base colors - modify these to change your theme
 // ----------------------------------------------------------------------------
 
+
+//backups
+$_primary_old: #f07167;
+$_primary-dark_old: #e05a50;
+
 // Brand Colors
-$_primary: #f07167;
+$_primary: #46BCCA;
+$_primary-dark: #3fa9b4;
 $_primary-dark: #e05a50;
 $_secondary: #5c6ac4;
-$_accent: $_secondary; // Can be customized for a third accent color
+$_accent: $_secondary; 
 
 // Backgrounds & Surfaces
-$_background: #f6f6f7; // Page background
-$_surface: #ffffff; // Cards, panels, elevated content
-$_elevated: #ffffff; // Modals, popovers (can be brighter/darker than surface)
+$_background: #f6f6f7; 
+$_surface: #ffffff;
+$_elevated: #ffffff; 
 
 // Text Colors
-$_foreground: #000000; // Primary text
-$_foreground-secondary: #323232; // Secondary text
-$_foreground-muted: #6d7175; // Tertiary/muted text
+$_foreground: #000000; 
+$_foreground-secondary: #323232; 
+$_foreground-muted: #6d7175; 
 
 // UI Elements
-$_border: #e1e3e5; // Default borders
-$_input: $_surface; // Input backgrounds
-$_muted: #f6f6f7; // Muted backgrounds (disabled, inactive areas)
-$_muted-foreground: #6d7175; // Text on muted backgrounds
+$_border: #e1e3e5; 
+$_input: $_surface; 
+$_muted: #f6f6f7; 
+$_muted-foreground: #6d7175;
 
 // Semantic Colors
 $_success: #50b83c;
 $_warning: #ffea8a;
-$_warning-foreground: #323232; // Dark text on warning yellow
-$_destructive: #d82c0d; // Errors, delete actions
-$_info: $_primary; // Info messages
+$_warning-foreground: #323232; 
+$_destructive: #d82c0d; 
+$_info: $_primary; 
 
 // Special States
-$_inactive: #c9cccf; // Disabled/inactive elements
+$_inactive: #c9cccf;
 
 // ----------------------------------------------------------------------------
 // CSS CUSTOM PROPERTIES
@@ -77,7 +83,7 @@ $_inactive: #c9cccf; // Disabled/inactive elements
   --input: #{$_input};
   --input-border: #{$_border};
   --input-hover: #{darken($_input, 2%)};
-  --ring: #{rgba($_primary, 0.3)}; // Focus ring color
+  --ring: #{rgba($_primary, 0.3)};
 
   --muted: #{$_muted};
   --muted-foreground: #{$_muted-foreground};
@@ -111,51 +117,34 @@ $_inactive: #c9cccf; // Disabled/inactive elements
 }
 
 // ----------------------------------------------------------------------------
-// DARK MODE EXAMPLE (Optional - uncomment to enable)
+// DARK MODE
 // ----------------------------------------------------------------------------
-// @media (prefers-color-scheme: dark) {
-//   :root {
-//     --background: #0a0a0a;
-//     --surface: #1a1a1a;
-//     --elevated: #2a2a2a;
-//     --foreground: #fafafa;
-//     --foreground-secondary: #e1e3e5;
-//     --foreground-muted: #8c9196;
-//     --border: #2c2f32;
-//     --muted: #1a1a1a;
-//     --muted-foreground: #8c9196;
-//   }
-// }
+[data-theme="dark"] {
+  // Backgrounds & Surfaces
+  --background: #0a0a0a;
+  --surface: #1a1a1a;
+  --elevated: #2a2a2a;
 
-// ----------------------------------------------------------------------------
-// LEGACY SUPPORT (For gradual migration)
-// Map old variable names to new CSS custom properties
-// ----------------------------------------------------------------------------
+  // Text
+  --foreground: #fafafa;
+  --foreground-secondary: #e1e3e5;
+  --foreground-muted: #8c9196;
 
-// Direct mappings
-$primary: var(--primary);
-$primary-dark: var(--primary-hover);
-$secondary: var(--secondary);
-$background: var(--background);
-$surface: var(--surface);
-$text-primary: var(--foreground);
-$text-secondary: var(--foreground-secondary);
-$text-tertiary: var(--foreground-muted);
+  // UI Elements
+  --border: #2c2f32;
+  --border-hover: #404449;
+  --input: #1a1a1a;
+  --input-border: #2c2f32;
+  --input-hover: #202020;
+  --ring: #{rgba($_primary, 0.4)};
 
-$success: var(--success);
-$warning: var(--warning);
-$error: var(--destructive);
-$inactive: var(--inactive);
+  --muted: #1a1a1a;
+  --muted-foreground: #8c9196;
+  --muted-hover: #252525;
 
-// Aliases for common patterns
-$border-color: var(--border);
-$border-color-focus: var(--ring);
-
-// Sidebar (can be customized or use defaults)
-$sidebar-bg: var(--surface);
-$sidebar-text: var(--foreground);
-$sidebar-border: var(--border);
-$sidebar-hover: var(--muted-hover);
+  // Brand colors stay the same (they work on dark backgrounds)
+  // --primary, --secondary, --success, --warning, --destructive remain unchanged
+}
 
 // ----------------------------------------------------------------------------
 // DESIGN TOKENS

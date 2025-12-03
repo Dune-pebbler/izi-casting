@@ -3,13 +3,13 @@
   display: flex;
   flex-direction: column;
   height: 100vh;
-  background-color: $black;
-  color: $white;
+  background-color: var(--foreground);
+  color: var(--surface);
   position: relative;
 
   &.pairing-screen {
-    background-color: #f9fafc;
-    color: $black;
+    background-color: var(--background);
+    color: var(--foreground);
     align-items: center;
     justify-content: center;
     padding: $spacing-lg;

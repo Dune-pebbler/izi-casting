@@ -33,20 +33,21 @@
 .admin-layout-btn {
   width: 40px;
   height: 40px;
-  background-color: white;
-  border: 1px solid $gray-200;
+  background-color: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 1em;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: all 0.2s ease;
-  color: black;
-  margin-left: auto;
+  color: var(--foreground);
   margin-right: $spacing-sm;
-
+  &:first-of-type{
+    margin-left: auto;
+  }
   &:hover {
-    background-color: $gray-100;
+    background-color: var(--muted-hover);
     transform: scale(1.05);
   }
 }
@@ -54,18 +55,18 @@
 .admin-settings-btn {
   width: 40px;
   height: 40px;
-  background-color: white;
-  border: 1px solid $gray-200;
+  background-color: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 1em;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: all 0.2s ease;
-  color: black;
+  color: var(--foreground);
 
   &:hover {
-    background-color: $gray-100;
+    background-color: var(--muted-hover);
     transform: scale(1.05);
   }
 }
@@ -87,13 +88,13 @@
     align-items: center;
     gap: $spacing-xs;
     font-size: $font-size-lg;
-    color: $primary;
+    color: var(--primary);
   }
 }
 
 .admin-header {
   margin: 0;
-  color: $text-primary;
+  color: var(--foreground);
   font-size: $font-size-lg;
 }
 
@@ -113,7 +114,7 @@
 }
 
 .delete-modal {
-  background-color: $surface;
+  background-color: var(--surface);
   border-radius: $border-radius-lg;
   padding: $spacing-xl;
   max-width: 400px;
@@ -123,16 +124,16 @@
 
   p {
     margin: 0 0 $spacing-sm 0;
-    color: $text-secondary;
+    color: var(--foreground-secondary);
     line-height: 1.5;
 
     strong {
-      color: $text-primary;
+      color: var(--foreground);
     }
   }
 
   .delete-warning {
-    color: $error;
+    color: var(--destructive);
     font-size: $font-size-sm;
     margin-bottom: $spacing-lg;
   }
@@ -150,11 +151,11 @@
       border: none;
 
       &.btn-secondary {
-        background-color: $gray-100;
-        color: $text-primary;
+        background-color: var(--muted);
+        color: var(--foreground);
 
         &:hover {
-          background-color: $gray-200;
+          background-color: var(--muted-hover);
         }
       }
 
@@ -169,16 +170,16 @@
         align-items: center;
         justify-content: center;
         min-width: 36px;
-        color: $text-secondary;
+        color: var(--foreground-secondary);
 
         &:hover {
-          background-color: rgba($danger, 0.1);
-          color: $danger;
+          background-color: var(--destructive-light);
+          color: var(--destructive);
         }
 
         &:active {
-          background-color: rgba($danger, 0.15);
-          color: $danger;
+          background-color: var(--destructive-light);
+          color: var(--destructive);
         }
       }
     }

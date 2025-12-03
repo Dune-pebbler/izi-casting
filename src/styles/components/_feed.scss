@@ -18,7 +18,7 @@
 .rss-feed-name {
   font-size: 1.2rem;
   font-weight: $font-weight-semibold;
-  color: rgba($text-primary, 0.7);
+  color: rgba(var(--foreground), 0.7);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin-bottom: $spacing-xs;

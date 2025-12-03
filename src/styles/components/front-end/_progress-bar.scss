@@ -14,7 +14,7 @@
 
 .display-progress-fill {
   height: 100%;
-  background-color: $primary-color;
+  background-color: var(--primary);
   transition: width 0.25s ease-out;
   border-radius: 0 2px 2px 0;
 }

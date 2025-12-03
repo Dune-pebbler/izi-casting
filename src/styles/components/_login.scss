@@ -55,14 +55,14 @@
   font-size: 2.5rem;
   font-weight: $font-weight-bold;
   margin-bottom: $spacing-md;
-  color: $black;
+  color: var(--foreground);
   letter-spacing: -0.5px;
 }
 
 .login-instructions {
   font-size: 1.1rem;
   line-height: 1.6;
-  color: $gray-600;
+  color: var(--foreground-secondary);
   margin-bottom: $spacing-xl;
   text-align: center;
 }
@@ -114,12 +114,12 @@
 }
 
 .login-debug-info {
-  background-color: $gray-100;
+  background-color: var(--muted);
   padding: $spacing-md;
   border-radius: $border-radius-sm;
   margin-bottom: $spacing-lg;
   font-size: $font-size-sm;
-  color: $text-secondary;
+  color: var(--foreground-secondary);
 }
 
 .login-divider {
@@ -128,15 +128,15 @@
   position: relative;
 
   span {
-    background-color: $surface;
+    background-color: var(--surface);
     padding: 0 $spacing-md;
-    color: $text-secondary;
+    color: var(--foreground-secondary);
     font-size: $font-size-sm;
   }
 
   hr {
     border: none;
-    border-top: 1px solid $gray-300;
+    border-top: 1px solid var(--border);
     margin: 0;
     position: absolute;
     top: 50%;
@@ -147,13 +147,13 @@
 }
 
 .login-error {
-  color: $error;
+  color: var(--destructive);
   font-size: 0.9rem;
   text-align: center;
   margin-top: $spacing-md;
   padding: $spacing-sm $spacing-md;
-  background-color: rgba($error, 0.1);
-  border: 1px solid rgba($error, 0.2);
+  background-color: var(--destructive-light);
+  border: 1px solid var(--destructive);
   border-radius: $border-radius-md;
   font-weight: $font-weight-medium;
 }
@@ -163,7 +163,7 @@
   text-align: center;
 
   a {
-    color: $primary;
+    color: var(--primary);
     text-decoration: none;
     font-size: $font-size-lg;
     font-weight: $font-weight-medium;
@@ -174,7 +174,7 @@
     transition: all 0.2s ease;
 
     &:hover {
-      color: darken($primary, 10%);
+      color: var(--primary-active);
       transform: translateX(-2px);
     }
   }

@@ -20,7 +20,7 @@
 body {
   margin: 0;
   padding: 0;
-  background: $background;
+  background: var(--background);
   position: relative;
   
   &::before {
@@ -55,7 +55,7 @@ h6 {
   margin: 0 0 $spacing-md 0;
   font-family: $font-family-heading;
   line-height: 1.2;
-  color: $text-primary;
+  color: var(--foreground);
   font-weight: unset;
 }
 
@@ -73,17 +73,17 @@ h3 {
 
 p {
   margin: 0 0 $spacing-md 0;
-  color: $text-primary;
+  color: var(--foreground);
 }
 
 // Links
 a {
-  color: $primary;
+  color: var(--primary);
   text-decoration: none;
   transition: $transition-base;
 
   &:hover {
-    color: darken($primary, 10%);
+    color: var(--primary-active);
   }
 }
 
@@ -94,5 +94,5 @@ a {
   align-items: center;
   height: 100vh;
   font-size: $font-size-lg;
-  color: $text-secondary;
+  color: var(--foreground-secondary);
 }

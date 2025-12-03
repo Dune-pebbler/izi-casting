@@ -1,7 +1,7 @@
 .sidebar {
   // Base styles for the sidebar container
   width: $sidebar-width;
-  color: $text-primary;
+  color: var(--foreground);
   padding: $spacing-lg;
   display: flex;
   flex-direction: column;
@@ -11,7 +11,7 @@
   right: 0;
   max-height: 100vh;
   gap: $spacing-md;
-  background: rgb(255, 255, 255);
+  background: var(--surface);
   font-family: $font-family-base;
   transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.7);
   z-index: 1000;
@@ -26,11 +26,11 @@
   }
 
   &::-webkit-scrollbar-thumb {
-    background-color: $gray-300;
+    background-color: var(--border);
     border-radius: 3px;
 
     &:hover {
-      background-color: $gray-400;
+      background-color: var(--muted-foreground);
     }
   }
 
@@ -41,8 +41,8 @@
     left: 24px;
     width: 40px;
     height: 40px;
-    background-color: white;
-    border: 1px solid $gray-200;
+    background-color: var(--surface);
+    border: 1px solid var(--border);
 
     border-radius: 1em;
     display: flex;
@@ -51,10 +51,10 @@
     cursor: pointer;
     z-index: 1001;
     transition: all 0.2s ease;
-    color: black;
+    color: var(--foreground);
 
     &:hover {
-      background-color: $gray-100;
+      background-color: var(--muted);
       transform: scale(1.05);
     }
   }
@@ -118,7 +118,7 @@
   }
 
   .delete-modal {
-    background-color: $surface;
+    background-color: var(--surface);
     border-radius: $border-radius-lg;
     padding: $spacing-xl;
     max-width: 400px;
@@ -127,23 +127,23 @@
 
     h3 {
       margin: 0 0 $spacing-md 0;
-      color: $text-primary;
+      color: var(--foreground);
       font-size: 1.125rem;
       font-weight: $font-weight-semibold;
     }
 
     p {
       margin: 0 0 $spacing-sm 0;
-      color: $text-secondary;
+      color: var(--foreground-secondary);
       line-height: 1.5;
 
       strong {
-        color: $text-primary;
+        color: var(--foreground);
       }
     }
 
     .delete-warning {
-      color: $error;
+      color: var(--destructive);
       font-size: 0.875rem;
       font-weight: $font-weight-medium;
       margin-bottom: $spacing-lg;
@@ -163,11 +163,11 @@
         border: none;
 
         &.btn-secondary {
-          background-color: $gray-100;
-          color: $text-primary;
+          background-color: var(--muted);
+          color: var(--foreground);
 
           &:hover {
-            background-color: $gray-200;
+            background-color: var(--border);
           }
         }
 
@@ -182,16 +182,16 @@
           align-items: center;
           justify-content: center;
           min-width: 36px;
-          color: $text-secondary;
+          color: var(--foreground-secondary);
 
           &:hover {
-            background-color: rgba($danger, 0.1);
-            color: $danger;
+            background-color: var(--destructive-light);
+            color: var(--destructive);
           }
 
           &:active {
-            background-color: rgba($danger, 0.15);
-            color: $danger;
+            background-color: var(--destructive-light);
+            color: var(--destructive);
           }
         }
       }

@@ -5,8 +5,8 @@
   margin-bottom: $spacing-md;
   transition: $transition-base;
   border-radius: $corner-rounding;
-  background-color: $surface;
-  border: 1px solid $gray-200;
+  background-color: var(--surface);
+  border: 1px solid var(--border);
 }
 // Admin content wrapper styles are handled by the component
 
@@ -31,7 +31,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: $gray-400;
+  color: var(--muted-foreground);
   flex-shrink: 0;
   cursor: grab;
   user-select: none;
@@ -40,14 +40,14 @@
   transition: $transition-base;
 
   &:hover {
-    color: $gray-600;
-    background-color: $gray-100;
+    color: var(--foreground-secondary);
+    background-color: var(--muted);
   }
 
   &:active {
     cursor: grabbing;
-    color: $primary;
-    background-color: rgba($primary, 0.1);
+    color: var(--primary);
+    background-color: rgba(var(--primary), 0.1);
   }
 }
 
@@ -57,7 +57,7 @@
   justify-content: center;
   width: 20px;
   height: 20px;
-  color: $gray-500;
+  color: var(--muted) 0;
   transition: $transition-base;
   margin-left: $spacing-sm;
   pointer-events: none;
@@ -72,7 +72,7 @@
 }
 
 .playlist-title {
-  color: $text-primary;
+  color: var(--foreground);
   font-size: $font-size-base;
   margin: 0;
   cursor: pointer;
@@ -81,7 +81,7 @@
   transition: $transition-base;
 
   &:hover {
-    background-color: $gray-100;
+    background-color: var(--muted);
   }
 }
 
@@ -89,22 +89,22 @@
   width: 100%;
   max-width: 300px;
   padding: $spacing-xs $spacing-sm;
-  border: 1px solid $border-color;
+  border: 1px solid var(--border);
   border-radius: $border-radius-sm;
   font-size: $font-size-base;
   font-weight: $font-weight-semibold;
-  color: $text-primary;
-  background-color: $surface;
+  color: var(--foreground);
+  background-color: var(--surface);
   transition: $transition-base;
 
   &:focus {
     outline: none;
-    border-color: $border-color-focus;
-    box-shadow: 0 0 0 1px $border-color-focus;
+    border-color: var(--ring);
+    box-shadow: 0 0 0 1px var(--ring);
   }
 
   &::placeholder {
-    color: $gray-400;
+    color: var(--muted-foreground);
     font-weight: $font-weight-normal;
   }
 }
@@ -130,7 +130,7 @@
 
   .duration-label {
     font-size: $font-size-sm;
-    color: $text-secondary;
+    color: var(--foreground-secondary);
     font-weight: $font-weight-medium;
   }
 
@@ -139,7 +139,7 @@
     align-items: center;
     gap: $spacing-xs;
     font-size: $font-size-base;
-    color: $primary;
+    color: var(--primary);
     font-weight: $font-weight-medium;
   }
 }
@@ -154,7 +154,7 @@
     align-items: center;
     gap: $spacing-xs;
     font-size: $font-size-base;
-    color: $primary;
+    color: var(--primary);
     font-weight: $font-weight-medium;
   }
 }
@@ -166,40 +166,40 @@
 
   .repeat-label {
     font-size: $font-size-sm;
-    color: $text-secondary;
+    color: var(--foreground-secondary);
     font-weight: $font-weight-medium;
   }
 
   .repeat-count-display {
     font-size: $font-size-base;
-    color: $text-primary;
+    color: var(--foreground);
     font-weight: $font-weight-medium;
-    background-color: $gray-100;
+    background-color: var(--muted);
     padding: 2px 6px;
     border-radius: $border-radius-sm;
     cursor: pointer;
     transition: $transition-base;
 
     &:hover {
-      background-color: $gray-200;
+      background-color: var(--border);
     }
   }
 
   .repeat-count-input {
     width: 50px;
     font-size: $font-size-sm;
-    color: $text-primary;
+    color: var(--foreground);
     font-weight: $font-weight-medium;
-    background-color: $surface;
+    background-color: var(--surface);
     padding: 2px 6px;
-    border: 1px solid $border-color;
+    border: 1px solid var(--border);
     border-radius: $border-radius-sm;
     text-align: center;
 
     &:focus {
       outline: none;
-      border-color: $border-color-focus;
-      box-shadow: 0 0 0 1px $border-color-focus;
+      border-color: var(--ring);
+      box-shadow: 0 0 0 1px var(--ring);
     }
   }
 }
@@ -217,11 +217,11 @@
   min-width: 36px;
   min-height: 36px;
   position: relative;
-  color: black;
+  color: var(--foreground);
 
   &:hover {
-    background-color: $gray-100;
-    color: black;
+    background-color: var(--muted);
+    color: var(--foreground);
     transform: translateY(-1px);
   }
 
@@ -243,11 +243,11 @@
   min-width: 36px;
   min-height: 36px;
   position: relative;
-  color: black;
+  color: var(--foreground-secondary);
 
   &:hover {
-    background-color: rgba($danger, 0.1);
-    color: $danger;
+    background-color: var(--destructive-light);
+    color: var(--destructive);
     transform: translateY(-1px);
   }
 
@@ -269,11 +269,11 @@
   min-width: 36px;
   min-height: 36px;
   position: relative;
-  color: black;
+  color: var(--foreground-secondary);
 
   &:hover {
-    background-color: rgba($primary, 0.08);
-    color: $primary;
+    background-color: rgba(var(--primary), 0.08);
+    color: var(--primary);
     transform: translateY(-1px);
   }
 
@@ -282,21 +282,21 @@
   }
 
   &.enabled {
-    color: $success;
-    background-color: rgba($success, 0.1);
+    color: var(--success);
+    background-color: rgba(var(--success), 0.1);
 
     &:hover {
-      background-color: rgba($success, 0.15);
-      color: darken($success, 10%);
+      background-color: rgba(var(--success), 0.15);
+      color: var(--success-hover);
     }
   }
 
   &.disabled {
-    color: $text-secondary;
+    color: var(--foreground-secondary);
 
     &:hover {
-      background-color: rgba($text-secondary, 0.1);
-      color: $text-primary;
+      background-color: rgba(var(--foreground-secondary), 0.1);
+      color: var(--foreground);
     }
   }
 }
@@ -325,7 +325,7 @@
   z-index: 1000;
   transform: rotate(1deg);
   box-shadow: $shadow-lg;
-  border-color: $primary;
+  border-color: var(--primary);
 }
 
 /* Add Playlist Button Styles */
@@ -333,13 +333,13 @@
   border-radius: $corner-rounding;
   margin-bottom: $spacing-md;
   background-color: transparent !important;
-  border: 2px dashed #c8c8c8;
+  border: 2px dashed var(--border);
   position: relative;
   cursor: pointer;
   transition: $transition-base;
   &:hover {
-    border-color: $primary;
-    background-color: rgba($primary, 0.05);
+    border-color: var(--primary);
+    background-color: rgba(var(--primary), 0.05);
   }
 
   &:active {
@@ -351,25 +351,23 @@
     align-items: center;
     justify-content: center;
     padding: $spacing-sm;
-    color: #f07167;
     background-color: transparent !important;
     transition: $transition-base;
     gap: $spacing-xs;
+    color: var(--foreground);
+    &:hover {
+      color: var(--primary);
 
+      svg {
+        transform: scale(1.1);
+      }
+    }
     svg {
       transition: $transition-base;
     }
-
     span {
       font-size: $font-size-base;
     }
   }
-
-  &:hover .add-playlist-content {
-    color: $primary;
-
-    svg {
-      transform: scale(1.1);
-    }
-  }
+  
 }

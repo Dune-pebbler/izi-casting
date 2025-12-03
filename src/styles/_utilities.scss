@@ -12,20 +12,20 @@
 }
 
 // Color utilities
-.text-primary { color: $text-primary; }
-.text-secondary { color: $text-secondary; }
-.text-success { color: $success; }
-.text-warning { color: $warning; }
-.text-error { color: $error; }
-.text-inactive { color: $inactive; }
+.text-primary { color: var(--foreground); }
+.text-secondary { color: var(--foreground-secondary); }
+.text-success { color: var(--success); }
+.text-warning { color: var(--warning-foreground); }
+.text-error { color: var(--destructive); }
+.text-inactive { color: var(--inactive); }
 
-.bg-primary { background-color: $primary; }
-.bg-secondary { background-color: $secondary; }
-.bg-surface { background-color: $surface; }
-.bg-background { background-color: $background; }
-.bg-success { background-color: $success; }
-.bg-warning { background-color: $warning; }
-.bg-error { background-color: $error; }
+.bg-primary { background-color: var(--primary); }
+.bg-secondary { background-color: var(--secondary); }
+.bg-surface { background-color: var(--surface); }
+.bg-background { background-color: var(--background); }
+.bg-success { background-color: var(--success); }
+.bg-warning { background-color: var(--warning); }
+.bg-error { background-color: var(--destructive); }
 
 // Spacing utilities
 .mb-0 { margin-bottom: 0; }
@@ -136,23 +136,23 @@
 
 // Border utilities - Shopify style
 .border {
-  border: 1px solid $border-color;
+  border: 1px solid var(--border);
 }
 
 .border-top {
-  border-top: 1px solid $border-color;
+  border-top: 1px solid var(--border);
 }
 
 .border-bottom {
-  border-bottom: 1px solid $border-color;
+  border-bottom: 1px solid var(--border);
 }
 
 .border-left {
-  border-left: 1px solid $border-color;
+  border-left: 1px solid var(--border);
 }
 
 .border-right {
-  border-right: 1px solid $border-color;
+  border-right: 1px solid var(--border);
 }
 
 // Border radius utilities

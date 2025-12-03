@@ -17,7 +17,7 @@
   }
 
   .modal-content {
-    background-color: $surface;
+    background-color: var(--surface);
     border-radius: $border-radius-lg;
     box-shadow: $shadow-lg;
     width: 100%;
@@ -34,14 +34,14 @@
     align-items: center;
     justify-content: space-between;
     padding: $spacing-lg;
-    border-bottom: 1px solid $border-color;
-    background-color: $surface;
+    border-bottom: 1px solid var(--border);
+    background-color: var(--surface);
 
     h2, h3 {
       margin: 0;
       font-size: $font-size-lg;
       font-weight: $font-weight-semibold;
-      color: $text-primary;
+      color: var(--foreground);
       font-family: $font-family-heading;
     }
 
@@ -54,18 +54,18 @@
       border: none;
       background: none;
       border-radius: $border-radius-md;
-      color: $text-secondary;
+      color: var(--foreground-secondary);
       cursor: pointer;
       transition: $transition-base;
 
       &:hover {
-        background-color: $gray-50;
-        color: $text-primary;
+        background-color: var(--muted);
+        color: var(--foreground);
       }
 
       &:focus {
         outline: none;
-        box-shadow: 0 0 0 2px $border-color-focus;
+        box-shadow: 0 0 0 2px var(--ring);
       }
     }
   }
@@ -81,8 +81,8 @@
     display: flex;
     gap: $spacing-md;
     padding: $spacing-lg;
-    border-top: 1px solid $border-color;
-    background-color: $gray-50;
+    border-top: 1px solid var(--border);
+    background-color: var(--muted);
     justify-content: flex-end;
   }
 }
@@ -111,7 +111,7 @@
       display: block;
       margin-bottom: $spacing-sm;
       font-weight: $font-weight-medium;
-      color: $text-primary;
+      color: var(--foreground);
       font-size: $font-size-base;
     }
 
@@ -120,22 +120,22 @@
       padding: $spacing-sm $spacing-md;
       font-size: $font-size-base;
       font-weight: $font-weight-normal;
-      color: $text-primary;
-      border: 1px solid $border-color;
+      color: var(--foreground);
+      border: 1px solid var(--border);
       border-radius: $border-radius-md;
-      background-color: $surface;
+      background-color: var(--surface);
       font-family: inherit;
       transition: $transition-base;
       min-height: 36px;
 
       &:focus {
         outline: none;
-        border-color: $border-color-focus;
-        box-shadow: 0 0 0 1px $border-color-focus;
+        border-color: var(--ring);
+        box-shadow: 0 0 0 1px var(--ring);
       }
 
       &::placeholder {
-        color: $text-secondary;
+        color: var(--foreground-secondary);
       }
     }
 
@@ -143,7 +143,7 @@
       display: block;
       margin-top: $spacing-xs;
       font-size: $font-size-sm;
-      color: $text-secondary;
+      color: var(--foreground-secondary);
       line-height: 1.4;
     }
   }
@@ -156,10 +156,10 @@
 
     .popular-feed-btn {
       padding: $spacing-sm $spacing-md;
-      border: 1px solid $border-color;
+      border: 1px solid var(--border);
       border-radius: $border-radius-md;
-      background-color: $surface;
-      color: $text-primary;
+      background-color: var(--surface);
+      color: var(--foreground);
       font-size: $font-size-sm;
       font-weight: $font-weight-normal;
       cursor: pointer;
@@ -167,15 +167,15 @@
       text-align: center;
 
       &:hover {
-        border-color: $primary;
-        color: $primary;
-        background-color: rgba($primary, 0.05);
+        border-color: var(--primary);
+        color: var(--primary);
+        background-color: rgba(var(--primary), 0.05);
       }
 
       &:focus {
         outline: none;
-        border-color: $border-color-focus;
-        box-shadow: 0 0 0 1px $border-color-focus;
+        border-color: var(--ring);
+        box-shadow: 0 0 0 1px var(--ring);
       }
     }
   }
@@ -187,22 +187,22 @@
       gap: $spacing-sm;
       cursor: pointer;
       font-size: $font-size-base;
-      color: $text-primary;
+      color: var(--foreground);
 
       input[type="checkbox"] {
         width: 16px;
         height: 16px;
-        border: 1px solid $border-color;
+        border: 1px solid var(--border);
         border-radius: $border-radius-sm;
-        background-color: $surface;
+        background-color: var(--surface);
         cursor: pointer;
         transition: $transition-base;
         appearance: none;
         position: relative;
 
         &:checked {
-          background-color: $primary;
-          border-color: $primary;
+          background-color: var(--primary);
+          border-color: var(--primary);
           background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='m12.207 4.793-1.414-1.414L6.5 7.086 5.207 5.793l-1.414 1.414L6.5 9.914z'/%3e%3c/svg%3e");
           background-size: 12px 12px;
           background-position: center;
@@ -211,12 +211,12 @@
 
         &:focus {
           outline: none;
-          border-color: $border-color-focus;
-          box-shadow: 0 0 0 1px $border-color-focus;
+          border-color: var(--ring);
+          box-shadow: 0 0 0 1px var(--ring);
         }
 
         &:hover:not(:checked) {
-          border-color: $gray-400;
+          border-color: var(--muted-foreground);
         }
       }
 
@@ -235,12 +235,12 @@
 
   .modal-description {
     margin: 0 0 $spacing-lg 0;
-    color: $text-secondary;
+    color: var(--foreground-secondary);
     font-size: $font-size-base;
     line-height: 1.5;
 
     strong {
-      color: $text-primary;
+      color: var(--foreground);
       font-weight: $font-weight-semibold;
     }
   }
@@ -252,7 +252,7 @@
       display: block;
       margin-bottom: $spacing-sm;
       font-weight: $font-weight-medium;
-      color: $text-primary;
+      color: var(--foreground);
       font-size: $font-size-base;
     }
 
@@ -261,10 +261,10 @@
       padding: $spacing-sm $spacing-md;
       font-size: $font-size-base;
       font-weight: $font-weight-normal;
-      color: $text-primary;
-      border: 1px solid $border-color;
+      color: var(--foreground);
+      border: 1px solid var(--border);
       border-radius: $border-radius-md;
-      background-color: $surface;
+      background-color: var(--surface);
       font-family: inherit;
       transition: $transition-base;
       min-height: 36px;
@@ -277,8 +277,8 @@
 
       &:focus {
         outline: none;
-        border-color: $border-color-focus;
-        box-shadow: 0 0 0 1px $border-color-focus;
+        border-color: var(--ring);
+        box-shadow: 0 0 0 1px var(--ring);
         background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23f07167' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
       }
     }
@@ -293,25 +293,25 @@
 
   .modal-description {
     margin: 0 0 $spacing-lg 0;
-    color: $text-secondary;
+    color: var(--foreground-secondary);
     font-size: $font-size-base;
     line-height: 1.5;
 
     strong {
-      color: $text-primary;
+      color: var(--foreground);
       font-weight: $font-weight-semibold;
     }
   }
 
   .delete-warning {
     margin: 0;
-    color: $error;
+    color: var(--destructive);
     font-size: $font-size-sm;
     font-weight: $font-weight-medium;
-    background-color: rgba($error, 0.1);
+    background-color: var(--destructive-light);
     padding: $spacing-sm $spacing-md;
     border-radius: $border-radius-md;
-    border-left: 3px solid $error;
+    border-left: 3px solid var(--destructive);
   }
 }
 

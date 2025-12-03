@@ -7,12 +7,12 @@
     margin: 0;
     font-size: 1.25rem;
     font-weight: $font-weight-semibold;
-    color: $text-primary;
+    color: var(--foreground);
   }
 
   .devices-content {
     font-size: 0.875rem;
-    color: $text-secondary;
+    color: var(--foreground-secondary);
 
     // Pairing Section
     .pairing-section {
@@ -42,7 +42,7 @@
             right: -22px;
             background: none;
             border: none;
-            color: $text-secondary;
+            color: var(--foreground-secondary);
             cursor: pointer;
             padding: 4px;
             border-radius: $border-radius-sm;
@@ -52,8 +52,8 @@
             transition: $transition-base;
 
             &:hover {
-              background-color: $gray-200;
-              color: $text-primary;
+              background-color: var(--border);
+              color: var(--foreground);
             }
           }
         }
@@ -61,7 +61,7 @@
         .pairing-form-content {
           .pairing-instructions {
             font-size: 0.875rem;
-            color: $text-secondary;
+            color: var(--foreground-secondary);
             margin-bottom: $spacing-md;
             text-align: center;
           }
@@ -80,17 +80,17 @@
               font-weight: $font-weight-bold;
               border: 2px solid transparent;
               border-radius: $border-radius-xxl;
-              color: $text-primary;
+              color: var(--foreground);
               transition: $transition-base;
-              background-color: $background;
+              background-color: var(--background);
               &:focus {
                 outline: none;
-                border-color: $primary;
-                box-shadow: 0 0 0 2px rgba($primary, 0.2);
+                border-color: var(--primary);
+                box-shadow: 0 0 0 2px rgba(var(--primary), 0.2);
               }
 
               &:hover {
-                border-color: $gray-400;
+                border-color: var(--muted-foreground);
               }
             }
           }
@@ -105,11 +105,11 @@
             border: none;
 
             &.btn-primary {
-              background-color: $primary;
-              color: $surface;
+              background-color: var(--primary);
+              color: var(--surface);
               border-radius: $border-radius-lg;
               &:hover:not(:disabled) {
-                background-color: darken($primary, 8%);
+                background-color: var(--primary-hover);
               }
 
               &:disabled {
@@ -119,14 +119,14 @@
             }
 
             &.btn-active {
-              background-color: $primary;
-              color: $surface;
+              background-color: var(--primary);
+              color: var(--surface);
             }
 
           }
 
           .pairing-error {
-            color: $error;
+            color: var(--destructive);
             font-size: 0.875rem;
             text-align: center;
             margin-top: $spacing-sm;
@@ -144,14 +144,14 @@
         padding: $spacing-md;
         border: 1px solid #50b83c;
         border-radius: 1em;
-        background-color: rgba($success, 0.05);
-        color: $success;
+        background-color: rgba(var(--success), 0.05);
+        color: var(--success);
         transition: $transition-base;
 
         &:has(.device-delete-btn:hover) {
-          border-color: $error;
-          background-color: rgba($error, 0.1);
-          color: $error;
+          border-color: var(--destructive);
+          background-color: var(--destructive-light);
+          color: var(--destructive);
         }
 
         .device-header {
@@ -180,7 +180,7 @@
             gap: 4px;
 
             .device-name-title {
-              color: black;
+              color: var(--foreground);
               font-size: 0.875rem;
               font-weight: $font-weight-semibold;
               cursor: pointer;
@@ -190,13 +190,13 @@
               align-self: flex-start;
 
               &:hover {
-                background-color: $gray-100;
+                background-color: var(--muted);
               }
             }
 
             .device-last-seen {
               font-size: 0.75rem;
-              color: $text-secondary;
+              color: var(--foreground-secondary);
               padding-left: $spacing-md;
               font-weight: $font-weight-normal;
             }
@@ -206,30 +206,30 @@
             width: 100%;
             max-width: 300px;
             padding: $spacing-xs $spacing-sm;
-            border: 1px solid $border-color;
+            border: 1px solid var(--border);
             border-radius: $border-radius-sm;
             font-size: 0.875rem;
             font-weight: $font-weight-semibold;
-            color: $text-primary;
-            background-color: $surface;
+            color: var(--foreground);
+            background-color: var(--surface);
             transition: $transition-base;
 
             &:focus {
               outline: none;
-              border-color: $border-color-focus;
-              box-shadow: 0 0 0 1px $border-color-focus;
+              border-color: var(--ring);
+              box-shadow: 0 0 0 1px var(--ring);
             }
 
             &::placeholder {
-              color: $gray-400;
+              color: var(--muted-foreground);
               font-weight: $font-weight-normal;
             }
           }
 
           .device-refresh-btn {
             background-color: white;
-            border: 1px solid $gray-200;
-            color: $text-primary;
+            border: 1px solid var(--border);
+            color: var(--foreground);
             cursor: pointer;
             padding: $spacing-sm $spacing-md;
             border-radius: 0.8em;
@@ -242,7 +242,7 @@
             font-weight: $font-weight-medium;
 
             &:hover {
-              background-color: $gray-100;
+              background-color: var(--muted);
               transform: scale(1.02);
 
               svg {
@@ -264,7 +264,7 @@
           .device-delete-btn {
             background: none;
             border: none;
-            color: $error;
+            color: var(--destructive);
             cursor: pointer;
             padding: $spacing-xs;
             border-radius: $border-radius-sm;
@@ -278,7 +278,7 @@
 
         .device-info {
           font-size: 0.75rem;
-          color: $text-secondary;
+          color: var(--foreground-secondary);
 
           .device-resolution {
             margin-bottom: 2px;
@@ -293,14 +293,14 @@
       border-radius: 1em;
       margin-top: $spacing-md;
       background-color: transparent !important;
-      border: 1px dashed $border-color;
+      border: 1px dashed var(--border);
       position: relative;
       cursor: pointer;
       transition: $transition-base;
 
       &:hover {
-        border-color: $primary;
-        background-color: rgba($primary, 0.05);
+        border-color: var(--primary);
+        background-color: rgba(var(--primary), 0.05);
       }
 
       &:active {
@@ -327,7 +327,7 @@
       }
 
       &:hover .extra-screen-content {
-        color: $primary;
+        color: var(--primary);
 
         svg {
           transform: scale(1.1);
@@ -339,7 +339,7 @@
     .no-devices {
       text-align: center;
       padding: $spacing-md;
-      color: $text-secondary;
+      color: var(--foreground-secondary);
 
       p {
         margin: 0 0 $spacing-xs 0;

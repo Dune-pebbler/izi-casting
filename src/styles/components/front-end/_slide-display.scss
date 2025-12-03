@@ -30,7 +30,7 @@
     align-items: center;
     justify-content: center;
     height: 100%;
-    color: $gray-500;
+    color: var(--muted)0;
     font-style: italic;
   }
 
@@ -39,8 +39,8 @@
     align-items: center;
     justify-content: center;
     height: 100%;
-    background-color: $gray-100;
-    border: 2px dashed $gray-300;
+    background-color: var(--muted);
+    border: 2px dashed var(--border);
   }
 
   .page-indicator {
@@ -60,7 +60,7 @@
 .display-left {
   width: 50%;
   height: 100%;
-  background-color: $black;
+  background-color: var(--foreground);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -75,8 +75,8 @@
 .display-right {
   width: 50%;
   height: 100%;
-  background-color: $white;
-  color: $black;
+  background-color: var(--surface);
+  color: var(--foreground);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -109,8 +109,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: $gray-800;
-  border: 2px dashed $gray-600;
+  background-color: var(--foreground);
+  border: 2px dashed var(--foreground-secondary);
 }
 
 .display-text-container {
@@ -151,12 +151,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: $gray-100;
-  border: 2px dashed $gray-300;
+  background-color: var(--muted);
+  border: 2px dashed var(--border);
 }
 
 .placeholder-text {
-  color: $gray-500;
+  color: var(--muted)0;
   font-size: $font-size-lg;
   font-style: italic;
 }
@@ -165,7 +165,7 @@
 .display-full-image {
   width: 100%;
   height: 100%;
-  background-color: $black;
+  background-color: var(--foreground);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -194,8 +194,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: $gray-800;
-  border: 2px dashed $gray-600;
+  background-color: var(--foreground);
+  border: 2px dashed var(--foreground-secondary);
 }
 
 // Text Over Image Layout Styles
@@ -203,7 +203,7 @@
   width: 100%;
   height: 100%;
   position: relative;
-  background-color: $black;
+  background-color: var(--foreground);
   overflow: hidden;
 }
 
@@ -235,8 +235,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: $gray-800;
-  border: 2px dashed $gray-600;
+  background-color: var(--foreground);
+  border: 2px dashed var(--foreground-secondary);
 }
 
 .display-text-overlay {
@@ -246,7 +246,7 @@
   right: 0;
   background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
   padding: $spacing-xl;
-  color: $white;
+  color: var(--surface);
   overflow: hidden;
   
   .display-text-overlay-content {
@@ -795,8 +795,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: $gray-100;
-  border: 2px dashed $gray-300;
+  background-color: var(--muted);
+  border: 2px dashed var(--border);
 }
 
 

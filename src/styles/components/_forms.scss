@@ -6,7 +6,7 @@
   display: block;
   margin-bottom: $spacing-sm;
   font-weight: $font-weight-medium;
-  color: $text-primary;
+  color: var(--foreground);
   font-size: $font-size-base;
 }
 
@@ -15,29 +15,29 @@
   padding: $spacing-sm $spacing-md;
   font-size: $font-size-base;
   font-weight: $font-weight-normal;
-  color: $text-primary;
-  border: 1px solid $border-color;
+  color: var(--foreground);
+  border: 1px solid var(--border);
   border-radius: $border-radius-md;
-  background-color: $surface;
+  background-color: var(--surface);
   font-family: inherit;
   transition: $transition-base;
   min-height: 36px;
 
   &:focus {
     outline: none;
-    border-color: $border-color-focus;
-    box-shadow: 0 0 0 1px $border-color-focus;
+    border-color: var(--ring);
+    box-shadow: 0 0 0 1px var(--ring);
   }
 
   &::placeholder {
-    color: $text-secondary;
+    color: var(--foreground-secondary);
   }
 
   &:disabled {
-    background-color: $gray-50;
-    color: $text-secondary;
+    background-color: var(--muted);
+    color: var(--foreground-secondary);
     cursor: not-allowed;
-    border-color: $gray-200;
+    border-color: var(--border);
   }
 }
 
@@ -57,14 +57,14 @@
   cursor: pointer;
   transition: $transition-base;
   position: relative;
-  background-color: $gray-300;
+  background-color: var(--border);
 
   &.active {
-    background-color: $success;
+    background-color: var(--success);
   }
 
   &.inactive {
-    background-color: $gray-300;
+    background-color: var(--border);
   }
 
   &::after {
@@ -75,7 +75,7 @@
     width: 16px;
     height: 16px;
     border-radius: 50%;
-    background-color: $surface;
+    background-color: var(--surface);
     transition: $transition-base;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   }
@@ -108,17 +108,17 @@
 .form-checkbox {
   width: 16px;
   height: 16px;
-  border: 1px solid $border-color;
+  border: 1px solid var(--border);
   border-radius: $border-radius-sm;
-  background-color: $surface;
+  background-color: var(--surface);
   cursor: pointer;
   transition: $transition-base;
   appearance: none;
   position: relative;
 
   &:checked {
-    background-color: $primary;
-    border-color: $primary;
+    background-color: var(--primary);
+    border-color: var(--primary);
     background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='m12.207 4.793-1.414-1.414L6.5 7.086 5.207 5.793l-1.414 1.414L6.5 9.914z'/%3e%3c/svg%3e");
     background-size: 12px 12px;
     background-position: center;
@@ -127,12 +127,12 @@
 
   &:focus {
     outline: none;
-    border-color: $border-color-focus;
-    box-shadow: 0 0 0 1px $border-color-focus;
+    border-color: var(--ring);
+    box-shadow: 0 0 0 1px var(--ring);
   }
 
   &:hover:not(:checked) {
-    border-color: $gray-400;
+    border-color: var(--muted-foreground);
   }
 }
 
@@ -140,17 +140,17 @@
 .form-radio {
   width: 16px;
   height: 16px;
-  border: 1px solid $border-color;
+  border: 1px solid var(--border);
   border-radius: 50%;
-  background-color: $surface;
+  background-color: var(--surface);
   cursor: pointer;
   transition: $transition-base;
   appearance: none;
   position: relative;
 
   &:checked {
-    background-color: $primary;
-    border-color: $primary;
+    background-color: var(--primary);
+    border-color: var(--primary);
     background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3ccircle cx='8' cy='8' r='3'/%3e%3c/svg%3e");
     background-size: 6px 6px;
     background-position: center;
@@ -159,32 +159,32 @@
 
   &:focus {
     outline: none;
-    border-color: $border-color-focus;
-    box-shadow: 0 0 0 1px $border-color-focus;
+    border-color: var(--ring);
+    box-shadow: 0 0 0 1px var(--ring);
   }
 
   &:hover:not(:checked) {
-    border-color: $gray-400;
+    border-color: var(--muted-foreground);
   }
 }
 
 // Form validation states
 .form-input {
   &.is-valid {
-    border-color: $success;
+    border-color: var(--success);
     
     &:focus {
-      border-color: $success;
-      box-shadow: 0 0 0 1px $success;
+      border-color: var(--success);
+      box-shadow: 0 0 0 1px var(--success);
     }
   }
 
   &.is-invalid {
-    border-color: $error;
+    border-color: var(--destructive);
     
     &:focus {
-      border-color: $error;
-      box-shadow: 0 0 0 1px $error;
+      border-color: var(--destructive);
+      box-shadow: 0 0 0 1px var(--destructive);
     }
   }
 }
@@ -193,20 +193,20 @@
 .form-help {
   margin-top: $spacing-xs;
   font-size: $font-size-sm;
-  color: $text-secondary;
+  color: var(--foreground-secondary);
   line-height: 1.4;
 }
 
 .form-error {
   margin-top: $spacing-xs;
   font-size: $font-size-sm;
-  color: $error;
+  color: var(--destructive);
   line-height: 1.4;
 }
 
 .form-success {
   margin-top: $spacing-xs;
   font-size: $font-size-sm;
-  color: $success;
+  color: var(--success);
   line-height: 1.4;
 }
