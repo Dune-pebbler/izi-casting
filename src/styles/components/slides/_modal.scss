@@ -34,8 +34,9 @@
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    box-shadow: $shadow-lg;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
     border-radius: $corner-rounding;
+    border: 1px solid var(--border);
   }
 
   // -----------------------------------------------------------------------------
@@ -90,23 +91,27 @@
   &__name-input {
     width: 260px;
     padding: $spacing-sm $spacing-md;
-    border: none;
-    background-color: #f6f6f7;
-    border-radius: 10em;
+    border: 1px solid var(--border);
+    background-color: var(--surface);
+    border-radius: $border-radius-md;
     font-size: $font-size-base;
-    font-weight: $font-weight-semibold;
+    font-weight: $font-weight-medium;
     color: var(--foreground);
     transition: $transition-base;
     height: 100%;
 
+    &:hover {
+      border-color: var(--foreground-secondary);
+    }
+
     &:focus {
       outline: none;
       border-color: var(--ring);
-      box-shadow: 0 0 0 1px var(--ring);
+      box-shadow: 0 0 0 2px rgba(var(--ring), 0.2);
     }
 
     &::placeholder {
-      color: var(--foreground-secondary);
+      color: var(--muted-foreground);
       font-weight: $font-weight-normal;
     }
   }
@@ -136,19 +141,23 @@
     width: 120px;
     padding: $spacing-sm $spacing-md;
     padding-right: 30px;
-    border: none;
-    background-color: #f6f6f7;
-    border-radius: 100px;
+    border: 1px solid var(--border);
+    background-color: var(--surface);
+    border-radius: $border-radius-md;
     font-size: $font-size-base;
-    font-weight: $font-weight-semibold;
+    font-weight: $font-weight-medium;
     color: var(--foreground);
     transition: $transition-base;
     height: 100%;
 
+    &:hover {
+      border-color: var(--foreground-secondary);
+    }
+
     &:focus {
       outline: none;
       border-color: var(--ring);
-      box-shadow: 0 0 0 1px var(--ring);
+      box-shadow: 0 0 0 2px rgba(var(--ring), 0.2);
     }
   }
 
@@ -184,24 +193,24 @@
   &__transition-select {
     width: 140px;
     padding: $spacing-sm $spacing-md;
-    border: none;
-    background-color: #f6f6f7;
-    border-radius: 1em;
+    border: 1px solid var(--border);
+    background-color: var(--surface);
+    border-radius: $border-radius-md;
     font-size: $font-size-base;
-    font-weight: $font-weight-semibold;
+    font-weight: $font-weight-medium;
     color: var(--foreground);
     transition: $transition-base;
     height: 100%;
     cursor: pointer;
 
+    &:hover {
+      border-color: var(--foreground-secondary);
+    }
+
     &:focus {
       outline: none;
       border-color: var(--ring);
-      box-shadow: 0 0 0 1px var(--ring);
-    }
-
-    &:hover {
-      background-color: #f0f0f1;
+      box-shadow: 0 0 0 2px rgba(var(--ring), 0.2);
     }
   }
 
@@ -218,7 +227,7 @@
     width: 78px;
     height: 36px;
     background-color: var(--muted);
-    border-radius: 200px;
+    border-radius: $border-radius-md;
     cursor: pointer;
     transition: $transition-base;
     overflow: hidden;
@@ -226,7 +235,8 @@
     height: 100%;
 
     &:hover {
-      background-color: var(--border);
+      background-color: var(--muted);
+      border-color: var(--foreground-secondary);
     }
 
     .slider-track {
@@ -240,14 +250,16 @@
 
     .slider-thumb {
       position: absolute;
-      top: 3px;
+      top: 2px;
       left: 2px;
       width: 34px;
-      height: 34px;
-      background-color: var(--primary);
+      height: calc(100% - 4px);
+      background-color: var(--surface);
       transition: transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
       z-index: 1;
-      border-radius: 200px;
+      border-radius: $border-radius-sm;
+      border: 1px solid var(--border);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     }
 
     .slider-icons {
@@ -276,17 +288,22 @@
     }
 
     &.active {
+      background-color: var(--primary);
+      border-color: var(--primary);
+
       .slider-thumb {
         transform: translateX(36px);
+        background-color: var(--surface);
+        border-color: var(--primary);
       }
 
       .slider-icons {
         .icon-fullscreen {
-          color: var(--foreground-secondary);
+          color: rgba(255, 255, 255, 0.6);
         }
 
         .icon-layout {
-          color: var(--surface);
+          color: rgba(255, 255, 255, 0.9);
         }
       }
     }
@@ -297,10 +314,10 @@
   // -----------------------------------------------------------------------------
   &__layout-selector {
     display: flex;
-    gap: $spacing-xs;
+    gap: 2px;
     background-color: var(--muted);
-    border-radius: 200px;
-    padding: $spacing-xs;
+    border-radius: $border-radius-md;
+    padding: 2px;
     border: 1px solid var(--border);
   }
 
@@ -311,29 +328,30 @@
     padding: $spacing-sm;
     border: none;
     background: none;
-    border-radius: 200px;
+    border-radius: $border-radius-sm;
     cursor: pointer;
     transition: $transition-base;
     width: 36px;
     height: 36px;
     color: var(--foreground-secondary);
     position: relative;
-    border: 1px solid transparent;
 
     &:hover {
-      background: white;
+      background: var(--surface);
+      color: var(--foreground);
     }
 
     &.active {
-      background-color: var(--primary);
-      color: var(--surface);
+      background-color: var(--surface);
+      color: var(--foreground);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     }
   }
 
   // Close Button
   &__close-btn {
-    background: none;
-    border: none;
+    background-color: var(--surface);
+    border: 1px solid var(--border);
     font-size: 2rem;
     cursor: pointer;
     color: var(--foreground-secondary);
@@ -343,12 +361,20 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: $border-radius-sm;
+    border-radius: $border-radius-md;
     transition: $transition-base;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 
     &:hover {
       background-color: var(--muted);
       color: var(--foreground);
+      border-color: var(--foreground-secondary);
+    }
+
+    &:focus {
+      outline: none;
+      border-color: var(--ring);
+      box-shadow: 0 0 0 2px rgba(var(--ring), 0.2);
     }
   }
 
@@ -397,25 +423,33 @@
     left: 50%;
     transform: translate(-50%, -50%);
     z-index: 10;
-    width: 52px;
-    height: 52px;
-    border-radius: 0.5em;
-    background-color: var(--primary);
-    border: 8px solid var(--surface);
-    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: $border-radius-md;
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--foreground);
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: $transition-base;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 
     &:hover {
-      background-color: var(--primary-active);
-      transform: translate(-50%, -50%) scale(1.1);
+      background-color: var(--muted);
+      border-color: var(--foreground-secondary);
+      transform: translate(-50%, -50%) scale(1.05);
+    }
+
+    &:focus {
+      outline: none;
+      border-color: var(--ring);
+      box-shadow: 0 0 0 2px rgba(var(--ring), 0.2);
     }
 
     &:active {
-      transform: translate(-50%, -50%) scale(0.95);
+      transform: translate(-50%, -50%) scale(0.98);
     }
   }
 
@@ -574,7 +608,7 @@
 .position-btn {
   width: 36px;
   height: 36px;
-  border: none;
+  border: 1px solid var(--border);
   background-color: var(--surface);
   color: var(--foreground-secondary);
   border-radius: $border-radius-sm;
@@ -584,17 +618,25 @@
   align-items: center;
   justify-content: center;
   transition: $transition-base;
-  border: 1px solid var(--border);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 
   &:hover {
     background-color: var(--muted);
     color: var(--foreground);
+    border-color: var(--foreground-secondary);
+  }
+
+  &:focus {
+    outline: none;
+    border-color: var(--ring);
+    box-shadow: 0 0 0 2px rgba(var(--ring), 0.2);
   }
 
   &.active {
     background-color: var(--primary);
     color: var(--surface);
     border-color: var(--primary);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   }
 }
 
@@ -605,7 +647,7 @@
   background-color: var(--surface);
   color: var(--foreground-secondary);
   border: 1px solid var(--border);
-  border-radius: $border-radius-sm;
+  border-radius: $border-radius-md;
   width: 36px;
   height: 36px;
   display: flex;
@@ -614,11 +656,18 @@
   cursor: pointer;
   transition: $transition-base;
   z-index: 20;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 
   &:hover {
     background-color: var(--destructive);
     color: var(--surface);
     border-color: var(--destructive);
+  }
+
+  &:focus {
+    outline: none;
+    border-color: var(--ring);
+    box-shadow: 0 0 0 2px rgba(var(--ring), 0.2);
   }
 }
 

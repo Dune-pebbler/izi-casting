@@ -24,7 +24,6 @@
 // Slide Card (Grid View)
 // -----------------------------------------------------------------------------
 .slide-card {
-  background: white;
   border-radius: 0.6em;
   overflow: hidden;
   cursor: pointer;
@@ -133,7 +132,7 @@
   display: flex;
   align-items: center;
   background: white;
-  border-radius: 1em;
+  border-radius: $corner-rounding;
   border: 1px solid var(--border);
   padding: $spacing-sm;
   cursor: pointer;
@@ -219,7 +218,7 @@
 // Playlist Containers
 // -----------------------------------------------------------------------------
 .playlist-container {
-  margin-bottom: $spacing-lg;
+  margin-bottom: $spacing-md;
 }
 
 .playlist-slides-container {
