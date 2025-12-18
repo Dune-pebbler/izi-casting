@@ -241,6 +241,10 @@
             font-size: 0.875rem;
             font-weight: $font-weight-medium;
 
+            [data-theme="dark"] & {
+              background-color: black;
+            }
+
             &:hover {
               background-color: var(--muted);
               transform: scale(1.02);
