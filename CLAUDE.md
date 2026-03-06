@@ -128,6 +128,7 @@ Admin can send commands to displays via `device_commands` collection:
 - Refresh command restarts slides and reloads browser
 - Commands marked as processed after execution to prevent re-execution
 
+
 ### Real-time Listeners
 DisplayView sets up multiple onSnapshot listeners:
 - Device pairing status (`devices/{deviceId}`)
