@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { doc, onSnapshot, setDoc, getDoc } from "firebase/firestore";
 import { db } from "../../firebase";
+import { tenantDoc } from "../../utils/tenantPaths";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { 
   setIsPaired, 
@@ -19,6 +20,11 @@ import StatusBar from "./StatusBar/StatusBar";
 import FullscreenIndicator from "./FullscreenIndicator";
 
 function DisplayView() {
+  // tenantId is NOT read from hostname here — it comes from the device document
+  // after pairing, so displays can be hosted on any URL.
+  const [displayTenantId, setDisplayTenantId] = useState(
+    () => localStorage.getItem("izi_tenant_id") || null
+  );
 
   const dispatch = useAppDispatch();
   const isPaired = useAppSelector((state) => state.device.isPaired);
@@ -121,8 +127,13 @@ function DisplayView() {
           const deviceData = deviceDoc.data();
           const isDevicePaired = deviceData.isPaired || false;
           console.log("Device pairing status from database:", isDevicePaired);
-          
-          
+
+          // Cache tenantId from device doc so display knows which tenant it belongs to
+          if (deviceData.tenantId) {
+            setDisplayTenantId(deviceData.tenantId);
+            localStorage.setItem("izi_tenant_id", deviceData.tenantId);
+          }
+
           if (!deviceData.isLinked) {
             console.log("Device exists but not marked as linked, updating...");
             await setDoc(
@@ -450,6 +461,12 @@ function DisplayView() {
           const deviceData = doc.data();
           const newPairedStatus = deviceData.isPaired || false;
 
+          // Capture tenantId as soon as it appears in the device doc
+          if (deviceData.tenantId) {
+            setDisplayTenantId(deviceData.tenantId);
+            localStorage.setItem("izi_tenant_id", deviceData.tenantId);
+          }
+
           console.log("Device pairing status changed:", newPairedStatus);
 
           
@@ -563,11 +580,11 @@ function DisplayView() {
 
   
   useEffect(() => {
-    console.log("📄 Content loading useEffect triggered, isPaired:", isPaired);
-    if (!isPaired) return; 
+    console.log("📄 Content loading useEffect triggered, isPaired:", isPaired, "tenantId:", displayTenantId);
+    if (!isPaired || !displayTenantId) return;
 
-    const displayDocRef = doc(db, "display", "content");
-    const settingsDocRef = doc(db, "display", "settings");
+    const displayDocRef = tenantDoc(db, displayTenantId, "display", "content");
+    const settingsDocRef = tenantDoc(db, displayTenantId, "display", "settings");
 
     const unsubscribeContent = onSnapshot(displayDocRef, (doc) => {
       if (doc.exists()) {
@@ -633,7 +650,7 @@ function DisplayView() {
       unsubscribeContent();
       unsubscribeSettings();
     };
-  }, [isPaired]);
+  }, [isPaired, displayTenantId]);
 
   
   useEffect(() => {

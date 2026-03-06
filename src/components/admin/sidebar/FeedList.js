@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { doc, setDoc, onSnapshot } from 'firebase/firestore';
 import { db } from '../../../firebase';
+import { useTenant } from '../../../context/TenantContext';
+import { tenantDoc } from '../../../utils/tenantPaths';
 import { GripVertical, Copy, Trash2, Plus, Eye, EyeOff } from 'lucide-react';
 import { toast } from 'sonner';
 import {
@@ -24,6 +26,7 @@ import { CSS } from '@dnd-kit/utilities';
 // import FeedEditModal from '../FeedEditModal'; // No longer needed for inline editing
 
 function FeedList() {
+  const { tenantId } = useTenant();
   const [feeds, setFeeds] = useState([]);
   const [hasLoaded, setHasLoaded] = useState(false);
   const [editingFeed, setEditingFeed] = useState(null);
@@ -43,7 +46,7 @@ function FeedList() {
 
   // Load feeds from Firestore
   useEffect(() => {
-    const settingsDocRef = doc(db, 'display', 'settings');
+    const settingsDocRef = tenantDoc(db, tenantId, 'display', 'settings');
     
     const unsubscribe = onSnapshot(settingsDocRef, (doc) => {
       if (doc.exists()) {
@@ -78,7 +81,7 @@ function FeedList() {
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [tenantId]);
 
   const addFeed = async () => {
     const newFeed = {
@@ -342,7 +345,7 @@ function FeedList() {
 
   const saveFeedsToFirebase = async (feedsToSave) => {
     try {
-      const settingsDocRef = doc(db, 'display', 'settings');
+      const settingsDocRef = tenantDoc(db, tenantId, 'display', 'settings');
       console.log('Saving feeds to Firebase:', feedsToSave.map(f => ({ id: f.id, name: f.name })));
       await setDoc(settingsDocRef, { feeds: feedsToSave }, { merge: true });
       console.log('Feeds saved to Firebase successfully');

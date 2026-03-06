@@ -13,6 +13,8 @@ import {
 } from "firebase/storage";
 import { db, storage } from "../../../firebase";
 import { toast } from "sonner";
+import { useTenant } from "../../../context/TenantContext";
+import { tenantDoc, tenantStorageRef } from "../../../utils/tenantPaths";
 
 // Available fonts list
 const AVAILABLE_FONTS = [
@@ -36,6 +38,7 @@ const AVAILABLE_FONTS = [
 ];
 
 function Settings({ onOpenTrash, trashedSlidesCount = 0 }) {
+  const { tenantId } = useTenant();
   const [isAdvancedSettingsExpanded, setIsAdvancedSettingsExpanded] = useState(false);
   const [isFontsExpanded, setIsFontsExpanded] = useState(false);
   const [uploadingLogo, setUploadingLogo] = useState(false);
@@ -56,7 +59,7 @@ function Settings({ onOpenTrash, trashedSlidesCount = 0 }) {
   useEffect(() => {
     const loadSettings = async () => {
       try {
-        const settingsDoc = await getDoc(doc(db, "display", "settings"));
+        const settingsDoc = await getDoc(tenantDoc(db, tenantId, "display", "settings"));
         if (settingsDoc.exists()) {
           const loadedSettings = settingsDoc.data();
           setSettings(prev => ({
@@ -119,7 +122,7 @@ function Settings({ onOpenTrash, trashedSlidesCount = 0 }) {
 
     try {
       const logoName = `logo_${Date.now()}_${file.name}`;
-      const logoRef = ref(storage, `logos/${logoName}`);
+      const logoRef = tenantStorageRef(storage, tenantId, `logos/${logoName}`);
       
       await uploadBytes(logoRef, file);
       const downloadURL = await getDownloadURL(logoRef);
@@ -133,7 +136,7 @@ function Settings({ onOpenTrash, trashedSlidesCount = 0 }) {
       setSettings(newSettings);
 
       // Save to Firestore
-      await setDoc(doc(db, "display", "settings"), newSettings, {
+      await setDoc(tenantDoc(db, tenantId, "display", "settings"), newSettings, {
         merge: true,
       });
 
@@ -159,7 +162,7 @@ function Settings({ onOpenTrash, trashedSlidesCount = 0 }) {
     try {
       if (settings.logoName) {
         try {
-          const logoRef = ref(storage, `logos/${settings.logoName}`);
+          const logoRef = tenantStorageRef(storage, tenantId, `logos/${settings.logoName}`);
           await deleteObject(logoRef);
         } catch (error) {
           console.error("Error deleting logo:", error);
@@ -175,7 +178,7 @@ function Settings({ onOpenTrash, trashedSlidesCount = 0 }) {
       setSettings(newSettings);
 
       // Save to Firestore
-      await setDoc(doc(db, "display", "settings"), newSettings, {
+      await setDoc(tenantDoc(db, tenantId, "display", "settings"), newSettings, {
         merge: true,
       });
 
@@ -199,7 +202,7 @@ function Settings({ onOpenTrash, trashedSlidesCount = 0 }) {
     const loadingToast = toast.loading("Instellingen opslaan...");
 
     try {
-      const settingsDocRef = doc(db, "display", "settings");
+      const settingsDocRef = tenantDoc(db, tenantId, "display", "settings");
       await setDoc(settingsDocRef, settings, { merge: true });
 
       // Dismiss loading toast and show success

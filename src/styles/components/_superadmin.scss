@@ -1,0 +1,403 @@
+// ============================================================================
+// SUPER ADMIN VIEW
+// ============================================================================
+
+.superadmin-layout {
+  min-height: 100vh;
+  background: var(--background);
+  font-family: $font-family-base;
+  color: var(--foreground);
+}
+
+// Header
+.superadmin-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-md $spacing-xl;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: $z-index-sticky;
+}
+
+.superadmin-header-left {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+
+  .logo-image {
+    height: 36px;
+    width: auto;
+  }
+
+  h1 {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
+    color: var(--foreground);
+    margin: 0;
+  }
+}
+
+.superadmin-header-right {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+.superadmin-user {
+  font-size: $font-size-sm;
+  color: var(--foreground-muted);
+}
+
+// Content area
+.superadmin-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: $spacing-xl;
+}
+
+.superadmin-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-xl;
+
+  h2 {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    font-size: $font-size-xl;
+    font-weight: $font-weight-semibold;
+    margin: 0;
+    color: var(--foreground);
+  }
+}
+
+.superadmin-empty {
+  text-align: center;
+  padding: $spacing-xxl $spacing-xl;
+  color: var(--foreground-muted);
+  background: var(--surface);
+  border-radius: $border-radius-xl;
+  border: 1px dashed var(--border);
+
+  p {
+    margin-bottom: $spacing-md;
+    font-size: $font-size-lg;
+  }
+}
+
+// Tenant grid
+.tenant-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: $spacing-lg;
+}
+
+.tenant-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: $border-radius-xl;
+  padding: $spacing-lg;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+  box-shadow: $shadow-sm;
+  transition: $transition-base;
+
+  &:hover {
+    box-shadow: $shadow-md;
+    border-color: var(--border-hover);
+  }
+}
+
+.tenant-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: $spacing-sm;
+}
+
+.tenant-name {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: var(--foreground);
+  margin: 0 0 $spacing-xs 0;
+}
+
+.tenant-subdomain {
+  font-size: $font-size-sm;
+  color: var(--foreground-muted);
+  margin: 0;
+  font-family: $font-family-mono;
+}
+
+.tenant-card-stats {
+  display: flex;
+  gap: $spacing-md;
+}
+
+.tenant-stat {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+  font-size: $font-size-sm;
+  color: var(--foreground-muted);
+}
+
+.tenant-card-actions {
+  display: flex;
+  gap: $spacing-sm;
+  padding-top: $spacing-sm;
+  border-top: 1px solid var(--border);
+}
+
+// Create tenant modal
+.create-tenant-modal {
+  background: var(--surface);
+  border-radius: $border-radius-xl;
+  width: 480px;
+  max-width: 95vw;
+  box-shadow: $shadow-xl;
+
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: $spacing-lg;
+    border-bottom: 1px solid var(--border);
+
+    h2 {
+      font-size: $font-size-lg;
+      font-weight: $font-weight-semibold;
+      margin: 0;
+    }
+  }
+
+  .modal-body {
+    padding: $spacing-lg;
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-md;
+  }
+
+  .modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: $spacing-sm;
+    padding: $spacing-md $spacing-lg;
+    border-top: 1px solid var(--border);
+  }
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+
+  label {
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+    color: var(--foreground-secondary);
+  }
+
+  .form-input {
+    width: 100%;
+    padding: $spacing-sm $spacing-md;
+    border: 1px solid var(--input-border);
+    border-radius: $border-radius-md;
+    background: var(--input);
+    color: var(--foreground);
+    font-size: $font-size-base;
+    font-family: $font-family-base;
+    transition: $transition-fast;
+    box-sizing: border-box;
+
+    &:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--ring);
+    }
+
+    &::placeholder {
+      color: var(--foreground-muted);
+    }
+  }
+
+  textarea.form-input {
+    resize: vertical;
+    min-height: 80px;
+  }
+}
+
+.subdomain-input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0;
+
+  .form-input {
+    border-radius: $border-radius-md 0 0 $border-radius-md;
+    flex: 1;
+  }
+
+  .subdomain-suffix {
+    padding: $spacing-sm $spacing-md;
+    background: var(--muted);
+    border: 1px solid var(--input-border);
+    border-left: none;
+    border-radius: 0 $border-radius-md $border-radius-md 0;
+    font-size: $font-size-sm;
+    color: var(--foreground-muted);
+    font-family: $font-family-mono;
+    white-space: nowrap;
+    line-height: 1.5;
+  }
+}
+
+// User management panel (modal)
+.user-management-panel {
+  background: var(--surface);
+  border-radius: $border-radius-xl;
+  width: 420px;
+  max-width: 95vw;
+  box-shadow: $shadow-xl;
+  overflow: hidden;
+
+  .panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: $spacing-md $spacing-lg;
+    border-bottom: 1px solid var(--border);
+
+    h3 {
+      font-size: $font-size-base;
+      font-weight: $font-weight-semibold;
+      margin: 0;
+    }
+
+    button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--foreground-muted);
+      font-size: 18px;
+      line-height: 1;
+      padding: 4px;
+      border-radius: $border-radius-sm;
+
+      &:hover {
+        color: var(--foreground);
+        background: var(--muted);
+      }
+    }
+  }
+
+  .users-list {
+    list-style: none;
+    margin: 0;
+    padding: $spacing-sm;
+    max-height: 300px;
+    overflow-y: auto;
+  }
+
+  .user-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: $spacing-sm $spacing-md;
+    border-radius: $border-radius-md;
+
+    &:hover {
+      background: var(--muted);
+    }
+  }
+
+  .user-email {
+    font-size: $font-size-sm;
+    color: var(--foreground);
+  }
+
+  .user-empty {
+    padding: $spacing-md;
+    color: var(--foreground-muted);
+    font-size: $font-size-sm;
+    text-align: center;
+  }
+
+  .user-remove-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--foreground-muted);
+    padding: 4px;
+    border-radius: $border-radius-sm;
+    font-size: 12px;
+    line-height: 1;
+
+    &:hover {
+      color: var(--destructive);
+      background: var(--destructive-light);
+    }
+  }
+
+  .user-add-form {
+    display: flex;
+    gap: $spacing-sm;
+    padding: $spacing-sm $spacing-md $spacing-md;
+    border-top: 1px solid var(--border);
+
+    .form-input {
+      flex: 1;
+      padding: $spacing-sm $spacing-md;
+      border: 1px solid var(--input-border);
+      border-radius: $border-radius-md;
+      background: var(--input);
+      color: var(--foreground);
+      font-size: $font-size-sm;
+      font-family: $font-family-base;
+
+      &:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px var(--ring);
+      }
+    }
+  }
+}
+
+// Access denied screen
+.access-denied {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  text-align: center;
+  padding: $spacing-xl;
+  background: var(--background);
+
+  h2 {
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-bold;
+    margin-bottom: $spacing-md;
+    color: var(--foreground);
+  }
+
+  p {
+    color: var(--foreground-muted);
+    margin-bottom: $spacing-sm;
+    font-size: $font-size-base;
+
+    a {
+      color: var(--primary);
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+}

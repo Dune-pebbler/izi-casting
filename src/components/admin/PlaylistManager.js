@@ -3,15 +3,18 @@ import { doc, setDoc, onSnapshot } from 'firebase/firestore';
 import { ref, deleteObject } from 'firebase/storage';
 import { db, storage } from '../../firebase';
 import { toast } from 'sonner';
+import { useTenant } from '../../context/TenantContext';
+import { tenantDoc, tenantStorageRef } from '../../utils/tenantPaths';
 
 // Custom hook for playlist management
 export const usePlaylistManager = () => {
+  const { tenantId } = useTenant();
   const [playlists, setPlaylists] = useState([]);
   const [hasLoaded, setHasLoaded] = useState(false);
 
   // Load playlists from Firestore
   useEffect(() => {
-    const displayDocRef = doc(db, 'display', 'content');
+    const displayDocRef = tenantDoc(db, tenantId, 'display', 'content');
     
     const unsubscribe = onSnapshot(displayDocRef, (doc) => {
       if (doc.exists()) {
@@ -50,7 +53,7 @@ export const usePlaylistManager = () => {
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [tenantId]);
 
 
   const calculatePlaylistDuration = (slides) => {
@@ -71,7 +74,7 @@ export const usePlaylistManager = () => {
 
   const savePlaylistsToFirebase = async (playlistsToSave) => {
     try {
-      const displayDocRef = doc(db, 'display', 'content');
+      const displayDocRef = tenantDoc(db, tenantId, 'display', 'content');
       console.log('Saving playlists to Firebase:', playlistsToSave.map(p => ({ id: p.id, slideCount: p.slides.length })));
       await setDoc(displayDocRef, { playlists: playlistsToSave }, { merge: true });
       console.log('Playlists saved to Firebase successfully');
@@ -112,7 +115,7 @@ export const usePlaylistManager = () => {
         for (const slide of playlistToRemove.slides) {
           if (slide.imageUrl && slide.imageName) {
             try {
-              const imageRef = ref(storage, `slides/${slide.imageName}`);
+              const imageRef = tenantStorageRef(storage, tenantId, `slides/${slide.imageName}`);
               await deleteObject(imageRef);
             } catch (error) {
               console.error('Error deleting image:', error);

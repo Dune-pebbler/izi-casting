@@ -30,7 +30,7 @@
   transition: all 0.2s ease;
   pointer-events: auto;
   border: 1px solid var(--border);
-
+  background-color: var(--background);
   &:hover {
     transform: translateY(-2px);
     border-color: var(--primary);
@@ -47,6 +47,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap:8px;
     border-bottom: 1px solid var(--border);
     padding: $spacing-sm;
   }
@@ -103,7 +104,7 @@
 
     .duration-value {
       font-size: 14px;
-      color: var(--primary);
+      color:rgb(62, 62, 62);
     }
   }
 
@@ -138,7 +139,7 @@
   cursor: pointer;
   transition: all 0.2s ease;
   gap: $spacing-md;
-
+  background: var(--background);
   &:hover {
     transform: translateY(-1px);
     border-color: var(--primary);

@@ -4,8 +4,11 @@ import { collection, query, orderBy, onSnapshot, deleteDoc, doc } from 'firebase
 import { db, storage } from '../../../firebase';
 import { ref, deleteObject } from 'firebase/storage';
 import { toast } from 'sonner';
+import { useTenant } from '../../../context/TenantContext';
+import { tenantDoc, tenantCollection } from '../../../utils/tenantPaths';
 
 const ImageLibraryModal = ({ isOpen, onClose, onSelectImage }) => {
+  const { tenantId } = useTenant();
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -17,7 +20,7 @@ const ImageLibraryModal = ({ isOpen, onClose, onSelectImage }) => {
 
     // Listen to media library changes in real-time
     const mediaQuery = query(
-      collection(db, 'mediaLibrary'),
+      tenantCollection(db, tenantId, 'mediaLibrary'),
       orderBy('uploadedAt', 'desc')
     );
 
@@ -56,7 +59,7 @@ const ImageLibraryModal = ({ isOpen, onClose, onSelectImage }) => {
       await deleteObject(imageRef);
 
       // Delete from Firestore
-      await deleteDoc(doc(db, 'mediaLibrary', image.id));
+      await deleteDoc(tenantDoc(db, tenantId, 'mediaLibrary', image.id));
 
       toast.success('Afbeelding succesvol verwijderd');
 

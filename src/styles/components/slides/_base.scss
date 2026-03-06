@@ -63,16 +63,12 @@
     }
   }
 
-  // Modifier: Danger state (red, for delete buttons)
+  // Modifier: Danger state (red, for delete buttons - only on hover)
   &--danger {
-    color: var(--destructive);
-    background-color: var(--destructive-light);
-    border-color: var(--destructive);
-
     &:hover {
-      background-color: var(--destructive);
-      color: var(--surface);
-      border-color: var(--destructive-hover);
+      color: var(--destructive);
+      background-color: var(--destructive-light);
+      border-color: var(--destructive);
     }
   }
 
@@ -225,7 +221,6 @@
   position: relative;
   cursor: pointer;
   transition: $transition-base;
-  min-height: 120px;
   width: 100%;
 
   &:hover {

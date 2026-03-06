@@ -2,6 +2,8 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { doc, setDoc, getDoc, addDoc, collection, getDocs, deleteDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import { db, storage, auth } from '../../firebase';
+import { useTenant } from '../../context/TenantContext';
+import { tenantDoc, tenantCollection, tenantStorageRef } from '../../utils/tenantPaths';
 import { sanitizeHTMLContent } from '../../utils/sanitize';
 import { toast } from 'sonner';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
@@ -16,6 +18,7 @@ import Sidebar from './sidebar/Sidebar';
 import { Monitor, Clock, X, Settings, LayoutGrid, List, Moon, Sun } from 'lucide-react';
 
 function AdminView() {
+  const { tenantId } = useTenant();
   // Playlist management hook
   const {
     playlists,
@@ -88,7 +91,7 @@ function AdminView() {
   useEffect(() => {
     const loadSettings = async () => {
       try {
-        const settingsDoc = await getDoc(doc(db, "display", "settings"));
+        const settingsDoc = await getDoc(tenantDoc(db, tenantId, "display", "settings"));
         if (settingsDoc.exists()) {
           const settings = settingsDoc.data();
           setDefaultSlideTransition(settings.defaultSlideTransition || 'fade');
@@ -144,7 +147,7 @@ function AdminView() {
   useEffect(() => {
     const loadTrashedSlides = async () => {
       try {
-        const trashSnapshot = await getDocs(collection(db, 'trash'));
+        const trashSnapshot = await getDocs(tenantCollection(db, tenantId, 'trash'));
         const trashData = trashSnapshot.docs.map(doc => ({
           trashId: doc.id,
           ...doc.data()
@@ -302,7 +305,7 @@ function AdminView() {
     let currentDefaultTransition = defaultSlideTransition;
     let currentEnabledFonts = enabledFonts;
     try {
-      const settingsDoc = await getDoc(doc(db, "display", "settings"));
+      const settingsDoc = await getDoc(tenantDoc(db, tenantId, "display", "settings"));
       if (settingsDoc.exists()) {
         const settings = settingsDoc.data();
         currentDefaultTransition = settings.defaultSlideTransition || 'fade';
@@ -382,7 +385,7 @@ function AdminView() {
       };
 
       // Add to trash collection
-      const trashDocRef = await addDoc(collection(db, 'trash'), trashData);
+      const trashDocRef = await addDoc(tenantCollection(db, tenantId, 'trash'), trashData);
 
       // Update local trash state
       setTrashedSlides(prev => [...prev, { trashId: trashDocRef.id, ...trashData }]);
@@ -482,7 +485,7 @@ function AdminView() {
     try {
       const timestamp = Date.now();
       const fileName = `${timestamp}_${file.name}`;
-      const storageRef = ref(storage, `slides/${fileName}`);
+      const storageRef = tenantStorageRef(storage, tenantId, `slides/${fileName}`);
 
       const snapshot = await uploadBytes(storageRef, file);
       const downloadURL = await getDownloadURL(snapshot.ref);
@@ -501,10 +504,10 @@ function AdminView() {
       const { width, height } = await dimensionsPromise;
 
       // Save to media library
-      await addDoc(collection(db, 'mediaLibrary'), {
+      await addDoc(tenantCollection(db, tenantId, 'mediaLibrary'), {
         name: file.name,
         url: downloadURL,
-        storagePath: `slides/${fileName}`,
+        storagePath: `tenants/${tenantId}/slides/${fileName}`,
         size: file.size,
         type: file.type,
         width,
@@ -589,7 +592,7 @@ function AdminView() {
     const loadingToast = toast.loading('Saving slide changes...');
     
     try {
-      const displayDocRef = doc(db, 'display', 'content');
+      const displayDocRef = tenantDoc(db, tenantId, 'display', 'content');
       await setDoc(displayDocRef, { playlists: updatedPlaylists }, { merge: true });
       
       toast.dismiss(loadingToast);
@@ -670,7 +673,7 @@ function AdminView() {
     try {
       const timestamp = Date.now();
       const fileName = `${timestamp}_${file.name}`;
-      const storageRef = ref(storage, `slides/${fileName}`);
+      const storageRef = tenantStorageRef(storage, tenantId, `slides/${fileName}`);
 
       const snapshot = await uploadBytes(storageRef, file);
       const downloadURL = await getDownloadURL(snapshot.ref);
@@ -712,7 +715,7 @@ function AdminView() {
       const loadingToast = toast.loading('Afbeelding verwijderen...');
 
       try {
-        const imageRef = ref(storage, `slides/${slide.imageName}`);
+        const imageRef = tenantStorageRef(storage, tenantId, `slides/${slide.imageName}`);
         await deleteObject(imageRef);
 
         const updatedPlaylists = playlists.map(playlist => {
@@ -808,7 +811,7 @@ function AdminView() {
       await savePlaylistsToFirebase(updatedPlaylists);
 
       // Remove from trash
-      await deleteDoc(doc(db, 'trash', trashId));
+      await deleteDoc(tenantDoc(db, tenantId, 'trash', trashId));
 
       // Update local trash state
       setTrashedSlides(prev => prev.filter(slide => slide.trashId !== trashId));
@@ -829,7 +832,7 @@ function AdminView() {
       // Delete image from storage if exists
       if (trashedSlide.imageUrl && trashedSlide.imageName) {
         try {
-          const imageRef = ref(storage, `slides/${trashedSlide.imageName}`);
+          const imageRef = tenantStorageRef(storage, tenantId, `slides/${trashedSlide.imageName}`);
           await deleteObject(imageRef);
         } catch (error) {
           console.error('Error deleting image:', error);
@@ -837,7 +840,7 @@ function AdminView() {
       }
 
       // Remove from trash collection
-      await deleteDoc(doc(db, 'trash', trashedSlide.trashId));
+      await deleteDoc(tenantDoc(db, tenantId, 'trash', trashedSlide.trashId));
 
       // Update local trash state
       setTrashedSlides(prev => prev.filter(slide => slide.trashId !== trashedSlide.trashId));
@@ -859,7 +862,7 @@ function AdminView() {
       for (const slide of trashedSlides) {
         if (slide.imageUrl && slide.imageName) {
           try {
-            const imageRef = ref(storage, `slides/${slide.imageName}`);
+            const imageRef = tenantStorageRef(storage, tenantId, `slides/${slide.imageName}`);
             await deleteObject(imageRef);
           } catch (error) {
             console.error('Error deleting image:', error);
@@ -869,7 +872,7 @@ function AdminView() {
 
       // Delete all trash documents
       const deletePromises = trashedSlides.map(slide =>
-        deleteDoc(doc(db, 'trash', slide.trashId))
+        deleteDoc(tenantDoc(db, tenantId, 'trash', slide.trashId))
       );
       await Promise.all(deletePromises);
 

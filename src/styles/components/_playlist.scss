@@ -46,7 +46,6 @@
 
   &:active {
     cursor: grabbing;
-    color: var(--primary);
     background-color: rgba(var(--primary), 0.1);
   }
 }
@@ -139,7 +138,6 @@
     align-items: center;
     gap: $spacing-xs;
     font-size: $font-size-base;
-    color: var(--primary);
     font-weight: $font-weight-medium;
   }
 }
@@ -154,7 +152,6 @@
     align-items: center;
     gap: $spacing-xs;
     font-size: $font-size-base;
-    color: var(--primary);
     font-weight: $font-weight-medium;
   }
 }

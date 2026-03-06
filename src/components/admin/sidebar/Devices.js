@@ -12,6 +12,7 @@ import {
 } from "firebase/firestore";
 import { db } from "../../../firebase";
 import { toast } from "sonner";
+import { useTenant } from "../../../context/TenantContext";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 import {
   setLinkedDevices,
@@ -22,6 +23,7 @@ import {
 } from "../../../store/slices/deviceSlice";
 
 function Devices({ setDeviceToDelete, deleteDevice }) {
+  const { tenantId } = useTenant();
   // Redux state
   const dispatch = useAppDispatch();
   const linkedDevices = useAppSelector((state) => state.device.linkedDevices);
@@ -51,7 +53,7 @@ function Devices({ setDeviceToDelete, deleteDevice }) {
   // Listen for linked devices
   useEffect(() => {
     const unsubscribe = onSnapshot(
-      query(collection(db, "devices"), where("isLinked", "==", true)),
+      query(collection(db, "devices"), where("isLinked", "==", true), where("tenantId", "==", tenantId)),
       (snapshot) => {
         const devices = snapshot.docs.map((doc) => {
           const data = doc.data();
@@ -150,7 +152,8 @@ function Devices({ setDeviceToDelete, deleteDevice }) {
         isPaired: true, // Also set isPaired for DisplayView compatibility
       };
 
-      await setDoc(doc(db, "devices", pairingData.deviceId), deviceData, {
+      // Write to root-level devices — includes tenantId so the display knows its tenant
+      await setDoc(doc(db, "devices", pairingData.deviceId), { ...deviceData, tenantId }, {
         merge: true,
       });
 

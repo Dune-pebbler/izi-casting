@@ -7,7 +7,7 @@
   font-size: $font-size-base;
   font-weight: $font-weight-medium;
   border: none;
-  border-radius: 200px;
+  border-radius: $border-radius-sm;
   cursor: pointer;
   text-decoration: none;
   transition: $transition-base;
@@ -63,11 +63,11 @@
   align-items: center;
   justify-content: center;
   min-width: 36px;
-  color: var(--foreground-secondary);
 
   &:hover:not(:disabled) {
     background-color: var(--destructive-light);
     color: var(--destructive);
+    
   }
 
   &:active:not(:disabled) {
