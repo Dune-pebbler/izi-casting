@@ -20,7 +20,10 @@
       "Bash(cd:*)",
       "Bash(./remove-legacy-variables.sh)",
       "Bash(./fix-remaining-variables.sh)",
-      "Bash(mkdir:*)"
+      "Bash(mkdir:*)",
+      "Bash(find /Users/ruben/Documents/Dune\\\\ pebbler/izi-casting/src/styles -type f -name \"*.scss\" -exec wc -l {} + | sort -rn)",
+      "Bash(wc -l /Users/ruben/Documents/Dune\\\\ pebbler/izi-casting/src/components/**/*.js | sort -rn | head -30)",
+      "Bash(find /Users/ruben/Documents/Dune\\\\ pebbler/izi-casting/src/components -type f -name \"*.js\" -exec wc -l {} + | sort -rn | head -30)"
     ],
     "deny": [],
     "ask": []
