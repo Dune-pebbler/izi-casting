@@ -2,30 +2,40 @@ import React, { useState, useEffect } from "react";
 import { collection, onSnapshot, doc, setDoc } from "firebase/firestore";
 import { db, auth } from "../../firebase";
 import { signOut } from "firebase/auth";
-import { Plus, ExternalLink, Users, Monitor, LogOut } from "lucide-react";
+import { Plus, ExternalLink, Users, Monitor, LogOut, Pencil } from "lucide-react";
 import CreateTenantModal from "./CreateTenantModal";
+import EditTenantModal from "./EditTenantModal";
 import { toast } from "sonner";
 
-function TenantCard({ tenant, onEditUsers }) {
-  const url = `https://izi-casting.com/${tenant.subdomain}`;
+function TenantCard({ tenant, onEditUsers, onEdit }) {
+  const url = `https://izi-casting.com/${tenant.id}`;
 
   return (
     <div className="tenant-card">
       <div className="tenant-card-header">
         <div>
           <h3 className="tenant-name">{tenant.name}</h3>
-          <p className="tenant-subdomain">izi-casting.com/{tenant.subdomain}</p>
+          <p className="tenant-subdomain">izi-casting.com/{tenant.id}</p>
         </div>
-        <a
-          href={url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="btn btn-sm btn-primary"
-          title="Open admin"
-        >
-          <ExternalLink size={14} />
-          <span>Open Admin</span>
-        </a>
+        <div className="tenant-card-header-actions">
+          <button
+            className="btn btn-sm btn-outline"
+            title="Bewerken"
+            onClick={() => onEdit(tenant)}
+          >
+            <Pencil size={14} />
+          </button>
+          <a
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn btn-sm btn-primary"
+            title="Open admin"
+          >
+            <ExternalLink size={14} />
+            <span>Open Admin</span>
+          </a>
+        </div>
       </div>
       <div className="tenant-card-stats">
         <span className="tenant-stat">
@@ -132,6 +142,7 @@ function SuperAdminView() {
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editingTenant, setEditingTenant] = useState(null);
+  const [editingTenantSettings, setEditingTenantSettings] = useState(null);
 
   useEffect(() => {
     const unsubscribe = onSnapshot(collection(db, "tenants"), (snapshot) => {
@@ -171,14 +182,14 @@ function SuperAdminView() {
         <div className="superadmin-toolbar">
           <h2>
             <Monitor size={20} />
-            Tenants ({tenants.length})
+            Klanten ({tenants.length})
           </h2>
           <button
             className="btn btn-primary"
             onClick={() => setShowCreateModal(true)}
           >
             <Plus size={16} />
-            Nieuwe tenant
+            Nieuwe klant
           </button>
         </div>
 
@@ -186,10 +197,10 @@ function SuperAdminView() {
           <div className="loading">Tenants laden...</div>
         ) : tenants.length === 0 ? (
           <div className="superadmin-empty">
-            <p>Nog geen tenants aangemaakt.</p>
+            <p>Nog geen klanten aangemaakt.</p>
             <button className="btn btn-primary" onClick={() => setShowCreateModal(true)}>
               <Plus size={16} />
-              Eerste tenant aanmaken
+              Eerste klant aanmaken
             </button>
           </div>
         ) : (
@@ -199,6 +210,7 @@ function SuperAdminView() {
                 key={tenant.id}
                 tenant={tenant}
                 onEditUsers={setEditingTenant}
+                onEdit={setEditingTenantSettings}
               />
             ))}
           </div>
@@ -221,6 +233,13 @@ function SuperAdminView() {
         onClose={() => setShowCreateModal(false)}
         onCreated={() => {}}
       />
+
+      {editingTenantSettings && (
+        <EditTenantModal
+          tenant={editingTenantSettings}
+          onClose={() => setEditingTenantSettings(null)}
+        />
+      )}
     </div>
   );
 }

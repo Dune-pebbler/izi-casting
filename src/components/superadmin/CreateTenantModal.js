@@ -37,7 +37,7 @@ function CreateTenantModal({ isOpen, onClose, onCreated }) {
         authorizedUsers,
         createdAt: new Date().toISOString(),
       });
-      toast.success(`Tenant "${name}" aangemaakt`);
+      toast.success(`Klant "${name}" aangemaakt`);
       onCreated?.();
       onClose();
       setPath("");
@@ -54,7 +54,7 @@ function CreateTenantModal({ isOpen, onClose, onCreated }) {
     <div className="modal-overlay create-tenant-modal-overlay" onClick={onClose}>
       <div className="modal create-tenant-modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
-          <h2>Nieuwe tenant aanmaken</h2>
+          <h2>Nieuwe klant aanmaken</h2>
           <button className="btn-icon" onClick={onClose}>
             <X size={20} />
           </button>
@@ -103,7 +103,7 @@ function CreateTenantModal({ isOpen, onClose, onCreated }) {
             onClick={handleCreate}
             disabled={isCreating}
           >
-            {isCreating ? "Aanmaken..." : "Tenant aanmaken"}
+            {isCreating ? "Aanmaken..." : "Klant aanmaken"}
           </button>
         </div>
       </div>

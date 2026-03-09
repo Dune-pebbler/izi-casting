@@ -120,6 +120,20 @@
   gap: $spacing-sm;
 }
 
+.tenant-card-header-actions {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+  flex-shrink: 0;
+}
+
+.form-hint {
+  font-size: $font-size-xs;
+  color: var(--foreground-muted);
+  margin-top: $spacing-xs;
+  display: block;
+}
+
 .tenant-name {
   font-size: $font-size-lg;
   font-weight: $font-weight-semibold;
