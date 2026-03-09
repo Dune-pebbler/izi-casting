@@ -4,26 +4,21 @@ const TenantContext = createContext(null);
 
 export function TenantProvider({ children }) {
   const value = useMemo(() => {
-    const hostname = window.location.hostname;
+    const pathname = window.location.pathname;
 
-    // Super admin mode: root domain (no subdomain, or www)
-    if (hostname === 'izi-casting.com' || hostname === 'www.izi-casting.com') {
+    // Super admin: /admin
+    if (pathname === '/admin') {
       return { tenantId: null, isSuperAdmin: true };
     }
 
-    // Subdomain: bakkerij.izi-casting.com → tenantId = "bakkerij"
-    const match = hostname.match(/^([^.]+)\.izi-casting\.com$/);
-    if (match) {
+    // Tenant admin: /:tenantId (any first path segment that isn't reserved)
+    const match = pathname.match(/^\/([a-zA-Z0-9_-]+)/);
+    if (match && !['login', 'test'].includes(match[1])) {
       return { tenantId: match[1], isSuperAdmin: false };
     }
 
-    // localhost: if REACT_APP_TENANT_ID is set, use that tenant
-    // otherwise behave as super admin (for local development of the dashboard)
-    const tenantId = process.env.REACT_APP_TENANT_ID;
-    if (tenantId) {
-      return { tenantId, isSuperAdmin: false };
-    }
-    return { tenantId: null, isSuperAdmin: true };
+    // Root / or anything else (display view)
+    return { tenantId: null, isSuperAdmin: false };
   }, []);
 
   return (

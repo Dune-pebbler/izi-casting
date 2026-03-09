@@ -33,6 +33,7 @@ function App() {
               <Route path="/" element={<DisplayView />} />
               <Route path="/test" element={<FeedTest />} />
               <Route path="/admin" element={<AdminRoute />} />
+              <Route path="/:tenantId" element={<AdminRoute />} />
             </Routes>
             <Toaster
               position="bottom-right"

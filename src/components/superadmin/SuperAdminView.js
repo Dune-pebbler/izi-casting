@@ -7,14 +7,14 @@ import CreateTenantModal from "./CreateTenantModal";
 import { toast } from "sonner";
 
 function TenantCard({ tenant, onEditUsers }) {
-  const url = `https://${tenant.subdomain}.izi-casting.com/admin`;
+  const url = `https://izi-casting.com/${tenant.subdomain}`;
 
   return (
     <div className="tenant-card">
       <div className="tenant-card-header">
         <div>
           <h3 className="tenant-name">{tenant.name}</h3>
-          <p className="tenant-subdomain">{tenant.subdomain}.izi-casting.com</p>
+          <p className="tenant-subdomain">izi-casting.com/{tenant.subdomain}</p>
         </div>
         <a
           href={url}
