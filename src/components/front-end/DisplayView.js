@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
-import { doc, onSnapshot, setDoc, getDoc, deleteDoc } from "firebase/firestore";
+import { doc, onSnapshot, setDoc, getDoc, deleteDoc, collection, query, where, getDocs } from "firebase/firestore";
 import { db } from "../../firebase";
 import { tenantDoc } from "../../utils/tenantPaths";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
@@ -183,15 +183,21 @@ function DisplayView() {
         return;
       }
 
-      const newCode = generatePairingCode();
-      console.log(
-        "Generated code:",
-        newCode,
-        "for device:",
-        currentDeviceId
-      );
+      // Delete any existing pairing codes for this device before creating a new one
+      try {
+        const oldCodes = await getDocs(
+          query(collection(db, "pairing_codes"), where("deviceId", "==", currentDeviceId))
+        );
+        for (const oldCode of oldCodes.docs) {
+          await deleteDoc(oldCode.ref);
+        }
+      } catch (e) {
+        // Non-critical — continue with new code generation
+      }
 
-      
+      const newCode = generatePairingCode();
+      console.log("Generated code:", newCode, "for device:", currentDeviceId);
+
       try {
         console.log("Saving to pairing_codes collection...");
         await setDoc(doc(db, "pairing_codes", newCode), {
