@@ -6,6 +6,22 @@
   background-color: var(--foreground);
   color: var(--surface);
   position: relative;
+  cursor: none;
+
+  // Hide cookie consent banners and overlays
+  .cc-window,
+  .cc-banner,
+  #cookiebot,
+  #CybotCookiebotDialog,
+  #CybotCookiebotDialogBodyUnderlay,
+  .cookieconsent,
+  .cookie-consent,
+  [id*="cookie-banner"],
+  [class*="cookie-banner"],
+  [id*="gdpr"],
+  [class*="gdpr"] {
+    display: none !important;
+  }
 
   &.pairing-screen {
     background-color: var(--background);

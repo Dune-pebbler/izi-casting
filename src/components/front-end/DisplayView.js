@@ -1022,12 +1022,6 @@ function DisplayView() {
     <div
       className="display-container"
     >
-      <FullscreenIndicator
-        isFullscreen={isFullscreen}
-        fullscreenSupported={fullscreenSupported}
-        requestFullscreen={requestFullscreen}
-      />
-      
       <SlideDisplay
         currentSlide={currentSlide}
         slideLayout={slideLayout}
