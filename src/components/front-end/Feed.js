@@ -300,16 +300,7 @@ function Feed({ feeds, settings }) {
   }, [rssFeed]);
 
   if (rssFeed.length === 0) {
-    return (
-      <div className="feed-container">
-        <div 
-          className="rss-placeholder"
-          style={{ color: settings.foregroundColor }}
-        >
-          RSS feeds aan het laden...
-        </div>
-      </div>
-    );
+    return null;
   }
 
   const currentItem = rssFeed[currentFeedIndex];
