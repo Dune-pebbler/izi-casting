@@ -154,6 +154,18 @@
   border-top: 1px solid var(--border);
 }
 
+// Create tenant modal overlay
+.create-tenant-modal-overlay,
+.modal-overlay:has(.create-tenant-modal) {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
 // Create tenant modal
 .create-tenant-modal {
   background: var(--surface);
@@ -237,22 +249,22 @@
   align-items: center;
   gap: 0;
 
-  .form-input {
-    border-radius: $border-radius-md 0 0 $border-radius-md;
-    flex: 1;
-  }
-
-  .subdomain-suffix {
+  .subdomain-prefix {
     padding: $spacing-sm $spacing-md;
     background: var(--muted);
     border: 1px solid var(--input-border);
-    border-left: none;
-    border-radius: 0 $border-radius-md $border-radius-md 0;
+    border-right: none;
+    border-radius: $border-radius-md 0 0 $border-radius-md;
     font-size: $font-size-sm;
     color: var(--foreground-muted);
     font-family: $font-family-mono;
     white-space: nowrap;
     line-height: 1.5;
+  }
+
+  .form-input {
+    border-radius: 0 $border-radius-md $border-radius-md 0;
+    flex: 1;
   }
 }
 

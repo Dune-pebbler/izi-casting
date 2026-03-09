@@ -5,7 +5,7 @@ import { db } from "../../firebase";
 import { toast } from "sonner";
 
 function CreateTenantModal({ isOpen, onClose, onCreated }) {
-  const [subdomain, setSubdomain] = useState("");
+  const [path, setPath] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [emailsInput, setEmailsInput] = useState("");
   const [isCreating, setIsCreating] = useState(false);
@@ -13,10 +13,10 @@ function CreateTenantModal({ isOpen, onClose, onCreated }) {
   if (!isOpen) return null;
 
   const handleCreate = async () => {
-    const tenantId = subdomain.trim().toLowerCase().replace(/[^a-z0-9-]/g, "");
+    const tenantId = path.trim().toLowerCase().replace(/[^a-z0-9-]/g, "");
     const name = displayName.trim();
     if (!tenantId) {
-      toast.error("Voer een geldig subdomein in (alleen letters, cijfers en koppeltekens)");
+      toast.error("Voer een geldig pad in (alleen letters, cijfers en koppeltekens)");
       return;
     }
     if (!name) {
@@ -33,14 +33,14 @@ function CreateTenantModal({ isOpen, onClose, onCreated }) {
     try {
       await setDoc(doc(db, "tenants", tenantId), {
         name,
-        subdomain: tenantId,
+        path: tenantId,
         authorizedUsers,
         createdAt: new Date().toISOString(),
       });
       toast.success(`Tenant "${name}" aangemaakt`);
       onCreated?.();
       onClose();
-      setSubdomain("");
+      setPath("");
       setDisplayName("");
       setEmailsInput("");
     } catch (error) {
@@ -51,7 +51,7 @@ function CreateTenantModal({ isOpen, onClose, onCreated }) {
   };
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
+    <div className="modal-overlay create-tenant-modal-overlay" onClick={onClose}>
       <div className="modal create-tenant-modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <h2>Nieuwe tenant aanmaken</h2>
@@ -61,16 +61,16 @@ function CreateTenantModal({ isOpen, onClose, onCreated }) {
         </div>
         <div className="modal-body">
           <div className="form-group">
-            <label>Subdomein</label>
+            <label>URL-pad</label>
             <div className="subdomain-input-wrapper">
+              <span className="subdomain-prefix">izi-casting.com/</span>
               <input
                 type="text"
                 className="form-input"
                 placeholder="bakkerij"
-                value={subdomain}
-                onChange={(e) => setSubdomain(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""))}
+                value={path}
+                onChange={(e) => setPath(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""))}
               />
-              <span className="subdomain-suffix">.izi-casting.com</span>
             </div>
           </div>
           <div className="form-group">
