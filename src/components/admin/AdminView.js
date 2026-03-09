@@ -15,7 +15,7 @@ import MoveSlideModal from './MoveSlideModal';
 import ImageLibraryModal from './modal/ImageLibraryModal';
 import TrashModal from './TrashModal';
 import Sidebar from './sidebar/Sidebar';
-import { Monitor, Clock, X, Settings, LayoutGrid, List, Moon, Sun } from 'lucide-react';
+import { Monitor, Clock, X, Settings, LayoutGrid, List } from 'lucide-react';
 
 function AdminView() {
   const { tenantId } = useTenant();
@@ -64,11 +64,6 @@ function AdminView() {
   const [editingPlaylistRepeatCountId, setEditingPlaylistRepeatCountId] = useState(null);
   const [playlistToDelete, setPlaylistToDelete] = useState(null);
   const [globalLayout, setGlobalLayout] = useState('grid'); // 'grid' or 'list'
-  const [isDarkMode, setIsDarkMode] = useState(() => {
-    // Use system preference as default
-    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-  });
-  const [darkModeLoaded, setDarkModeLoaded] = useState(false);
 
   // Move slide modal state
   const [moveSlideModalOpen, setMoveSlideModalOpen] = useState(false);
@@ -105,43 +100,10 @@ function AdminView() {
     loadSettings();
   }, []);
 
-  // Load user's dark mode preference from Firebase
+  // Ensure light mode is always applied
   useEffect(() => {
-    const loadDarkModePreference = async () => {
-      try {
-        const user = auth.currentUser;
-        if (user) {
-          const userPrefsDoc = await getDoc(doc(db, "userPreferences", user.uid));
-          if (userPrefsDoc.exists()) {
-            const prefs = userPrefsDoc.data();
-            if (prefs.darkMode !== undefined) {
-              // User has a saved preference
-              setIsDarkMode(prefs.darkMode);
-            }
-            // else: keep system preference (already set in state initialization)
-          }
-          // else: new user, keep system preference
-        }
-        setDarkModeLoaded(true);
-      } catch (error) {
-        console.error("Error loading dark mode preference:", error);
-        setDarkModeLoaded(true);
-      }
-    };
-
-    loadDarkModePreference();
+    document.documentElement.removeAttribute('data-theme');
   }, []);
-
-  // Apply dark mode to document root
-  useEffect(() => {
-    if (!darkModeLoaded) return; // Wait until preference is loaded
-
-    if (isDarkMode) {
-      document.documentElement.setAttribute('data-theme', 'dark');
-    } else {
-      document.documentElement.removeAttribute('data-theme');
-    }
-  }, [isDarkMode, darkModeLoaded]);
 
   // Load trashed slides from Firebase
   useEffect(() => {
@@ -256,24 +218,6 @@ function AdminView() {
     setGlobalLayout(prevLayout => prevLayout === 'grid' ? 'list' : 'grid');
   };
 
-  const toggleDarkMode = async () => {
-    const newDarkMode = !isDarkMode;
-    setIsDarkMode(newDarkMode);
-
-    // Save to Firebase
-    try {
-      const user = auth.currentUser;
-      if (user) {
-        await setDoc(doc(db, "userPreferences", user.uid), {
-          darkMode: newDarkMode,
-          updatedAt: new Date().toISOString()
-        }, { merge: true });
-      }
-    } catch (error) {
-      console.error("Error saving dark mode preference:", error);
-      toast.error("Failed to save dark mode preference");
-    }
-  };
 
   const handleAddPlaylist = async () => {
     const newPlaylistId = await addPlaylist();
@@ -954,13 +898,7 @@ function AdminView() {
             >
               {globalLayout === 'grid' ? <List size={18} /> : <LayoutGrid size={16} />}
             </button>
-            <button
-              className="admin-layout-btn"
-              onClick={toggleDarkMode}
-              title={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
-            >
-              {isDarkMode ? <Sun size={18} /> : <Moon size={18} />}
-            </button>
+
             <button
               className="admin-settings-btn"
               onClick={toggleSidebarCollapse}
