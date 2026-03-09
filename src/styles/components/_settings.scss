@@ -49,7 +49,7 @@
   // Settings Content - matches feed-list content styling
   .settings-content {
     margin-top: $spacing-sm;
-    border-radius: 1em;
+    border-radius: $border-radius-lg;
     background-color: var(--surface);
     border: 1px solid var(--border);
     transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
@@ -138,7 +138,7 @@
           .logo-image {
             max-width: 200px;
             max-height: 120px;
-            border-radius: 1em;
+            border-radius: $border-radius-md;
             border: 1px solid var(--border);
           }
 
@@ -173,7 +173,7 @@
 
       .logo-upload-placeholder {
         border: 2px dashed var(--border);
-        border-radius: 1em;
+        border-radius: $border-radius-lg;
         padding: $spacing-xl;
         text-align: center;
         transition: $transition-base;
@@ -234,7 +234,7 @@
           cursor: pointer;
           appearance: none;
           border: 2px solid var(--border);
-          border-radius: 1em;
+          border-radius: $border-radius-md;
           background-color: var(--surface);
           transition: $transition-base;
           position: relative;
@@ -298,7 +298,7 @@
             width: 40px;
             height: 40px;
             border: 1px solid var(--border);
-            border-radius: 1em;
+            border-radius: $border-radius-md;
             cursor: pointer;
             padding: 0;
             transition: $transition-base;
@@ -319,7 +319,7 @@
 
             &::-webkit-color-swatch {
               border: none;
-              border-radius: 1em;
+              border-radius: $border-radius-md;
             }
           }
 
@@ -328,7 +328,7 @@
             height: 40px;
             padding: 0.6em;
             border: 1px solid var(--border);
-            border-radius: 1em;
+            border-radius: $border-radius-md;
             font-size: $font-size-sm;
             font-family: $font-family-mono;
             background-color: var(--surface);
@@ -364,7 +364,7 @@
           width: 100%;
           padding: 0.6em;
           border: 1px solid var(--border);
-          border-radius: 1em;
+          border-radius: $border-radius-md;
           font-size: $font-size-sm;
           background-color: var(--surface);
           color: var(--foreground);
@@ -398,7 +398,7 @@
         width: 100%;
         padding: $spacing-sm;
         border: 1px solid var(--border);
-        border-radius: 1em;
+        border-radius: $border-radius-md;
         background-color: var(--surface);
         color: var(--foreground);
         cursor: pointer;
@@ -425,7 +425,7 @@
         margin-top: $spacing-md;
         padding: $spacing-md;
         border: 1px solid var(--border);
-        border-radius: 1em;
+        border-radius: $border-radius-md;
         background-color: rgba(var(--muted), 0.3);
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
