@@ -8018,6 +8018,17 @@ a:hover {
   border-top: 1px solid var(--border);
 }
 
+.create-tenant-modal-overlay,
+.modal-overlay:has(.create-tenant-modal) {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
 .create-tenant-modal {
   background: var(--surface);
   border-radius: 12px;
@@ -8094,21 +8105,21 @@ a:hover {
   align-items: center;
   gap: 0;
 }
-.subdomain-input-wrapper .form-input, .subdomain-input-wrapper .form-textarea, .subdomain-input-wrapper .form-select {
-  border-radius: 6px 0 0 6px;
-  flex: 1;
-}
-.subdomain-input-wrapper .subdomain-suffix {
+.subdomain-input-wrapper .subdomain-prefix {
   padding: 8px 16px;
   background: var(--muted);
   border: 1px solid var(--input-border);
-  border-left: none;
-  border-radius: 0 6px 6px 0;
+  border-right: none;
+  border-radius: 6px 0 0 6px;
   font-size: 12px;
   color: var(--foreground-muted);
   font-family: "SF Mono", Monaco, Inconsolata, "Roboto Mono", monospace;
   white-space: nowrap;
   line-height: 1.5;
+}
+.subdomain-input-wrapper .form-input, .subdomain-input-wrapper .form-textarea, .subdomain-input-wrapper .form-select {
+  border-radius: 0 6px 6px 0;
+  flex: 1;
 }
 
 .user-management-panel {
