@@ -288,6 +288,7 @@ function SlideDisplay({ currentSlide, slideLayout, nextSlide, nextSlideLayout })
                 className="display-iframe-content"
                 sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
                 allow="autoplay; fullscreen"
+                scrolling="no"
               />
             ) : (
               <div className="display-iframe-placeholder">
