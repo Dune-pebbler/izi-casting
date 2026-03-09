@@ -4,6 +4,7 @@ import {
   doc,
   getDoc,
   setDoc,
+  deleteDoc,
   updateDoc,
   collection,
   query,
@@ -157,12 +158,8 @@ function Devices({ setDeviceToDelete, deleteDevice }) {
         merge: true,
       });
 
-      // Mark pairing code as used
-      await setDoc(
-        doc(db, "pairing_codes", enteredPairingCode),
-        { isUsed: true, usedAt: new Date() },
-        { merge: true }
-      );
+      // Delete pairing code — it's been used, no need to keep it
+      await deleteDoc(doc(db, "pairing_codes", enteredPairingCode));
 
       setEnteredPairingCode("");
       dispatch(setShowPairingForm(false));

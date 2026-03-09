@@ -754,12 +754,7 @@ function AdminView() {
 
   const deleteDevice = async (deviceId) => {
     try {
-      await setDoc(doc(db, 'devices', deviceId), {
-        isPaired: false,
-        isLinked: false,
-        unpairedAt: new Date().toISOString()
-      }, { merge: true });
-      
+      await deleteDoc(doc(db, 'devices', deviceId));
       dispatch(clearDeviceToDelete());
       toast.success('Apparaat succesvol ontkoppeld');
     } catch (error) {

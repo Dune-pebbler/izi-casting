@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
-import { doc, onSnapshot, setDoc, getDoc } from "firebase/firestore";
+import { doc, onSnapshot, setDoc, getDoc, deleteDoc } from "firebase/firestore";
 import { db } from "../../firebase";
 import { tenantDoc } from "../../utils/tenantPaths";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
@@ -558,11 +558,9 @@ function DisplayView() {
             }
             
             
-            setDoc(doc(db, "device_commands", currentDeviceId), {
-              processed: true,
-              processedAt: new Date()
-            }, { merge: true }).catch(error => {
-              console.error("Error marking command as processed:", error);
+            // Delete command after processing — keeps collection clean
+            deleteDoc(doc(db, "device_commands", currentDeviceId)).catch(error => {
+              console.error("Error deleting processed command:", error);
             });
           }
         }
