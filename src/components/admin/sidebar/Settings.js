@@ -364,8 +364,10 @@ function Settings({ onOpenTrash, trashedSlidesCount = 0 }) {
                     >
                       <option value="onder">Onder</option>
                       <option value="boven">Boven</option>
-                      <option value="transparant onder">Transparant Onder</option>
-                      <option value="transparant boven">Transparant Boven</option>
+                      <option value="donker transparant onder">Donker Transparant Onder</option>
+                      <option value="donker transparant boven">Donker Transparant Boven</option>
+                      <option value="licht transparant onder">Licht Transparant Onder</option>
+                      <option value="licht transparant boven">Licht Transparant Boven</option>
                     </select>
                   </div>
                 </div>

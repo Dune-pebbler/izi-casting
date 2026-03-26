@@ -47,21 +47,35 @@ function StatusBar({ currentSlide, settings, feeds }) {
             borderBottom: "1px solid var(--gray-700)",
             borderTop: "none",
           };
-        case "transparant onder":
+        case "donker transparant onder":
+        case "transparant onder": // legacy
           return {
             ...baseStyle,
-            backgroundColor: "rgba(0, 0, 0, 0.3)",
-            backdropFilter: "blur(2px)",
-            WebkitBackdropFilter: "blur(2px)",
+            backgroundColor: "rgba(0, 0, 0, 0.6)",
             border: "none",
             boxShadow: "none",
           };
-        case "transparant boven":
+        case "donker transparant boven":
+        case "transparant boven": // legacy
           return {
             ...baseStyle,
-            backgroundColor: "rgba(0, 0, 0, 0.3)",
-            backdropFilter: "blur(2px)",
-            WebkitBackdropFilter: "blur(2px)",
+            backgroundColor: "rgba(0, 0, 0, 0.6)",
+            top: 0,
+            bottom: "auto",
+            border: "none",
+            boxShadow: "none",
+          };
+        case "licht transparant onder":
+          return {
+            ...baseStyle,
+            backgroundColor: "rgba(255, 255, 255, 0.45)",
+            border: "none",
+            boxShadow: "none",
+          };
+        case "licht transparant boven":
+          return {
+            ...baseStyle,
+            backgroundColor: "rgba(255, 255, 255, 0.45)",
             top: 0,
             bottom: "auto",
             border: "none",

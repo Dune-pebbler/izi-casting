@@ -34,66 +34,67 @@ function TextEditor({ content, onContentChange }) {
     textcolor_cols: 6,
     textcolor_rows: 3,
     content_style: `
-      body { 
-        font-family: 'Roboto', Arial, Helvetica, sans-serif; 
-        font-size: 16px; 
-        line-height: 1.6; 
-        margin: 0; 
-        padding: 20px; 
+      body {
+        font-family: 'Roboto', Arial, Helvetica, sans-serif;
+        font-size: 27px;
+        line-height: 1.6;
+        margin: 0;
+        padding: 20px;
         color: #333;
       }
-      
+
       h1 {
-        font-size: 2.5em;
+        font-size: 64px;
         font-weight: 600;
-        margin: 1.5em 0 0.5em 0;
+        margin: 0.5em 0 0.25em 0;
         line-height: 1.2;
         color: #1a1a1a;
         border-bottom: 2px solid #e1e5e9;
         padding-bottom: 0.3em;
       }
-      
+
       h2 {
-        font-size: 2em;
+        font-size: 53px;
         font-weight: 600;
-        margin: 1.3em 0 0.4em 0;
+        margin: 0.5em 0 0.25em 0;
         line-height: 1.3;
         color: #1a1a1a;
       }
-      
+
       h3 {
-        font-size: 1.5em;
+        font-size: 43px;
         font-weight: 600;
-        margin: 1.1em 0 0.3em 0;
+        margin: 0.5em 0 0.25em 0;
         line-height: 1.4;
         color: #1a1a1a;
       }
-      
+
       h4 {
-        font-size: 1.25em;
+        font-size: 32px;
         font-weight: 600;
-        margin: 1em 0 0.3em 0;
+        margin: 0.5em 0 0.25em 0;
         line-height: 1.4;
         color: #1a1a1a;
       }
-      
+
       h5 {
-        font-size: 1.1em;
+        font-size: 27px;
         font-weight: 600;
-        margin: 0.9em 0 0.3em 0;
+        margin: 0.5em 0 0.25em 0;
         line-height: 1.4;
         color: #1a1a1a;
       }
-      
+
       h6 {
-        font-size: 1em;
+        font-size: 27px;
         font-weight: 600;
-        margin: 0.8em 0 0.3em 0;
+        margin: 0.5em 0 0.25em 0;
         line-height: 1.4;
         color: #1a1a1a;
       }
-      
+
       p {
+        font-size: 27px;
         margin: 0 0 1em 0;
         line-height: 1.6;
         color: #333;
@@ -278,8 +279,25 @@ function TextEditor({ content, onContentChange }) {
       }
     `,
     setup: (editor) => {
+      // Strip inline font-size from headings so our CSS sizes take effect
+      const stripHeadingFontSizes = () => {
+        editor.dom.select('h1,h2,h3,h4,h5,h6').forEach((el) => {
+          el.style.removeProperty('font-size');
+          editor.dom.select('*', el).forEach((child) => {
+            child.style.removeProperty('font-size');
+          });
+        });
+      };
+
       editor.on('init', () => {
+        stripHeadingFontSizes();
         editor.focus();
+      });
+
+      editor.on('FormatApply', ({ format }) => {
+        if (['h1','h2','h3','h4','h5','h6'].includes(format)) {
+          setTimeout(stripHeadingFontSizes, 0);
+        }
       });
     }
   };

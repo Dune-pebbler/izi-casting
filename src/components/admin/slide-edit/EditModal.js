@@ -25,6 +25,7 @@ function EditModal({
   enabledFonts,
   teletekstChannel,
   teletekstTheme,
+  teletekstPageCount,
   iframeUrl,
   onClose,
   onSave,
@@ -41,6 +42,7 @@ function EditModal({
   onTransitionChange,
   onTeletekstChannelChange,
   onTeletekstThemeChange,
+  onTeletekstPageCountChange,
   onIframeUrlChange,
   onOpenLibrary,
 }) {
@@ -162,8 +164,10 @@ function EditModal({
               <TeletekstInput
                 channel={teletekstChannel}
                 theme={teletekstTheme}
+                pageCount={teletekstPageCount}
                 onChannelChange={onTeletekstChannelChange}
                 onThemeChange={onTeletekstThemeChange}
+                onPageCountChange={onTeletekstPageCountChange}
               />
             </div>
           </div>

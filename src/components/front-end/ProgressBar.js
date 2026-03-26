@@ -10,25 +10,21 @@ function ProgressBar({ currentSlide, slideProgress, progressBarRef, barStyle }) 
   const getProgressBarStyle = () => {
     switch (barStyle) {
       case "boven":
+      case "donker transparant boven":
+      case "licht transparant boven":
+      case "transparant boven": // legacy
         return {
-          top: "20vh", // Position below the top bar
+          top: "140px",
           bottom: "auto",
-        };
-      case "transparant boven":
-        return {
-          top: "20vh", // Position below the top bar
-          bottom: "auto",
-        };
-      case "transparant onder":
-        return {
-          top: "auto",
-          bottom: "20vh", // Position above the bottom bar
         };
       case "onder":
+      case "donker transparant onder":
+      case "licht transparant onder":
+      case "transparant onder": // legacy
       default:
         return {
           top: "auto",
-          bottom: "20vh", // Position above the bottom bar
+          bottom: "140px",
         };
     }
   };

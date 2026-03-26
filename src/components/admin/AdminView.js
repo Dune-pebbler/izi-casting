@@ -50,6 +50,7 @@ function AdminView() {
   const [modalSlideTransition, setModalSlideTransition] = useState('fade');
   const [modalTeletekstChannel, setModalTeletekstChannel] = useState('101');
   const [modalTeletekstTheme, setModalTeletekstTheme] = useState('classic');
+  const [modalTeletekstPageCount, setModalTeletekstPageCount] = useState(1);
   const [modalIframeUrl, setModalIframeUrl] = useState('');
   const [currentEditingPlaylistId, setCurrentEditingPlaylistId] = useState(null);
   const [slideToDelete, setSlideToDelete] = useState(null);
@@ -385,6 +386,7 @@ function AdminView() {
     setModalSlideTransition(slide.transition || 'fade');
     setModalTeletekstChannel(slide.teletekstChannel || '101');
     setModalTeletekstTheme(slide.teletekstTheme || 'classic');
+    setModalTeletekstPageCount(slide.teletekstPageCount || 1);
     setModalIframeUrl(slide.iframeUrl || '');
   };
 
@@ -499,6 +501,7 @@ function AdminView() {
               videoUrl: modalVideoUrl,
               teletekstChannel: modalTeletekstChannel,
               teletekstTheme: modalTeletekstTheme,
+              teletekstPageCount: modalTeletekstPageCount,
               iframeUrl: modalIframeUrl,
               type: slideLayout === 'iframe' ? 'iframe' : (slideLayout === 'teletekst' ? 'teletekst' : (modalVideoUrl ? 'video' : (modalImageUrl ? 'image' : 'text'))),
               imagePosition: imagePosition,
@@ -980,8 +983,10 @@ function AdminView() {
           enabledFonts={enabledFonts}
           teletekstChannel={modalTeletekstChannel}
           teletekstTheme={modalTeletekstTheme}
+          teletekstPageCount={modalTeletekstPageCount}
           onTeletekstChannelChange={setModalTeletekstChannel}
           onTeletekstThemeChange={setModalTeletekstTheme}
+          onTeletekstPageCountChange={setModalTeletekstPageCount}
           iframeUrl={modalIframeUrl}
           onIframeUrlChange={setModalIframeUrl}
           onOpenLibrary={handleOpenImageLibrary}

@@ -1,7 +1,7 @@
 export default async function handler(req, res) {
   const { channel } = req.query;
 
-  if (!channel || !/^\d{1,4}$/.test(channel)) {
+  if (!channel || !/^\d{1,4}(-\d+)?$/.test(channel)) {
     return res.status(400).json({ error: 'Invalid channel' });
   }
 

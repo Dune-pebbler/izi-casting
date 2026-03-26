@@ -270,6 +270,8 @@ function SlideDisplay({ currentSlide, slideLayout, nextSlide, nextSlideLayout })
               <TeletekstDisplay
                 channel={slide.teletekstChannel}
                 theme={slide.teletekstTheme || 'classic'}
+                pageCount={slide.teletekstPageCount || 1}
+                duration={slide.duration || 10}
               />
             ) : (
               <div className="display-teletekst-placeholder">

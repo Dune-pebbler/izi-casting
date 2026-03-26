@@ -2,21 +2,24 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Tv, RefreshCw, AlertCircle } from 'lucide-react';
 import { TELETEKST_THEMES } from '../admin/slide-edit/TeletekstInput';
 
-function TeletekstDisplay({ channel = '101', theme = 'classic' }) {
+function TeletekstDisplay({ channel = '101', theme = 'classic', pageCount = 1, duration = 10 }) {
   const [content, setContent] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [shouldScroll, setShouldScroll] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
   const contentRef = useRef(null);
 
   const selectedTheme = TELETEKST_THEMES.find(t => t.id === theme) || TELETEKST_THEMES[0];
+  const totalPages = Math.max(1, pageCount);
 
-  const fetchTeletekst = async () => {
+  const fetchTeletekst = async (page) => {
     try {
       setLoading(true);
       setError(null);
 
-      const response = await fetch(`/api/teletekst/${channel}`);
+      const key = page > 1 ? `${channel}-${page}` : channel;
+      const response = await fetch(`/api/teletekst/${key}`);
 
       if (!response.ok) {
         throw new Error(`Failed to load page ${channel}`);
@@ -43,15 +46,36 @@ function TeletekstDisplay({ channel = '101', theme = 'classic' }) {
     }
   };
 
+  // Initial fetch and 60-second refresh
+  const fetchTeletekstRef = useRef(fetchTeletekst);
+  fetchTeletekstRef.current = fetchTeletekst;
+
   useEffect(() => {
     if (channel) {
-      fetchTeletekst();
+      setCurrentPage(1);
+      fetchTeletekstRef.current(1);
 
-      // Refresh every 60 seconds
-      const interval = setInterval(fetchTeletekst, 60000);
+      const interval = setInterval(() => fetchTeletekstRef.current(currentPageRef.current), 60000);
       return () => clearInterval(interval);
     }
   }, [channel]);
+
+  const currentPageRef = useRef(currentPage);
+  currentPageRef.current = currentPage;
+
+  // Cycle through sub-pages when pageCount > 1
+  useEffect(() => {
+    if (totalPages <= 1) return;
+
+    const perPage = duration / totalPages;
+    const timer = setTimeout(() => {
+      const next = currentPage >= totalPages ? 1 : currentPage + 1;
+      setCurrentPage(next);
+      fetchTeletekstRef.current(next);
+    }, perPage * 1000);
+
+    return () => clearTimeout(timer);
+  }, [currentPage, totalPages, duration]);
 
   // Check if content overflows and should scroll
   useEffect(() => {
@@ -68,7 +92,7 @@ function TeletekstDisplay({ channel = '101', theme = 'classic' }) {
           // Calculate scroll distance and duration based on content height
           // Add extra 200px to scroll further so the end appears higher on screen
           const scrollDistance = contentHeight - containerHeight + 200;
-          const duration = Math.max(20, (scrollDistance / 30)); // ~30px per second
+          const duration = scrollDistance / 30; // 30px per second max scroll speed
 
           if (contentRef.current) {
             contentRef.current.style.setProperty('--scroll-distance', `-${scrollDistance}px`);
@@ -137,6 +161,7 @@ function TeletekstDisplay({ channel = '101', theme = 'classic' }) {
       }}
     >
       <div
+        key={currentPage}
         ref={contentRef}
         className={`teletekst-content ${shouldScroll ? 'auto-scroll' : ''}`}
         dangerouslySetInnerHTML={{ __html: content }}

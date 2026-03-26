@@ -76,6 +76,48 @@
     line-height: 1.4;
   }
 
+  .page-count-selector {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+
+    .page-count-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 2.5rem;
+      height: 2.5rem;
+      border: 2px solid var(--primary);
+      border-radius: 8px;
+      background: var(--bg-primary);
+      color: var(--primary);
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      &:hover:not(:disabled) {
+        background: var(--primary);
+        color: #fff;
+      }
+
+      &:disabled {
+        opacity: 0.35;
+        cursor: not-allowed;
+        border-color: var(--border-color);
+        color: var(--text-tertiary);
+      }
+    }
+
+    .page-count-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      min-width: 4rem;
+      text-align: center;
+      letter-spacing: 0.05em;
+    }
+  }
+
   .theme-selector {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
@@ -223,7 +265,13 @@
   0% {
     transform: translateY(0);
   }
+  15% {
+    transform: translateY(0);
+  }
   50% {
+    transform: translateY(var(--scroll-distance, -200px));
+  }
+  65% {
     transform: translateY(var(--scroll-distance, -200px));
   }
   100% {
@@ -250,7 +298,7 @@
     width: fit-content;
 
     &.auto-scroll {
-      animation: teletekst-scroll var(--scroll-duration, 20s) ease-in-out infinite;
+      animation: teletekst-scroll var(--scroll-duration, 20s) linear infinite;
     }
 
     // Color classes - use theme colors

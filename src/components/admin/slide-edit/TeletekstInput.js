@@ -1,5 +1,5 @@
-import React from 'react';
-import { Tv, Palette } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Tv, Palette, ChevronLeft, ChevronRight } from 'lucide-react';
 
 export const TELETEKST_THEMES = [
   {
@@ -132,7 +132,10 @@ export const TELETEKST_THEMES = [
   },
 ];
 
-function TeletekstInput({ channel = '101', theme = 'classic', onChannelChange, onThemeChange }) {
+function TeletekstInput({ channel = '101', theme = 'classic', pageCount = 1, onChannelChange, onThemeChange, onPageCountChange }) {
+  const [maxPages, setMaxPages] = useState(1);
+  const [detectingPages, setDetectingPages] = useState(false);
+
   const handleChange = (e) => {
     const value = e.target.value;
     // Only allow numbers and limit to 3 digits
@@ -146,6 +149,42 @@ function TeletekstInput({ channel = '101', theme = 'classic', onChannelChange, o
       onThemeChange(e.target.value);
     }
   };
+
+  // Detect how many sub-pages are available for this channel
+  useEffect(() => {
+    if (!channel || channel.length < 3) {
+      setMaxPages(1);
+      return;
+    }
+
+    let cancelled = false;
+    const detect = async () => {
+      setDetectingPages(true);
+      try {
+        let page = 1;
+        let nextSubPage = true;
+        while (nextSubPage) {
+          const key = page === 1 ? channel : `${channel}-${page}`;
+          const res = await fetch(`/api/teletekst/${key}`);
+          if (!res.ok) break;
+          const ct = res.headers.get('content-type') || '';
+          if (!ct.includes('application/json')) break;
+          const data = await res.json();
+          nextSubPage = !!data.nextSubPage;
+          page += 1;
+          if (page > 10) break; // safety cap
+        }
+        if (!cancelled) setMaxPages(page - 1);
+      } catch {
+        if (!cancelled) setMaxPages(1);
+      } finally {
+        if (!cancelled) setDetectingPages(false);
+      }
+    };
+
+    const timer = setTimeout(detect, 600);
+    return () => { cancelled = true; clearTimeout(timer); };
+  }, [channel]);
 
   const selectedTheme = TELETEKST_THEMES.find(t => t.id === theme) || TELETEKST_THEMES[0];
 
@@ -168,6 +207,45 @@ function TeletekstInput({ channel = '101', theme = 'classic', onChannelChange, o
           Voer een 3-cijferig NOS Teletekst paginanummer in (bijv. 101 voor nieuws, 102 voor koppen)
         </p>
       </div>
+
+      {channel.length === 3 && (
+        <div className="teletekst-input-section">
+          <label className="input-label">
+            <Tv size={16} />
+            Aantal pagina's
+          </label>
+          {detectingPages ? (
+            <p className="input-hint">Pagina's detecteren...</p>
+          ) : maxPages <= 1 ? (
+            <p className="input-hint">Deze pagina heeft geen subpagina's.</p>
+          ) : (
+            <>
+              <div className="page-count-selector">
+                <button
+                  type="button"
+                  className="page-count-btn"
+                  onClick={() => onPageCountChange && onPageCountChange(Math.max(1, pageCount - 1))}
+                  disabled={pageCount <= 1}
+                >
+                  <ChevronLeft size={16} />
+                </button>
+                <span className="page-count-value">{pageCount} / {maxPages}</span>
+                <button
+                  type="button"
+                  className="page-count-btn"
+                  onClick={() => onPageCountChange && onPageCountChange(Math.min(maxPages, pageCount + 1))}
+                  disabled={pageCount >= maxPages}
+                >
+                  <ChevronRight size={16} />
+                </button>
+              </div>
+              <p className="input-hint">
+                Toon {pageCount === 1 ? 'alleen pagina 1' : `pagina's 1 t/m ${pageCount}`} — elke pagina wordt even lang getoond.
+              </p>
+            </>
+          )}
+        </div>
+      )}
 
       <div className="teletekst-theme-section">
         <label className="input-label">
@@ -201,6 +279,9 @@ function TeletekstInput({ channel = '101', theme = 'classic', onChannelChange, o
       <div className="teletekst-preview">
         <p className="preview-label">API Eindpunt:</p>
         <code>/api/teletekst/{channel || '101'}</code>
+        {pageCount > 1 && (
+          <code> … /api/teletekst/{channel}-{pageCount}</code>
+        )}
       </div>
     </div>
   );
