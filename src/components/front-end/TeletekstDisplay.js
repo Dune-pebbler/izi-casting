@@ -22,6 +22,11 @@ function TeletekstDisplay({ channel = '101', theme = 'classic' }) {
         throw new Error(`Failed to load page ${channel}`);
       }
 
+      const contentType = response.headers.get('content-type') || '';
+      if (!contentType.includes('application/json')) {
+        throw new Error(`Pagina ${channel} niet beschikbaar`);
+      }
+
       const data = await response.json();
 
       // Extract text content from the JSON response
