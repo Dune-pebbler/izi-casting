@@ -135,8 +135,9 @@ function Settings({ onOpenTrash, trashedSlidesCount = 0 }) {
 
       setSettings(newSettings);
 
-      // Save to Firestore
-      await setDoc(tenantDoc(db, tenantId, "display", "settings"), newSettings, {
+      // Save to Firestore — exclude feeds, managed separately by FeedList
+      const { feeds: _feeds, ...newSettingsToSave } = newSettings;
+      await setDoc(tenantDoc(db, tenantId, "display", "settings"), newSettingsToSave, {
         merge: true,
       });
 
@@ -177,8 +178,9 @@ function Settings({ onOpenTrash, trashedSlidesCount = 0 }) {
 
       setSettings(newSettings);
 
-      // Save to Firestore
-      await setDoc(tenantDoc(db, tenantId, "display", "settings"), newSettings, {
+      // Save to Firestore — exclude feeds, managed separately by FeedList
+      const { feeds: _feeds, ...newSettingsToSave } = newSettings;
+      await setDoc(tenantDoc(db, tenantId, "display", "settings"), newSettingsToSave, {
         merge: true,
       });
 
@@ -203,7 +205,9 @@ function Settings({ onOpenTrash, trashedSlidesCount = 0 }) {
 
     try {
       const settingsDocRef = tenantDoc(db, tenantId, "display", "settings");
-      await setDoc(settingsDocRef, settings, { merge: true });
+      // Exclude feeds — those are managed separately by FeedList and should never be overwritten here
+      const { feeds: _feeds, ...settingsToSave } = settings;
+      await setDoc(settingsDocRef, settingsToSave, { merge: true });
 
       // Dismiss loading toast and show success
       toast.dismiss(loadingToast);
