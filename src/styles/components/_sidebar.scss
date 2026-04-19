@@ -91,16 +91,19 @@
   // Logo Section
   .sidebar-logo {
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     padding: $spacing-md 0;
     margin-bottom: $spacing-lg;
+    gap: $spacing-xs;
 
     .logo-image {
       width: 120px;
       transition: height 0.3s ease;
     }
   }
+
 
   // Delete confirmation modal styles
   .delete-modal-overlay {
@@ -244,6 +247,13 @@
         min-width: 0;
       }
 
+      .user-item-actions {
+        display: flex;
+        align-items: center;
+        gap: $spacing-xs;
+        flex-shrink: 0;
+      }
+
       .user-remove-btn {
         flex-shrink: 0;
         display: flex;
@@ -270,6 +280,27 @@
       color: var(--foreground-muted);
       padding: $spacing-sm $spacing-md;
       text-align: center;
+    }
+  }
+
+  .user-role-select {
+    padding: $spacing-xs $spacing-sm;
+    border: 1px solid var(--border);
+    border-radius: $border-radius-sm;
+    background: var(--background);
+    color: var(--foreground);
+    font-size: $font-size-xs;
+    font-family: $font-family-base;
+    cursor: pointer;
+
+    &:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: default;
     }
   }
 

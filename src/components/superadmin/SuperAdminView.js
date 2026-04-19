@@ -1,14 +1,64 @@
 import React, { useState, useEffect } from "react";
-import { collection, onSnapshot, doc, setDoc } from "firebase/firestore";
+import { collection, onSnapshot, doc, setDoc, getDoc } from "firebase/firestore";
 import { db, auth } from "../../firebase";
 import { signOut } from "firebase/auth";
-import { Plus, ExternalLink, Users, Monitor, LogOut, Pencil } from "lucide-react";
+import { Plus, ExternalLink, Users, Monitor, LogOut, Pencil, ShieldCheck } from "lucide-react";
 import CreateTenantModal from "./CreateTenantModal";
 import EditTenantModal from "./EditTenantModal";
 import { toast } from "sonner";
 
-function TenantCard({ tenant, onEditUsers, onEdit }) {
+function normaliseUser(u) {
+  if (typeof u === "string") return { email: u, role: "admin" };
+  return { email: u.email, role: u.role || "admin" };
+}
+
+function TenantCard({ tenant, onEdit }) {
   const url = `https://izi-casting.com/${tenant.id}`;
+  const [users, setUsers] = useState((tenant.authorizedUsers || []).map(normaliseUser));
+  const [newEmail, setNewEmail] = useState("");
+  const [newRole, setNewRole] = useState("editor");
+  const [isSaving, setIsSaving] = useState(false);
+
+  const save = async (updated) => {
+    await setDoc(doc(db, "tenants", tenant.id), { authorizedUsers: updated }, { merge: true });
+    setUsers(updated);
+  };
+
+  const handleAdd = async () => {
+    const email = newEmail.trim().toLowerCase();
+    if (!email || !email.includes("@")) { toast.error("Voer een geldig e-mailadres in"); return; }
+    if (users.some((u) => u.email === email)) { toast.error("Gebruiker heeft al toegang"); return; }
+    setIsSaving(true);
+    try {
+      await save([...users, { email, role: newRole }]);
+      setNewEmail("");
+      toast.success(`${email} toegevoegd als ${newRole}`);
+    } catch (e) {
+      toast.error("Fout: " + e.message);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleRemove = async (email) => {
+    setIsSaving(true);
+    try {
+      await save(users.filter((u) => u.email !== email));
+      toast.success(`${email} verwijderd`);
+    } catch (e) {
+      toast.error("Fout: " + e.message);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleRoleChange = async (email, role) => {
+    try {
+      await save(users.map((u) => (u.email === email ? { ...u, role } : u)));
+    } catch (e) {
+      toast.error("Fout: " + e.message);
+    }
+  };
 
   return (
     <div className="tenant-card">
@@ -18,48 +68,84 @@ function TenantCard({ tenant, onEditUsers, onEdit }) {
           <p className="tenant-subdomain">izi-casting.com/{tenant.id}</p>
         </div>
         <div className="tenant-card-header-actions">
-          <button
-            className="btn btn-sm btn-outline"
-            title="Bewerken"
-            onClick={() => onEdit(tenant)}
-          >
+          <button className="btn btn-sm btn-outline" title="Bewerken" onClick={() => onEdit(tenant)}>
             <Pencil size={14} />
           </button>
-          <a
-            href={url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn btn-sm btn-primary"
-            title="Open admin"
-          >
+          <a href={url} target="_blank" rel="noopener noreferrer" className="btn btn-sm btn-primary" title="Open admin">
             <ExternalLink size={14} />
             <span>Open Admin</span>
           </a>
         </div>
       </div>
-      <div className="tenant-card-stats">
-        <span className="tenant-stat">
-          <Users size={14} />
-          {(tenant.authorizedUsers || []).length} gebruiker(s)
+
+      <div className="tenant-card-users">
+        <span className="tenant-users-label">
+          <Users size={13} />
+          Gebruikers
         </span>
-      </div>
-      <div className="tenant-card-actions">
-        <button
-          className="btn btn-sm btn-outline"
-          onClick={() => onEditUsers(tenant)}
-        >
-          <Users size={14} />
-          Gebruikers beheren
-        </button>
+        <ul className="users-list">
+          {users.map(({ email, role }) => (
+            <li key={email} className="user-item">
+              <span className="user-email">{email}</span>
+              <div className="user-item-actions">
+                <select
+                  className="user-role-select"
+                  value={role}
+                  onChange={(e) => handleRoleChange(email, e.target.value)}
+                  disabled={isSaving}
+                >
+                  <option value="admin">Admin</option>
+                  <option value="editor">Editor</option>
+                </select>
+                <button className="user-remove-btn" onClick={() => handleRemove(email)} disabled={isSaving}>✕</button>
+              </div>
+            </li>
+          ))}
+          {users.length === 0 && <li className="user-empty">Geen gebruikers</li>}
+        </ul>
+        <div className="user-add-form">
+          <input
+            type="email"
+            className="form-input"
+            placeholder="e-mailadres"
+            value={newEmail}
+            onChange={(e) => setNewEmail(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleAdd()}
+          />
+          <select
+            className="user-role-select"
+            value={newRole}
+            onChange={(e) => setNewRole(e.target.value)}
+          >
+            <option value="admin">Admin</option>
+            <option value="editor">Editor</option>
+          </select>
+          <button className="btn btn-primary btn-sm" onClick={handleAdd} disabled={isSaving}>
+            Toevoegen
+          </button>
+        </div>
       </div>
     </div>
   );
 }
 
-function UserManagementPanel({ tenant, onClose }) {
-  const [users, setUsers] = useState(tenant.authorizedUsers || []);
+
+function SuperAdminUsersPanel() {
+  const [users, setUsers] = useState([]);
   const [newEmail, setNewEmail] = useState("");
   const [isSaving, setIsSaving] = useState(false);
+  const currentEmail = auth.currentUser?.email || "";
+
+  useEffect(() => {
+    getDoc(doc(db, "config", "superadmin")).then((d) => {
+      setUsers(d.data()?.authorizedUsers || []);
+    });
+  }, []);
+
+  const save = async (updated) => {
+    await setDoc(doc(db, "config", "superadmin"), { authorizedUsers: updated }, { merge: true });
+    setUsers(updated);
+  };
 
   const handleAdd = async () => {
     const email = newEmail.trim().toLowerCase();
@@ -73,9 +159,7 @@ function UserManagementPanel({ tenant, onClose }) {
     }
     setIsSaving(true);
     try {
-      const updated = [...users, email];
-      await setDoc(doc(db, "tenants", tenant.id), { authorizedUsers: updated }, { merge: true });
-      setUsers(updated);
+      await save([...users, email]);
       setNewEmail("");
       toast.success(`${email} toegevoegd`);
     } catch (error) {
@@ -86,11 +170,13 @@ function UserManagementPanel({ tenant, onClose }) {
   };
 
   const handleRemove = async (email) => {
+    if (email === currentEmail) {
+      toast.error("Je kunt jezelf niet verwijderen");
+      return;
+    }
     setIsSaving(true);
     try {
-      const updated = users.filter((u) => u !== email);
-      await setDoc(doc(db, "tenants", tenant.id), { authorizedUsers: updated }, { merge: true });
-      setUsers(updated);
+      await save(users.filter((u) => u !== email));
       toast.success(`${email} verwijderd`);
     } catch (error) {
       toast.error("Fout: " + error.message);
@@ -100,38 +186,41 @@ function UserManagementPanel({ tenant, onClose }) {
   };
 
   return (
-    <div className="user-management-panel">
-      <div className="panel-header">
-        <h3>Gebruikers — {tenant.name}</h3>
-        <button className="btn-icon" onClick={onClose}>✕</button>
-      </div>
-      <ul className="users-list">
-        {users.map((email) => (
-          <li key={email} className="user-item">
-            <span className="user-email">{email}</span>
-            <button
-              className="user-remove-btn"
-              onClick={() => handleRemove(email)}
-              disabled={isSaving}
-            >
-              ✕
-            </button>
-          </li>
-        ))}
-        {users.length === 0 && <li className="user-empty">Geen gebruikers</li>}
-      </ul>
-      <div className="user-add-form">
-        <input
-          type="email"
-          className="form-input"
-          placeholder="e-mailadres toevoegen"
-          value={newEmail}
-          onChange={(e) => setNewEmail(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && handleAdd()}
-        />
-        <button className="btn btn-primary btn-sm" onClick={handleAdd} disabled={isSaving}>
-          Toevoegen
-        </button>
+    <div className="superadmin-users-section">
+      <h2 className="superadmin-sidebar-title">
+        <ShieldCheck size={16} />
+        Super Admin gebruikers
+      </h2>
+      <div className="user-management-panel">
+        <ul className="users-list">
+          {users.map((email) => (
+            <li key={email} className="user-item">
+              <span className="user-email">{email}</span>
+              <button
+                className="user-remove-btn"
+                onClick={() => handleRemove(email)}
+                disabled={isSaving || email === currentEmail}
+                title={email === currentEmail ? "Je kunt jezelf niet verwijderen" : "Verwijderen"}
+              >
+                ✕
+              </button>
+            </li>
+          ))}
+          {users.length === 0 && <li className="user-empty">Geen extra gebruikers</li>}
+        </ul>
+        <div className="user-add-form">
+          <input
+            type="email"
+            className="form-input"
+            placeholder="e-mailadres toevoegen"
+            value={newEmail}
+            onChange={(e) => setNewEmail(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleAdd()}
+          />
+          <button className="btn btn-primary btn-sm" onClick={handleAdd} disabled={isSaving}>
+            Toevoegen
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -141,7 +230,6 @@ function SuperAdminView() {
   const [tenants, setTenants] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [editingTenant, setEditingTenant] = useState(null);
   const [editingTenantSettings, setEditingTenantSettings] = useState(null);
 
   useEffect(() => {
@@ -178,55 +266,49 @@ function SuperAdminView() {
         </div>
       </div>
 
-      <div className="superadmin-content">
-        <div className="superadmin-toolbar">
-          <h2>
-            <Monitor size={20} />
-            Klanten ({tenants.length})
-          </h2>
-          <button
-            className="btn btn-primary"
-            onClick={() => setShowCreateModal(true)}
-          >
-            <Plus size={16} />
-            Nieuwe klant
-          </button>
-        </div>
-
-        {loading ? (
-          <div className="loading">Tenants laden...</div>
-        ) : tenants.length === 0 ? (
-          <div className="superadmin-empty">
-            <p>Nog geen klanten aangemaakt.</p>
-            <button className="btn btn-primary" onClick={() => setShowCreateModal(true)}>
+      <div className="superadmin-body">
+        <div className="superadmin-content">
+          <div className="superadmin-toolbar">
+            <h2>
+              <Monitor size={20} />
+              Klanten ({tenants.length})
+            </h2>
+            <button
+              className="btn btn-primary"
+              onClick={() => setShowCreateModal(true)}
+            >
               <Plus size={16} />
-              Eerste klant aanmaken
+              Nieuwe klant
             </button>
           </div>
-        ) : (
-          <div className="tenant-grid">
-            {tenants.map((tenant) => (
-              <TenantCard
-                key={tenant.id}
-                tenant={tenant}
-                onEditUsers={setEditingTenant}
-                onEdit={setEditingTenantSettings}
-              />
-            ))}
-          </div>
-        )}
-      </div>
 
-      {editingTenant && (
-        <div className="modal-overlay" onClick={() => setEditingTenant(null)}>
-          <div onClick={(e) => e.stopPropagation()}>
-            <UserManagementPanel
-              tenant={editingTenant}
-              onClose={() => setEditingTenant(null)}
-            />
-          </div>
+          {loading ? (
+            <div className="loading">Tenants laden...</div>
+          ) : tenants.length === 0 ? (
+            <div className="superadmin-empty">
+              <p>Nog geen klanten aangemaakt.</p>
+              <button className="btn btn-primary" onClick={() => setShowCreateModal(true)}>
+                <Plus size={16} />
+                Eerste klant aanmaken
+              </button>
+            </div>
+          ) : (
+            <div className="tenant-grid">
+              {tenants.map((tenant) => (
+                <TenantCard
+                  key={tenant.id}
+                  tenant={tenant}
+                  onEdit={setEditingTenantSettings}
+                />
+              ))}
+            </div>
+          )}
         </div>
-      )}
+
+        <aside className="superadmin-sidebar">
+          <SuperAdminUsersPanel />
+        </aside>
+      </div>
 
       <CreateTenantModal
         isOpen={showCreateModal}

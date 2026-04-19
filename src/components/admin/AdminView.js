@@ -83,7 +83,9 @@ function AdminView() {
   const deviceToDelete = useAppSelector((state) => state.device.deviceToDelete);
   const isSidebarCollapsed = useAppSelector((state) => state.device.isSidebarCollapsed);
 
-  // Load default slide transition and enabled fonts from settings
+  const [tenantName, setTenantName] = useState('');
+
+  // Load default slide transition, enabled fonts, and tenant name
   useEffect(() => {
     const loadSettings = async () => {
       try {
@@ -98,8 +100,19 @@ function AdminView() {
       }
     };
 
+    const loadTenantName = async () => {
+      if (!tenantId) return;
+      try {
+        const snap = await getDoc(doc(db, 'tenants', tenantId));
+        if (snap.exists()) setTenantName(snap.data().name || '');
+      } catch (error) {
+        console.error("Error loading tenant name:", error);
+      }
+    };
+
     loadSettings();
-  }, []);
+    loadTenantName();
+  }, [tenantId]);
 
   // Ensure light mode is always applied
   useEffect(() => {
@@ -873,13 +886,14 @@ function AdminView() {
         onToggleCollapse={toggleSidebarCollapse}
         onOpenTrash={openTrashModal}
         trashedSlidesCount={trashedSlides.length}
+        tenantName={tenantName}
       />
 
       {/* Main Content Area */}
       <div className="admin-main-content">
         <div className="admin-header-section">
           <div className="admin-header-content">
-            <h1 className="admin-header">Afspeellijsten</h1>
+            <h1 className="admin-header">{tenantName ? `${tenantName} - Afspeellijsten` : 'Afspeellijsten'}</h1>
             <div className="admin-stats">
               <div className="admin-slide-count">
                 <span className="admin-stat-value">

@@ -9,26 +9,37 @@ import FeedList from "./FeedList";
 import Settings from "./Settings";
 import { toast } from "sonner";
 
+// Normalise a raw authorizedUsers entry to { email, role }
+function normaliseUser(u) {
+  if (typeof u === "string") return { email: u, role: "admin" };
+  return { email: u.email, role: u.role || "admin" };
+}
+
 function UsersPanel({ tenantId }) {
-  const [authorizedUsers, setAuthorizedUsers] = useState([]);
+  const [users, setUsers] = useState([]);
   const [newEmail, setNewEmail] = useState("");
+  const [newRole, setNewRole] = useState("editor");
   const [isAdding, setIsAdding] = useState(false);
   const currentUserEmail = auth.currentUser?.email || "";
 
   useEffect(() => {
-    const loadUsers = async () => {
+    const load = async () => {
       try {
-        const tenantDocRef = doc(db, "tenants", tenantId);
-        const snapshot = await getDoc(tenantDocRef);
+        const snapshot = await getDoc(doc(db, "tenants", tenantId));
         if (snapshot.exists()) {
-          setAuthorizedUsers(snapshot.data().authorizedUsers || []);
+          setUsers((snapshot.data().authorizedUsers || []).map(normaliseUser));
         }
       } catch (error) {
         console.error("Error loading users:", error);
       }
     };
-    loadUsers();
+    load();
   }, [tenantId]);
+
+  const save = async (updated) => {
+    await setDoc(doc(db, "tenants", tenantId), { authorizedUsers: updated }, { merge: true });
+    setUsers(updated);
+  };
 
   const handleAddUser = async () => {
     const email = newEmail.trim().toLowerCase();
@@ -36,17 +47,15 @@ function UsersPanel({ tenantId }) {
       toast.error("Voer een geldig e-mailadres in");
       return;
     }
-    if (authorizedUsers.includes(email)) {
+    if (users.some((u) => u.email === email)) {
       toast.error("Gebruiker heeft al toegang");
       return;
     }
     setIsAdding(true);
     try {
-      const updated = [...authorizedUsers, email];
-      await setDoc(doc(db, "tenants", tenantId), { authorizedUsers: updated }, { merge: true });
-      setAuthorizedUsers(updated);
+      await save([...users, { email, role: newRole }]);
       setNewEmail("");
-      toast.success(`${email} toegevoegd`);
+      toast.success(`${email} toegevoegd als ${newRole}`);
     } catch (error) {
       toast.error("Fout bij toevoegen: " + error.message);
     } finally {
@@ -60,12 +69,18 @@ function UsersPanel({ tenantId }) {
       return;
     }
     try {
-      const updated = authorizedUsers.filter((u) => u !== email);
-      await setDoc(doc(db, "tenants", tenantId), { authorizedUsers: updated }, { merge: true });
-      setAuthorizedUsers(updated);
+      await save(users.filter((u) => u.email !== email));
       toast.success(`${email} verwijderd`);
     } catch (error) {
       toast.error("Fout bij verwijderen: " + error.message);
+    }
+  };
+
+  const handleRoleChange = async (email, role) => {
+    try {
+      await save(users.map((u) => (u.email === email ? { ...u, role } : u)));
+    } catch (error) {
+      toast.error("Fout bij opslaan: " + error.message);
     }
   };
 
@@ -74,18 +89,29 @@ function UsersPanel({ tenantId }) {
       <div className="sidebar-users">
         <h3>Gebruikers</h3>
         <ul className="users-list">
-          {authorizedUsers.map((email) => (
+          {users.map(({ email, role }) => (
             <li key={email} className="user-item">
               <span className="user-email">{email}</span>
-              {email !== currentUserEmail && (
-                <button
-                  className="user-remove-btn"
-                  onClick={() => handleRemoveUser(email)}
-                  title="Verwijderen"
+              <div className="user-item-actions">
+                <select
+                  className="user-role-select"
+                  value={role}
+                  onChange={(e) => handleRoleChange(email, e.target.value)}
+                  disabled={email === currentUserEmail}
                 >
-                  <X size={14} />
-                </button>
-              )}
+                  <option value="admin">Admin</option>
+                  <option value="editor">Editor</option>
+                </select>
+                {email !== currentUserEmail && (
+                  <button
+                    className="user-remove-btn"
+                    onClick={() => handleRemoveUser(email)}
+                    title="Verwijderen"
+                  >
+                    <X size={14} />
+                  </button>
+                )}
+              </div>
             </li>
           ))}
         </ul>
@@ -98,6 +124,14 @@ function UsersPanel({ tenantId }) {
             onChange={(e) => setNewEmail(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleAddUser()}
           />
+          <select
+            className="user-role-select"
+            value={newRole}
+            onChange={(e) => setNewRole(e.target.value)}
+          >
+            <option value="admin">Admin</option>
+            <option value="editor">Editor</option>
+          </select>
           <button
             className="btn btn-sm btn-primary"
             onClick={handleAddUser}
@@ -118,8 +152,22 @@ function Sidebar({
   onToggleCollapse,
   onOpenTrash,
   trashedSlidesCount = 0,
+  tenantName = "",
 }) {
   const { tenantId } = useTenant();
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    if (!tenantId) { setIsAdmin(true); return; }
+    const email = auth.currentUser?.email || "";
+    if (email.endsWith("@dunepebbler.nl")) { setIsAdmin(true); return; }
+    getDoc(doc(db, "tenants", tenantId)).then((snap) => {
+      if (!snap.exists()) return;
+      const users = (snap.data().authorizedUsers || []).map(normaliseUser);
+      const me = users.find((u) => u.email === email);
+      setIsAdmin(!me || me.role === "admin");
+    });
+  }, [tenantId]);
 
   return (
     <div className={`sidebar ${isCollapsed ? "collapsed" : ""}`}>
@@ -136,17 +184,22 @@ function Sidebar({
           alt="iziCasting"
           className="logo-image"
         />
+        {tenantName && (
+          <h2 className="sidebar-tenant-name">{tenantName}</h2>
+        )}
       </div>
       <Devices
         setDeviceToDelete={setDeviceToDelete}
         deleteDevice={deleteDevice}
       />
       <FeedList />
-      {tenantId && <UsersPanel tenantId={tenantId} />}
-      <Settings
-        onOpenTrash={onOpenTrash}
-        trashedSlidesCount={trashedSlidesCount}
-      />
+      {tenantId && isAdmin && <UsersPanel tenantId={tenantId} />}
+      {isAdmin && (
+        <Settings
+          onOpenTrash={onOpenTrash}
+          trashedSlidesCount={trashedSlidesCount}
+        />
+      )}
     </div>
   );
 }

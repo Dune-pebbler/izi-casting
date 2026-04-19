@@ -29,9 +29,16 @@ function ProtectedRoute({ children }) {
         return;
       }
 
-      // Super admin mode (www.izi-casting.com): only @dunepebbler.nl allowed
+      // Super admin mode (www.izi-casting.com): @dunepebbler.nl or config/superadmin authorizedUsers
       if (isSuperAdmin) {
-        setAuthorized(false);
+        try {
+          const superDoc = await getDoc(doc(db, 'config', 'superadmin'));
+          const allowed = superDoc.data()?.authorizedUsers || [];
+          setAuthorized(allowed.includes(email));
+        } catch (error) {
+          console.error('Error checking super admin authorization:', error);
+          setAuthorized(false);
+        }
         setLoading(false);
         return;
       }
@@ -43,7 +50,9 @@ function ProtectedRoute({ children }) {
           if (tenantDoc.exists()) {
             const data = tenantDoc.data();
             const authorizedUsers = data.authorizedUsers || [];
-            const isAuthorized = authorizedUsers.includes(email);
+            const isAuthorized = authorizedUsers.some((u) =>
+              typeof u === 'string' ? u === email : u.email === email
+            );
             setAuthorized(isAuthorized);
           } else {
             setAuthorized(false);
