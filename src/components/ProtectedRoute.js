@@ -6,7 +6,7 @@ import { getDoc, doc } from 'firebase/firestore';
 import { useTenant } from '../context/TenantContext';
 
 function ProtectedRoute({ children }) {
-  const { tenantId, isSuperAdmin } = useTenant();
+  const { tenantId, isSuperAdmin, isMyAdmin } = useTenant();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [authorized, setAuthorized] = useState(false);
@@ -24,6 +24,13 @@ function ProtectedRoute({ children }) {
 
       // Dunepebbler staff always have full access
       if (email.endsWith('@dunepebbler.nl')) {
+        setAuthorized(true);
+        setLoading(false);
+        return;
+      }
+
+      // /my/admin: any logged-in user can access — tenant filtering happens inside MyAdminView
+      if (isMyAdmin) {
         setAuthorized(true);
         setLoading(false);
         return;
@@ -69,14 +76,14 @@ function ProtectedRoute({ children }) {
     });
 
     return () => unsubscribe();
-  }, [tenantId, isSuperAdmin]);
+  }, [tenantId, isSuperAdmin, isMyAdmin]);
 
   if (loading) {
     return <div className="loading">Loading...</div>;
   }
 
   if (!user) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to={`/login?next=${encodeURIComponent(window.location.pathname)}`} replace />;
   }
 
   if (!authorized) {

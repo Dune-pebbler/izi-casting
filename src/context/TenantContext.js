@@ -11,10 +11,15 @@ export function TenantProvider({ children }) {
       return { tenantId: null, isSuperAdmin: true };
     }
 
+    // Customer portal: /my-izi
+    if (pathname === '/my-izi') {
+      return { tenantId: null, isSuperAdmin: false, isMyAdmin: true };
+    }
+
     // Tenant admin: /:tenantId (any first path segment that isn't reserved)
     const match = pathname.match(/^\/([a-zA-Z0-9_-]+)/);
-    if (match && !['login', 'test'].includes(match[1])) {
-      return { tenantId: match[1], isSuperAdmin: false };
+    if (match && !['login', 'test', 'my-izi'].includes(match[1])) {
+      return { tenantId: match[1], isSuperAdmin: false, isMyAdmin: false };
     }
 
     // Root / or anything else (display view)

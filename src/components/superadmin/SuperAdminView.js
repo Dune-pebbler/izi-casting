@@ -271,14 +271,14 @@ function SuperAdminView() {
           <div className="superadmin-toolbar">
             <h2>
               <Monitor size={20} />
-              Klanten ({tenants.length})
+              Omgevingen ({tenants.length})
             </h2>
             <button
               className="btn btn-primary"
               onClick={() => setShowCreateModal(true)}
             >
               <Plus size={16} />
-              Nieuwe klant
+              Nieuwe omgeving
             </button>
           </div>
 
@@ -286,10 +286,10 @@ function SuperAdminView() {
             <div className="loading">Tenants laden...</div>
           ) : tenants.length === 0 ? (
             <div className="superadmin-empty">
-              <p>Nog geen klanten aangemaakt.</p>
+              <p>Nog geen omgevingen aangemaakt.</p>
               <button className="btn btn-primary" onClick={() => setShowCreateModal(true)}>
                 <Plus size={16} />
-                Eerste klant aanmaken
+                Eerste omgeving aanmaken
               </button>
             </div>
           ) : (

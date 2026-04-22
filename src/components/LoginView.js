@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, Navigate } from 'react-router-dom';
+import { Link, Navigate, useSearchParams } from 'react-router-dom';
 import { auth, googleProvider } from '../firebase';
 import { 
   signInWithRedirect, 
@@ -13,6 +13,8 @@ function LoginView() {
   const [error, setError] = useState('');
   const [user, setUser] = useState(null);
   const [redirectChecked, setRedirectChecked] = useState(false);
+  const [searchParams] = useSearchParams();
+  const nextUrl = searchParams.get('next') || '/admin';
 
   // Handle redirect result when component mounts
   useEffect(() => {
@@ -89,7 +91,7 @@ function LoginView() {
       email: user.email,
       displayName: user.displayName
     });
-    return <Navigate to="/admin" replace />;
+    return <Navigate to={nextUrl} replace />;
   }
 
 

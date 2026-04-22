@@ -8,6 +8,7 @@ import LoginView from './components/LoginView';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminView from './components/admin/AdminView';
 import SuperAdminView from './components/superadmin/SuperAdminView';
+import MyAdminView from './components/myadmin/MyAdminView';
 import DisplayView from './components/front-end/DisplayView';
 import FeedTest from './components/front-end/FeedTest';
 import './styles/main.scss';
@@ -17,6 +18,14 @@ function AdminRoute() {
   return (
     <ProtectedRoute>
       {isSuperAdmin ? <SuperAdminView /> : <AdminView />}
+    </ProtectedRoute>
+  );
+}
+
+function MyAdminRoute() {
+  return (
+    <ProtectedRoute>
+      <MyAdminView />
     </ProtectedRoute>
   );
 }
@@ -33,7 +42,9 @@ function App() {
               <Route path="/" element={<DisplayView />} />
               <Route path="/test" element={<FeedTest />} />
               <Route path="/admin" element={<AdminRoute />} />
+              <Route path="/my-izi" element={<MyAdminRoute />} />
               <Route path="/:tenantId" element={<AdminRoute />} />
+              <Route path="/:tenantId/admin" element={<AdminRoute />} />
             </Routes>
             <Toaster
               position="bottom-right"

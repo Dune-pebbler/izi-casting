@@ -362,6 +362,28 @@
   }
 }
 
+// Role badge
+.role-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px $spacing-sm;
+  border-radius: $border-radius-sm;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  text-transform: capitalize;
+
+  &--admin {
+    background: var(--primary);
+    color: var(--primary-foreground);
+  }
+
+  &--editor {
+    background: var(--muted);
+    color: var(--foreground-secondary);
+    border: 1px solid var(--border);
+  }
+}
+
 // Create tenant modal overlay
 .create-tenant-modal-overlay,
 .modal-overlay:has(.create-tenant-modal) {
