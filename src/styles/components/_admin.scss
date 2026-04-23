@@ -14,7 +14,7 @@
 .admin-main-content {
   flex: 1;
   padding: $spacing-lg;
-  padding-right:532px;
+  padding-right: 532px;
   overflow-y: auto;
   transition: padding-right 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
@@ -26,7 +26,7 @@
 .admin-header-content {
   display: flex;
   align-items: center;
-  gap:8px;
+  gap: 8px;
   position: relative;
 }
 
@@ -43,7 +43,7 @@
   transition: all 0.2s ease;
   color: var(--foreground);
   margin-right: 2px;
-  &:first-of-type{
+  &:first-of-type {
     margin-left: auto;
   }
   &:hover {
@@ -120,7 +120,6 @@
   width: 90%;
   box-shadow: $shadow-lg;
 
-
   p {
     margin: 0 0 $spacing-sm 0;
     color: var(--foreground-secondary);
@@ -185,13 +184,26 @@
   }
 }
 
-
-
-
-
 /* Small button styles */
 .btn-small {
   padding: $spacing-xs $spacing-sm;
   font-size: $font-size-xs;
   min-height: auto;
+}
+
+/* Media queries */
+@media (max-width: 1200px) {
+  .admin-layout {
+    display: block;
+
+    .sidebar {
+      width: 100%;
+      position: relative;
+      max-height: auto;
+    }
+
+    .admin-main-content {
+      padding: 24px;
+    }
+  }
 }
