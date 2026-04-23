@@ -1,8 +1,22 @@
 import React, { useState, useEffect } from "react";
-import { collection, onSnapshot, doc, setDoc, getDoc } from "firebase/firestore";
+import {
+  collection,
+  onSnapshot,
+  doc,
+  setDoc,
+  getDoc,
+} from "firebase/firestore";
 import { db, auth } from "../../firebase";
 import { signOut } from "firebase/auth";
-import { Plus, ExternalLink, Users, Monitor, LogOut, Pencil, ShieldCheck } from "lucide-react";
+import {
+  Plus,
+  ExternalLink,
+  Users,
+  Monitor,
+  LogOut,
+  Pencil,
+  ShieldCheck,
+} from "lucide-react";
 import CreateTenantModal from "./CreateTenantModal";
 import EditTenantModal from "./EditTenantModal";
 import { toast } from "sonner";
@@ -14,20 +28,32 @@ function normaliseUser(u) {
 
 function TenantCard({ tenant, onEdit }) {
   const url = `https://izi-casting.com/${tenant.id}`;
-  const [users, setUsers] = useState((tenant.authorizedUsers || []).map(normaliseUser));
+  const [users, setUsers] = useState(
+    (tenant.authorizedUsers || []).map(normaliseUser),
+  );
   const [newEmail, setNewEmail] = useState("");
   const [newRole, setNewRole] = useState("editor");
   const [isSaving, setIsSaving] = useState(false);
 
   const save = async (updated) => {
-    await setDoc(doc(db, "tenants", tenant.id), { authorizedUsers: updated }, { merge: true });
+    await setDoc(
+      doc(db, "tenants", tenant.id),
+      { authorizedUsers: updated },
+      { merge: true },
+    );
     setUsers(updated);
   };
 
   const handleAdd = async () => {
     const email = newEmail.trim().toLowerCase();
-    if (!email || !email.includes("@")) { toast.error("Voer een geldig e-mailadres in"); return; }
-    if (users.some((u) => u.email === email)) { toast.error("Gebruiker heeft al toegang"); return; }
+    if (!email || !email.includes("@")) {
+      toast.error("Voer een geldig e-mailadres in");
+      return;
+    }
+    if (users.some((u) => u.email === email)) {
+      toast.error("Gebruiker heeft al toegang");
+      return;
+    }
     setIsSaving(true);
     try {
       await save([...users, { email, role: newRole }]);
@@ -68,10 +94,20 @@ function TenantCard({ tenant, onEdit }) {
           <p className="tenant-subdomain">izi-casting.com/{tenant.id}</p>
         </div>
         <div className="tenant-card-header-actions">
-          <button className="btn btn-sm btn-outline" title="Bewerken" onClick={() => onEdit(tenant)}>
+          <button
+            className="btn btn-sm btn-outline"
+            title="Bewerken"
+            onClick={() => onEdit(tenant)}
+          >
             <Pencil size={14} />
           </button>
-          <a href={url} target="_blank" rel="noopener noreferrer" className="btn btn-sm btn-primary" title="Open admin">
+          <a
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn btn-sm btn-primary"
+            title="Open admin"
+          >
             <ExternalLink size={14} />
             <span>Open Admin</span>
           </a>
@@ -97,11 +133,19 @@ function TenantCard({ tenant, onEdit }) {
                   <option value="admin">Admin</option>
                   <option value="editor">Editor</option>
                 </select>
-                <button className="user-remove-btn" onClick={() => handleRemove(email)} disabled={isSaving}>✕</button>
+                <button
+                  className="user-remove-btn"
+                  onClick={() => handleRemove(email)}
+                  disabled={isSaving}
+                >
+                  ✕
+                </button>
               </div>
             </li>
           ))}
-          {users.length === 0 && <li className="user-empty">Geen gebruikers</li>}
+          {users.length === 0 && (
+            <li className="user-empty">Geen gebruikers</li>
+          )}
         </ul>
         <div className="user-add-form">
           <input
@@ -120,7 +164,11 @@ function TenantCard({ tenant, onEdit }) {
             <option value="admin">Admin</option>
             <option value="editor">Editor</option>
           </select>
-          <button className="btn btn-primary btn-sm" onClick={handleAdd} disabled={isSaving}>
+          <button
+            className="btn btn-primary btn-sm"
+            onClick={handleAdd}
+            disabled={isSaving}
+          >
             Toevoegen
           </button>
         </div>
@@ -128,7 +176,6 @@ function TenantCard({ tenant, onEdit }) {
     </div>
   );
 }
-
 
 function SuperAdminUsersPanel() {
   const [users, setUsers] = useState([]);
@@ -143,7 +190,11 @@ function SuperAdminUsersPanel() {
   }, []);
 
   const save = async (updated) => {
-    await setDoc(doc(db, "config", "superadmin"), { authorizedUsers: updated }, { merge: true });
+    await setDoc(
+      doc(db, "config", "superadmin"),
+      { authorizedUsers: updated },
+      { merge: true },
+    );
     setUsers(updated);
   };
 
@@ -196,17 +247,21 @@ function SuperAdminUsersPanel() {
           {users.map((email) => (
             <li key={email} className="user-item">
               <span className="user-email">{email}</span>
-              <button
-                className="user-remove-btn"
-                onClick={() => handleRemove(email)}
-                disabled={isSaving || email === currentEmail}
-                title={email === currentEmail ? "Je kunt jezelf niet verwijderen" : "Verwijderen"}
-              >
-                ✕
-              </button>
+              {email !== currentEmail && (
+                <button
+                  className="user-remove-btn"
+                  onClick={() => handleRemove(email)}
+                  disabled={isSaving}
+                  title="Verwijderen"
+                >
+                  ✕
+                </button>
+              )}
             </li>
           ))}
-          {users.length === 0 && <li className="user-empty">Geen extra gebruikers</li>}
+          {users.length === 0 && (
+            <li className="user-empty">Geen extra gebruikers</li>
+          )}
         </ul>
         <div className="user-add-form">
           <input
@@ -217,7 +272,11 @@ function SuperAdminUsersPanel() {
             onChange={(e) => setNewEmail(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleAdd()}
           />
-          <button className="btn btn-primary btn-sm" onClick={handleAdd} disabled={isSaving}>
+          <button
+            className="btn btn-primary btn-sm"
+            onClick={handleAdd}
+            disabled={isSaving}
+          >
             Toevoegen
           </button>
         </div>
@@ -254,7 +313,11 @@ function SuperAdminView() {
     <div className="superadmin-layout">
       <div className="superadmin-header">
         <div className="superadmin-header-left">
-          <img src="/izicasting-logo.svg" alt="iziCasting" className="logo-image" />
+          <img
+            src="/izicasting-logo.svg"
+            alt="iziCasting"
+            className="logo-image"
+          />
           <h1>Super Admin</h1>
         </div>
         <div className="superadmin-header-right">
@@ -287,7 +350,10 @@ function SuperAdminView() {
           ) : tenants.length === 0 ? (
             <div className="superadmin-empty">
               <p>Nog geen omgevingen aangemaakt.</p>
-              <button className="btn btn-primary" onClick={() => setShowCreateModal(true)}>
+              <button
+                className="btn btn-primary"
+                onClick={() => setShowCreateModal(true)}
+              >
                 <Plus size={16} />
                 Eerste omgeving aanmaken
               </button>
