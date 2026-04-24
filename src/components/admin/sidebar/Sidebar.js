@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { ChevronLeft, ChevronRight, UserPlus, X } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  UserPlus,
+  X,
+  ChevronDown,
+  ChevronUp,
+} from "lucide-react";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "../../../firebase";
 import { useTenant } from "../../../context/TenantContext";
@@ -20,6 +27,7 @@ function UsersPanel({ tenantId }) {
   const [newEmail, setNewEmail] = useState("");
   const [newRole, setNewRole] = useState("editor");
   const [isAdding, setIsAdding] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
   const currentUserEmail = auth.currentUser?.email || "";
 
   useEffect(() => {
@@ -37,7 +45,11 @@ function UsersPanel({ tenantId }) {
   }, [tenantId]);
 
   const save = async (updated) => {
-    await setDoc(doc(db, "tenants", tenantId), { authorizedUsers: updated }, { merge: true });
+    await setDoc(
+      doc(db, "tenants", tenantId),
+      { authorizedUsers: updated },
+      { merge: true },
+    );
     setUsers(updated);
   };
 
@@ -87,58 +99,68 @@ function UsersPanel({ tenantId }) {
   return (
     <div className="sidebar-section">
       <div className="sidebar-users">
-        <h3>Gebruikers</h3>
-        <ul className="users-list">
-          {users.map(({ email, role }) => (
-            <li key={email} className="user-item">
-              <span className="user-email">{email}</span>
-              <div className="user-item-actions">
-                <select
-                  className="user-role-select"
-                  value={role}
-                  onChange={(e) => handleRoleChange(email, e.target.value)}
-                  disabled={email === currentUserEmail}
-                >
-                  <option value="admin">Admin</option>
-                  <option value="editor">Editor</option>
-                </select>
-                {email !== currentUserEmail && (
-                  <button
-                    className="user-remove-btn"
-                    onClick={() => handleRemoveUser(email)}
-                    title="Verwijderen"
-                  >
-                    <X size={14} />
-                  </button>
-                )}
-              </div>
-            </li>
-          ))}
-        </ul>
-        <div className="user-add-form">
-          <input
-            type="email"
-            className="user-email-input"
-            placeholder="e-mailadres"
-            value={newEmail}
-            onChange={(e) => setNewEmail(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && handleAddUser()}
-          />
-          <select
-            className="user-role-select"
-            value={newRole}
-            onChange={(e) => setNewRole(e.target.value)}
-          >
-            <option value="admin">Admin</option>
-            <option value="editor">Editor</option>
-          </select>
-          <button
-            className="btn btn-sm btn-primary"
-            onClick={handleAddUser}
-            disabled={isAdding}
-          >
-            <UserPlus size={14} />
-          </button>
+        <button
+          className="settings-toggle-btn"
+          onClick={() => setIsExpanded(!isExpanded)}
+        >
+          <span>Gebruikers ({users.length})</span>
+          {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+        </button>
+        <div className={`collapsible-wrapper${isExpanded ? " expanded" : ""}`}>
+          <div className="users-collapse-inner">
+            <ul className="users-list">
+              {users.map(({ email, role }) => (
+                <li key={email} className="user-item">
+                  <span className="user-email">{email}</span>
+                  <div className="user-item-actions">
+                    <select
+                      className="user-role-select"
+                      value={role}
+                      onChange={(e) => handleRoleChange(email, e.target.value)}
+                      disabled={email === currentUserEmail}
+                    >
+                      <option value="admin">Admin</option>
+                      <option value="editor">Editor</option>
+                    </select>
+                    {email !== currentUserEmail && (
+                      <button
+                        className="user-remove-btn"
+                        onClick={() => handleRemoveUser(email)}
+                        title="Verwijderen"
+                      >
+                        <X size={14} />
+                      </button>
+                    )}
+                  </div>
+                </li>
+              ))}
+            </ul>
+            <div className="user-add-form mt-2">
+              <input
+                type="email"
+                className="user-email-input"
+                placeholder="e-mailadres"
+                value={newEmail}
+                onChange={(e) => setNewEmail(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleAddUser()}
+              />
+              <select
+                className="user-role-select"
+                value={newRole}
+                onChange={(e) => setNewRole(e.target.value)}
+              >
+                <option value="admin">Admin</option>
+                <option value="editor">Editor</option>
+              </select>
+              <button
+                className="btn btn-sm btn-primary"
+                onClick={handleAddUser}
+                disabled={isAdding}
+              >
+                <UserPlus size={14} />
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -158,9 +180,15 @@ function Sidebar({
   const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
-    if (!tenantId) { setIsAdmin(true); return; }
+    if (!tenantId) {
+      setIsAdmin(true);
+      return;
+    }
     const email = auth.currentUser?.email || "";
-    if (email.endsWith("@dunepebbler.nl")) { setIsAdmin(true); return; }
+    if (email.endsWith("@dunepebbler.nl")) {
+      setIsAdmin(true);
+      return;
+    }
     getDoc(doc(db, "tenants", tenantId)).then((snap) => {
       if (!snap.exists()) return;
       const users = (snap.data().authorizedUsers || []).map(normaliseUser);
@@ -184,9 +212,7 @@ function Sidebar({
           alt="iziCasting"
           className="logo-image"
         />
-        {tenantName && (
-          <h2 className="sidebar-tenant-name">{tenantName}</h2>
-        )}
+        {tenantName && <h2 className="sidebar-tenant-name">{tenantName}</h2>}
       </div>
       <Devices
         setDeviceToDelete={setDeviceToDelete}

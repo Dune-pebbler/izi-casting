@@ -8,14 +8,15 @@
   }
 
   .devices-content,
-  .feed-collapse-inner {
+  .feed-collapse-inner,
+  .users-collapse-inner,
+  .settings-content {
     overflow: hidden;
     min-height: 0;
   }
 }
 
 .sidebar-devices {
-  margin-bottom: $spacing-lg;
   display: flex;
   flex-direction: column;
 
@@ -32,6 +33,7 @@
     transition: $transition-base;
     font-size: $font-size-lg;
     background: transparent;
+    margin-bottom: $spacing-sm;
 
     &:hover {
       transform: translateY(-1px);
@@ -171,7 +173,6 @@
               background-color: var(--primary);
               color: var(--surface);
             }
-
           }
 
           .pairing-error {
@@ -186,7 +187,7 @@
 
     // Devices List
     .devices-list {
-      margin-top: $spacing-sm;
+      // margin-top: $spacing-sm;
 
       .device-item {
         margin-bottom: $spacing-sm;
@@ -303,7 +304,6 @@
               }
             }
 
-
             &:disabled {
               cursor: not-allowed;
               opacity: 0.6;
@@ -325,7 +325,6 @@
             align-items: center;
             justify-content: center;
             transition: $transition-base;
-
           }
         }
 
@@ -339,7 +338,6 @@
         }
       }
     }
-
 
     // Extra Screen Button
     .extra-screen-button {
@@ -423,4 +421,3 @@
     transform: rotate(-360deg);
   }
 }
-
