@@ -233,13 +233,15 @@ function Settings({ onOpenTrash, trashedSlidesCount = 0 }) {
               setIsAdvancedSettingsExpanded(!isAdvancedSettingsExpanded)
             }
           >
-            <SettingsIcon size={16} />
-            <span>Admin instellingen</span>
+            <div className="settings-toggle-left">
+              <SettingsIcon size={16} />
+              <span>Admin instellingen</span>
+            </div>
             {isAdvancedSettingsExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
           </button>
         </div>
 
-        {isAdvancedSettingsExpanded && (
+        <div className={`collapsible-wrapper${isAdvancedSettingsExpanded ? " expanded" : ""}`}>
           <div className="settings-content">
               {/* Logo Section - Full Width */}
               <div className="settings-section">
@@ -473,7 +475,7 @@ function Settings({ onOpenTrash, trashedSlidesCount = 0 }) {
                 </button>
               </div>
           </div>
-        )}
+        </div>
       </div>
     </div>
   );

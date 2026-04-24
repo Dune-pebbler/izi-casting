@@ -6,6 +6,13 @@
   display: flex;
   flex-direction: column;
   // Settings Header - matches feed-list and devices patterns
+
+  .collapsible-wrapper:not(.expanded) {
+    .settings-content {
+      border: none !important;
+    }
+  }
+
   .settings-header {
     display: flex;
     align-items: center;
@@ -15,6 +22,7 @@
     .settings-toggle-btn {
       display: flex;
       align-items: center;
+      justify-content: space-between;
       gap: $spacing-sm;
       width: 100%;
       border: 0px;
@@ -24,6 +32,13 @@
       transition: $transition-base;
       font-size: $font-size-lg;
       background: transparent;
+
+      .settings-toggle-left {
+        display: flex;
+        align-items: center;
+        gap: $spacing-sm;
+      }
+
       &:hover {
         transform: translateY(-1px);
       }
@@ -54,7 +69,6 @@
     border: 1px solid var(--border);
     transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     overflow: hidden;
-
 
     // Trash button
     .sidebar-trash-btn {
@@ -168,7 +182,6 @@
             }
           }
         }
-
       }
 
       .logo-upload-placeholder {
@@ -404,7 +417,6 @@
         cursor: pointer;
         transition: $transition-base;
         font-size: $font-size-base;
-
 
         &:hover {
           border-color: var(--primary);
