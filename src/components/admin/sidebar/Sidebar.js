@@ -6,6 +6,7 @@ import {
   X,
   ChevronDown,
   ChevronUp,
+  Users,
 } from "lucide-react";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "../../../firebase";
@@ -103,7 +104,10 @@ function UsersPanel({ tenantId }) {
           className="settings-toggle-btn"
           onClick={() => setIsExpanded(!isExpanded)}
         >
-          <span>Gebruikers ({users.length})</span>
+          <div className="settings-toggle-left">
+            <Users size={16} />
+            <span>Gebruikers ({users.length})</span>
+          </div>
           {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
         </button>
         <div className={`collapsible-wrapper${isExpanded ? " expanded" : ""}`}>

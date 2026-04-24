@@ -7,6 +7,7 @@ import {
   Plus,
   ChevronDown,
   ChevronUp,
+  Monitor,
 } from "lucide-react";
 
 import {
@@ -295,14 +296,19 @@ function Devices({ setDeviceToDelete, deleteDevice }) {
         className="settings-toggle-btn"
         onClick={() => setIsDeviceSettingsExpanded(!isDeviceSettingsExpanded)}
       >
-        <span>Schermen ({onlineDevices.length}) </span>
+        <div className="settings-toggle-left">
+          <Monitor size={16} />
+          <span>Schermen ({onlineDevices.length})</span>
+        </div>
         {isDeviceSettingsExpanded ? (
           <ChevronUp size={16} />
         ) : (
           <ChevronDown size={16} />
         )}
       </button>
-      <div className={`collapsible-wrapper${isDeviceSettingsExpanded ? ' expanded' : ''}`}>
+      <div
+        className={`collapsible-wrapper${isDeviceSettingsExpanded ? " expanded" : ""}`}
+      >
         <div className="devices-content">
           {/* Pairing Section */}
 

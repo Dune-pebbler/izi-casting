@@ -12,6 +12,7 @@ import {
   EyeOff,
   ChevronDown,
   ChevronUp,
+  MessageSquareText,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -662,9 +663,10 @@ function FeedList() {
           className="settings-toggle-btn"
           onClick={() => setIsFeedSettingsExpanded(!isFeedSettingsExpanded)}
         >
-          <span>
-            Feed configuratie ({enabledFeedsCount}/{feeds.length})
-          </span>
+          <div className="settings-toggle-left">
+            <MessageSquareText size={16} />
+            <span>Feed configuratie ({enabledFeedsCount}/{feeds.length})</span>
+          </div>
           {isFeedSettingsExpanded ? (
             <ChevronUp size={16} />
           ) : (
