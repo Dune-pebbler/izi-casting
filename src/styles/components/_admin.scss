@@ -190,16 +190,19 @@
   font-size: $font-size-xs;
   min-height: auto;
 }
-
 /* Media queries */
 @media (max-width: 1200px) {
   .admin-layout {
-    display: block;
+    display: flex;
+    flex-direction: column-reverse;
+    height: 100%;
 
     .sidebar {
       width: 100%;
       position: relative;
-      max-height: auto;
+      height: auto;
+      max-height: none;
+      z-index: auto;
     }
 
     .admin-main-content {
