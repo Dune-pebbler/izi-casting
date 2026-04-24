@@ -649,6 +649,7 @@ function FeedList() {
   );
 
   const [isFeedSettingsExpanded, setIsFeedSettingsExpanded] = useState(false);
+  const enabledFeedsCount = feeds.filter((feed) => feed.isEnabled).length;
 
   const handleFeedDragStart = useCallback((event) => {
     console.log("Feed drag start:", event);
@@ -661,7 +662,9 @@ function FeedList() {
           className="settings-toggle-btn"
           onClick={() => setIsFeedSettingsExpanded(!isFeedSettingsExpanded)}
         >
-          <span>Feed configuratie ({feeds.length})</span>
+          <span>
+            Feed configuratie ({enabledFeedsCount}/{feeds.length})
+          </span>
           {isFeedSettingsExpanded ? (
             <ChevronUp size={16} />
           ) : (
