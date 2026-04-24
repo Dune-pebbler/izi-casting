@@ -1,7 +1,18 @@
-import React, { useMemo, useCallback } from 'react';
-import { Copy, GripVertical, Eye, EyeOff, Plus, ChevronsUpDown, Play, Tv, Trash2, Globe } from 'lucide-react';
-import { sanitizeHTMLContent } from '../../utils/sanitize';
-import { extractVideoInfo } from '../../utils/videoMetadata';
+import React, { useMemo, useCallback } from "react";
+import {
+  Copy,
+  GripVertical,
+  Eye,
+  EyeOff,
+  Plus,
+  ChevronsUpDown,
+  Play,
+  Tv,
+  Trash2,
+  Globe,
+} from "lucide-react";
+import { sanitizeHTMLContent } from "../../utils/sanitize";
+import { extractVideoInfo } from "../../utils/videoMetadata";
 import {
   DndContext,
   closestCenter,
@@ -9,21 +20,19 @@ import {
   PointerSensor,
   useSensor,
   useSensors,
-} from '@dnd-kit/core';
+} from "@dnd-kit/core";
 import {
   arrayMove,
   SortableContext,
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
-} from '@dnd-kit/sortable';
-import {
-  useSortable,
-} from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
+} from "@dnd-kit/sortable";
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 function SlideList({
   slides,
-  layout = 'grid',
+  layout = "grid",
   onEditSlide,
   onUpdateSlideType,
   onToggleSlideVisibility,
@@ -35,14 +44,14 @@ function SlideList({
   onCopySlide,
   onReorderSlides,
   onAddSlide,
-  onMoveSlide
+  onMoveSlide,
 }) {
   // Function to strip HTML tags and get clean text
   const stripHtml = (html) => {
-    if (!html) return '';
-    const tmp = document.createElement('div');
+    if (!html) return "";
+    const tmp = document.createElement("div");
     tmp.innerHTML = html;
-    return tmp.textContent || tmp.innerText || '';
+    return tmp.textContent || tmp.innerText || "";
   };
 
   // Function to get preview text with proper truncation
@@ -56,30 +65,30 @@ function SlideList({
 
   // Function to get rich HTML content for preview
   const getPreviewHTML = (htmlContent, maxLength = 100) => {
-    if (!htmlContent || typeof htmlContent !== 'string') return '';
-    
+    if (!htmlContent || typeof htmlContent !== "string") return "";
+
     // First get the clean text to check length
     const cleanText = stripHtml(htmlContent);
     if (cleanText.length <= maxLength) {
       return htmlContent;
     }
-    
+
     // If content is too long, we need to truncate while preserving HTML structure
     // This is a more sophisticated approach that tries to preserve formatting
     try {
-      const tmp = document.createElement('div');
+      const tmp = document.createElement("div");
       tmp.innerHTML = htmlContent;
-      
+
       // Function to recursively truncate text content while preserving HTML structure
       const truncateNode = (node, remainingLength) => {
         if (remainingLength <= 0) return 0;
-        
+
         if (node.nodeType === Node.TEXT_NODE) {
           const text = node.textContent;
           if (text.length <= remainingLength) {
             return remainingLength - text.length;
           } else {
-            node.textContent = text.substring(0, remainingLength) + '...';
+            node.textContent = text.substring(0, remainingLength) + "...";
             return 0;
           }
         } else if (node.nodeType === Node.ELEMENT_NODE) {
@@ -91,19 +100,19 @@ function SlideList({
           }
           return remainingLength;
         }
-        
+
         return remainingLength;
       };
-      
+
       // Clone the content to avoid modifying the original
       const clonedContent = tmp.cloneNode(true);
       truncateNode(clonedContent, maxLength);
-      
+
       return clonedContent.innerHTML;
     } catch (error) {
-      console.warn('Error processing HTML for preview:', error);
+      console.warn("Error processing HTML for preview:", error);
       // Fallback to simple text truncation
-      return cleanText.substring(0, maxLength) + '...';
+      return cleanText.substring(0, maxLength) + "...";
     }
   };
 
@@ -125,11 +134,11 @@ function SlideList({
     };
 
     const renderSlidePreview = (slide) => {
-      const layout = slide.layout || 'side-by-side';
-      const type = slide.type || 'text';
+      const layout = slide.layout || "side-by-side";
+      const type = slide.type || "text";
 
       switch (layout) {
-        case 'image-only':
+        case "image-only":
           return (
             <div className="slide-preview slide-preview--image-only">
               {slide.imageUrl ? (
@@ -150,14 +159,16 @@ function SlideList({
             </div>
           );
 
-        case 'text-only':
+        case "text-only":
           return (
             <div className="slide-preview slide-preview--text-only">
               {slide.text || slide.tinyMCEContent ? (
                 <div
                   className="preview-text-content"
                   dangerouslySetInnerHTML={{
-                    __html: sanitizeHTMLContent(getPreviewHTML(slide.tinyMCEContent || slide.text, 100))
+                    __html: sanitizeHTMLContent(
+                      getPreviewHTML(slide.tinyMCEContent || slide.text, 100),
+                    ),
                   }}
                 />
               ) : (
@@ -169,7 +180,7 @@ function SlideList({
             </div>
           );
 
-        case 'text-over-image':
+        case "text-over-image":
           return (
             <div className="slide-preview slide-preview--text-over-image">
               {slide.imageUrl ? (
@@ -187,7 +198,12 @@ function SlideList({
                       <div
                         className="preview-text-content"
                         dangerouslySetInnerHTML={{
-                          __html: sanitizeHTMLContent(getPreviewHTML(slide.tinyMCEContent || slide.text, 50))
+                          __html: sanitizeHTMLContent(
+                            getPreviewHTML(
+                              slide.tinyMCEContent || slide.text,
+                              50,
+                            ),
+                          ),
                         }}
                       />
                     ) : (
@@ -204,16 +220,18 @@ function SlideList({
             </div>
           );
 
-        case 'video':
-          const videoInfo = slide.videoUrl ? extractVideoInfo(slide.videoUrl) : null;
+        case "video":
+          const videoInfo = slide.videoUrl
+            ? extractVideoInfo(slide.videoUrl)
+            : null;
           const getVideoThumbnailUrl = () => {
-            if (!videoInfo) return '';
-            if (videoInfo.type === 'youtube') {
+            if (!videoInfo) return "";
+            if (videoInfo.type === "youtube") {
               return `https://img.youtube.com/vi/${videoInfo.id}/maxresdefault.jpg`;
-            } else if (videoInfo.type === 'vimeo') {
+            } else if (videoInfo.type === "vimeo") {
               return `https://vumbnail.com/${videoInfo.id}.jpg`;
             }
-            return '';
+            return "";
           };
 
           return (
@@ -225,15 +243,17 @@ function SlideList({
                     alt="Video thumbnail"
                     className="preview-video-thumbnail"
                     onError={(e) => {
-                      e.target.style.display = 'none';
+                      e.target.style.display = "none";
                     }}
                   />
                   <div className="preview-video-overlay">
                     <Play size={24} />
                   </div>
                   <div className="preview-video-info">
-                    <span className={`video-platform ${videoInfo.type === 'vimeo' ? 'vimeo' : ''}`}>
-                      {videoInfo.type === 'youtube' ? 'YouTube' : 'Vimeo'}
+                    <span
+                      className={`video-platform ${videoInfo.type === "vimeo" ? "vimeo" : ""}`}
+                    >
+                      {videoInfo.type === "youtube" ? "YouTube" : "Vimeo"}
                     </span>
                   </div>
                 </div>
@@ -246,7 +266,7 @@ function SlideList({
             </div>
           );
 
-        case 'teletekst':
+        case "teletekst":
           return (
             <div className="slide-preview slide-preview--teletekst">
               {slide.teletekstChannel ? (
@@ -256,19 +276,25 @@ function SlideList({
                   </div>
                   <div className="preview-teletekst-info">
                     <span className="teletekst-label">NOS Teletekst</span>
-                    <span className="teletekst-channel">Pagina {slide.teletekstChannel}</span>
+                    <span className="teletekst-channel">
+                      Pagina {slide.teletekstChannel}
+                    </span>
                   </div>
                 </div>
               ) : (
                 <div className="placeholder">
-                  <div className="placeholder__icon"><Tv size={24} /></div>
-                  <span className="placeholder__text">No teletekst channel</span>
+                  <div className="placeholder__icon">
+                    <Tv size={24} />
+                  </div>
+                  <span className="placeholder__text">
+                    No teletekst channel
+                  </span>
                 </div>
               )}
             </div>
           );
 
-        case 'iframe':
+        case "iframe":
           return (
             <div className="slide-preview slide-preview--iframe">
               {slide.iframeUrl ? (
@@ -283,18 +309,22 @@ function SlideList({
                 </div>
               ) : (
                 <div className="placeholder">
-                  <div className="placeholder__icon"><Globe size={24} /></div>
+                  <div className="placeholder__icon">
+                    <Globe size={24} />
+                  </div>
                   <span className="placeholder__text">Geen website URL</span>
                 </div>
               )}
             </div>
           );
 
-        case 'side-by-side':
+        case "side-by-side":
         default:
           return (
             <div className="slide-preview slide-preview--side-by-side">
-              <div className={`preview-left ${slide.imageSide === 'right' ? 'flipped' : ''}`}>
+              <div
+                className={`preview-left ${slide.imageSide === "right" ? "flipped" : ""}`}
+              >
                 {slide.imageUrl ? (
                   <img
                     src={slide.imageUrl}
@@ -310,12 +340,16 @@ function SlideList({
                   </div>
                 )}
               </div>
-              <div className={`preview-right ${slide.imageSide === 'right' ? 'flipped' : ''}`}>
+              <div
+                className={`preview-right ${slide.imageSide === "right" ? "flipped" : ""}`}
+              >
                 {slide.text || slide.tinyMCEContent ? (
                   <div
                     className="preview-text-content"
                     dangerouslySetInnerHTML={{
-                      __html: sanitizeHTMLContent(getPreviewHTML(slide.tinyMCEContent || slide.text, 80))
+                      __html: sanitizeHTMLContent(
+                        getPreviewHTML(slide.tinyMCEContent || slide.text, 80),
+                      ),
                     }}
                   />
                 ) : (
@@ -333,15 +367,21 @@ function SlideList({
       <div
         ref={setNodeRef}
         style={style}
-        className={`slide-card ${isDragging ? 'dragging' : ''}`}
+        className={`slide-card ${isDragging ? "dragging" : ""}`}
         onClick={() => onEditSlide(slide)}
       >
         <div className="slide-card__header">
-          <div className="slide-card__header-left" {...attributes} {...listeners}>
+          <div
+            className="slide-card__header-left"
+            {...attributes}
+            {...listeners}
+          >
             <div className="drag-handle">
               <GripVertical size={18} />
             </div>
-            <h4 className="slide-card__title">{slide.name || `Slide ${index + 1}`}</h4>
+            <h4 className="slide-card__title">
+              {slide.name || `Slide ${index + 1}`}
+            </h4>
             <div className="slide-card__duration">
               <span className="duration-value">{slide.duration || 5}s</span>
             </div>
@@ -382,17 +422,15 @@ function SlideList({
                 e.stopPropagation();
                 onToggleSlideVisibility(slide.id);
               }}
-              className={`btn-icon ${slide.isVisible ? 'btn-icon--success' : ''}`}
-              title={slide.isVisible ? 'Hide slide' : 'Show slide'}
+              className={`btn-icon ${slide.isVisible ? "btn-icon--success" : ""}`}
+              title={slide.isVisible ? "Hide slide" : "Show slide"}
             >
               {slide.isVisible ? <Eye size={16} /> : <EyeOff size={16} />}
             </button>
           </div>
         </div>
 
-        <div className="slide-card__preview">
-          {renderSlidePreview(slide)}
-        </div>
+        <div className="slide-card__preview">{renderSlidePreview(slide)}</div>
       </div>
     );
   };
@@ -415,23 +453,23 @@ function SlideList({
     };
 
     const getSlideTypeLabel = (slide) => {
-      const layout = slide.layout || 'side-by-side';
+      const layout = slide.layout || "side-by-side";
       switch (layout) {
-        case 'image-only':
-          return 'Image Only';
-        case 'text-only':
-          return 'Text Only';
-        case 'text-over-image':
-          return 'Text Over Image';
-        case 'video':
-          return 'Video';
-        case 'teletekst':
-          return `Teletekst ${slide.teletekstChannel || ''}`;
-        case 'iframe':
-          return 'Website';
-        case 'side-by-side':
+        case "image-only":
+          return "Image Only";
+        case "text-only":
+          return "Text Only";
+        case "text-over-image":
+          return "Text Over Image";
+        case "video":
+          return "Video";
+        case "teletekst":
+          return `Teletekst ${slide.teletekstChannel || ""}`;
+        case "iframe":
+          return "Website";
+        case "side-by-side":
         default:
-          return 'Side by Side';
+          return "Side by Side";
       }
     };
 
@@ -439,7 +477,7 @@ function SlideList({
       <div
         ref={setNodeRef}
         style={style}
-        className={`slide-row ${isDragging ? 'dragging' : ''}`}
+        className={`slide-row ${isDragging ? "dragging" : ""}`}
         onClick={() => onEditSlide(slide)}
       >
         <div className="slide-row__left" {...attributes} {...listeners}>
@@ -447,8 +485,33 @@ function SlideList({
             <GripVertical size={18} />
           </div>
         </div>
+
+        <div
+          className="slide-preview slide-preview--image-only"
+          style={{
+            height: "50px",
+            width: "50px",
+          }}
+        >
+          {slide.imageUrl ? (
+            <img
+              src={slide.imageUrl}
+              alt="Slide"
+              className="slide-preview__image"
+              style={{
+                objectPosition: slide.imagePosition || "center",
+                borderRadius: "9px",
+              }}
+            />
+          ) : (
+            <div className="slide-img-placeholder">No img</div>
+          )}
+        </div>
+
         <div className="slide-row__content">
-          <h4 className="slide-row__title">{slide.name || `Slide ${index + 1}`}</h4>
+          <h4 className="slide-row__title">
+            {slide.name || `Slide ${index + 1}`}
+          </h4>
           <div className="slide-row__info">
             <span className="slide-row__type">{getSlideTypeLabel(slide)}</span>
             <span className="slide-row__duration">{slide.duration || 5}s</span>
@@ -490,8 +553,8 @@ function SlideList({
               e.stopPropagation();
               onToggleSlideVisibility(slide.id);
             }}
-            className={`btn-icon ${slide.isVisible ? 'btn-icon--success' : ''}`}
-            title={slide.isVisible ? 'Hide slide' : 'Show slide'}
+            className={`btn-icon ${slide.isVisible ? "btn-icon--success" : ""}`}
+            title={slide.isVisible ? "Hide slide" : "Show slide"}
           >
             {slide.isVisible ? <Eye size={16} /> : <EyeOff size={16} />}
           </button>
@@ -508,28 +571,31 @@ function SlideList({
     }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
-    })
+    }),
   );
 
-  const slideIds = useMemo(() => slides.map(slide => slide.id), [slides]);
+  const slideIds = useMemo(() => slides.map((slide) => slide.id), [slides]);
 
-  const handleDragEnd = useCallback((event) => {
-    const { active, over } = event;
-    console.log('Drag end:', { active, over });
+  const handleDragEnd = useCallback(
+    (event) => {
+      const { active, over } = event;
+      console.log("Drag end:", { active, over });
 
-    if (active.id !== over?.id) {
-      const oldIndex = slides.findIndex(slide => slide.id === active.id);
-      const newIndex = slides.findIndex(slide => slide.id === over.id);
-      
-      if (oldIndex !== -1 && newIndex !== -1) {
-        const newSlides = arrayMove(slides, oldIndex, newIndex);
-        onReorderSlides(newSlides);
+      if (active.id !== over?.id) {
+        const oldIndex = slides.findIndex((slide) => slide.id === active.id);
+        const newIndex = slides.findIndex((slide) => slide.id === over.id);
+
+        if (oldIndex !== -1 && newIndex !== -1) {
+          const newSlides = arrayMove(slides, oldIndex, newIndex);
+          onReorderSlides(newSlides);
+        }
       }
-    }
-  }, [slides, onReorderSlides]);
+    },
+    [slides, onReorderSlides],
+  );
 
   const handleDragStart = useCallback((event) => {
-    console.log('Drag start:', event);
+    console.log("Drag start:", event);
   }, []);
 
   return (
@@ -540,7 +606,7 @@ function SlideList({
       onDragEnd={handleDragEnd}
     >
       <SortableContext items={slideIds} strategy={verticalListSortingStrategy}>
-        {layout === 'list' ? (
+        {layout === "list" ? (
           <div className="slides-list">
             {slides.map((slide, index) => (
               <SortableSlideRow key={slide.id} slide={slide} index={index} />
