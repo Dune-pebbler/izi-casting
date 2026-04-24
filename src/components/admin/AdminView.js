@@ -1,21 +1,42 @@
-import React, { useState, useMemo, useEffect } from 'react';
-import { doc, setDoc, getDoc, addDoc, collection, getDocs, deleteDoc } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
-import { db, storage, auth } from '../../firebase';
-import { useTenant } from '../../context/TenantContext';
-import { tenantDoc, tenantCollection, tenantStorageRef } from '../../utils/tenantPaths';
-import { sanitizeHTMLContent } from '../../utils/sanitize';
-import { toast } from 'sonner';
-import { useAppDispatch, useAppSelector } from '../../store/hooks';
-import { setDeviceToDelete, clearDeviceToDelete, setIsSidebarCollapsed } from '../../store/slices/deviceSlice';
-import { usePlaylistManager } from './PlaylistManager';
-import PlaylistList from './PlaylistList';
-import EditModal from './slide-edit/EditModal';
-import MoveSlideModal from './MoveSlideModal';
-import ImageLibraryModal from './modal/ImageLibraryModal';
-import TrashModal from './TrashModal';
-import Sidebar from './sidebar/Sidebar';
-import { Monitor, Clock, X, Settings, LayoutGrid, List } from 'lucide-react';
+import React, { useState, useMemo, useEffect } from "react";
+import {
+  doc,
+  setDoc,
+  getDoc,
+  addDoc,
+  collection,
+  getDocs,
+  deleteDoc,
+} from "firebase/firestore";
+import {
+  ref,
+  uploadBytes,
+  getDownloadURL,
+  deleteObject,
+} from "firebase/storage";
+import { db, storage, auth } from "../../firebase";
+import { useTenant } from "../../context/TenantContext";
+import {
+  tenantDoc,
+  tenantCollection,
+  tenantStorageRef,
+} from "../../utils/tenantPaths";
+import { sanitizeHTMLContent } from "../../utils/sanitize";
+import { toast } from "sonner";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import {
+  setDeviceToDelete,
+  clearDeviceToDelete,
+  setIsSidebarCollapsed,
+} from "../../store/slices/deviceSlice";
+import { usePlaylistManager } from "./PlaylistManager";
+import PlaylistList from "./PlaylistList";
+import EditModal from "./slide-edit/EditModal";
+import MoveSlideModal from "./MoveSlideModal";
+import ImageLibraryModal from "./modal/ImageLibraryModal";
+import TrashModal from "./TrashModal";
+import Sidebar from "./sidebar/Sidebar";
+import { Monitor, Clock, X, Settings, LayoutGrid, List } from "lucide-react";
 
 function AdminView() {
   const { tenantId } = useTenant();
@@ -32,39 +53,42 @@ function AdminView() {
     copyPlaylist,
     reorderPlaylists,
     calculatePlaylistDuration,
-    savePlaylistsToFirebase
+    savePlaylistsToFirebase,
   } = usePlaylistManager();
 
   // Modal and editing state
   const [uploadingImage, setUploadingImage] = useState(false);
   const [editingSlide, setEditingSlide] = useState(null);
-  const [modalImageUrl, setModalImageUrl] = useState('');
-  const [modalTinyMCEContent, setModalTinyMCEContent] = useState('');
-  const [imagePosition, setImagePosition] = useState('center');
-  const [slideLayout, setSlideLayout] = useState('side-by-side');
-  const [modalSlideName, setModalSlideName] = useState('');
+  const [modalImageUrl, setModalImageUrl] = useState("");
+  const [modalTinyMCEContent, setModalTinyMCEContent] = useState("");
+  const [imagePosition, setImagePosition] = useState("center");
+  const [slideLayout, setSlideLayout] = useState("side-by-side");
+  const [modalSlideName, setModalSlideName] = useState("");
   const [modalSlideDuration, setModalSlideDuration] = useState(5);
   const [modalShowBar, setModalShowBar] = useState(true);
-  const [modalVideoUrl, setModalVideoUrl] = useState('');
-  const [modalImageSide, setModalImageSide] = useState('left');
-  const [modalSlideTransition, setModalSlideTransition] = useState('fade');
-  const [modalTeletekstChannel, setModalTeletekstChannel] = useState('101');
-  const [modalTeletekstTheme, setModalTeletekstTheme] = useState('classic');
+  const [modalVideoUrl, setModalVideoUrl] = useState("");
+  const [modalImageSide, setModalImageSide] = useState("left");
+  const [modalSlideTransition, setModalSlideTransition] = useState("fade");
+  const [modalTeletekstChannel, setModalTeletekstChannel] = useState("101");
+  const [modalTeletekstTheme, setModalTeletekstTheme] = useState("classic");
   const [modalTeletekstPageCount, setModalTeletekstPageCount] = useState(1);
-  const [modalIframeUrl, setModalIframeUrl] = useState('');
-  const [currentEditingPlaylistId, setCurrentEditingPlaylistId] = useState(null);
+  const [modalIframeUrl, setModalIframeUrl] = useState("");
+  const [currentEditingPlaylistId, setCurrentEditingPlaylistId] =
+    useState(null);
   const [slideToDelete, setSlideToDelete] = useState(null);
-  const [defaultSlideTransition, setDefaultSlideTransition] = useState('fade');
+  const [defaultSlideTransition, setDefaultSlideTransition] = useState("fade");
   const [enabledFonts, setEnabledFonts] = useState([]);
 
   // Playlist editing state
   const [editingPlaylistNameId, setEditingPlaylistNameId] = useState(null);
-  const [editingPlaylistName, setEditingPlaylistName] = useState('');
+  const [editingPlaylistName, setEditingPlaylistName] = useState("");
   const [expandedPlaylists, setExpandedPlaylists] = useState(new Set());
-  const [editingPlaylistRepeatCount, setEditingPlaylistRepeatCount] = useState(1);
-  const [editingPlaylistRepeatCountId, setEditingPlaylistRepeatCountId] = useState(null);
+  const [editingPlaylistRepeatCount, setEditingPlaylistRepeatCount] =
+    useState(1);
+  const [editingPlaylistRepeatCountId, setEditingPlaylistRepeatCountId] =
+    useState(null);
   const [playlistToDelete, setPlaylistToDelete] = useState(null);
-  const [globalLayout, setGlobalLayout] = useState('grid'); // 'grid' or 'list'
+  const [globalLayout, setGlobalLayout] = useState("grid"); // 'grid' or 'list'
 
   // Move slide modal state
   const [moveSlideModalOpen, setMoveSlideModalOpen] = useState(false);
@@ -81,19 +105,25 @@ function AdminView() {
   // Redux hooks
   const dispatch = useAppDispatch();
   const deviceToDelete = useAppSelector((state) => state.device.deviceToDelete);
-  const isSidebarCollapsed = useAppSelector((state) => state.device.isSidebarCollapsed);
+  const isSidebarCollapsed = useAppSelector(
+    (state) => state.device.isSidebarCollapsed,
+  );
 
-  const [tenantName, setTenantName] = useState('');
+  const [tenantName, setTenantName] = useState("");
+  const [tenantLogoUrl, setTenantLogoUrl] = useState("");
 
   // Load default slide transition, enabled fonts, and tenant name
   useEffect(() => {
     const loadSettings = async () => {
       try {
-        const settingsDoc = await getDoc(tenantDoc(db, tenantId, "display", "settings"));
+        const settingsDoc = await getDoc(
+          tenantDoc(db, tenantId, "display", "settings"),
+        );
         if (settingsDoc.exists()) {
           const settings = settingsDoc.data();
-          setDefaultSlideTransition(settings.defaultSlideTransition || 'fade');
+          setDefaultSlideTransition(settings.defaultSlideTransition || "fade");
           setEnabledFonts(settings.enabledFonts || []);
+          setTenantLogoUrl(settings.logoUrl || "");
         }
       } catch (error) {
         console.error("Error loading settings:", error);
@@ -103,8 +133,8 @@ function AdminView() {
     const loadTenantName = async () => {
       if (!tenantId) return;
       try {
-        const snap = await getDoc(doc(db, 'tenants', tenantId));
-        if (snap.exists()) setTenantName(snap.data().name || '');
+        const snap = await getDoc(doc(db, "tenants", tenantId));
+        if (snap.exists()) setTenantName(snap.data().name || "");
       } catch (error) {
         console.error("Error loading tenant name:", error);
       }
@@ -116,17 +146,19 @@ function AdminView() {
 
   // Ensure light mode is always applied
   useEffect(() => {
-    document.documentElement.removeAttribute('data-theme');
+    document.documentElement.removeAttribute("data-theme");
   }, []);
 
   // Load trashed slides from Firebase
   useEffect(() => {
     const loadTrashedSlides = async () => {
       try {
-        const trashSnapshot = await getDocs(tenantCollection(db, tenantId, 'trash'));
-        const trashData = trashSnapshot.docs.map(doc => ({
+        const trashSnapshot = await getDocs(
+          tenantCollection(db, tenantId, "trash"),
+        );
+        const trashData = trashSnapshot.docs.map((doc) => ({
           trashId: doc.id,
-          ...doc.data()
+          ...doc.data(),
         }));
         setTrashedSlides(trashData);
       } catch (error) {
@@ -143,14 +175,16 @@ function AdminView() {
     let activeSlides = 0;
     let totalDuration = 0;
 
-    playlists.forEach(playlist => {
+    playlists.forEach((playlist) => {
       const isPlaylistEnabled = playlist.isEnabled !== false;
-      
+
       if (playlist.slides && isPlaylistEnabled) {
         const playlistSlides = playlist.slides.length;
-        const playlistActiveSlides = playlist.slides.filter(slide => slide.isVisible !== false).length;
+        const playlistActiveSlides = playlist.slides.filter(
+          (slide) => slide.isVisible !== false,
+        ).length;
         const playlistDuration = calculatePlaylistDuration(playlist.slides);
-        
+
         totalSlides += playlistSlides;
         activeSlides += playlistActiveSlides;
         totalDuration += playlistDuration;
@@ -173,21 +207,24 @@ function AdminView() {
 
   const savePlaylistName = async () => {
     if (editingPlaylistNameId && editingPlaylistName.trim()) {
-      await updatePlaylistName(editingPlaylistNameId, editingPlaylistName.trim());
+      await updatePlaylistName(
+        editingPlaylistNameId,
+        editingPlaylistName.trim(),
+      );
     }
     setEditingPlaylistNameId(null);
-    setEditingPlaylistName('');
+    setEditingPlaylistName("");
   };
 
   const cancelEditingPlaylistName = () => {
     setEditingPlaylistNameId(null);
-    setEditingPlaylistName('');
+    setEditingPlaylistName("");
   };
 
   const handlePlaylistNameKeyPress = (e) => {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       savePlaylistName();
-    } else if (e.key === 'Escape') {
+    } else if (e.key === "Escape") {
       cancelEditingPlaylistName();
     }
   };
@@ -199,7 +236,10 @@ function AdminView() {
 
   const savePlaylistRepeatCount = async () => {
     if (editingPlaylistRepeatCountId && editingPlaylistRepeatCount > 0) {
-      await updatePlaylistRepeatCount(editingPlaylistRepeatCountId, editingPlaylistRepeatCount);
+      await updatePlaylistRepeatCount(
+        editingPlaylistRepeatCountId,
+        editingPlaylistRepeatCount,
+      );
     }
     setEditingPlaylistRepeatCountId(null);
     setEditingPlaylistRepeatCount(1);
@@ -211,9 +251,9 @@ function AdminView() {
   };
 
   const handlePlaylistRepeatCountKeyPress = (e) => {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       savePlaylistRepeatCount();
-    } else if (e.key === 'Escape') {
+    } else if (e.key === "Escape") {
       cancelEditingPlaylistRepeatCount();
     }
   };
@@ -229,9 +269,8 @@ function AdminView() {
   };
 
   const toggleGlobalLayout = () => {
-    setGlobalLayout(prevLayout => prevLayout === 'grid' ? 'list' : 'grid');
+    setGlobalLayout((prevLayout) => (prevLayout === "grid" ? "list" : "grid"));
   };
-
 
   const handleAddPlaylist = async () => {
     const newPlaylistId = await addPlaylist();
@@ -256,17 +295,19 @@ function AdminView() {
 
   // Slide management handlers
   const addSlide = async (playlistId) => {
-    const playlist = playlists.find(p => p.id === playlistId);
+    const playlist = playlists.find((p) => p.id === playlistId);
     if (!playlist) return;
 
     // Fetch the latest settings (default transition and enabled fonts)
     let currentDefaultTransition = defaultSlideTransition;
     let currentEnabledFonts = enabledFonts;
     try {
-      const settingsDoc = await getDoc(tenantDoc(db, tenantId, "display", "settings"));
+      const settingsDoc = await getDoc(
+        tenantDoc(db, tenantId, "display", "settings"),
+      );
       if (settingsDoc.exists()) {
         const settings = settingsDoc.data();
-        currentDefaultTransition = settings.defaultSlideTransition || 'fade';
+        currentDefaultTransition = settings.defaultSlideTransition || "fade";
         currentEnabledFonts = settings.enabledFonts || [];
         setDefaultSlideTransition(currentDefaultTransition);
         setEnabledFonts(currentEnabledFonts);
@@ -278,18 +319,18 @@ function AdminView() {
     const newSlide = {
       id: Date.now(),
       name: `Slide ${playlist.slides.length + 1}`,
-      type: 'text',
-      text: '',
-      imageUrl: '',
-      imageName: '',
-      imagePosition: 'center',
-      layout: 'side-by-side',
+      type: "text",
+      text: "",
+      imageUrl: "",
+      imageName: "",
+      imagePosition: "center",
+      layout: "side-by-side",
       isVisible: false,
       showBar: true,
-      transition: currentDefaultTransition
+      transition: currentDefaultTransition,
     };
-    
-    const updatedPlaylists = playlists.map(p => {
+
+    const updatedPlaylists = playlists.map((p) => {
       if (p.id === playlistId) {
         const newSlides = [...p.slides, newSlide];
         const totalDuration = calculatePlaylistDuration(newSlides);
@@ -299,21 +340,21 @@ function AdminView() {
     });
     setPlaylists(updatedPlaylists);
     await savePlaylistsToFirebase(updatedPlaylists);
-    toast.success('Slide added successfully!');
+    toast.success("Slide added successfully!");
   };
 
   const copySlide = async (slideToCopy, playlistId) => {
-    const playlist = playlists.find(p => p.id === playlistId);
+    const playlist = playlists.find((p) => p.id === playlistId);
     if (!playlist) return;
 
     const copiedSlide = {
       ...slideToCopy,
       id: Date.now(),
       name: `${slideToCopy.name} (Copy)`,
-      isVisible: false // Disable copied slide by default
+      isVisible: false, // Disable copied slide by default
     };
-    
-    const updatedPlaylists = playlists.map(p => {
+
+    const updatedPlaylists = playlists.map((p) => {
       if (p.id === playlistId) {
         const newSlides = [...p.slides, copiedSlide];
         const totalDuration = calculatePlaylistDuration(newSlides);
@@ -323,15 +364,17 @@ function AdminView() {
     });
     setPlaylists(updatedPlaylists);
     await savePlaylistsToFirebase(updatedPlaylists);
-    toast.success('Slide copied successfully! (Disabled by default)');
+    toast.success("Slide copied successfully! (Disabled by default)");
   };
 
   const moveSlideToTrash = async (slide, playlistId) => {
-    const playlist = playlists.find(p => p.id === playlistId);
+    const playlist = playlists.find((p) => p.id === playlistId);
     if (!playlist) return;
 
-    const slideName = slide?.name || 'Slide';
-    const loadingToast = toast.loading(`${slideName} verplaatsen naar prullenbak...`);
+    const slideName = slide?.name || "Slide";
+    const loadingToast = toast.loading(
+      `${slideName} verplaatsen naar prullenbak...`,
+    );
 
     try {
       // Create trash entry
@@ -343,16 +386,22 @@ function AdminView() {
       };
 
       // Add to trash collection
-      const trashDocRef = await addDoc(tenantCollection(db, tenantId, 'trash'), trashData);
+      const trashDocRef = await addDoc(
+        tenantCollection(db, tenantId, "trash"),
+        trashData,
+      );
 
       // Update local trash state
-      setTrashedSlides(prev => [...prev, { trashId: trashDocRef.id, ...trashData }]);
+      setTrashedSlides((prev) => [
+        ...prev,
+        { trashId: trashDocRef.id, ...trashData },
+      ]);
 
       // Remove from playlist
-      const updatedPlaylists = playlists.map(p =>
+      const updatedPlaylists = playlists.map((p) =>
         p.id === playlistId
-          ? { ...p, slides: p.slides.filter(s => s.id !== slide.id) }
-          : p
+          ? { ...p, slides: p.slides.filter((s) => s.id !== slide.id) }
+          : p,
       );
       setPlaylists(updatedPlaylists);
       await savePlaylistsToFirebase(updatedPlaylists);
@@ -362,22 +411,25 @@ function AdminView() {
 
       closeEditModal();
     } catch (error) {
-      console.error('Error moving slide to trash:', error);
+      console.error("Error moving slide to trash:", error);
       toast.dismiss(loadingToast);
-      toast.error(`Fout bij verplaatsen van ${slideName} naar prullenbak: ` + error.message);
+      toast.error(
+        `Fout bij verplaatsen van ${slideName} naar prullenbak: ` +
+          error.message,
+      );
     }
   };
 
   const deleteSlide = async (slideId, playlistId) => {
-    console.log('deleteSlide called with:', { slideId, playlistId });
-    const playlist = playlists.find(p => p.id === playlistId);
+    console.log("deleteSlide called with:", { slideId, playlistId });
+    const playlist = playlists.find((p) => p.id === playlistId);
     if (!playlist) {
-      console.log('Playlist not found');
+      console.log("Playlist not found");
       return;
     }
 
-    const slideToDelete = playlist.slides.find(s => s.id === slideId);
-    console.log('Slide to delete found:', slideToDelete);
+    const slideToDelete = playlist.slides.find((s) => s.id === slideId);
+    console.log("Slide to delete found:", slideToDelete);
 
     if (slideToDelete) {
       await moveSlideToTrash(slideToDelete, playlistId);
@@ -387,34 +439,34 @@ function AdminView() {
   const openEditModal = (slide, playlistId) => {
     setEditingSlide(slide);
     setCurrentEditingPlaylistId(playlistId);
-    setModalTinyMCEContent(slide.tinyMCEContent || slide.text || '');
-    setModalImageUrl(slide.imageUrl || '');
-    setImagePosition(slide.imagePosition || 'center');
-    setSlideLayout(slide.layout || 'side-by-side');
-    setModalSlideName(slide.name || '');
+    setModalTinyMCEContent(slide.tinyMCEContent || slide.text || "");
+    setModalImageUrl(slide.imageUrl || "");
+    setImagePosition(slide.imagePosition || "center");
+    setSlideLayout(slide.layout || "side-by-side");
+    setModalSlideName(slide.name || "");
     setModalSlideDuration(slide.duration || 5);
     setModalShowBar(slide.showBar !== false);
-    setModalVideoUrl(slide.videoUrl || '');
-    setModalImageSide(slide.imageSide || 'left');
-    setModalSlideTransition(slide.transition || 'fade');
-    setModalTeletekstChannel(slide.teletekstChannel || '101');
-    setModalTeletekstTheme(slide.teletekstTheme || 'classic');
+    setModalVideoUrl(slide.videoUrl || "");
+    setModalImageSide(slide.imageSide || "left");
+    setModalSlideTransition(slide.transition || "fade");
+    setModalTeletekstChannel(slide.teletekstChannel || "101");
+    setModalTeletekstTheme(slide.teletekstTheme || "classic");
     setModalTeletekstPageCount(slide.teletekstPageCount || 1);
-    setModalIframeUrl(slide.iframeUrl || '');
+    setModalIframeUrl(slide.iframeUrl || "");
   };
 
   const closeEditModal = () => {
     setEditingSlide(null);
     setCurrentEditingPlaylistId(null);
-    setModalTinyMCEContent('');
-    setModalImageUrl('');
-    setImagePosition('center');
-    setSlideLayout('side-by-side');
-    setModalSlideName('');
+    setModalTinyMCEContent("");
+    setModalImageUrl("");
+    setImagePosition("center");
+    setSlideLayout("side-by-side");
+    setModalSlideName("");
     setModalSlideDuration(5);
     setModalShowBar(true);
-    setModalTeletekstChannel('101');
-    setModalIframeUrl('');
+    setModalTeletekstChannel("101");
+    setModalIframeUrl("");
   };
 
   const handleContentChange = (content) => {
@@ -423,28 +475,32 @@ function AdminView() {
 
   const handleModalImageUpload = async (file) => {
     if (!file) {
-      setModalImageUrl('');
+      setModalImageUrl("");
       return;
     }
 
-    if (!file.type.startsWith('image/')) {
-      toast.error('Selecteer een geldig afbeeldingsbestand.');
+    if (!file.type.startsWith("image/")) {
+      toast.error("Selecteer een geldig afbeeldingsbestand.");
       return;
     }
 
     const maxSize = 5 * 1024 * 1024;
     if (file.size > maxSize) {
-      toast.error('Afbeelding moet kleiner zijn dan 5MB.');
+      toast.error("Afbeelding moet kleiner zijn dan 5MB.");
       return;
     }
 
     setUploadingImage(true);
-    const loadingToast = toast.loading('Afbeelding uploaden...');
+    const loadingToast = toast.loading("Afbeelding uploaden...");
 
     try {
       const timestamp = Date.now();
       const fileName = `${timestamp}_${file.name}`;
-      const storageRef = tenantStorageRef(storage, tenantId, `slides/${fileName}`);
+      const storageRef = tenantStorageRef(
+        storage,
+        tenantId,
+        `slides/${fileName}`,
+      );
 
       const snapshot = await uploadBytes(storageRef, file);
       const downloadURL = await getDownloadURL(snapshot.ref);
@@ -463,7 +519,7 @@ function AdminView() {
       const { width, height } = await dimensionsPromise;
 
       // Save to media library
-      await addDoc(tenantCollection(db, tenantId, 'mediaLibrary'), {
+      await addDoc(tenantCollection(db, tenantId, "mediaLibrary"), {
         name: file.name,
         url: downloadURL,
         storagePath: `tenants/${tenantId}/slides/${fileName}`,
@@ -471,17 +527,17 @@ function AdminView() {
         type: file.type,
         width,
         height,
-        uploadedAt: new Date()
+        uploadedAt: new Date(),
       });
 
       setModalImageUrl(downloadURL);
 
       toast.dismiss(loadingToast);
-      toast.success('Afbeelding succesvol geüpload!');
+      toast.success("Afbeelding succesvol geüpload!");
     } catch (error) {
-      console.error('Error uploading image:', error);
+      console.error("Error uploading image:", error);
       toast.dismiss(loadingToast);
-      toast.error('Fout bij uploaden: ' + error.message);
+      toast.error("Fout bij uploaden: " + error.message);
     } finally {
       setUploadingImage(false);
     }
@@ -489,7 +545,7 @@ function AdminView() {
 
   const handleSelectImageFromLibrary = (image) => {
     setModalImageUrl(image.url);
-    toast.success('Afbeelding geselecteerd uit bibliotheek');
+    toast.success("Afbeelding geselecteerd uit bibliotheek");
   };
 
   const handleOpenImageLibrary = () => {
@@ -501,9 +557,9 @@ function AdminView() {
       return;
     }
 
-    const updatedPlaylists = playlists.map(playlist => {
+    const updatedPlaylists = playlists.map((playlist) => {
       if (playlist.id === currentEditingPlaylistId) {
-        const updatedSlides = playlist.slides.map(slide => {
+        const updatedSlides = playlist.slides.map((slide) => {
           if (slide.id === editingSlide.id) {
             const updatedSlide = {
               ...slide,
@@ -516,13 +572,22 @@ function AdminView() {
               teletekstTheme: modalTeletekstTheme,
               teletekstPageCount: modalTeletekstPageCount,
               iframeUrl: modalIframeUrl,
-              type: slideLayout === 'iframe' ? 'iframe' : (slideLayout === 'teletekst' ? 'teletekst' : (modalVideoUrl ? 'video' : (modalImageUrl ? 'image' : 'text'))),
+              type:
+                slideLayout === "iframe"
+                  ? "iframe"
+                  : slideLayout === "teletekst"
+                    ? "teletekst"
+                    : modalVideoUrl
+                      ? "video"
+                      : modalImageUrl
+                        ? "image"
+                        : "text",
               imagePosition: imagePosition,
               imageSide: modalImageSide,
               layout: slideLayout,
-              duration: modalSlideDuration === '' ? 5 : modalSlideDuration,
+              duration: modalSlideDuration === "" ? 5 : modalSlideDuration,
               showBar: modalShowBar,
-              transition: modalSlideTransition
+              transition: modalSlideTransition,
             };
 
             // Debug logging for slide updates
@@ -535,7 +600,7 @@ function AdminView() {
               videoUrl: updatedSlide.videoUrl,
               hasImageUrl: !!updatedSlide.imageUrl,
               hasText: !!updatedSlide.text,
-              isVisible: updatedSlide.isVisible
+              isVisible: updatedSlide.isVisible,
             });
             return updatedSlide;
           }
@@ -548,35 +613,44 @@ function AdminView() {
     });
 
     setPlaylists(updatedPlaylists);
-    
-    const loadingToast = toast.loading('Saving slide changes...');
-    
+
+    const loadingToast = toast.loading("Saving slide changes...");
+
     try {
-      const displayDocRef = tenantDoc(db, tenantId, 'display', 'content');
-      await setDoc(displayDocRef, { playlists: updatedPlaylists }, { merge: true });
-      
+      const displayDocRef = tenantDoc(db, tenantId, "display", "content");
+      await setDoc(
+        displayDocRef,
+        { playlists: updatedPlaylists },
+        { merge: true },
+      );
+
       toast.dismiss(loadingToast);
-      toast.success('Slide saved successfully!');
-      
+      toast.success("Slide saved successfully!");
+
       closeEditModal();
     } catch (error) {
-      console.error('Error saving modal changes to Firebase:', error);
+      console.error("Error saving modal changes to Firebase:", error);
       toast.dismiss(loadingToast);
-      toast.error('Error saving slide: ' + error.message);
+      toast.error("Error saving slide: " + error.message);
     }
   };
 
   const updateSlideType = async (playlistId, slideId, type) => {
-    const updatedPlaylists = playlists.map(playlist => {
+    const updatedPlaylists = playlists.map((playlist) => {
       if (playlist.id === playlistId) {
-        const updatedSlides = playlist.slides.map(slide => 
-          slide.id === slideId ? { 
-            ...slide, 
-            type, 
-            text: type === 'image' ? '' : slide.text, 
-            imageUrl: type === 'text' ? '' : slide.imageUrl,
-            imagePosition: type === 'image' ? (slide.imagePosition || 'center') : slide.imagePosition
-          } : slide
+        const updatedSlides = playlist.slides.map((slide) =>
+          slide.id === slideId
+            ? {
+                ...slide,
+                type,
+                text: type === "image" ? "" : slide.text,
+                imageUrl: type === "text" ? "" : slide.imageUrl,
+                imagePosition:
+                  type === "image"
+                    ? slide.imagePosition || "center"
+                    : slide.imagePosition,
+              }
+            : slide,
         );
         return { ...playlist, slides: updatedSlides };
       }
@@ -591,8 +665,10 @@ function AdminView() {
   };
 
   const removeSlide = async (playlistId, slideId) => {
-    const playlist = playlists.find(p => p.id === playlistId);
-    const slideToRemove = playlist?.slides.find(slide => slide.id === slideId);
+    const playlist = playlists.find((p) => p.id === playlistId);
+    const slideToRemove = playlist?.slides.find(
+      (slide) => slide.id === slideId,
+    );
 
     if (slideToRemove) {
       await moveSlideToTrash(slideToRemove, playlistId);
@@ -600,10 +676,12 @@ function AdminView() {
   };
 
   const toggleSlideVisibility = async (playlistId, slideId) => {
-    const updatedPlaylists = playlists.map(playlist => {
+    const updatedPlaylists = playlists.map((playlist) => {
       if (playlist.id === playlistId) {
-        const updatedSlides = playlist.slides.map(slide => 
-          slide.id === slideId ? { ...slide, isVisible: !slide.isVisible } : slide
+        const updatedSlides = playlist.slides.map((slide) =>
+          slide.id === slideId
+            ? { ...slide, isVisible: !slide.isVisible }
+            : slide,
         );
         return { ...playlist, slides: updatedSlides };
       }
@@ -616,38 +694,44 @@ function AdminView() {
   const handleImageUpload = async (playlistId, slideId, file) => {
     if (!file) return;
 
-    if (!file.type.startsWith('image/')) {
-      toast.error('Selecteer een geldig afbeeldingsbestand.');
+    if (!file.type.startsWith("image/")) {
+      toast.error("Selecteer een geldig afbeeldingsbestand.");
       return;
     }
 
     const maxSize = 5 * 1024 * 1024;
     if (file.size > maxSize) {
-      toast.error('Afbeelding moet kleiner zijn dan 5MB.');
+      toast.error("Afbeelding moet kleiner zijn dan 5MB.");
       return;
     }
 
     setUploadingImage(true);
-    const loadingToast = toast.loading('Afbeelding uploaden...');
-    
+    const loadingToast = toast.loading("Afbeelding uploaden...");
+
     try {
       const timestamp = Date.now();
       const fileName = `${timestamp}_${file.name}`;
-      const storageRef = tenantStorageRef(storage, tenantId, `slides/${fileName}`);
+      const storageRef = tenantStorageRef(
+        storage,
+        tenantId,
+        `slides/${fileName}`,
+      );
 
       const snapshot = await uploadBytes(storageRef, file);
       const downloadURL = await getDownloadURL(snapshot.ref);
 
-      const updatedPlaylists = playlists.map(playlist => {
+      const updatedPlaylists = playlists.map((playlist) => {
         if (playlist.id === playlistId) {
-          const updatedSlides = playlist.slides.map(slide => 
-            slide.id === slideId ? { 
-              ...slide, 
-              imageUrl: downloadURL, 
-              imageName: fileName,
-              type: 'image',
-              imagePosition: slide.imagePosition || 'center'
-            } : slide
+          const updatedSlides = playlist.slides.map((slide) =>
+            slide.id === slideId
+              ? {
+                  ...slide,
+                  imageUrl: downloadURL,
+                  imageName: fileName,
+                  type: "image",
+                  imagePosition: slide.imagePosition || "center",
+                }
+              : slide,
           );
           return { ...playlist, slides: updatedSlides };
         }
@@ -657,31 +741,37 @@ function AdminView() {
       await savePlaylistsToFirebase(updatedPlaylists);
 
       toast.dismiss(loadingToast);
-      toast.success('Afbeelding succesvol geüpload!');
+      toast.success("Afbeelding succesvol geüpload!");
     } catch (error) {
-      console.error('Error uploading image:', error);
+      console.error("Error uploading image:", error);
       toast.dismiss(loadingToast);
-      toast.error('Fout bij uploaden: ' + error.message);
+      toast.error("Fout bij uploaden: " + error.message);
     } finally {
       setUploadingImage(false);
     }
   };
 
   const removeImage = async (playlistId, slideId) => {
-    const playlist = playlists.find(p => p.id === playlistId);
-    const slide = playlist?.slides.find(slide => slide.id === slideId);
+    const playlist = playlists.find((p) => p.id === playlistId);
+    const slide = playlist?.slides.find((slide) => slide.id === slideId);
 
     if (slide && slide.imageUrl && slide.imageName) {
-      const loadingToast = toast.loading('Afbeelding verwijderen...');
+      const loadingToast = toast.loading("Afbeelding verwijderen...");
 
       try {
-        const imageRef = tenantStorageRef(storage, tenantId, `slides/${slide.imageName}`);
+        const imageRef = tenantStorageRef(
+          storage,
+          tenantId,
+          `slides/${slide.imageName}`,
+        );
         await deleteObject(imageRef);
 
-        const updatedPlaylists = playlists.map(playlist => {
+        const updatedPlaylists = playlists.map((playlist) => {
           if (playlist.id === playlistId) {
-            const updatedSlides = playlist.slides.map(s =>
-              s.id === slideId ? { ...s, imageUrl: '', imageName: '', type: 'text' } : s
+            const updatedSlides = playlist.slides.map((s) =>
+              s.id === slideId
+                ? { ...s, imageUrl: "", imageName: "", type: "text" }
+                : s,
             );
             return { ...playlist, slides: updatedSlides };
           }
@@ -691,17 +781,17 @@ function AdminView() {
         await savePlaylistsToFirebase(updatedPlaylists);
 
         toast.dismiss(loadingToast);
-        toast.success('Afbeelding succesvol verwijderd!');
+        toast.success("Afbeelding succesvol verwijderd!");
       } catch (error) {
-        console.error('Error removing image:', error);
+        console.error("Error removing image:", error);
         toast.dismiss(loadingToast);
-        toast.error('Fout bij verwijderen: ' + error.message);
+        toast.error("Fout bij verwijderen: " + error.message);
       }
     }
   };
 
   const reorderSlides = async (playlistId, newSlides) => {
-    const updatedPlaylists = playlists.map(playlist => {
+    const updatedPlaylists = playlists.map((playlist) => {
       if (playlist.id === playlistId) {
         const totalDuration = calculatePlaylistDuration(newSlides);
         return { ...playlist, slides: newSlides, totalDuration };
@@ -714,12 +804,12 @@ function AdminView() {
 
   const deleteDevice = async (deviceId) => {
     try {
-      await deleteDoc(doc(db, 'devices', deviceId));
+      await deleteDoc(doc(db, "devices", deviceId));
       dispatch(clearDeviceToDelete());
-      toast.success('Apparaat succesvol ontkoppeld');
+      toast.success("Apparaat succesvol ontkoppeld");
     } catch (error) {
-      console.error('Error removing device:', error);
-      toast.error('Fout bij het ontkoppelen van apparaat');
+      console.error("Error removing device:", error);
+      toast.error("Fout bij het ontkoppelen van apparaat");
     }
   };
 
@@ -746,14 +836,22 @@ function AdminView() {
   };
 
   const restoreSlideFromTrash = async (trashedSlide, targetPlaylistId) => {
-    const loadingToast = toast.loading(`${trashedSlide.name || 'slide'} herstellen...`);
+    const loadingToast = toast.loading(
+      `${trashedSlide.name || "slide"} herstellen...`,
+    );
 
     try {
       // Create a new slide object without trash metadata
-      const { trashId, originalPlaylistId, originalPlaylistName, deletedAt, ...slideData } = trashedSlide;
+      const {
+        trashId,
+        originalPlaylistId,
+        originalPlaylistName,
+        deletedAt,
+        ...slideData
+      } = trashedSlide;
 
       // Add to target playlist
-      const updatedPlaylists = playlists.map(playlist => {
+      const updatedPlaylists = playlists.map((playlist) => {
         if (playlist.id === targetPlaylistId) {
           const newSlides = [...playlist.slides, slideData];
           const totalDuration = calculatePlaylistDuration(newSlides);
@@ -766,44 +864,54 @@ function AdminView() {
       await savePlaylistsToFirebase(updatedPlaylists);
 
       // Remove from trash
-      await deleteDoc(tenantDoc(db, tenantId, 'trash', trashId));
+      await deleteDoc(tenantDoc(db, tenantId, "trash", trashId));
 
       // Update local trash state
-      setTrashedSlides(prev => prev.filter(slide => slide.trashId !== trashId));
+      setTrashedSlides((prev) =>
+        prev.filter((slide) => slide.trashId !== trashId),
+      );
 
       toast.dismiss(loadingToast);
-      toast.success(`${trashedSlide.name || 'Slide'} succesvol hersteld!`);
+      toast.success(`${trashedSlide.name || "Slide"} succesvol hersteld!`);
     } catch (error) {
-      console.error('Error restoring slide:', error);
+      console.error("Error restoring slide:", error);
       toast.dismiss(loadingToast);
       toast.error(`Fout bij herstellen van slide: ` + error.message);
     }
   };
 
   const permanentDeleteSlide = async (trashedSlide) => {
-    const loadingToast = toast.loading(`${trashedSlide.name || 'slide'} permanent verwijderen...`);
+    const loadingToast = toast.loading(
+      `${trashedSlide.name || "slide"} permanent verwijderen...`,
+    );
 
     try {
       // Delete image from storage if exists
       if (trashedSlide.imageUrl && trashedSlide.imageName) {
         try {
-          const imageRef = tenantStorageRef(storage, tenantId, `slides/${trashedSlide.imageName}`);
+          const imageRef = tenantStorageRef(
+            storage,
+            tenantId,
+            `slides/${trashedSlide.imageName}`,
+          );
           await deleteObject(imageRef);
         } catch (error) {
-          console.error('Error deleting image:', error);
+          console.error("Error deleting image:", error);
         }
       }
 
       // Remove from trash collection
-      await deleteDoc(tenantDoc(db, tenantId, 'trash', trashedSlide.trashId));
+      await deleteDoc(tenantDoc(db, tenantId, "trash", trashedSlide.trashId));
 
       // Update local trash state
-      setTrashedSlides(prev => prev.filter(slide => slide.trashId !== trashedSlide.trashId));
+      setTrashedSlides((prev) =>
+        prev.filter((slide) => slide.trashId !== trashedSlide.trashId),
+      );
 
       toast.dismiss(loadingToast);
-      toast.success(`${trashedSlide.name || 'Slide'} permanent verwijderd`);
+      toast.success(`${trashedSlide.name || "Slide"} permanent verwijderd`);
     } catch (error) {
-      console.error('Error permanently deleting slide:', error);
+      console.error("Error permanently deleting slide:", error);
       toast.dismiss(loadingToast);
       toast.error(`Fout bij permanent verwijderen: ` + error.message);
     }
@@ -817,17 +925,21 @@ function AdminView() {
       for (const slide of trashedSlides) {
         if (slide.imageUrl && slide.imageName) {
           try {
-            const imageRef = tenantStorageRef(storage, tenantId, `slides/${slide.imageName}`);
+            const imageRef = tenantStorageRef(
+              storage,
+              tenantId,
+              `slides/${slide.imageName}`,
+            );
             await deleteObject(imageRef);
           } catch (error) {
-            console.error('Error deleting image:', error);
+            console.error("Error deleting image:", error);
           }
         }
       }
 
       // Delete all trash documents
-      const deletePromises = trashedSlides.map(slide =>
-        deleteDoc(tenantDoc(db, tenantId, 'trash', slide.trashId))
+      const deletePromises = trashedSlides.map((slide) =>
+        deleteDoc(tenantDoc(db, tenantId, "trash", slide.trashId)),
       );
       await Promise.all(deletePromises);
 
@@ -837,7 +949,7 @@ function AdminView() {
       toast.dismiss(loadingToast);
       toast.success(`Prullenbak succesvol geleegd`);
     } catch (error) {
-      console.error('Error emptying trash:', error);
+      console.error("Error emptying trash:", error);
       toast.dismiss(loadingToast);
       toast.error(`Fout bij legen van prullenbak: ` + error.message);
     }
@@ -850,9 +962,9 @@ function AdminView() {
 
     try {
       // Remove slide from source playlist
-      const updatedPlaylists = playlists.map(playlist => {
+      const updatedPlaylists = playlists.map((playlist) => {
         if (playlist.id === fromPlaylistId) {
-          const newSlides = playlist.slides.filter(s => s.id !== slide.id);
+          const newSlides = playlist.slides.filter((s) => s.id !== slide.id);
           const totalDuration = calculatePlaylistDuration(newSlides);
           return { ...playlist, slides: newSlides, totalDuration };
         }
@@ -866,18 +978,20 @@ function AdminView() {
 
       setPlaylists(updatedPlaylists);
       await savePlaylistsToFirebase(updatedPlaylists);
-      
+
       toast.dismiss(loadingToast);
       toast.success(`"${slide.name}" moved successfully!`);
     } catch (error) {
-      console.error('Error moving slide:', error);
+      console.error("Error moving slide:", error);
       toast.dismiss(loadingToast);
       toast.error(`Error moving "${slide.name}": ` + error.message);
     }
   };
 
   return (
-    <div className={`admin-layout ${isSidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
+    <div
+      className={`admin-layout ${isSidebarCollapsed ? "sidebar-collapsed" : ""}`}
+    >
       {/* Fixed Left Sidebar */}
       <Sidebar
         setDeviceToDelete={(device) => dispatch(setDeviceToDelete(device))}
@@ -893,12 +1007,29 @@ function AdminView() {
       <div className="admin-main-content">
         <div className="admin-header-section">
           <div className="admin-header-content">
-            <h1 className="admin-header">{tenantName ? `${tenantName} - Afspeellijsten` : 'Afspeellijsten'}</h1>
+            <div className="d-flex">
+              {tenantLogoUrl && (
+                <img
+                  src={tenantLogoUrl}
+                  alt={tenantName}
+                  height={40}
+                  className="admin-tenant-logo"
+                />
+              )}
+              <h1 className="admin-header">
+                {tenantName
+                  ? `${tenantName} - Afspeellijsten`
+                  : "Afspeellijsten"}
+              </h1>
+            </div>
+
             <div className="admin-stats">
               <div className="admin-slide-count">
                 <span className="admin-stat-value">
                   <Monitor size={18} />
-                  <span>{totalStats.activeSlides}/{totalStats.totalSlides}</span>
+                  <span>
+                    {totalStats.activeSlides}/{totalStats.totalSlides}
+                  </span>
                 </span>
               </div>
               <div className="admin-duration">
@@ -911,9 +1042,17 @@ function AdminView() {
             <button
               className="admin-layout-btn"
               onClick={toggleGlobalLayout}
-              title={globalLayout === 'grid' ? 'Switch to list view' : 'Switch to grid view'}
+              title={
+                globalLayout === "grid"
+                  ? "Switch to list view"
+                  : "Switch to grid view"
+              }
             >
-              {globalLayout === 'grid' ? <List size={18} /> : <LayoutGrid size={16} />}
+              {globalLayout === "grid" ? (
+                <List size={18} />
+              ) : (
+                <LayoutGrid size={16} />
+              )}
             </button>
 
             <button
@@ -980,7 +1119,12 @@ function AdminView() {
           showBar={modalShowBar}
           onClose={closeEditModal}
           onSave={saveModalChanges}
-          onDelete={() => setSlideToDelete({ slide: editingSlide, playlistId: currentEditingPlaylistId })}
+          onDelete={() =>
+            setSlideToDelete({
+              slide: editingSlide,
+              playlistId: currentEditingPlaylistId,
+            })
+          }
           onImageUpload={handleModalImageUpload}
           onPositionChange={setImagePosition}
           onLayoutChange={setSlideLayout}
@@ -1013,10 +1157,16 @@ function AdminView() {
           <div className="delete-modal">
             <h3>Apparaat ontkoppelen</h3>
             <p>
-              Weet je zeker dat je <strong>{deviceToDelete.customName || `Display ${deviceToDelete.id.substring(0, 8)}`}</strong> wilt ontkoppelen?
+              Weet je zeker dat je{" "}
+              <strong>
+                {deviceToDelete.customName ||
+                  `Display ${deviceToDelete.id.substring(0, 8)}`}
+              </strong>{" "}
+              wilt ontkoppelen?
             </p>
             <p className="delete-warning">
-              Dit apparaat zal niet meer gekoppeld zijn en moet opnieuw gekoppeld worden om content te tonen.
+              Dit apparaat zal niet meer gekoppeld zijn en moet opnieuw
+              gekoppeld worden om content te tonen.
             </p>
             <div className="delete-modal-actions">
               <button
@@ -1042,10 +1192,12 @@ function AdminView() {
           <div className="delete-modal">
             <h3>Playlist verwijderen</h3>
             <p>
-              Weet je zeker dat je <strong>{playlistToDelete.name}</strong> wilt verwijderen?
+              Weet je zeker dat je <strong>{playlistToDelete.name}</strong> wilt
+              verwijderen?
             </p>
             <p className="delete-warning">
-              Deze actie kan niet ongedaan worden gemaakt. Alle slides en afbeeldingen in deze playlist zullen permanent worden verwijderd.
+              Deze actie kan niet ongedaan worden gemaakt. Alle slides en
+              afbeeldingen in deze playlist zullen permanent worden verwijderd.
             </p>
             <div className="delete-modal-actions">
               <button
@@ -1054,10 +1206,7 @@ function AdminView() {
               >
                 Annuleren
               </button>
-              <button
-                onClick={handleDeletePlaylist}
-                className="btn btn-danger"
-              >
+              <button onClick={handleDeletePlaylist} className="btn btn-danger">
                 Verwijderen
               </button>
             </div>
@@ -1098,49 +1247,54 @@ function AdminView() {
         <div className="slide-delete-modal-wrapper">
           <div className="modal-overlay" onClick={() => setSlideToDelete(null)}>
             <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h3>Slide verwijderen</h3>
-              <button 
-                onClick={() => setSlideToDelete(null)}
-                className="modal-close-btn"
-                title="Close"
-              >
-                <X size={20} />
-              </button>
+              <div className="modal-header">
+                <h3>Slide verwijderen</h3>
+                <button
+                  onClick={() => setSlideToDelete(null)}
+                  className="modal-close-btn"
+                  title="Close"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+
+              <div className="modal-body">
+                <p className="modal-description">
+                  Weet je zeker dat je{" "}
+                  <strong>{slideToDelete.slide.name || "Slide"}</strong> wilt
+                  verwijderen?
+                </p>
+                <p className="delete-warning">
+                  De slide wordt verplaatst naar de prullenbak en kan later
+                  worden hersteld.
+                </p>
+              </div>
+
+              <div className="modal-footer">
+                <button
+                  onClick={() => setSlideToDelete(null)}
+                  className="btn btn-secondary"
+                >
+                  Annuleren
+                </button>
+                <button
+                  onClick={() => {
+                    deleteSlide(
+                      slideToDelete.slide.id,
+                      slideToDelete.playlistId,
+                    );
+                    setSlideToDelete(null);
+                    closeEditModal();
+                  }}
+                  className="btn btn-danger"
+                >
+                  Verwijderen
+                </button>
+              </div>
             </div>
-            
-            <div className="modal-body">
-              <p className="modal-description">
-                Weet je zeker dat je <strong>{slideToDelete.slide.name || 'Slide'}</strong> wilt verwijderen?
-              </p>
-              <p className="delete-warning">
-                De slide wordt verplaatst naar de prullenbak en kan later worden hersteld.
-              </p>
-            </div>
-            
-            <div className="modal-footer">
-              <button
-                onClick={() => setSlideToDelete(null)}
-                className="btn btn-secondary"
-              >
-                Annuleren
-              </button>
-              <button
-                onClick={() => {
-                  deleteSlide(slideToDelete.slide.id, slideToDelete.playlistId);
-                  setSlideToDelete(null);
-                  closeEditModal();
-                }}
-                className="btn btn-danger"
-              >
-                Verwijderen
-              </button>
-            </div>
-          </div>
           </div>
         </div>
       )}
-
     </div>
   );
 }

@@ -190,6 +190,15 @@
   font-size: $font-size-xs;
   min-height: auto;
 }
+
+.admin-header {
+  display: flex;
+  align-items: center;
+}
+
+.admin-tenant-logo {
+  margin-right: 8px;
+}
 /* Media queries */
 @media (max-width: 1200px) {
   .admin-layout {

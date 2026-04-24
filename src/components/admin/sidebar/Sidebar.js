@@ -182,7 +182,7 @@ function Sidebar({
 }) {
   const { tenantId } = useTenant();
   const [isAdmin, setIsAdmin] = useState(false);
-
+  const [logoUrl, setLogoUrl] = useState("");
   useEffect(() => {
     if (!tenantId) {
       setIsAdmin(true);
@@ -191,13 +191,15 @@ function Sidebar({
     const email = auth.currentUser?.email || "";
     if (email.endsWith("@dunepebbler.nl")) {
       setIsAdmin(true);
-      return;
     }
     getDoc(doc(db, "tenants", tenantId)).then((snap) => {
       if (!snap.exists()) return;
       const users = (snap.data().authorizedUsers || []).map(normaliseUser);
       const me = users.find((u) => u.email === email);
       setIsAdmin(!me || me.role === "admin");
+    });
+    getDoc(doc(db, "tenants", tenantId, "display", "settings")).then((snap) => {
+      if (snap.exists()) setLogoUrl(snap.data()?.logoUrl || "");
     });
   }, [tenantId]);
 
