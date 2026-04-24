@@ -3,7 +3,16 @@ import { doc, setDoc, onSnapshot } from "firebase/firestore";
 import { db } from "../../../firebase";
 import { useTenant } from "../../../context/TenantContext";
 import { tenantDoc } from "../../../utils/tenantPaths";
-import { GripVertical, Copy, Trash2, Plus, Eye, EyeOff } from "lucide-react";
+import {
+  GripVertical,
+  Copy,
+  Trash2,
+  Plus,
+  Eye,
+  EyeOff,
+  ChevronDown,
+  ChevronUp,
+} from "lucide-react";
 import { toast } from "sonner";
 import {
   DndContext,
@@ -639,6 +648,8 @@ function FeedList() {
     [feeds, reorderFeeds],
   );
 
+  const [isFeedSettingsExpanded, setIsFeedSettingsExpanded] = useState(false);
+
   const handleFeedDragStart = useCallback((event) => {
     console.log("Feed drag start:", event);
   }, []);
@@ -646,30 +657,49 @@ function FeedList() {
   return (
     <div className="feed-list">
       <div className="settings-header">
-        <h3>Feed configuratie ({feeds.length})</h3>
+        <button
+          className="settings-toggle-btn"
+          onClick={() => setIsFeedSettingsExpanded(!isFeedSettingsExpanded)}
+        >
+          <span>Feed configuratie ({feeds.length})</span>
+          {isFeedSettingsExpanded ? (
+            <ChevronUp size={16} />
+          ) : (
+            <ChevronDown size={16} />
+          )}
+        </button>
       </div>
 
       {/* Feeds */}
-      <DndContext
-        sensors={sensors}
-        collisionDetection={closestCenter}
-        onDragEnd={handleFeedDragEnd}
-        onDragStart={handleFeedDragStart}
+      <div
+        className={`collapsible-wrapper${isFeedSettingsExpanded ? " expanded" : ""}`}
       >
-        <SortableContext items={feedIds} strategy={verticalListSortingStrategy}>
-          {feeds.map((feed, index) => (
-            <SortableFeedHeader key={feed.id} feed={feed} index={index} />
-          ))}
-        </SortableContext>
+        <div className="feed-collapse-inner">
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleFeedDragEnd}
+            onDragStart={handleFeedDragStart}
+          >
+            <SortableContext
+              items={feedIds}
+              strategy={verticalListSortingStrategy}
+            >
+              {feeds.map((feed, index) => (
+                <SortableFeedHeader key={feed.id} feed={feed} index={index} />
+              ))}
+            </SortableContext>
 
-        {/* Add Feed Button */}
-        <div className="add-feed-button" onClick={addFeed}>
-          <div className="add-feed-content">
-            <Plus size={20} />
-            <span>Feed toevoegen</span>
-          </div>
+            {/* Add Feed Button */}
+            <div className="add-feed-button" onClick={addFeed}>
+              <div className="add-feed-content">
+                <Plus size={20} />
+                <span>Feed toevoegen</span>
+              </div>
+            </div>
+          </DndContext>
         </div>
-      </DndContext>
+      </div>
 
       {/* Feed Deletion Confirmation Modal */}
       {feedToDelete && (
