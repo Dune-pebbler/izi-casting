@@ -11,20 +11,32 @@ function normaliseUser(u) {
 }
 
 function TenantUserManager({ tenant }) {
-  const [users, setUsers] = useState((tenant.authorizedUsers || []).map(normaliseUser));
+  const [users, setUsers] = useState(
+    (tenant.authorizedUsers || []).map(normaliseUser),
+  );
   const [newEmail, setNewEmail] = useState("");
   const [newRole, setNewRole] = useState("editor");
   const [isSaving, setIsSaving] = useState(false);
 
   const save = async (updated) => {
-    await setDoc(doc(db, "tenants", tenant.id), { authorizedUsers: updated }, { merge: true });
+    await setDoc(
+      doc(db, "tenants", tenant.id),
+      { authorizedUsers: updated },
+      { merge: true },
+    );
     setUsers(updated);
   };
 
   const handleAdd = async () => {
     const email = newEmail.trim().toLowerCase();
-    if (!email || !email.includes("@")) { toast.error("Voer een geldig e-mailadres in"); return; }
-    if (users.some((u) => u.email === email)) { toast.error("Gebruiker heeft al toegang"); return; }
+    if (!email || !email.includes("@")) {
+      toast.error("Voer een geldig e-mailadres in");
+      return;
+    }
+    if (users.some((u) => u.email === email)) {
+      toast.error("Gebruiker heeft al toegang");
+      return;
+    }
     setIsSaving(true);
     try {
       await save([...users, { email, role: newRole }]);
@@ -77,7 +89,13 @@ function TenantUserManager({ tenant }) {
                 <option value="admin">Admin</option>
                 <option value="editor">Editor</option>
               </select>
-              <button className="user-remove-btn" onClick={() => handleRemove(email)} disabled={isSaving}>✕</button>
+              <button
+                className="user-remove-btn"
+                onClick={() => handleRemove(email)}
+                disabled={isSaving}
+              >
+                ✕
+              </button>
             </div>
           </li>
         ))}
@@ -100,7 +118,11 @@ function TenantUserManager({ tenant }) {
           <option value="admin">Admin</option>
           <option value="editor">Editor</option>
         </select>
-        <button className="btn btn-primary btn-sm" onClick={handleAdd} disabled={isSaving}>
+        <button
+          className="btn btn-primary btn-sm"
+          onClick={handleAdd}
+          disabled={isSaving}
+        >
           Toevoegen
         </button>
       </div>
@@ -122,7 +144,7 @@ function MyAdminView() {
           .filter((t) => {
             const users = t.authorizedUsers || [];
             return users.some((u) =>
-              typeof u === "string" ? u === email : u.email === email
+              typeof u === "string" ? u === email : u.email === email,
             );
           });
         mine.sort((a, b) => a.name?.localeCompare(b.name));
@@ -148,7 +170,7 @@ function MyAdminView() {
   function getMyRole(tenant) {
     const users = tenant.authorizedUsers || [];
     const me = users.find((u) =>
-      typeof u === "string" ? u === email : u.email === email
+      typeof u === "string" ? u === email : u.email === email,
     );
     if (!me) return null;
     return typeof me === "string" ? "admin" : me.role || "admin";
@@ -158,7 +180,11 @@ function MyAdminView() {
     <div className="superadmin-layout">
       <div className="superadmin-header">
         <div className="superadmin-header-left">
-          <img src="/izicasting-logo.svg" alt="iziCasting" className="logo-image" />
+          <img
+            src="/izicasting-logo.svg"
+            alt="iziCasting"
+            className="logo-image"
+          />
           <h1>Mijn omgevingen</h1>
         </div>
         <div className="superadmin-header-right">
@@ -176,7 +202,11 @@ function MyAdminView() {
         ) : tenants.length === 0 ? (
           <div className="superadmin-empty">
             <p>Je hebt geen toegang tot een omgeving.</p>
-            <p>Neem contact op met <a href="mailto:info@dunepebbler.nl">info@dunepebbler.nl</a> om toegang te krijgen.</p>
+            <p>
+              Neem contact op met{" "}
+              <a href="mailto:info@dunepebbler.nl">info@dunepebbler.nl</a> om
+              toegang te krijgen.
+            </p>
           </div>
         ) : (
           <>
@@ -195,13 +225,20 @@ function MyAdminView() {
                     <div className="tenant-card-header">
                       <div>
                         <h3 className="tenant-name">{tenant.name}</h3>
-                        <p className="tenant-subdomain">izi-casting.com/{tenant.id}</p>
+                        <p className="tenant-subdomain">
+                          izi-casting.com/{tenant.id}
+                        </p>
                       </div>
                       <div className="tenant-card-header-actions">
                         {role && (
-                          <span className={`role-badge role-badge--${role}`}>{role}</span>
+                          <span className={`role-badge role-badge--${role}`}>
+                            {role}
+                          </span>
                         )}
-                        <a href={`/${tenant.id}/admin`} className="btn btn-primary btn-sm">
+                        <a
+                          href={`/${tenant.id}/admin`}
+                          className="btn btn-primary btn-sm"
+                        >
                           <ExternalLink size={14} />
                           <span>Open Admin</span>
                         </a>

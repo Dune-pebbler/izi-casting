@@ -195,6 +195,24 @@
   gap: $spacing-sm;
 }
 
+.tenant-card-header-info {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: $spacing-md;
+}
+
+.tenant-card-logo {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  border-radius: $border-radius-md;
+  border: 1px solid var(--border);
+  background: var(--background);
+  padding: 4px;
+  flex-shrink: 0;
+}
+
 .tenant-card-header-actions {
   display: flex;
   align-items: center;

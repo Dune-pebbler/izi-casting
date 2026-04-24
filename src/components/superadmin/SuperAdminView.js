@@ -37,6 +37,13 @@ function TenantCard({ tenant, onEdit }) {
   const [newRole, setNewRole] = useState("editor");
   const [isSaving, setIsSaving] = useState(false);
   const [isUsersExpanded, setIsUsersExpanded] = useState(false);
+  const [logoUrl, setLogoUrl] = useState('');
+
+  useEffect(() => {
+    getDoc(doc(db, 'tenants', tenant.id, 'display', 'settings')).then((snap) => {
+      if (snap.exists()) setLogoUrl(snap.data()?.logoUrl || '');
+    });
+  }, [tenant.id]);
 
   const save = async (updated) => {
     await setDoc(
@@ -92,9 +99,14 @@ function TenantCard({ tenant, onEdit }) {
   return (
     <div className="tenant-card">
       <div className="tenant-card-header">
-        <div>
-          <h3 className="tenant-name">{tenant.name}</h3>
-          <p className="tenant-subdomain">izi-casting.com/{tenant.id}</p>
+        <div className="tenant-card-header-info">
+          <div>
+            <h3 className="tenant-name">{tenant.name}</h3>
+            <p className="tenant-subdomain">izi-casting.com/{tenant.id}</p>
+          </div>
+          {logoUrl && (
+            <img src={logoUrl} alt={tenant.name} className="tenant-card-logo" />
+          )}
         </div>
         <div className="tenant-card-header-actions">
           <button
@@ -126,9 +138,15 @@ function TenantCard({ tenant, onEdit }) {
             <Users size={13} />
             <span>Gebruikers ({users.length})</span>
           </div>
-          {isUsersExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+          {isUsersExpanded ? (
+            <ChevronUp size={14} />
+          ) : (
+            <ChevronDown size={14} />
+          )}
         </button>
-        <div className={`collapsible-wrapper${isUsersExpanded ? " expanded" : ""}`}>
+        <div
+          className={`collapsible-wrapper${isUsersExpanded ? " expanded" : ""}`}
+        >
           <div className="tenant-users-collapse-inner">
             <ul className="users-list">
               {users.map(({ email, role }) => (
