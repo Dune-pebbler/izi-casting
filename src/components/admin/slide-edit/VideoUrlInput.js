@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Play, AlertCircle, CheckCircle, Clock, Loader2 } from 'lucide-react';
 import { getVideoMetadata, formatDuration, estimateVideoDuration } from '../../../utils/videoMetadata';
 
@@ -10,6 +10,7 @@ function VideoUrlInput({ videoUrl, onVideoUrlChange, onRemoveVideo, onDurationCh
   const [isLoadingMetadata, setIsLoadingMetadata] = useState(false);
   const [videoMetadata, setVideoMetadata] = useState(null);
   const [metadataError, setMetadataError] = useState(null);
+  const userTypedRef = useRef(false);
 
   // Extract video ID and type from URL
   const extractVideoInfo = (url) => {
@@ -80,23 +81,23 @@ function VideoUrlInput({ videoUrl, onVideoUrlChange, onRemoveVideo, onDurationCh
       console.log('✅ Metadata fetch successful:', metadata);
       setVideoMetadata(metadata);
       
-      // If we have duration, automatically set it
-      if (metadata.duration && onDurationChange) {
-        console.log(`🎬 Auto-setting video duration: ${metadata.duration} seconds (${formatDuration(metadata.duration)})`);
-        onDurationChange(metadata.duration);
-      } else if (videoInfo.type === 'youtube' && onDurationChange) {
-        // For YouTube, try to estimate duration based on title or use a reasonable default
-        const estimatedDuration = estimateVideoDuration(videoInfo.id, metadata?.title || '');
-        console.log(`🎬 Using estimated duration for YouTube video: ${estimatedDuration} seconds`);
-        onDurationChange(estimatedDuration);
+      // Only update duration when the user typed a new URL
+      if (userTypedRef.current) {
+        if (metadata.duration && onDurationChange) {
+          console.log(`🎬 Auto-setting video duration: ${metadata.duration} seconds (${formatDuration(metadata.duration)})`);
+          onDurationChange(metadata.duration);
+        } else if (videoInfo.type === 'youtube' && onDurationChange) {
+          const estimatedDuration = estimateVideoDuration(videoInfo.id, metadata?.title || '');
+          console.log(`🎬 Using estimated duration for YouTube video: ${estimatedDuration} seconds`);
+          onDurationChange(estimatedDuration);
+        }
       }
     } catch (error) {
       console.error('❌ Error fetching video metadata:', error);
       setMetadataError(error.message);
-      
-      // Still set a default duration even if metadata fetch fails
-      if (onDurationChange) {
-        const defaultDuration = videoInfo.type === 'youtube' ? 240 : 60; // 4 minutes for YouTube, 1 minute for Vimeo
+
+      if (userTypedRef.current && onDurationChange) {
+        const defaultDuration = videoInfo.type === 'youtube' ? 240 : 60;
         console.log(`🎬 Using fallback duration: ${defaultDuration} seconds`);
         onDurationChange(defaultDuration);
       }
@@ -126,12 +127,14 @@ function VideoUrlInput({ videoUrl, onVideoUrlChange, onRemoveVideo, onDurationCh
 
   useEffect(() => {
     if (videoUrl !== url) {
+      userTypedRef.current = false;
       setUrl(videoUrl || '');
     }
   }, [videoUrl]);
 
   const handleUrlChange = (e) => {
     const newUrl = e.target.value;
+    userTypedRef.current = true;
     setUrl(newUrl);
     onVideoUrlChange(newUrl);
   };
