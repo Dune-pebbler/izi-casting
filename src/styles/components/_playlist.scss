@@ -382,3 +382,10 @@
   color: var(--muted-foreground);
   font-size: 10px;
 }
+
+.slide-preview {
+  &__image {
+    border-radius: 9px;
+    border: 1px solid var(--border);
+  }
+}

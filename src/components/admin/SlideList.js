@@ -500,7 +500,6 @@ function SlideList({
               className="slide-preview__image"
               style={{
                 objectPosition: slide.imagePosition || "center",
-                borderRadius: "9px",
               }}
             />
           ) : (
