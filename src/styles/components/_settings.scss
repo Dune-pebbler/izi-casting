@@ -39,14 +39,6 @@
         gap: $spacing-sm;
       }
 
-      &:hover {
-        transform: translateY(-1px);
-      }
-
-      &:active {
-        transform: translateY(0);
-      }
-
       svg {
         color: var(--foreground-secondary);
         transition: $transition-base;

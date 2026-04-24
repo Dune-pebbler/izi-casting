@@ -229,12 +229,7 @@
     margin-bottom: $spacing-sm;
 
     &:hover {
-      transform: translateY(-1px);
       color: var(--primary);
-    }
-
-    &:active {
-      transform: translateY(0);
     }
 
     svg {
