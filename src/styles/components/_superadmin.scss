@@ -242,13 +242,48 @@
   flex-direction: column;
   gap: $spacing-sm;
 
-  .tenant-users-label {
+  .tenant-users-toggle {
     display: flex;
     align-items: center;
-    gap: $spacing-xs;
-    font-size: $font-size-sm;
-    font-weight: $font-weight-medium;
+    justify-content: space-between;
+    width: 100%;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
     color: var(--foreground-secondary);
+    transition: $transition-base;
+
+    .tenant-users-toggle-left {
+      display: flex;
+      align-items: center;
+      gap: $spacing-xs;
+      font-size: $font-size-sm;
+      font-weight: $font-weight-medium;
+    }
+
+    svg {
+      transition: $transition-base;
+    }
+
+    &:hover {
+      color: var(--primary);
+
+      svg {
+        color: var(--primary);
+      }
+    }
+  }
+
+  .collapsible-wrapper {
+    .tenant-users-collapse-inner {
+      overflow: hidden;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      gap: $spacing-sm;
+      padding-top: $spacing-sm;
+    }
   }
 
   .users-list {

@@ -16,6 +16,8 @@ import {
   LogOut,
   Pencil,
   ShieldCheck,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 import CreateTenantModal from "./CreateTenantModal";
 import EditTenantModal from "./EditTenantModal";
@@ -34,6 +36,7 @@ function TenantCard({ tenant, onEdit }) {
   const [newEmail, setNewEmail] = useState("");
   const [newRole, setNewRole] = useState("editor");
   const [isSaving, setIsSaving] = useState(false);
+  const [isUsersExpanded, setIsUsersExpanded] = useState(false);
 
   const save = async (updated) => {
     await setDoc(
@@ -115,62 +118,72 @@ function TenantCard({ tenant, onEdit }) {
       </div>
 
       <div className="tenant-card-users">
-        <span className="tenant-users-label">
-          <Users size={13} />
-          Gebruikers
-        </span>
-        <ul className="users-list">
-          {users.map(({ email, role }) => (
-            <li key={email} className="user-item">
-              <span className="user-email">{email}</span>
-              <div className="user-item-actions">
-                <select
-                  className="user-role-select"
-                  value={role}
-                  onChange={(e) => handleRoleChange(email, e.target.value)}
-                  disabled={isSaving}
-                >
-                  <option value="admin">Admin</option>
-                  <option value="editor">Editor</option>
-                </select>
-                <button
-                  className="user-remove-btn"
-                  onClick={() => handleRemove(email)}
-                  disabled={isSaving}
-                >
-                  ✕
-                </button>
-              </div>
-            </li>
-          ))}
-          {users.length === 0 && (
-            <li className="user-empty">Geen gebruikers</li>
-          )}
-        </ul>
-        <div className="user-add-form">
-          <input
-            type="email"
-            className="form-input"
-            placeholder="e-mailadres"
-            value={newEmail}
-            onChange={(e) => setNewEmail(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && handleAdd()}
-          />
-          <select
-            className="user-role-select"
-            value={newRole}
-            onChange={(e) => setNewRole(e.target.value)}
-          >
-            <option value="admin">Admin</option>
-            <option value="editor">Editor</option>
-          </select>
-          <button
-            className="btn btn-primary btn-sm"
-            onClick={handleAdd}
-            disabled={isSaving}
-          >
-            Toevoegen
-          </button>
+        <button
+          className="tenant-users-toggle"
+          onClick={() => setIsUsersExpanded(!isUsersExpanded)}
+        >
+          <div className="tenant-users-toggle-left">
+            <Users size={13} />
+            <span>Gebruikers ({users.length})</span>
+          </div>
+          {isUsersExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+        </button>
+        <div className={`collapsible-wrapper${isUsersExpanded ? " expanded" : ""}`}>
+          <div className="tenant-users-collapse-inner">
+            <ul className="users-list">
+              {users.map(({ email, role }) => (
+                <li key={email} className="user-item">
+                  <span className="user-email">{email}</span>
+                  <div className="user-item-actions">
+                    <select
+                      className="user-role-select"
+                      value={role}
+                      onChange={(e) => handleRoleChange(email, e.target.value)}
+                      disabled={isSaving}
+                    >
+                      <option value="admin">Admin</option>
+                      <option value="editor">Editor</option>
+                    </select>
+                    <button
+                      className="user-remove-btn"
+                      onClick={() => handleRemove(email)}
+                      disabled={isSaving}
+                    >
+                      ✕
+                    </button>
+                  </div>
+                </li>
+              ))}
+              {users.length === 0 && (
+                <li className="user-empty">Geen gebruikers</li>
+              )}
+            </ul>
+            <div className="user-add-form">
+              <input
+                type="email"
+                className="form-input"
+                placeholder="e-mailadres"
+                value={newEmail}
+                onChange={(e) => setNewEmail(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleAdd()}
+              />
+              <select
+                className="user-role-select"
+                value={newRole}
+                onChange={(e) => setNewRole(e.target.value)}
+              >
+                <option value="admin">Admin</option>
+                <option value="editor">Editor</option>
+              </select>
+              <button
+                className="btn btn-primary btn-sm"
+                onClick={handleAdd}
+                disabled={isSaving}
+              >
+                Toevoegen
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
