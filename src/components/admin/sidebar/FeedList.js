@@ -1,10 +1,19 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { doc, setDoc, onSnapshot } from 'firebase/firestore';
-import { db } from '../../../firebase';
-import { useTenant } from '../../../context/TenantContext';
-import { tenantDoc } from '../../../utils/tenantPaths';
-import { GripVertical, Copy, Trash2, Plus, Eye, EyeOff } from 'lucide-react';
-import { toast } from 'sonner';
+import React, { useState, useEffect, useMemo, useCallback } from "react";
+import { doc, setDoc, onSnapshot } from "firebase/firestore";
+import { db } from "../../../firebase";
+import { useTenant } from "../../../context/TenantContext";
+import { tenantDoc } from "../../../utils/tenantPaths";
+import {
+  GripVertical,
+  Copy,
+  Trash2,
+  Plus,
+  Eye,
+  EyeOff,
+  ChevronDown,
+  ChevronUp,
+} from "lucide-react";
+import { toast } from "sonner";
 import {
   DndContext,
   closestCenter,
@@ -12,17 +21,15 @@ import {
   PointerSensor,
   useSensor,
   useSensors,
-} from '@dnd-kit/core';
+} from "@dnd-kit/core";
 import {
   arrayMove,
   SortableContext,
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
-} from '@dnd-kit/sortable';
-import {
-  useSortable,
-} from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
+} from "@dnd-kit/sortable";
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 // import FeedEditModal from '../FeedEditModal'; // No longer needed for inline editing
 
 function FeedList() {
@@ -33,42 +40,42 @@ function FeedList() {
   const [feedToDelete, setFeedToDelete] = useState(null);
   const [inlineEditingFeed, setInlineEditingFeed] = useState(null);
   const [inlineEditForm, setInlineEditForm] = useState({
-    name: '',
-    url: '',
+    name: "",
+    url: "",
     maxPosts: 5,
     isEnabled: true,
-    isVisible: true
+    isVisible: true,
   });
   const [editingUrl, setEditingUrl] = useState(null);
-  const [tempUrl, setTempUrl] = useState('');
+  const [tempUrl, setTempUrl] = useState("");
   const [editingMaxPosts, setEditingMaxPosts] = useState(null);
-  const [tempMaxPosts, setTempMaxPosts] = useState('');
+  const [tempMaxPosts, setTempMaxPosts] = useState("");
 
   // Load feeds from Firestore
   useEffect(() => {
-    const settingsDocRef = tenantDoc(db, tenantId, 'display', 'settings');
-    
+    const settingsDocRef = tenantDoc(db, tenantId, "display", "settings");
+
     const unsubscribe = onSnapshot(settingsDocRef, (doc) => {
       if (doc.exists()) {
         const data = doc.data();
         if (data.feeds && Array.isArray(data.feeds)) {
           // Migrate existing feeds to include new properties
-          const migratedFeeds = data.feeds.map(feed => ({
+          const migratedFeeds = data.feeds.map((feed) => ({
             ...feed,
             isEnabled: feed.isEnabled !== false, // Default to true if not set
             maxPosts: feed.maxPosts || 5, // Default 5 posts
-            isVisible: feed.isVisible !== false // Default to true if not set
+            isVisible: feed.isVisible !== false, // Default to true if not set
           }));
           setFeeds(migratedFeeds);
         } else if (data.feedUrl) {
           // Migrate old single feed structure to new multiple feeds structure
           const defaultFeed = {
-            id: 'default',
-            name: 'Default Feed',
+            id: "default",
+            name: "Default Feed",
             url: data.feedUrl,
             isEnabled: true,
             maxPosts: 5,
-            isVisible: true
+            isVisible: true,
           };
           setFeeds([defaultFeed]);
         } else {
@@ -87,35 +94,35 @@ function FeedList() {
     const newFeed = {
       id: `feed_${Date.now()}`,
       name: `Feed ${feeds.length + 1}`,
-      url: '',
+      url: "",
       isEnabled: true,
       maxPosts: 5,
-      isVisible: true
+      isVisible: true,
     };
     const updatedFeeds = [...feeds, newFeed];
     setFeeds(updatedFeeds);
     await saveFeedsToFirebase(updatedFeeds);
-    toast.success('Feed added successfully!');
+    toast.success("Feed added successfully!");
   };
 
   const removeFeed = async (feedId) => {
-    const feedToRemove = feeds.find(feed => feed.id === feedId);
-    const feedName = feedToRemove?.name || 'Feed';
-    
+    const feedToRemove = feeds.find((feed) => feed.id === feedId);
+    const feedName = feedToRemove?.name || "Feed";
+
     // Show loading toast
     const loadingToast = toast.loading(`Deleting ${feedName}...`);
 
     try {
-      const updatedFeeds = feeds.filter(feed => feed.id !== feedId);
+      const updatedFeeds = feeds.filter((feed) => feed.id !== feedId);
       setFeeds(updatedFeeds);
       await saveFeedsToFirebase(updatedFeeds);
-      
+
       // Dismiss loading toast and show success
       toast.dismiss(loadingToast);
       toast.success(`${feedName} deleted successfully!`);
     } catch (error) {
-      console.error('Error deleting feed:', error);
-      
+      console.error("Error deleting feed:", error);
+
       // Dismiss loading toast and show error
       toast.dismiss(loadingToast);
       toast.error(`Error deleting ${feedName}: ` + error.message);
@@ -140,27 +147,26 @@ function FeedList() {
       id: `feed_${Date.now()}`,
       name: `${feedToCopy.name} (Copy)`,
       isEnabled: true,
-      isVisible: true
+      isVisible: true,
     };
-    
+
     const updatedFeeds = [...feeds, copiedFeed];
     setFeeds(updatedFeeds);
     await saveFeedsToFirebase(updatedFeeds);
-    toast.success('Feed copied successfully!');
+    toast.success("Feed copied successfully!");
   };
 
-
   const toggleFeedEnabled = async (feedId) => {
-    const updatedFeeds = feeds.map(feed => 
-      feed.id === feedId ? { ...feed, isEnabled: !feed.isEnabled } : feed
+    const updatedFeeds = feeds.map((feed) =>
+      feed.id === feedId ? { ...feed, isEnabled: !feed.isEnabled } : feed,
     );
     setFeeds(updatedFeeds);
     await saveFeedsToFirebase(updatedFeeds);
   };
 
   const toggleFeedVisibility = async (feedId) => {
-    const updatedFeeds = feeds.map(feed => 
-      feed.id === feedId ? { ...feed, isVisible: !feed.isVisible } : feed
+    const updatedFeeds = feeds.map((feed) =>
+      feed.id === feedId ? { ...feed, isVisible: !feed.isVisible } : feed,
     );
     setFeeds(updatedFeeds);
     await saveFeedsToFirebase(updatedFeeds);
@@ -175,12 +181,12 @@ function FeedList() {
   };
 
   const saveFeedChanges = async (updatedFeed) => {
-    const updatedFeeds = feeds.map(feed => 
-      feed.id === updatedFeed.id ? updatedFeed : feed
+    const updatedFeeds = feeds.map((feed) =>
+      feed.id === updatedFeed.id ? updatedFeed : feed,
     );
     setFeeds(updatedFeeds);
     await saveFeedsToFirebase(updatedFeeds);
-    toast.success('Feed updated successfully!');
+    toast.success("Feed updated successfully!");
     closeEditModal();
   };
 
@@ -188,33 +194,33 @@ function FeedList() {
   const startInlineEdit = (feed) => {
     setInlineEditingFeed(feed.id);
     setInlineEditForm({
-      name: feed.name || '',
-      url: feed.url || '',
+      name: feed.name || "",
+      url: feed.url || "",
       maxPosts: feed.maxPosts || 5,
       isEnabled: feed.isEnabled !== false,
-      isVisible: feed.isVisible !== false
+      isVisible: feed.isVisible !== false,
     });
   };
 
   const cancelInlineEdit = () => {
     setInlineEditingFeed(null);
     setInlineEditForm({
-      name: '',
-      url: '',
+      name: "",
+      url: "",
       maxPosts: 5,
       isEnabled: true,
-      isVisible: true
+      isVisible: true,
     });
   };
 
   const saveInlineEdit = async () => {
     if (!inlineEditForm.name.trim()) {
-      toast.error('Please enter a feed name');
+      toast.error("Please enter a feed name");
       return;
     }
 
     if (!inlineEditForm.url.trim()) {
-      toast.error('Please enter a feed URL');
+      toast.error("Please enter a feed URL");
       return;
     }
 
@@ -222,49 +228,49 @@ function FeedList() {
     try {
       new URL(inlineEditForm.url);
     } catch (error) {
-      toast.error('Please enter a valid URL');
+      toast.error("Please enter a valid URL");
       return;
     }
 
     const updatedFeed = {
-      ...feeds.find(f => f.id === inlineEditingFeed),
+      ...feeds.find((f) => f.id === inlineEditingFeed),
       name: inlineEditForm.name.trim(),
       url: inlineEditForm.url.trim(),
       maxPosts: parseInt(inlineEditForm.maxPosts) || 5,
       isEnabled: inlineEditForm.isEnabled,
-      isVisible: inlineEditForm.isVisible
+      isVisible: inlineEditForm.isVisible,
     };
 
-    const updatedFeeds = feeds.map(feed => 
-      feed.id === inlineEditingFeed ? updatedFeed : feed
+    const updatedFeeds = feeds.map((feed) =>
+      feed.id === inlineEditingFeed ? updatedFeed : feed,
     );
     setFeeds(updatedFeeds);
     await saveFeedsToFirebase(updatedFeeds);
-    toast.success('Feed updated successfully!');
+    toast.success("Feed updated successfully!");
     cancelInlineEdit();
   };
 
   const handleInlineFormChange = (field, value) => {
-    setInlineEditForm(prev => ({
+    setInlineEditForm((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
   };
 
   // URL editing functions
   const startUrlEdit = (feed) => {
     setEditingUrl(feed.id);
-    setTempUrl(feed.url || '');
+    setTempUrl(feed.url || "");
   };
 
   const cancelUrlEdit = () => {
     setEditingUrl(null);
-    setTempUrl('');
+    setTempUrl("");
   };
 
   const saveUrlEdit = async (feedId) => {
     if (!tempUrl.trim()) {
-      toast.error('Please enter a URL');
+      toast.error("Please enter a URL");
       return;
     }
 
@@ -272,23 +278,23 @@ function FeedList() {
     try {
       new URL(tempUrl.trim());
     } catch (error) {
-      toast.error('Please enter a valid URL');
+      toast.error("Please enter a valid URL");
       return;
     }
 
-    const updatedFeeds = feeds.map(feed => 
-      feed.id === feedId ? { ...feed, url: tempUrl.trim() } : feed
+    const updatedFeeds = feeds.map((feed) =>
+      feed.id === feedId ? { ...feed, url: tempUrl.trim() } : feed,
     );
     setFeeds(updatedFeeds);
     await saveFeedsToFirebase(updatedFeeds);
-    toast.success('URL updated successfully!');
+    toast.success("URL updated successfully!");
     cancelUrlEdit();
   };
 
   const handleUrlKeyPress = (e, feedId) => {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       saveUrlEdit(feedId);
-    } else if (e.key === 'Escape') {
+    } else if (e.key === "Escape") {
       cancelUrlEdit();
     }
   };
@@ -296,62 +302,68 @@ function FeedList() {
   // Max Posts editing functions
   const startMaxPostsEdit = (feed) => {
     setEditingMaxPosts(feed.id);
-    setTempMaxPosts(feed.maxPosts?.toString() || '5');
+    setTempMaxPosts(feed.maxPosts?.toString() || "5");
   };
 
   const cancelMaxPostsEdit = () => {
     setEditingMaxPosts(null);
-    setTempMaxPosts('');
+    setTempMaxPosts("");
   };
 
   const saveMaxPostsEdit = async (feedId) => {
     const maxPostsValue = parseInt(tempMaxPosts);
-    
+
     if (!tempMaxPosts.trim() || isNaN(maxPostsValue)) {
-      toast.error('Please enter a valid number');
+      toast.error("Please enter a valid number");
       return;
     }
 
     if (maxPostsValue < 1 || maxPostsValue > 50) {
-      toast.error('Max posts must be between 1 and 50');
+      toast.error("Max posts must be between 1 and 50");
       return;
     }
 
-    const updatedFeeds = feeds.map(feed => 
-      feed.id === feedId ? { ...feed, maxPosts: maxPostsValue } : feed
+    const updatedFeeds = feeds.map((feed) =>
+      feed.id === feedId ? { ...feed, maxPosts: maxPostsValue } : feed,
     );
     setFeeds(updatedFeeds);
     await saveFeedsToFirebase(updatedFeeds);
-    toast.success('Max posts updated successfully!');
+    toast.success("Max posts updated successfully!");
     cancelMaxPostsEdit();
   };
 
   const handleMaxPostsKeyPress = (e, feedId) => {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       saveMaxPostsEdit(feedId);
-    } else if (e.key === 'Escape') {
+    } else if (e.key === "Escape") {
       cancelMaxPostsEdit();
     }
   };
 
   const popularFeeds = [
-    { name: 'BBC News', url: 'https://feeds.bbci.co.uk/news/rss.xml' },
-    { name: 'CNN', url: 'https://rss.cnn.com/rss/edition.rss' },
-    { name: 'Reuters', url: 'https://feeds.reuters.com/reuters/topNews' },
-    { name: 'NPR News', url: 'https://feeds.npr.org/1001/rss.xml' },
-    { name: 'The Guardian', url: 'https://www.theguardian.com/world/rss' },
-    { name: 'Informanagement (JSON)', url: 'https://nl.informanagement.com/rss/customfeed.aspx?command=rss&mode=xml&nr=24&length=200&sjabloon=confianza052025' }
+    { name: "BBC News", url: "https://feeds.bbci.co.uk/news/rss.xml" },
+    { name: "CNN", url: "https://rss.cnn.com/rss/edition.rss" },
+    { name: "Reuters", url: "https://feeds.reuters.com/reuters/topNews" },
+    { name: "NPR News", url: "https://feeds.npr.org/1001/rss.xml" },
+    { name: "The Guardian", url: "https://www.theguardian.com/world/rss" },
+    {
+      name: "Informanagement (JSON)",
+      url: "https://nl.informanagement.com/rss/customfeed.aspx?command=rss&mode=xml&nr=24&length=200&sjabloon=confianza052025",
+    },
   ];
 
   const saveFeedsToFirebase = async (feedsToSave) => {
     try {
-      const settingsDocRef = tenantDoc(db, tenantId, 'display', 'settings');
-      console.log('Saving feeds to Firebase:', feedsToSave.map(f => ({ id: f.id, name: f.name })));
+      const settingsDocRef = tenantDoc(db, tenantId, "display", "settings");
+      console.log(
+        "Saving feeds to Firebase:",
+        feedsToSave.map((f) => ({ id: f.id, name: f.name })),
+      );
       await setDoc(settingsDocRef, { feeds: feedsToSave }, { merge: true });
-      console.log('Feeds saved to Firebase successfully');
+      console.log("Feeds saved to Firebase successfully");
     } catch (error) {
-      console.error('Error saving feeds to Firebase:', error);
-      toast.error('Error saving changes: ' + error.message);
+      console.error("Error saving feeds to Firebase:", error);
+      toast.error("Error saving changes: " + error.message);
       throw error;
     }
   };
@@ -381,10 +393,10 @@ function FeedList() {
     const isInlineEditing = inlineEditingFeed === feed.id;
 
     return (
-      <div 
+      <div
         ref={setNodeRef}
         style={style}
-        className={`feed-content-wrapper ${isDragging ? 'dragging' : ''}`}
+        className={`feed-content-wrapper ${isDragging ? "dragging" : ""}`}
       >
         <div className="feed-header">
           <div className="feed-header-left">
@@ -406,8 +418,8 @@ function FeedList() {
                   autoFocus
                 />
               ) : (
-                <span 
-                  className="max-posts-value max-posts-editable" 
+                <span
+                  className="max-posts-value max-posts-editable"
                   title="Klik om aantal berichten te bewerken"
                   onClick={() => startMaxPostsEdit(feed)}
                 >
@@ -442,10 +454,18 @@ function FeedList() {
                 e.stopPropagation();
                 toggleFeedEnabled(feed.id);
               }}
-              className={`visibility-btn ${feed.isEnabled && feed.isVisible ? 'enabled' : 'disabled'}`}
-              title={feed.isEnabled && feed.isVisible ? 'Disable feed' : 'Enable feed'}
+              className={`visibility-btn ${feed.isEnabled && feed.isVisible ? "enabled" : "disabled"}`}
+              title={
+                feed.isEnabled && feed.isVisible
+                  ? "Disable feed"
+                  : "Enable feed"
+              }
             >
-              {feed.isEnabled && feed.isVisible ? <Eye size={18} /> : <EyeOff size={18} />}
+              {feed.isEnabled && feed.isVisible ? (
+                <Eye size={18} />
+              ) : (
+                <EyeOff size={18} />
+              )}
             </button>
           </div>
         </div>
@@ -465,12 +485,16 @@ function FeedList() {
                 autoFocus
               />
             ) : (
-              <div 
-                className="url-value url-editable" 
-                title={feed.url || 'Click to edit URL'}
+              <div
+                className="url-value url-editable"
+                title={feed.url || "Click to edit URL"}
                 onClick={() => startUrlEdit(feed)}
               >
-                {feed.url ? (feed.url.length > 50 ? `${feed.url.substring(0, 50)}...` : feed.url) : 'Click to set URL'}
+                {feed.url
+                  ? feed.url.length > 50
+                    ? `${feed.url.substring(0, 50)}...`
+                    : feed.url
+                  : "Click to set URL"}
               </div>
             )}
           </div>
@@ -485,7 +509,7 @@ function FeedList() {
                 type="text"
                 id={`feedName-${feed.id}`}
                 value={inlineEditForm.name}
-                onChange={(e) => handleInlineFormChange('name', e.target.value)}
+                onChange={(e) => handleInlineFormChange("name", e.target.value)}
                 placeholder="Enter feed name"
                 className="form-input"
               />
@@ -497,7 +521,7 @@ function FeedList() {
                 type="url"
                 id={`feedUrl-${feed.id}`}
                 value={inlineEditForm.url}
-                onChange={(e) => handleInlineFormChange('url', e.target.value)}
+                onChange={(e) => handleInlineFormChange("url", e.target.value)}
                 placeholder="https://example.com/feed.xml"
                 className="form-input"
               />
@@ -515,8 +539,8 @@ function FeedList() {
                     type="button"
                     className="popular-feed-btn"
                     onClick={() => {
-                      handleInlineFormChange('name', popularFeed.name);
-                      handleInlineFormChange('url', popularFeed.url);
+                      handleInlineFormChange("name", popularFeed.name);
+                      handleInlineFormChange("url", popularFeed.url);
                     }}
                   >
                     {popularFeed.name}
@@ -526,14 +550,21 @@ function FeedList() {
             </div>
 
             <div className="form-group">
-              <label htmlFor={`feedMaxPosts-${feed.id}`}>Maximum Number of Posts</label>
+              <label htmlFor={`feedMaxPosts-${feed.id}`}>
+                Maximum Number of Posts
+              </label>
               <input
                 type="number"
                 id={`feedMaxPosts-${feed.id}`}
                 min="1"
                 max="50"
                 value={inlineEditForm.maxPosts}
-                onChange={(e) => handleInlineFormChange('maxPosts', parseInt(e.target.value) || 5)}
+                onChange={(e) =>
+                  handleInlineFormChange(
+                    "maxPosts",
+                    parseInt(e.target.value) || 5,
+                  )
+                }
                 className="form-input"
               />
               <small className="input-help">
@@ -547,7 +578,9 @@ function FeedList() {
                   <input
                     type="checkbox"
                     checked={inlineEditForm.isEnabled}
-                    onChange={(e) => handleInlineFormChange('isEnabled', e.target.checked)}
+                    onChange={(e) =>
+                      handleInlineFormChange("isEnabled", e.target.checked)
+                    }
                   />
                   <span className="checkbox-text">Enable this feed</span>
                 </label>
@@ -560,7 +593,9 @@ function FeedList() {
                   <input
                     type="checkbox"
                     checked={inlineEditForm.isVisible}
-                    onChange={(e) => handleInlineFormChange('isVisible', e.target.checked)}
+                    onChange={(e) =>
+                      handleInlineFormChange("isVisible", e.target.checked)
+                    }
                   />
                   <span className="checkbox-text">Show in display</span>
                 </label>
@@ -568,16 +603,10 @@ function FeedList() {
             </div>
 
             <div className="form-actions">
-              <button
-                onClick={cancelInlineEdit}
-                className="btn btn-secondary"
-              >
+              <button onClick={cancelInlineEdit} className="btn btn-secondary">
                 Cancel
               </button>
-              <button
-                onClick={saveInlineEdit}
-                className="btn btn-primary"
-              >
+              <button onClick={saveInlineEdit} className="btn btn-primary">
                 Save Changes
               </button>
             </div>
@@ -596,64 +625,79 @@ function FeedList() {
     }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
-    })
+    }),
   );
 
-  const feedIds = useMemo(() => feeds.map(feed => feed.id), [feeds]);
+  const feedIds = useMemo(() => feeds.map((feed) => feed.id), [feeds]);
 
-  const handleFeedDragEnd = useCallback((event) => {
-    const { active, over } = event;
-    console.log('Feed drag end:', { active, over });
+  const handleFeedDragEnd = useCallback(
+    (event) => {
+      const { active, over } = event;
+      console.log("Feed drag end:", { active, over });
 
-    if (active.id !== over?.id) {
-      const oldIndex = feeds.findIndex(feed => feed.id === active.id);
-      const newIndex = feeds.findIndex(feed => feed.id === over.id);
-      
-      if (oldIndex !== -1 && newIndex !== -1) {
-        const newFeeds = arrayMove(feeds, oldIndex, newIndex);
-        reorderFeeds(newFeeds);
+      if (active.id !== over?.id) {
+        const oldIndex = feeds.findIndex((feed) => feed.id === active.id);
+        const newIndex = feeds.findIndex((feed) => feed.id === over.id);
+
+        if (oldIndex !== -1 && newIndex !== -1) {
+          const newFeeds = arrayMove(feeds, oldIndex, newIndex);
+          reorderFeeds(newFeeds);
+        }
       }
-    }
-  }, [feeds, reorderFeeds]);
+    },
+    [feeds, reorderFeeds],
+  );
+
+  const [isFeedSettingsExpanded, setIsFeedSettingsExpanded] = useState(false);
 
   const handleFeedDragStart = useCallback((event) => {
-    console.log('Feed drag start:', event);
+    console.log("Feed drag start:", event);
   }, []);
 
   return (
     <div className="feed-list">
       <div className="settings-header">
-        <h3>Feed configuratie ({feeds.length})</h3>
+        <button
+          className="settings-toggle-btn"
+          onClick={() => setIsFeedSettingsExpanded(!isFeedSettingsExpanded)}
+        >
+          <span>Feed configuratie ({feeds.length})</span>
+          {isFeedSettingsExpanded ? (
+            <ChevronUp size={16} />
+          ) : (
+            <ChevronDown size={16} />
+          )}
+        </button>
       </div>
 
       {/* Feeds */}
-      <DndContext
-        sensors={sensors}
-        collisionDetection={closestCenter}
-        onDragEnd={handleFeedDragEnd}
-        onDragStart={handleFeedDragStart}
-      >
-        <SortableContext
-          items={feedIds}
-          strategy={verticalListSortingStrategy}
-        >
-          {feeds.map((feed, index) => (
-            <SortableFeedHeader
-              key={feed.id}
-              feed={feed}
-              index={index}
-            />
-          ))}
-        </SortableContext>
-        
-        {/* Add Feed Button */}
-        <div className="add-feed-button" onClick={addFeed}>
-          <div className="add-feed-content">
-            <Plus size={20} />
-            <span>Feed toevoegen</span>
-          </div>
+      <div className={`collapsible-wrapper${isFeedSettingsExpanded ? ' expanded' : ''}`}>
+        <div className="feed-collapse-inner">
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleFeedDragEnd}
+            onDragStart={handleFeedDragStart}
+          >
+            <SortableContext
+              items={feedIds}
+              strategy={verticalListSortingStrategy}
+            >
+              {feeds.map((feed, index) => (
+                <SortableFeedHeader key={feed.id} feed={feed} index={index} />
+              ))}
+            </SortableContext>
+
+            {/* Add Feed Button */}
+            <div className="add-feed-button" onClick={addFeed}>
+              <div className="add-feed-content">
+                <Plus size={20} />
+                <span>Feed toevoegen</span>
+              </div>
+            </div>
+          </DndContext>
         </div>
-      </DndContext>
+      </div>
 
       {/* Feed Deletion Confirmation Modal */}
       {feedToDelete && (
@@ -661,7 +705,8 @@ function FeedList() {
           <div className="delete-modal">
             <h3>Feed verwijderen</h3>
             <p>
-              Weet je zeker dat je <strong>{feedToDelete.name}</strong> wilt verwijderen?
+              Weet je zeker dat je <strong>{feedToDelete.name}</strong> wilt
+              verwijderen?
             </p>
             <p className="delete-warning">
               Deze actie kan niet ongedaan worden gemaakt.
@@ -673,10 +718,7 @@ function FeedList() {
               >
                 Annuleren
               </button>
-              <button
-                onClick={handleDeleteFeed}
-                className="btn btn-danger"
-              >
+              <button onClick={handleDeleteFeed} className="btn btn-danger">
                 Verwijderen
               </button>
             </div>
