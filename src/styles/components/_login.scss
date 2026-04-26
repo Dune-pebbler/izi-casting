@@ -73,6 +73,46 @@
 }
 
 // Google login button (matching pairing screen style)
+.login-microsoft-button {
+  width: 100%;
+  padding: $spacing-lg $spacing-xl;
+  font-size: 1.1rem;
+  font-weight: $font-weight-semibold;
+  color: white;
+  background-color: #0078d4;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-md;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  margin-bottom: $spacing-lg;
+
+  &:hover:not(:disabled) {
+    background-color: #006cbe;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  &:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  svg {
+    flex-shrink: 0;
+  }
+}
+
 .login-google-button {
   width: 100%;
   padding: $spacing-lg $spacing-xl;

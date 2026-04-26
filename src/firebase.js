@@ -2,7 +2,7 @@
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
-import { getAuth, GoogleAuthProvider } from "firebase/auth";
+import { getAuth, GoogleAuthProvider, OAuthProvider } from "firebase/auth";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -40,7 +40,19 @@ export const googleProvider = new GoogleAuthProvider();
 googleProvider.addScope('email');
 googleProvider.addScope('profile');
 
-// Debug: Log Google provider configuration
-console.log('Google Provider configured with scopes:', googleProvider.getScopes());
+// Initialize Microsoft Auth Provider (only when client ID is configured)
+export const microsoftProvider = process.env.REACT_APP_MICROSOFT_CLIENT_ID
+  ? new OAuthProvider('microsoft.com')
+  : null;
+
+if (microsoftProvider) {
+  microsoftProvider.setCustomParameters({
+    prompt: 'select_account',
+    tenant: process.env.REACT_APP_MICROSOFT_TENANT_ID || 'common',
+  });
+  microsoftProvider.addScope('email');
+  microsoftProvider.addScope('profile');
+  microsoftProvider.addScope('openid');
+}
 
 export default app;

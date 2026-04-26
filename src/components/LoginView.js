@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, Navigate, useSearchParams } from 'react-router-dom';
-import { auth, googleProvider } from '../firebase';
+import { auth, googleProvider, microsoftProvider } from '../firebase';
 import { 
   signInWithRedirect, 
   signInWithPopup,
@@ -95,6 +95,38 @@ function LoginView() {
   }
 
 
+  const handleMicrosoftLogin = async () => {
+    setIsLoading(true);
+    setError('');
+    try {
+      console.log('🔐 Starting Microsoft login...');
+      const result = await signInWithPopup(auth, microsoftProvider);
+      console.log('✅ Microsoft login successful:', result.user);
+      setUser(result.user);
+    } catch (error) {
+      console.error('❌ Microsoft login error:', {
+        code: error.code,
+        message: error.message,
+        customData: error.customData,
+        serverResponse: error.customData?.serverResponse,
+        stack: error.stack,
+        fullError: JSON.stringify(error, Object.getOwnPropertyNames(error))
+      });
+      if (error.code === 'auth/popup-closed-by-user' || error.code === 'auth/popup-blocked') {
+        try {
+          await signInWithRedirect(auth, microsoftProvider);
+        } catch (redirectError) {
+          console.error('❌ Microsoft redirect error:', redirectError);
+          setError('Microsoft login failed: ' + redirectError.message);
+          setIsLoading(false);
+        }
+      } else {
+        setError('Microsoft login failed: ' + error.message);
+        setIsLoading(false);
+      }
+    }
+  };
+
   const handleGoogleLogin = async () => {
     console.log('🔐 Starting Google login process...');
     setIsLoading(true);
@@ -153,6 +185,23 @@ function LoginView() {
             Meld je aan om toegang te krijgen tot het admin dashboard
           </p>
 
+          <div className="login-button-section">
+            {microsoftProvider && (
+              <button
+                onClick={handleMicrosoftLogin}
+                disabled={isLoading}
+                className="login-microsoft-button"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24">
+                  <path fill="#f25022" d="M1 1h10v10H1z"/>
+                  <path fill="#00a4ef" d="M13 1h10v10H13z"/>
+                  <path fill="#7fba00" d="M1 13h10v10H1z"/>
+                  <path fill="#ffb900" d="M13 13h10v10H13z"/>
+                </svg>
+                {isLoading ? 'Inloggen...' : 'Inloggen met Microsoft'}
+              </button>
+            )}
+          </div>
           <div className="login-button-section">
             <button
               onClick={handleGoogleLogin}
