@@ -1,6 +1,13 @@
 import React, { useState } from "react";
 import { Editor } from "@tinymce/tinymce-react";
-import { Trash2, Clock, Maximize2, Layout, ArrowLeftRight, Zap } from "lucide-react";
+import {
+  Trash2,
+  Clock,
+  Maximize2,
+  Layout,
+  ArrowLeftRight,
+  Zap,
+} from "lucide-react";
 import LayoutSelector from "./LayoutSelector";
 import ImageUpload from "./ImageUpload";
 import PositionSelector from "./PositionSelector";
@@ -55,7 +62,9 @@ function EditModal({
       case "side-by-side":
         return (
           <>
-            <div className={`slide-modal__body-left ${imageSide === 'right' ? 'flipped' : ''}`}>
+            <div
+              className={`slide-modal__body-left ${imageSide === "right" ? "flipped" : ""}`}
+            >
               <ImageUpload
                 imageUrl={modalImageUrl}
                 uploadingImage={uploadingImage}
@@ -70,13 +79,17 @@ function EditModal({
 
             <button
               className="slide-modal__flip-btn"
-              onClick={() => onImageSideChange(imageSide === 'left' ? 'right' : 'left')}
+              onClick={() =>
+                onImageSideChange(imageSide === "left" ? "right" : "left")
+              }
               title="Flip image and text positions"
             >
               <ArrowLeftRight size={20} />
             </button>
 
-            <div className={`slide-modal__body-right ${imageSide === 'right' ? 'flipped' : ''}`}>
+            <div
+              className={`slide-modal__body-right ${imageSide === "right" ? "flipped" : ""}`}
+            >
               <div className="text-input-section">
                 <TextEditor
                   content={modalTinyMCEContent}
@@ -154,7 +167,7 @@ function EditModal({
               <VideoUrlInput
                 videoUrl={videoUrl}
                 onVideoUrlChange={onVideoUrlChange}
-                onRemoveVideo={() => onVideoUrlChange('')}
+                onRemoveVideo={() => onVideoUrlChange("")}
                 onDurationChange={onDurationChange}
               />
             </div>
@@ -184,7 +197,7 @@ function EditModal({
               <IframeUrlInput
                 iframeUrl={iframeUrl}
                 onIframeUrlChange={onIframeUrlChange}
-                onRemoveIframe={() => onIframeUrlChange('')}
+                onRemoveIframe={() => onIframeUrlChange("")}
               />
             </div>
           </div>
@@ -198,171 +211,189 @@ function EditModal({
   return (
     <div className="slide-modal">
       <div className="slide-modal__overlay" onClick={onClose}>
-        <div className="slide-modal__content" onClick={(e) => e.stopPropagation()}>
-        <div className="slide-modal__header">
-          <div className="slide-modal__header-left">
-            <div className="slide-modal__name-input-container">
-              <input
-                type="text"
-                className="slide-modal__name-input"
-                value={slideName || ""}
-                onChange={(e) => onSlideNameChange(e.target.value)}
-                placeholder="Enter slide name..."
-                maxLength={50}
+        <div
+          className="slide-modal__content"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="slide-modal__header">
+            <div className="slide-modal__header-left">
+              <div className="slide-modal__name-input-container">
+                <input
+                  type="text"
+                  className="slide-modal__name-input"
+                  value={slideName || ""}
+                  onChange={(e) => onSlideNameChange(e.target.value)}
+                  placeholder="Enter slide name..."
+                  maxLength={50}
+                />
+              </div>
+              <div className="slide-modal__duration-container">
+                <label htmlFor="slide-duration">
+                  <Clock size={16} />
+                </label>
+                <div className="slide-modal__duration-wrapper">
+                  <input
+                    id="slide-duration"
+                    type="number"
+                    className="slide-modal__duration-input"
+                    value={slideDuration || ""}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      if (value === "") {
+                        onDurationChange("");
+                      } else {
+                        const numValue = parseInt(value);
+                        onDurationChange(isNaN(numValue) ? 5 : numValue);
+                      }
+                    }}
+                    min="0"
+                    step="1"
+                  />
+                  <span className="slide-modal__duration-suffix">s</span>
+                </div>
+              </div>
+              <div className="slide-modal__showbar-container">
+                <div
+                  className={`slide-modal__showbar-slider ${showBar ? "active" : ""}`}
+                  onClick={() => onShowBarChange(!showBar)}
+                  title={showBar ? "Fullscreen mode" : "Two-bar layout mode"}
+                >
+                  <div className="slider-track">
+                    <div className="slider-thumb"></div>
+                  </div>
+                  <div className="slider-icons">
+                    <Maximize2 size={16} className="icon-fullscreen" />
+                    <Layout size={16} className="icon-layout" />
+                  </div>
+                </div>
+              </div>
+              <div className="slide-modal__transition-container">
+                <label htmlFor="slide-transition">
+                  <Zap size={16} />
+                </label>
+                <select
+                  id="slide-transition"
+                  className="slide-modal__transition-select"
+                  value={slideTransition || "fade"}
+                  onChange={(e) => onTransitionChange(e.target.value)}
+                  title="Select slide transition effect"
+                >
+                  <option value="fade">Fade</option>
+                  <option value="slide-left">Slide Left</option>
+                  <option value="slide-right">Slide Right</option>
+                  <option value="slide-up">Slide Up</option>
+                  <option value="slide-down">Slide Down</option>
+                  <option value="zoom-in">Zoom In</option>
+                  <option value="zoom-out">Zoom Out</option>
+                  <option value="flip-horizontal">Flip Horizontal</option>
+                  <option value="flip-vertical">Flip Vertical</option>
+                  <option value="none">None</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="slide-modal__header-center">
+              <LayoutSelector
+                currentLayout={slideLayout}
+                onLayoutChange={onLayoutChange}
               />
             </div>
-            <div className="slide-modal__duration-container">
-              <label htmlFor="slide-duration">
-                <Clock size={16} />
-              </label>
-              <div className="slide-modal__duration-wrapper">
-                <input
-                  id="slide-duration"
-                  type="number"
-                  className="slide-modal__duration-input"
-                  value={slideDuration || ''}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    if (value === '') {
-                      onDurationChange('');
-                    } else {
-                      const numValue = parseInt(value);
-                      onDurationChange(isNaN(numValue) ? 5 : numValue);
-                    }
-                  }}
-                  min="0"
-                  step="1"
-                />
-                <span className="slide-modal__duration-suffix">s</span>
-              </div>
-            </div>
-            <div className="slide-modal__showbar-container">
-              <div
-                className={`slide-modal__showbar-slider ${showBar ? 'active' : ''}`}
-                onClick={() => onShowBarChange(!showBar)}
-                title={showBar ? 'Fullscreen mode' : 'Two-bar layout mode'}
-              >
-                <div className="slider-track">
-                  <div className="slider-thumb"></div>
-                </div>
-                <div className="slider-icons">
-                  <Maximize2 size={16} className="icon-fullscreen" />
-                  <Layout size={16} className="icon-layout" />
-                </div>
-              </div>
-            </div>
-            <div className="slide-modal__transition-container">
-              <label htmlFor="slide-transition">
-                <Zap size={16} />
-              </label>
-              <select
-                id="slide-transition"
-                className="slide-modal__transition-select"
-                value={slideTransition || 'fade'}
-                onChange={(e) => onTransitionChange(e.target.value)}
-                title="Select slide transition effect"
-              >
-                <option value="fade">Fade</option>
-                <option value="slide-left">Slide Left</option>
-                <option value="slide-right">Slide Right</option>
-                <option value="slide-up">Slide Up</option>
-                <option value="slide-down">Slide Down</option>
-                <option value="zoom-in">Zoom In</option>
-                <option value="zoom-out">Zoom Out</option>
-                <option value="flip-horizontal">Flip Horizontal</option>
-                <option value="flip-vertical">Flip Vertical</option>
-                <option value="none">None</option>
-              </select>
-            </div>
-          </div>
 
-          <div className="slide-modal__header-center">
-            <LayoutSelector
-              currentLayout={slideLayout}
-              onLayoutChange={onLayoutChange}
-            />
-          </div>
-
-          <div className="slide-modal__header-actions">
-            <div className="slide-modal__time-popup-wrapper">
-              <button
-                className={`btn-icon${timeRestriction?.enabled ? ' btn-icon--time' : ''}`}
-                title="Tijdvenster instellen"
-                onClick={() => setTimePopupOpen(!timePopupOpen)}
-              >
-                <Clock size={16} />
-              </button>
-              {timePopupOpen && (
-                <div className="slide-modal__time-popup">
-                  <div className="time-popup__header">
-                    <span>Tijdvenster</span>
-                    <button className="time-popup__close" onClick={() => setTimePopupOpen(false)}>✕</button>
-                  </div>
-                  <label className="time-popup__toggle">
-                    <input
-                      type="checkbox"
-                      checked={timeRestriction?.enabled || false}
-                      onChange={(e) =>
-                        onTimeRestrictionChange({ ...timeRestriction, enabled: e.target.checked })
-                      }
-                    />
-                    <span>Tijdvenster inschakelen</span>
-                  </label>
-                  {timeRestriction?.enabled && (
-                    <div className="time-popup__inputs">
-                      <div className="time-popup__field">
-                        <label>Van</label>
-                        <input
-                          type="time"
-                          value={timeRestriction.startTime || "08:00"}
-                          onChange={(e) =>
-                            onTimeRestrictionChange({ ...timeRestriction, startTime: e.target.value })
-                          }
-                          className="time-popup__time-input"
-                        />
-                      </div>
-                      <div className="time-popup__field">
-                        <label>Tot</label>
-                        <input
-                          type="time"
-                          value={timeRestriction.endTime || "17:00"}
-                          onChange={(e) =>
-                            onTimeRestrictionChange({ ...timeRestriction, endTime: e.target.value })
-                          }
-                          className="time-popup__time-input"
-                        />
-                      </div>
-                      {timeRestriction.startTime > timeRestriction.endTime && (
-                        <p className="time-popup__midnight-note">
-                          ↻ Loopt over middernacht
-                        </p>
-                      )}
+            <div className="slide-modal__header-actions">
+              <div className="slide-modal__time-popup-wrapper">
+                <button
+                  className={`btn-icon btn-icon--time ${timeRestriction?.enabled ? "btn-icon--success" : ""}`}
+                  title="Tijdvenster instellen"
+                  onClick={() => setTimePopupOpen(!timePopupOpen)}
+                >
+                  <Clock size={16} />
+                </button>
+                {timePopupOpen && (
+                  <div className="slide-modal__time-popup">
+                    <div className="time-popup__header">
+                      <span>Tijdvenster</span>
+                      <button
+                        className="time-popup__close"
+                        onClick={() => setTimePopupOpen(false)}
+                      >
+                        ✕
+                      </button>
                     </div>
-                  )}
-                </div>
-              )}
+                    <label className="time-popup__toggle">
+                      <input
+                        type="checkbox"
+                        checked={timeRestriction?.enabled || false}
+                        onChange={(e) =>
+                          onTimeRestrictionChange({
+                            ...timeRestriction,
+                            enabled: e.target.checked,
+                          })
+                        }
+                      />
+                      <span>Tijdvenster inschakelen</span>
+                    </label>
+                    {timeRestriction?.enabled && (
+                      <div className="time-popup__inputs">
+                        <div className="time-popup__field">
+                          <label>Van</label>
+                          <input
+                            type="time"
+                            value={timeRestriction.startTime || "08:00"}
+                            onChange={(e) =>
+                              onTimeRestrictionChange({
+                                ...timeRestriction,
+                                startTime: e.target.value,
+                              })
+                            }
+                            className="time-popup__time-input"
+                          />
+                        </div>
+                        <div className="time-popup__field">
+                          <label>Tot</label>
+                          <input
+                            type="time"
+                            value={timeRestriction.endTime || "17:00"}
+                            onChange={(e) =>
+                              onTimeRestrictionChange({
+                                ...timeRestriction,
+                                endTime: e.target.value,
+                              })
+                            }
+                            className="time-popup__time-input"
+                          />
+                        </div>
+                        {timeRestriction.startTime >
+                          timeRestriction.endTime && (
+                          <p className="time-popup__midnight-note">
+                            ↻ Loopt over middernacht
+                          </p>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              <button
+                onClick={() => {
+                  console.log("Delete button clicked");
+                  onDelete();
+                }}
+                className="btn-icon btn-icon--danger"
+                title="Delete slide"
+              >
+                <Trash2 size={16} />
+              </button>
+              <button onClick={onClose} className="btn btn-secondary">
+                Close
+              </button>
+              <button onClick={onSave} className="btn btn-primary">
+                Save Changes
+              </button>
             </div>
-
-            <button
-              onClick={() => {
-                console.log('Delete button clicked');
-                onDelete();
-              }}
-              className="btn-icon btn-icon--danger"
-              title="Delete slide"
-            >
-              <Trash2 size={16} />
-            </button>
-            <button onClick={onClose} className="btn btn-secondary">
-              Close
-            </button>
-            <button onClick={onSave} className="btn btn-primary">
-              Save Changes
-            </button>
           </div>
-        </div>
 
-        <div className="slide-modal__body">{renderLayoutContent()}</div>
+          <div className="slide-modal__body">{renderLayoutContent()}</div>
         </div>
       </div>
     </div>

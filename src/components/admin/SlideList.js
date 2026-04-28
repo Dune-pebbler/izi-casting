@@ -418,14 +418,14 @@ function SlideList({
             >
               <Trash2 size={16} />
             </button>
-            {slide.timeRestriction?.enabled && (
-              <span
-                className="btn-icon btn-icon--time"
-                title={`Tijdvenster: ${slide.timeRestriction.startTime} – ${slide.timeRestriction.endTime}`}
-              >
-                <Clock size={16} />
-              </span>
-            )}
+
+            <span
+              className={`btn-icon btn-icon--time ${slide.timeRestriction?.enabled ? "btn-icon--success" : ""}`}
+              title={`Tijdvenster: ${slide.timeRestriction.startTime} – ${slide.timeRestriction.endTime}`}
+            >
+              <Clock size={16} />
+            </span>
+
             <button
               onClick={(e) => {
                 e.stopPropagation();
@@ -556,14 +556,14 @@ function SlideList({
           >
             <Trash2 size={16} />
           </button>
-          {slide.timeRestriction?.enabled && (
-            <span
-              className="btn-icon btn-icon--time"
-              title={`Tijdvenster: ${slide.timeRestriction.startTime} – ${slide.timeRestriction.endTime}`}
-            >
-              <Clock size={16} />
-            </span>
-          )}
+
+          <span
+            className={`btn-icon btn-icon--time ${slide.timeRestriction?.enabled ? "btn-icon--success" : ""}`}
+            title={`Tijdvenster: ${slide.timeRestriction.startTime} – ${slide.timeRestriction.endTime}`}
+          >
+            <Clock size={16} />
+          </span>
+
           <button
             onClick={(e) => {
               e.stopPropagation();
