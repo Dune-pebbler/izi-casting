@@ -321,6 +321,7 @@ function SuperAdminView() {
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editingTenantSettings, setEditingTenantSettings] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     const unsubscribe = onSnapshot(collection(db, "tenants"), (snapshot) => {
@@ -367,13 +368,22 @@ function SuperAdminView() {
               <Monitor size={20} />
               Omgevingen ({tenants.length})
             </h2>
-            <button
-              className="btn btn-primary"
-              onClick={() => setShowCreateModal(true)}
-            >
-              <Plus size={16} />
-              Nieuwe omgeving
-            </button>
+            <div className="superadmin-toolbar-right">
+              <input
+                type="text"
+                className="form-input"
+                placeholder="Zoek omgeving..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+              <button
+                className="btn btn-primary"
+                onClick={() => setShowCreateModal(true)}
+              >
+                <Plus size={16} />
+                Nieuwe omgeving
+              </button>
+            </div>
           </div>
 
           {loading ? (
@@ -390,15 +400,26 @@ function SuperAdminView() {
               </button>
             </div>
           ) : (
-            <div className="tenant-grid">
-              {tenants.map((tenant) => (
-                <TenantCard
-                  key={tenant.id}
-                  tenant={tenant}
-                  onEdit={setEditingTenantSettings}
-                />
-              ))}
-            </div>
+            (() => {
+              const filtered = tenants.filter((tenant) =>
+                tenant.name?.toLowerCase().includes(searchQuery.toLowerCase()),
+              );
+              return filtered.length === 0 ? (
+                <div className="superadmin-empty">
+                  <p>Geen omgevingen gevonden voor "{searchQuery}".</p>
+                </div>
+              ) : (
+                <div className="tenant-grid">
+                  {filtered.map((tenant) => (
+                    <TenantCard
+                      key={tenant.id}
+                      tenant={tenant}
+                      onEdit={setEditingTenantSettings}
+                    />
+                  ))}
+                </div>
+              );
+            })()
           )}
         </div>
 

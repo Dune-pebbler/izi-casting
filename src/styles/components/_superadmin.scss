@@ -146,6 +146,21 @@
   }
 }
 
+.superadmin-toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+
+  .form-input {
+    border-radius: 4px;
+    width: 220px;
+
+    &::placeholder {
+      color: var(--border);
+    }
+  }
+}
+
 .superadmin-empty {
   text-align: center;
   padding: $spacing-xxl $spacing-xl;
