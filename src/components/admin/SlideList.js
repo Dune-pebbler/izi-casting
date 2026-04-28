@@ -11,11 +11,18 @@ import {
   Trash2,
   Globe,
   Clock,
+  LayoutGrid,
+  FileText,
+  LucideImage,
 } from "lucide-react";
 
 const iconMap = {
   video: <Play />,
   iframe: <Globe />,
+  "side-by-side": <LayoutGrid />,
+  "text-only": <FileText />,
+  "image-only": <LucideImage />,
+  teletekst: <Tv />,
   // Voeg hier makkelijk nieuwe types toe in de toekomst
 };
 import { sanitizeHTMLContent } from "../../utils/sanitize";
@@ -467,9 +474,10 @@ function SlideList({
       opacity: isDragging ? 0.5 : 1,
     };
 
-    const getPlaceholderIcon = (type) => {
+    const getPlaceholderIcon = (layout) => {
       // Return het specifieke icoon, of een standaard icoon als fallback
-      return iconMap[type] || "Geen Icon";
+      console.log(layout);
+      return iconMap[layout] || "Geen Icon";
     };
 
     const getSlideTypeLabel = (slide) => {
@@ -524,7 +532,7 @@ function SlideList({
             />
           ) : (
             <div className="slide-img-placeholder">
-              {getPlaceholderIcon(slide.type)}
+              {getPlaceholderIcon(slide.layout)}
             </div>
           )}
         </div>
