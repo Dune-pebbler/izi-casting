@@ -29,7 +29,8 @@ function normaliseUser(u) {
 }
 
 function TenantCard({ tenant, onEdit }) {
-  const url = `https://izi-casting.com/${tenant.id}`;
+  const baseUrl = process.env.REACT_APP_BASE_URL || "https://izi-casting.com";
+  const url = `${baseUrl}/${tenant.id}`;
   const [users, setUsers] = useState(
     (tenant.authorizedUsers || []).map(normaliseUser),
   );
