@@ -37,12 +37,14 @@ function TenantCard({ tenant, onEdit }) {
   const [newRole, setNewRole] = useState("editor");
   const [isSaving, setIsSaving] = useState(false);
   const [isUsersExpanded, setIsUsersExpanded] = useState(false);
-  const [logoUrl, setLogoUrl] = useState('');
+  const [logoUrl, setLogoUrl] = useState("");
 
   useEffect(() => {
-    getDoc(doc(db, 'tenants', tenant.id, 'display', 'settings')).then((snap) => {
-      if (snap.exists()) setLogoUrl(snap.data()?.logoUrl || '');
-    });
+    getDoc(doc(db, "tenants", tenant.id, "display", "settings")).then(
+      (snap) => {
+        if (snap.exists()) setLogoUrl(snap.data()?.logoUrl || "");
+      },
+    );
   }, [tenant.id]);
 
   const save = async (updated) => {
@@ -366,7 +368,15 @@ function SuperAdminView() {
           <div className="superadmin-toolbar">
             <h2>
               <Monitor size={20} />
-              Omgevingen ({tenants.length})
+              Omgevingen (
+              {
+                tenants.filter((tenant) =>
+                  tenant.name
+                    ?.toLowerCase()
+                    .includes(searchQuery.toLowerCase()),
+                ).length
+              }
+              )
             </h2>
             <div className="superadmin-toolbar-right">
               <input
