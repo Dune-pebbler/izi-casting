@@ -12,6 +12,12 @@ import {
   Globe,
   Clock,
 } from "lucide-react";
+
+const iconMap = {
+  video: <Play />,
+  iframe: <Globe />,
+  // Voeg hier makkelijk nieuwe types toe in de toekomst
+};
 import { sanitizeHTMLContent } from "../../utils/sanitize";
 import { extractVideoInfo } from "../../utils/videoMetadata";
 import {
@@ -421,7 +427,7 @@ function SlideList({
 
             <span
               className={`btn-icon btn-icon--time ${slide.timeRestriction?.enabled ? "btn-icon--success" : ""}`}
-              title={`Tijdvenster: ${slide.timeRestriction.startTime} – ${slide.timeRestriction.endTime}`}
+              title={`Tijdvenster: ${slide.timeRestriction?.startTime} – ${slide.timeRestriction?.endTime}`}
             >
               <Clock size={16} />
             </span>
@@ -459,6 +465,11 @@ function SlideList({
       transform: CSS.Transform.toString(transform),
       transition,
       opacity: isDragging ? 0.5 : 1,
+    };
+
+    const getPlaceholderIcon = (type) => {
+      // Return het specifieke icoon, of een standaard icoon als fallback
+      return iconMap[type] || "Geen Icon";
     };
 
     const getSlideTypeLabel = (slide) => {
@@ -512,7 +523,9 @@ function SlideList({
               }}
             />
           ) : (
-            <div className="slide-img-placeholder">No img</div>
+            <div className="slide-img-placeholder">
+              {getPlaceholderIcon(slide.type)}
+            </div>
           )}
         </div>
 
@@ -559,7 +572,7 @@ function SlideList({
 
           <span
             className={`btn-icon btn-icon--time ${slide.timeRestriction?.enabled ? "btn-icon--success" : ""}`}
-            title={`Tijdvenster: ${slide.timeRestriction.startTime} – ${slide.timeRestriction.endTime}`}
+            title={`Tijdvenster: ${slide.timeRestriction?.startTime} – ${slide.timeRestriction?.endTime}`}
           >
             <Clock size={16} />
           </span>
