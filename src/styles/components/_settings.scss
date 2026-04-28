@@ -279,12 +279,11 @@
 
     // Color Settings - matches form input styling
     .color-settings {
-      display: flex;
-      flex-direction: row;
-      gap: $spacing-lg;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: $spacing-sm;
 
       .color-input-group {
-        flex: 1;
         min-width: 0;
 
         label {

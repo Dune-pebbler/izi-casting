@@ -1,17 +1,27 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
-import { doc, onSnapshot, setDoc, getDoc, deleteDoc, collection, query, where, getDocs } from "firebase/firestore";
+import {
+  doc,
+  onSnapshot,
+  setDoc,
+  getDoc,
+  deleteDoc,
+  collection,
+  query,
+  where,
+  getDocs,
+} from "firebase/firestore";
 import { db } from "../../firebase";
 import { tenantDoc } from "../../utils/tenantPaths";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
-import { 
-  setIsPaired, 
-  setDeviceId, 
-  setDisplayPairingCode, 
+import {
+  setIsPaired,
+  setDeviceId,
+  setDisplayPairingCode,
   setIsGeneratingCode,
   setPairingError,
   clearPairingError,
   setCodeTimeRemaining,
-  setIsCodeFlashing
+  setIsCodeFlashing,
 } from "../../store/slices/deviceSlice";
 import PairingScreen from "./PairingScreen";
 import SlideDisplay from "./SlideDisplay";
@@ -23,19 +33,24 @@ function DisplayView() {
   // tenantId is NOT read from hostname here — it comes from the device document
   // after pairing, so displays can be hosted on any URL.
   const [displayTenantId, setDisplayTenantId] = useState(
-    () => localStorage.getItem("izi_tenant_id") || null
+    () => localStorage.getItem("izi_tenant_id") || null,
   );
 
   const dispatch = useAppDispatch();
   const isPaired = useAppSelector((state) => state.device.isPaired);
   const deviceId = useAppSelector((state) => state.device.deviceId);
-  const displayPairingCode = useAppSelector((state) => state.device.displayPairingCode);
-  const isGeneratingCode = useAppSelector((state) => state.device.isGeneratingCode);
+  const displayPairingCode = useAppSelector(
+    (state) => state.device.displayPairingCode,
+  );
+  const isGeneratingCode = useAppSelector(
+    (state) => state.device.isGeneratingCode,
+  );
   const pairingError = useAppSelector((state) => state.device.pairingError);
-  const codeTimeRemaining = useAppSelector((state) => state.device.codeTimeRemaining);
+  const codeTimeRemaining = useAppSelector(
+    (state) => state.device.codeTimeRemaining,
+  );
   const isCodeFlashing = useAppSelector((state) => state.device.isCodeFlashing);
-  
-  
+
   const [playlists, setPlaylists] = useState([]);
   const [slides, setSlides] = useState([]);
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
@@ -44,28 +59,31 @@ function DisplayView() {
     logoUrl: "",
     backgroundColor: "#FAFAFA",
     foregroundColor: "#212121",
-    feedUrl: "", 
+    feedUrl: "",
     showClock: true,
     barStyle: "onder",
   });
   const [feeds, setFeeds] = useState([]);
-  
+
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [fullscreenSupported, setFullscreenSupported] = useState(false);
-  
-  const [animationStep, setAnimationStep] = useState(0); 
-  
+
+  const [animationStep, setAnimationStep] = useState(0);
+
   const hasInitializedRef = useRef(false);
   const generateDisplayPairingCodeRef = useRef();
   const isPairedRef = useRef(isPaired);
   const isGeneratingCodeRef = useRef(isGeneratingCode);
   const displayPairingCodeRef = useRef(displayPairingCode);
   const isGeneratingCodeInternalRef = useRef(false);
-  
-  
+
   const clearInvalidDeviceId = useCallback(() => {
     const storedDeviceId = localStorage.getItem("izi_device_id");
-    if (!storedDeviceId || storedDeviceId.trim() === '' || storedDeviceId.length < 10) {
+    if (
+      !storedDeviceId ||
+      storedDeviceId.trim() === "" ||
+      storedDeviceId.length < 10
+    ) {
       console.log("Clearing invalid device ID from localStorage");
       localStorage.removeItem("izi_device_id");
       return true;
@@ -73,48 +91,40 @@ function DisplayView() {
     return false;
   }, []);
 
-  console .log("DisplayView component rendered");
-  
-  
+  console.log("DisplayView component rendered");
+
   const generatePairingCode = useCallback(() => {
     const code = Math.floor(10000 + Math.random() * 90000).toString();
     console.log("Generated pairing code:", code);
     return code;
   }, []);
 
-  
   const generateDeviceId = useCallback(() => {
     const userAgent = navigator.userAgent;
     const screenRes = `${screen.width}x${screen.height}`;
     const timeStamp = Date.now();
     const fingerprint = `${userAgent}-${screenRes}-${timeStamp}`;
-    
-    
-    let deviceId = '';
+
+    let deviceId = "";
     try {
-      
-      const hash = fingerprint.split('').reduce((a, b) => {
-        a = ((a << 5) - a) + b.charCodeAt(0);
+      const hash = fingerprint.split("").reduce((a, b) => {
+        a = (a << 5) - a + b.charCodeAt(0);
         return a & a;
       }, 0);
       deviceId = `device_${Math.abs(hash)}_${timeStamp}`.substring(0, 20);
     } catch (error) {
-      
       deviceId = `device_${timeStamp}_${Math.random().toString(36).substr(2, 9)}`;
     }
-    
+
     console.log("Generated device ID:", deviceId);
     return deviceId;
   }, []);
 
-  
   const checkDevicePairing = useCallback(
     async (deviceId) => {
-      
       const currentDeviceId = deviceId || localStorage.getItem("izi_device_id");
-      
-      
-      if (!currentDeviceId || currentDeviceId.trim() === '') {
+
+      if (!currentDeviceId || currentDeviceId.trim() === "") {
         console.error("Invalid device ID:", currentDeviceId);
         dispatch(setIsPaired(false));
         return false;
@@ -139,10 +149,10 @@ function DisplayView() {
             await setDoc(
               doc(db, "devices", currentDeviceId),
               { isLinked: true },
-              { merge: true }
+              { merge: true },
             );
           }
-          
+
           dispatch(setIsPaired(isDevicePaired));
           return isDevicePaired;
         } else {
@@ -156,15 +166,13 @@ function DisplayView() {
         return false;
       }
     },
-    [dispatch]
+    [dispatch],
   );
 
-  
   const generateDisplayPairingCode = useCallback(async () => {
-    
     if (isGeneratingCodeInternalRef.current) {
       console.log("Already generating code internally, skipping...");
-      return; 
+      return;
     }
 
     console.log("Starting code generation...");
@@ -173,11 +181,9 @@ function DisplayView() {
     dispatch(clearPairingError());
 
     try {
-      
       const currentDeviceId = deviceId || localStorage.getItem("izi_device_id");
-      
-      
-      if (!currentDeviceId || currentDeviceId.trim() === '') {
+
+      if (!currentDeviceId || currentDeviceId.trim() === "") {
         console.error("No valid device ID available:", currentDeviceId);
         dispatch(setPairingError("Geen geldig apparaat ID beschikbaar"));
         return;
@@ -186,7 +192,10 @@ function DisplayView() {
       // Delete any existing pairing codes for this device before creating a new one
       try {
         const oldCodes = await getDocs(
-          query(collection(db, "pairing_codes"), where("deviceId", "==", currentDeviceId))
+          query(
+            collection(db, "pairing_codes"),
+            where("deviceId", "==", currentDeviceId),
+          ),
         );
         for (const oldCode of oldCodes.docs) {
           await deleteDoc(oldCode.ref);
@@ -205,16 +214,15 @@ function DisplayView() {
           deviceId: currentDeviceId,
           isUsed: false,
           createdAt: new Date().toISOString(),
-          expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), 
+          expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
         });
 
         console.log("Saving to devices collection...");
-        
-        
+
         const deviceUpdateData = {
           deviceId: currentDeviceId,
           displayPairingCode: newCode,
-          isLinked: true, 
+          isLinked: true,
           deviceInfo: {
             userAgent: navigator.userAgent,
             screenResolution: `${screen.width}x${screen.height}`,
@@ -224,66 +232,57 @@ function DisplayView() {
             lastSeen: new Date().toISOString(),
           },
         };
-        
-        
-        
+
         if (!isPairedRef.current) {
           deviceUpdateData.isPaired = false;
         }
-        
-        await setDoc(
-          doc(db, "devices", currentDeviceId),
-          deviceUpdateData,
-          { merge: true }
-        );
+
+        await setDoc(doc(db, "devices", currentDeviceId), deviceUpdateData, {
+          merge: true,
+        });
 
         console.log("Firebase save successful");
       } catch (firebaseError) {
         console.warn(
           "Firebase save failed, but continuing with local code:",
-          firebaseError
+          firebaseError,
         );
-        
       }
 
       console.log("Code generation successful, updating state...");
       dispatch(setDisplayPairingCode(newCode));
-      dispatch(setCodeTimeRemaining(30)); 
-      dispatch(setIsCodeFlashing(false)); 
+      dispatch(setCodeTimeRemaining(30));
+      dispatch(setIsCodeFlashing(false));
     } catch (error) {
       console.error("Error generating pairing code:", error);
       dispatch(setPairingError(`Fout bij genereren: ${error.message}`));
 
-      
       try {
         const fallbackCode = generatePairingCode();
         console.log("Using fallback code:", fallbackCode);
         dispatch(setDisplayPairingCode(fallbackCode));
         dispatch(setCodeTimeRemaining(30));
         dispatch(setIsCodeFlashing(false));
-        dispatch(clearPairingError()); 
+        dispatch(clearPairingError());
       } catch (fallbackError) {
         console.error("Even fallback code generation failed:", fallbackError);
         dispatch(setPairingError("Kritieke fout: geen code gegenereerd"));
       }
     } finally {
       console.log(
-        "Code generation finished, setting isGeneratingCode to false"
+        "Code generation finished, setting isGeneratingCode to false",
       );
       isGeneratingCodeInternalRef.current = false;
       dispatch(setIsGeneratingCode(false));
     }
   }, [generatePairingCode, dispatch]);
 
-  
   generateDisplayPairingCodeRef.current = generateDisplayPairingCode;
-  
-  
+
   isPairedRef.current = isPaired;
   isGeneratingCodeRef.current = isGeneratingCode;
   displayPairingCodeRef.current = displayPairingCode;
 
-  
   const requestFullscreen = async () => {
     if (!fullscreenSupported) {
       console.log("Fullscreen not supported");
@@ -319,15 +318,12 @@ function DisplayView() {
     }
   };
 
-
-  
   useEffect(() => {
     const handleFullscreenChange = () => {
       setIsFullscreen(!!document.fullscreenElement);
     };
 
     const handleKeyDown = (e) => {
-      
       if (e.key === "F11") {
         e.preventDefault();
         if (isFullscreen) {
@@ -336,7 +332,7 @@ function DisplayView() {
           requestFullscreen();
         }
       }
-      
+
       if (e.key === "Escape" && isFullscreen) {
         exitFullscreen();
       }
@@ -351,33 +347,18 @@ function DisplayView() {
       document.removeEventListener("fullscreenchange", handleFullscreenChange);
       document.removeEventListener(
         "webkitfullscreenchange",
-        handleFullscreenChange
+        handleFullscreenChange,
       );
       document.removeEventListener(
         "msfullscreenchange",
-        handleFullscreenChange
+        handleFullscreenChange,
       );
       document.removeEventListener("keydown", handleKeyDown);
     };
   }, [isFullscreen]);
 
-  
-  
-  
-  
-  
-  
-  
-  
-  
-
-  
-  
-  
-
-  
   useEffect(() => {
-    if (isPaired && deviceId && deviceId.trim() !== '') {
+    if (isPaired && deviceId && deviceId.trim() !== "") {
       const updateLastSeen = async () => {
         try {
           await setDoc(
@@ -385,7 +366,7 @@ function DisplayView() {
             {
               lastSeen: new Date().toISOString(),
             },
-            { merge: true }
+            { merge: true },
           );
         } catch (error) {
           console.error("Error updating last seen:", error);
@@ -393,18 +374,16 @@ function DisplayView() {
       };
 
       updateLastSeen();
-      const interval = setInterval(updateLastSeen, 60000); 
+      const interval = setInterval(updateLastSeen, 60000);
       return () => clearInterval(interval);
     }
   }, [isPaired, deviceId]);
-  
 
   const handleRefreshSlides = useCallback(() => {
     console.log("Restarting slides from beginning");
     setCurrentSlideIndex(0);
     setSlideProgress(0);
 
-    
     const refreshIndicator = document.createElement("div");
     refreshIndicator.style.cssText = `
       position: fixed;
@@ -420,7 +399,6 @@ function DisplayView() {
     `;
     refreshIndicator.textContent = "Slides opnieuw gestart";
 
-    
     const style = document.createElement("style");
     style.textContent = `
       @keyframes fadeInOut {
@@ -434,29 +412,27 @@ function DisplayView() {
 
     document.body.appendChild(refreshIndicator);
 
-    
     setTimeout(() => {
       if (refreshIndicator.parentNode) {
         refreshIndicator.parentNode.removeChild(refreshIndicator);
       }
-      
+
       console.log("Force reloading browser...");
       window.location.reload();
     }, 2000);
   }, []);
 
-  
   useEffect(() => {
     console.log("🎧 Device pairing listener useEffect triggered");
     const currentDeviceId = deviceId || localStorage.getItem("izi_device_id");
-    if (!currentDeviceId || currentDeviceId.trim() === '') {
+    if (!currentDeviceId || currentDeviceId.trim() === "") {
       console.log("No valid device ID available for listener");
       return;
     }
 
     console.log(
       "Setting up device pairing listener for device:",
-      currentDeviceId
+      currentDeviceId,
     );
     const deviceDocRef = doc(db, "devices", currentDeviceId);
 
@@ -475,35 +451,37 @@ function DisplayView() {
 
           console.log("Device pairing status changed:", newPairedStatus);
 
-          
           if (newPairedStatus !== isPairedRef.current) {
             dispatch(setIsPaired(newPairedStatus));
 
             if (newPairedStatus) {
               console.log("Device is now paired! Switching to display mode.");
-              
+
               dispatch(setDisplayPairingCode(""));
               dispatch(clearPairingError());
             } else {
               console.log(
-                "Device is no longer paired. Switching to pairing mode."
+                "Device is no longer paired. Switching to pairing mode.",
               );
-              
-              
-              if (!isGeneratingCodeRef.current && !displayPairingCodeRef.current) {
+
+              if (
+                !isGeneratingCodeRef.current &&
+                !displayPairingCodeRef.current
+              ) {
                 console.log("Generating new pairing code for unpaired device");
                 generateDisplayPairingCodeRef.current?.();
               }
             }
           }
-
         } else {
-          
           if (isPairedRef.current) {
             console.log("Device document not found, treating as unpaired");
             dispatch(setIsPaired(false));
-            
-            if (!isGeneratingCodeRef.current && !displayPairingCodeRef.current) {
+
+            if (
+              !isGeneratingCodeRef.current &&
+              !displayPairingCodeRef.current
+            ) {
               generateDisplayPairingCodeRef.current?.();
             }
           }
@@ -511,25 +489,27 @@ function DisplayView() {
       },
       (error) => {
         console.error("Error listening to device pairing status:", error);
-      }
+      },
     );
 
     return () => {
       console.log("Cleaning up device pairing listener");
       unsubscribeDevice();
     };
-  }, [deviceId]); 
+  }, [deviceId]);
 
-  
   useEffect(() => {
     console.log("🎮 Device commands listener useEffect triggered");
     const currentDeviceId = deviceId || localStorage.getItem("izi_device_id");
-    if (!currentDeviceId || currentDeviceId.trim() === '') {
+    if (!currentDeviceId || currentDeviceId.trim() === "") {
       console.log("No valid device ID available for commands listener");
       return;
     }
 
-    console.log("Setting up device commands listener for device:", currentDeviceId);
+    console.log(
+      "Setting up device commands listener for device:",
+      currentDeviceId,
+    );
     const commandsDocRef = doc(db, "device_commands", currentDeviceId);
 
     const unsubscribeCommands = onSnapshot(
@@ -537,73 +517,72 @@ function DisplayView() {
       (commandDoc) => {
         if (commandDoc.exists()) {
           const commandData = commandDoc.data();
-          
-          
+
           if (!commandData.processed) {
             console.log("New command received:", commandData);
-            
-            
+
             switch (commandData.command) {
               case "refresh":
                 if (commandData.action === "restart_slides") {
-                  console.log("Refresh command received, restarting slides from beginning");
+                  console.log(
+                    "Refresh command received, restarting slides from beginning",
+                  );
                   handleRefreshSlides();
                 }
                 break;
-              
-              
-              
-              
-              
-              
-              
-              
-              
+
               default:
                 console.log("Unknown command type:", commandData.command);
             }
-            
-            
+
             // Delete command after processing — keeps collection clean
-            deleteDoc(doc(db, "device_commands", currentDeviceId)).catch(error => {
-              console.error("Error deleting processed command:", error);
-            });
+            deleteDoc(doc(db, "device_commands", currentDeviceId)).catch(
+              (error) => {
+                console.error("Error deleting processed command:", error);
+              },
+            );
           }
         }
       },
       (error) => {
         console.error("Error in device commands listener:", error);
-      }
+      },
     );
 
     return () => {
       console.log("Cleaning up device commands listener");
       unsubscribeCommands();
     };
-  }, [deviceId, handleRefreshSlides]); 
+  }, [deviceId, handleRefreshSlides]);
 
-  
   useEffect(() => {
-    console.log("📄 Content loading useEffect triggered, isPaired:", isPaired, "tenantId:", displayTenantId);
+    console.log(
+      "📄 Content loading useEffect triggered, isPaired:",
+      isPaired,
+      "tenantId:",
+      displayTenantId,
+    );
     if (!isPaired || !displayTenantId) return;
 
     const displayDocRef = tenantDoc(db, displayTenantId, "display", "content");
-    const settingsDocRef = tenantDoc(db, displayTenantId, "display", "settings");
+    const settingsDocRef = tenantDoc(
+      db,
+      displayTenantId,
+      "display",
+      "settings",
+    );
 
     const unsubscribeContent = onSnapshot(displayDocRef, (doc) => {
       if (doc.exists()) {
         const data = doc.data();
-        
+
         if (Date.now() % 10000 < 100) {
-          
           console.log("Raw Firebase data:", data);
         }
 
         if (data.playlists) {
-          
           setPlaylists(data.playlists);
         } else if (data.slides) {
-          
           const defaultPlaylist = {
             id: "default",
             name: "Default Playlist",
@@ -623,25 +602,25 @@ function DisplayView() {
           logoUrl: data.logoUrl || "",
           backgroundColor: data.backgroundColor || "#FAFAFA",
           foregroundColor: data.foregroundColor || "#212121",
-          feedUrl: data.feedUrl || "", 
+          progressBarColor: data.progressBarColor || "#3dbcc9",
+          feedUrl: data.feedUrl || "",
           showClock: data.showClock !== undefined ? data.showClock : true,
           barStyle: data.barStyle || "onder",
         });
-        
-        
+
         if (data.feeds && Array.isArray(data.feeds)) {
-          
-          const enabledFeeds = data.feeds.filter(feed => feed.isEnabled !== false && feed.isVisible !== false);
+          const enabledFeeds = data.feeds.filter(
+            (feed) => feed.isEnabled !== false && feed.isVisible !== false,
+          );
           setFeeds(enabledFeeds);
         } else if (data.feedUrl) {
-          
           const migratedFeed = {
-            id: 'legacy',
-            name: 'Legacy Feed',
+            id: "legacy",
+            name: "Legacy Feed",
             url: data.feedUrl,
             isEnabled: true,
             duration: 10,
-            isVisible: true
+            isVisible: true,
           };
           setFeeds([migratedFeed]);
         } else {
@@ -656,25 +635,42 @@ function DisplayView() {
     };
   }, [isPaired, displayTenantId]);
 
-  
   useEffect(() => {
-    console.log("🎬 Playlists flattening useEffect triggered, playlists:", playlists.length);
+    console.log(
+      "🎬 Playlists flattening useEffect triggered, playlists:",
+      playlists.length,
+    );
     if (playlists.length === 0) {
       setSlides([]);
       return;
     }
 
-    
     const allSlides = playlists.reduce((acc, playlist) => {
-      
       if (playlist.isEnabled === false) {
         return acc;
       }
 
       if (playlist.slides) {
+        const now = new Date();
+        const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
+        const isTimeActive = (slide) => {
+          const tr = slide.timeRestriction;
+          if (!tr?.enabled) return true;
+          const [sh, sm] = tr.startTime.split(":").map(Number);
+          const [eh, em] = tr.endTime.split(":").map(Number);
+          const start = sh * 60 + sm;
+          const end = eh * 60 + em;
+          // Midnight overlap: start > end means e.g. 22:00 – 02:00
+          return start <= end
+            ? currentMinutes >= start && currentMinutes <= end
+            : currentMinutes >= start || currentMinutes <= end;
+        };
+
         const visibleSlides = playlist.slides.filter(
           (slide) =>
             slide.isVisible &&
+            isTimeActive(slide) &&
             ((slide.type === "text" && slide.text && slide.text.trim()) ||
               (slide.type === "image" && slide.imageUrl) ||
               (slide.type === "video" && slide.videoUrl) ||
@@ -682,10 +678,9 @@ function DisplayView() {
               (slide.layout === "teletekst" && slide.teletekstChannel) ||
               (slide.type === "iframe" && slide.iframeUrl) ||
               (slide.layout === "iframe" && slide.iframeUrl) ||
-              (!slide.type && slide.text && slide.text.trim()))
+              (!slide.type && slide.text && slide.text.trim())),
         );
 
-        
         const repeatCount = playlist.repeatCount || 1;
         const repeatedSlides = [];
         for (let i = 0; i < repeatCount; i++) {
@@ -697,7 +692,6 @@ function DisplayView() {
       return acc;
     }, []);
 
-    
     console.log("🎬 Slide processing debug:");
     console.log("📊 Total playlists:", playlists.length);
     playlists.forEach((playlist, index) => {
@@ -705,9 +699,9 @@ function DisplayView() {
         id: playlist.id,
         name: playlist.name,
         isEnabled: playlist.isEnabled,
-        slidesCount: playlist.slides?.length || 0
+        slidesCount: playlist.slides?.length || 0,
       });
-      
+
       if (playlist.slides) {
         playlist.slides.forEach((slide, slideIndex) => {
           console.log(`  📄 Slide ${slideIndex + 1}:`, {
@@ -721,34 +715,36 @@ function DisplayView() {
             hasTeletekstChannel: !!slide.teletekstChannel,
             teletekstChannel: slide.teletekstChannel,
             layout: slide.layout,
-            duration: slide.duration
+            duration: slide.duration,
           });
-          
-          
+
           if (slide.imageUrl) {
-            console.log(`🖼️ Slide ${slideIndex + 1} Image URL:`, slide.imageUrl);
-            console.log(`📐 Slide ${slideIndex + 1} Layout:`, slide.layout || 'default');
+            console.log(
+              `🖼️ Slide ${slideIndex + 1} Image URL:`,
+              slide.imageUrl,
+            );
+            console.log(
+              `📐 Slide ${slideIndex + 1} Layout:`,
+              slide.layout || "default",
+            );
           }
         });
       }
     });
 
-    
     console.log("🎬 All flattened slides with image URLs and layouts:");
     allSlides.forEach((slide, index) => {
       console.log(`📄 Flattened Slide ${index + 1}:`, {
         id: slide.id,
         name: slide.name,
-        layout: slide.layout || 'default',
-        imageUrl: slide.imageUrl || 'No image',
-        videoUrl: slide.videoUrl || 'No video',
-        duration: slide.duration
+        layout: slide.layout || "default",
+        imageUrl: slide.imageUrl || "No image",
+        videoUrl: slide.videoUrl || "No video",
+        duration: slide.duration,
       });
     });
 
-    
     if (Date.now() % 10000 < 100) {
-      
       console.log(
         "All flattened slides with positions:",
         allSlides.map((s) => ({
@@ -756,66 +752,62 @@ function DisplayView() {
           type: s.type,
           imagePosition: s.imagePosition,
           duration: s.duration,
-          hasVideoUrl: !!s.videoUrl
-        }))
+          hasVideoUrl: !!s.videoUrl,
+        })),
       );
     }
     console.log("🎬 Setting slides:", allSlides.length, "slides");
     setSlides(allSlides);
-    setCurrentSlideIndex(0); 
+    setCurrentSlideIndex(0);
   }, [playlists]);
 
   useEffect(() => {
-    console.log("🎠 Slide rotation useEffect triggered, slides:", slides.length);
+    console.log(
+      "🎠 Slide rotation useEffect triggered, slides:",
+      slides.length,
+    );
     if (slides.length === 0) return;
 
     let currentIndex = 0;
     let timeoutId = null;
-    
+
     const rotateSlides = () => {
       const currentSlide = slides[currentIndex];
-      const slideDuration = (currentSlide?.duration || 5) * 1000; 
+      const slideDuration = (currentSlide?.duration || 5) * 1000;
 
-      
       console.log("🎠 Current slide details:", {
         index: currentIndex,
         name: currentSlide?.name,
-        layout: currentSlide?.layout || 'default',
-        imageUrl: currentSlide?.imageUrl || 'No image',
-        videoUrl: currentSlide?.videoUrl || 'No video',
+        layout: currentSlide?.layout || "default",
+        imageUrl: currentSlide?.imageUrl || "No image",
+        videoUrl: currentSlide?.videoUrl || "No video",
         duration: currentSlide?.duration,
-        calculatedDurationMs: slideDuration
+        calculatedDurationMs: slideDuration,
       });
 
-      
       if (Date.now() % 5000 < 100) {
-        
         console.log(
           "Slide timing - Current slide:",
           currentSlide?.name,
           "Duration:",
           currentSlide?.duration,
           "Calculated duration (ms):",
-          slideDuration
+          slideDuration,
         );
       }
 
-      
       console.log("🎠 Setting current slide index:", currentIndex);
       setCurrentSlideIndex(currentIndex);
       currentSlideRef.current = currentIndex;
 
-      
       timeoutId = setTimeout(() => {
         currentIndex = (currentIndex + 1) % slides.length;
         rotateSlides();
       }, slideDuration);
     };
 
-    
     rotateSlides();
 
-    
     return () => {
       if (timeoutId) {
         clearTimeout(timeoutId);
@@ -823,32 +815,28 @@ function DisplayView() {
     };
   }, [slides]);
 
-  
   const currentSlideRef = useRef(0);
   const progressRef = useRef(0);
   const progressBarRef = useRef(null);
-  
+
   useEffect(() => {
     if (slides.length === 0) return;
 
-    const progressInterval = 100; 
+    const progressInterval = 100;
     progressRef.current = 0;
     let startTime = Date.now();
 
     const progressIntervalId = setInterval(() => {
       const currentSlide = slides[currentSlideRef.current];
       const slideDuration = (currentSlide?.duration || 5) * 1000;
-      
-      
+
       const elapsedTime = Date.now() - startTime;
       const newProgress = Math.min((elapsedTime / slideDuration) * 100, 100);
 
-      
       if (newProgress >= 100) {
         if (slides.length === 1) {
-          
           progressRef.current = 0;
-          
+
           startTime = Date.now();
         } else {
           progressRef.current = 100;
@@ -856,67 +844,53 @@ function DisplayView() {
       } else {
         progressRef.current = newProgress;
       }
-      
-      
+
       if (progressBarRef.current) {
         progressBarRef.current.style.width = `${progressRef.current}%`;
       }
     }, progressInterval);
 
     return () => clearInterval(progressIntervalId);
-  }, [slides, currentSlideIndex]); 
+  }, [slides, currentSlideIndex]);
 
-  
   useEffect(() => {
     progressRef.current = 0;
     if (progressBarRef.current) {
-      progressBarRef.current.style.width = '0%';
+      progressBarRef.current.style.width = "0%";
     }
   }, [currentSlideIndex]);
 
-  
   useEffect(() => {
     return () => {
-      
       setSlideProgress(0);
       setCurrentSlideIndex(0);
-      
     };
   }, []);
 
-  
   useEffect(() => {
     console.log("⏰ Countdown timer useEffect triggered", {
       isPaired,
       displayPairingCode: !!displayPairingCode,
       isGeneratingCode,
-      codeTimeRemaining
+      codeTimeRemaining,
     });
-    if (
-      !isPaired &&
-      displayPairingCode &&
-      !isGeneratingCode
-    ) {
+    if (!isPaired && displayPairingCode && !isGeneratingCode) {
       const timer = setInterval(() => {
-        
         const currentTime = codeTimeRemaining;
         const newTime = currentTime - 1;
 
-        
         if (newTime <= 5 && newTime > 0) {
           dispatch(setIsCodeFlashing(true));
         } else if (newTime === 0) {
-          
           if (!isPaired) {
             console.log("Timer reached 0, generating new code...");
             generateDisplayPairingCodeRef.current?.();
           }
-          dispatch(setCodeTimeRemaining(30)); 
+          dispatch(setCodeTimeRemaining(30));
         } else {
           dispatch(setIsCodeFlashing(false));
         }
 
-        
         if (newTime > 0) {
           dispatch(setCodeTimeRemaining(newTime));
         }
@@ -924,31 +898,27 @@ function DisplayView() {
 
       return () => clearInterval(timer);
     }
-  }, [
-    isPaired,
-    displayPairingCode,
-    isGeneratingCode,
-    codeTimeRemaining,
-  ]); 
+  }, [isPaired, displayPairingCode, isGeneratingCode, codeTimeRemaining]);
 
-  
   useEffect(() => {
-    console.log("🚀 Initialization useEffect triggered, hasInitialized:", hasInitializedRef.current);
-    if (hasInitializedRef.current) return; 
+    console.log(
+      "🚀 Initialization useEffect triggered, hasInitialized:",
+      hasInitializedRef.current,
+    );
+    if (hasInitializedRef.current) return;
 
     console.log("DisplayView component mounted");
     hasInitializedRef.current = true;
 
     const initializeDevice = async () => {
-      
       if (clearInvalidDeviceId()) {
         console.log("Invalid device ID cleared, generating new one");
       }
-      
+
       const storedDeviceId = localStorage.getItem("izi_device_id");
       let currentDeviceId;
-      
-      if (storedDeviceId && storedDeviceId.trim() !== '') {
+
+      if (storedDeviceId && storedDeviceId.trim() !== "") {
         console.log("Using stored device ID:", storedDeviceId);
         currentDeviceId = storedDeviceId;
         dispatch(setDeviceId(storedDeviceId));
@@ -961,26 +931,25 @@ function DisplayView() {
         localStorage.setItem("izi_device_id", newDeviceId);
       }
 
-      
       setFullscreenSupported(!!document.fullscreenEnabled);
 
-      
       const isPaired = await checkDevicePairing(currentDeviceId);
-      
-      
+
       if (!isPaired) {
         console.log("Device not paired, generating pairing code...");
-        
+
         setTimeout(() => {
           generateDisplayPairingCodeRef.current?.();
         }, 500);
       } else {
-        console.log("Device is already paired, skipping pairing code generation");
+        console.log(
+          "Device is already paired, skipping pairing code generation",
+        );
       }
     };
 
     initializeDevice();
-  }, []); 
+  }, []);
 
   if (!isPaired) {
     return (
@@ -1015,17 +984,14 @@ function DisplayView() {
 
   const currentSlide = slides[currentSlideIndex];
   const slideLayout = currentSlide?.layout || "side-by-side";
-  
+
   // Calculate next slide for pre-rendering
   const nextSlideIndex = (currentSlideIndex + 1) % slides.length;
   const nextSlide = slides[nextSlideIndex];
-  const nextSlideLayout = nextSlide?.layout || "side-by-side"; 
-
+  const nextSlideLayout = nextSlide?.layout || "side-by-side";
 
   return (
-    <div
-      className="display-container"
-    >
+    <div className="display-container">
       <SlideDisplay
         currentSlide={currentSlide}
         slideLayout={slideLayout}
@@ -1038,6 +1004,7 @@ function DisplayView() {
         slideProgress={slideProgress}
         progressBarRef={progressBarRef}
         barStyle={settings.barStyle}
+        color={settings.progressBarColor}
       />
 
       <StatusBar

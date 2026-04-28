@@ -1,6 +1,6 @@
 import React from "react";
 
-function ProgressBar({ currentSlide, slideProgress, progressBarRef, barStyle }) {
+function ProgressBar({ currentSlide, slideProgress, progressBarRef, barStyle, color }) {
 
   if (currentSlide?.showBar === false) {
     return null;
@@ -37,7 +37,7 @@ function ProgressBar({ currentSlide, slideProgress, progressBarRef, barStyle }) 
       <div
         ref={progressBarRef}
         className="display-progress-fill"
-        style={{ width: `${slideProgress}%` }}
+        style={{ width: `${slideProgress}%`, backgroundColor: color || undefined }}
       />
     </div>
   );

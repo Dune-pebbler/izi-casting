@@ -142,6 +142,27 @@
   }
 }
 
+.btn-icon--success {
+  color: var(--success);
+  border-color: var(--success);
+  background-color: rgba(var(--success), 0.08);
+}
+
+.btn-icon--danger {
+  &:hover:not(:disabled) {
+    background-color: var(--destructive-light);
+    color: var(--destructive);
+    border-color: var(--destructive);
+  }
+}
+
+.btn-icon--time {
+  color: var(--primary);
+  border-color: var(--primary);
+  background-color: rgba(var(--primary), 0.08);
+  cursor: default;
+}
+
 // Button sizes - Shopify style
 .btn-sm {
   padding: $spacing-xs $spacing-sm;

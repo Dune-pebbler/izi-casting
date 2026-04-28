@@ -73,6 +73,7 @@ function AdminView() {
   const [modalTeletekstTheme, setModalTeletekstTheme] = useState("classic");
   const [modalTeletekstPageCount, setModalTeletekstPageCount] = useState(1);
   const [modalIframeUrl, setModalIframeUrl] = useState("");
+  const [modalTimeRestriction, setModalTimeRestriction] = useState({ enabled: false, startTime: "08:00", endTime: "17:00" });
   const [currentEditingPlaylistId, setCurrentEditingPlaylistId] =
     useState(null);
   const [slideToDelete, setSlideToDelete] = useState(null);
@@ -453,6 +454,7 @@ function AdminView() {
     setModalTeletekstTheme(slide.teletekstTheme || "classic");
     setModalTeletekstPageCount(slide.teletekstPageCount || 1);
     setModalIframeUrl(slide.iframeUrl || "");
+    setModalTimeRestriction(slide.timeRestriction || { enabled: false, startTime: "08:00", endTime: "17:00" });
   };
 
   const closeEditModal = () => {
@@ -467,6 +469,7 @@ function AdminView() {
     setModalShowBar(true);
     setModalTeletekstChannel("101");
     setModalIframeUrl("");
+    setModalTimeRestriction({ enabled: false, startTime: "08:00", endTime: "17:00" });
   };
 
   const handleContentChange = (content) => {
@@ -588,6 +591,7 @@ function AdminView() {
               duration: modalSlideDuration === "" ? 5 : modalSlideDuration,
               showBar: modalShowBar,
               transition: modalSlideTransition,
+              timeRestriction: modalTimeRestriction,
             };
 
             // Debug logging for slide updates
@@ -1148,6 +1152,8 @@ function AdminView() {
           iframeUrl={modalIframeUrl}
           onIframeUrlChange={setModalIframeUrl}
           onOpenLibrary={handleOpenImageLibrary}
+          timeRestriction={modalTimeRestriction}
+          onTimeRestrictionChange={setModalTimeRestriction}
         />
       )}
 

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Editor } from "@tinymce/tinymce-react";
 import { Trash2, Clock, Maximize2, Layout, ArrowLeftRight, Zap } from "lucide-react";
 import LayoutSelector from "./LayoutSelector";
@@ -45,7 +45,11 @@ function EditModal({
   onTeletekstPageCountChange,
   onIframeUrlChange,
   onOpenLibrary,
+  timeRestriction,
+  onTimeRestrictionChange,
 }) {
+  const [timePopupOpen, setTimePopupOpen] = useState(false);
+
   const renderLayoutContent = () => {
     switch (slideLayout) {
       case "side-by-side":
@@ -280,6 +284,65 @@ function EditModal({
           </div>
 
           <div className="slide-modal__header-actions">
+            <div className="slide-modal__time-popup-wrapper">
+              <button
+                className={`btn-icon${timeRestriction?.enabled ? ' btn-icon--time' : ''}`}
+                title="Tijdvenster instellen"
+                onClick={() => setTimePopupOpen(!timePopupOpen)}
+              >
+                <Clock size={16} />
+              </button>
+              {timePopupOpen && (
+                <div className="slide-modal__time-popup">
+                  <div className="time-popup__header">
+                    <span>Tijdvenster</span>
+                    <button className="time-popup__close" onClick={() => setTimePopupOpen(false)}>✕</button>
+                  </div>
+                  <label className="time-popup__toggle">
+                    <input
+                      type="checkbox"
+                      checked={timeRestriction?.enabled || false}
+                      onChange={(e) =>
+                        onTimeRestrictionChange({ ...timeRestriction, enabled: e.target.checked })
+                      }
+                    />
+                    <span>Tijdvenster inschakelen</span>
+                  </label>
+                  {timeRestriction?.enabled && (
+                    <div className="time-popup__inputs">
+                      <div className="time-popup__field">
+                        <label>Van</label>
+                        <input
+                          type="time"
+                          value={timeRestriction.startTime || "08:00"}
+                          onChange={(e) =>
+                            onTimeRestrictionChange({ ...timeRestriction, startTime: e.target.value })
+                          }
+                          className="time-popup__time-input"
+                        />
+                      </div>
+                      <div className="time-popup__field">
+                        <label>Tot</label>
+                        <input
+                          type="time"
+                          value={timeRestriction.endTime || "17:00"}
+                          onChange={(e) =>
+                            onTimeRestrictionChange({ ...timeRestriction, endTime: e.target.value })
+                          }
+                          className="time-popup__time-input"
+                        />
+                      </div>
+                      {timeRestriction.startTime > timeRestriction.endTime && (
+                        <p className="time-popup__midnight-note">
+                          ↻ Loopt over middernacht
+                        </p>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
             <button
               onClick={() => {
                 console.log('Delete button clicked');

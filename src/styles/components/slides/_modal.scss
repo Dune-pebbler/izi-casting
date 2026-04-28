@@ -753,6 +753,111 @@
   }
 }
 
+.slide-modal__time-popup-wrapper {
+  position: relative;
+
+  .slide-modal__time-popup {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: $border-radius-lg;
+    box-shadow: $shadow-lg;
+    padding: $spacing-md;
+    width: 220px;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-md;
+
+    .time-popup__header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: $font-size-sm;
+      font-weight: $font-weight-semibold;
+      color: var(--foreground);
+
+      .time-popup__close {
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: var(--foreground-secondary);
+        font-size: $font-size-sm;
+        padding: 0;
+        line-height: 1;
+
+        &:hover {
+          color: var(--foreground);
+        }
+      }
+    }
+
+    .time-popup__toggle {
+      display: flex;
+      align-items: center;
+      gap: $spacing-sm;
+      cursor: pointer;
+      font-size: $font-size-sm;
+      color: var(--foreground-secondary);
+      user-select: none;
+
+      input[type="checkbox"] {
+        cursor: pointer;
+        width: 16px;
+        height: 16px;
+        flex-shrink: 0;
+      }
+
+      &:hover {
+        color: var(--foreground);
+      }
+    }
+
+    .time-popup__inputs {
+      display: flex;
+      flex-direction: column;
+      gap: $spacing-sm;
+    }
+
+    .time-popup__field {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: $spacing-sm;
+
+      label {
+        font-size: $font-size-sm;
+        color: var(--foreground-secondary);
+        min-width: 28px;
+      }
+
+      .time-popup__time-input {
+        flex: 1;
+        padding: $spacing-xs $spacing-sm;
+        border: 1px solid var(--border);
+        border-radius: $border-radius-sm;
+        background: var(--background);
+        color: var(--foreground);
+        font-size: $font-size-sm;
+        font-family: $font-family-base;
+
+        &:focus {
+          outline: none;
+          border-color: var(--primary);
+        }
+      }
+    }
+
+    .time-popup__midnight-note {
+      font-size: $font-size-xs;
+      color: var(--primary);
+      margin: 0;
+    }
+  }
+}
+
 .modal-textarea-overlay {
   width: 100%;
   height: 100%;

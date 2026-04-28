@@ -10,6 +10,7 @@ import {
   Tv,
   Trash2,
   Globe,
+  Clock,
 } from "lucide-react";
 import { sanitizeHTMLContent } from "../../utils/sanitize";
 import { extractVideoInfo } from "../../utils/videoMetadata";
@@ -417,6 +418,14 @@ function SlideList({
             >
               <Trash2 size={16} />
             </button>
+            {slide.timeRestriction?.enabled && (
+              <span
+                className="btn-icon btn-icon--time"
+                title={`Tijdvenster: ${slide.timeRestriction.startTime} – ${slide.timeRestriction.endTime}`}
+              >
+                <Clock size={16} />
+              </span>
+            )}
             <button
               onClick={(e) => {
                 e.stopPropagation();
@@ -547,6 +556,14 @@ function SlideList({
           >
             <Trash2 size={16} />
           </button>
+          {slide.timeRestriction?.enabled && (
+            <span
+              className="btn-icon btn-icon--time"
+              title={`Tijdvenster: ${slide.timeRestriction.startTime} – ${slide.timeRestriction.endTime}`}
+            >
+              <Clock size={16} />
+            </span>
+          )}
           <button
             onClick={(e) => {
               e.stopPropagation();
