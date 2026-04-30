@@ -393,7 +393,7 @@ function DisplayView() {
       border-radius: 5px;
       font-size: 14px;
       z-index: 9999;
-      animation: fadeInOut 2s ease-in-out;
+      animation: fadeInOut 3s ease-in-out;
     `;
     PingIndicator.textContent = "Pong";
 
@@ -414,8 +414,6 @@ function DisplayView() {
       if (PingIndicator.parentNode) {
         PingIndicator.parentNode.removeChild(PingIndicator);
       }
-
-      console.log("Force reloading browser...");
     }, 3000);
   }, []);
 
