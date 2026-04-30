@@ -60,6 +60,12 @@
     }
   }
 
+  @media (max-width: 1200px) {
+    .sidebar-toggle-btn {
+      display: none;
+    }
+  }
+
   // Collapsed state
   &.collapsed {
     transform: translateX(100%);
