@@ -389,3 +389,9 @@
     border: 1px solid var(--border);
   }
 }
+
+@media (max-width: 768px) {
+  .playlist-header {
+    flex-direction: column;
+  }
+}

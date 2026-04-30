@@ -1192,7 +1192,10 @@ function AdminView() {
       {/* Unpair Confirmation Modal */}
       {deviceToDelete && (
         <div className="slide-delete-modal-wrapper">
-          <div className="modal-overlay" onClick={() => dispatch(clearDeviceToDelete())}>
+          <div
+            className="modal-overlay"
+            onClick={() => dispatch(clearDeviceToDelete())}
+          >
             <div className="modal-content" onClick={(e) => e.stopPropagation()}>
               <div className="modal-header">
                 <h3>Apparaat ontkoppelen</h3>
@@ -1240,7 +1243,10 @@ function AdminView() {
       {/* Playlist Deletion Confirmation Modal */}
       {playlistToDelete && (
         <div className="slide-delete-modal-wrapper">
-          <div className="modal-overlay" onClick={() => setPlaylistToDelete(null)}>
+          <div
+            className="modal-overlay"
+            onClick={() => setPlaylistToDelete(null)}
+          >
             <div className="modal-content" onClick={(e) => e.stopPropagation()}>
               <div className="modal-header">
                 <h3>Playlist verwijderen</h3>
@@ -1254,8 +1260,8 @@ function AdminView() {
               </div>
               <div className="modal-body">
                 <p className="modal-description">
-                  Weet je zeker dat je{" "}
-                  <strong>{playlistToDelete.name}</strong> wilt verwijderen?
+                  Weet je zeker dat je
+                  <strong> {playlistToDelete.name}</strong> wilt verwijderen?
                 </p>
                 <p className="delete-warning">
                   Deze actie kan niet ongedaan worden gemaakt. Alle slides en
@@ -1270,7 +1276,10 @@ function AdminView() {
                 >
                   Annuleren
                 </button>
-                <button onClick={handleDeletePlaylist} className="btn btn-danger">
+                <button
+                  onClick={handleDeletePlaylist}
+                  className="btn btn-danger"
+                >
                   Verwijderen
                 </button>
               </div>

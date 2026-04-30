@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback } from "react";
+import React, { useMemo, useCallback, useState } from "react";
 import {
   Copy,
   GripVertical,
@@ -14,6 +14,7 @@ import {
   LayoutGrid,
   FileText,
   LucideImage,
+  MoreVertical,
 } from "lucide-react";
 
 const iconMap = {
@@ -459,6 +460,7 @@ function SlideList({
 
   // SortableSlideRow component for list view
   const SortableSlideRow = ({ slide, index }) => {
+    const [actionsOpen, setActionsOpen] = useState(false);
     const {
       attributes,
       listeners,
@@ -595,7 +597,81 @@ function SlideList({
           >
             {slide.isVisible ? <Eye size={16} /> : <EyeOff size={16} />}
           </button>
+
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setActionsOpen((o) => !o);
+            }}
+            className={`btn-icon slide-row__mobile-toggle${actionsOpen ? " active" : ""}`}
+            title="Meer acties"
+          >
+            <MoreVertical size={16} />
+          </button>
         </div>
+
+        {actionsOpen && (
+          <div
+            className="slide-row__actions-panel"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onMoveSlide(slide);
+                setActionsOpen(false);
+              }}
+              className="btn-icon slide-row__actions-panel-btn"
+            >
+              <ChevronsUpDown size={16} />
+              <span>Verplaatsen</span>
+            </button>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onCopySlide(slide);
+                setActionsOpen(false);
+              }}
+              className="btn-icon slide-row__actions-panel-btn"
+            >
+              <Copy size={16} />
+              <span>Kopiëren</span>
+            </button>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onToggleSlideVisibility(slide.id);
+                setActionsOpen(false);
+              }}
+              className={`btn-icon slide-row__actions-panel-btn${slide.isVisible ? " btn-icon--success" : ""}`}
+            >
+              {slide.isVisible ? <Eye size={16} /> : <EyeOff size={16} />}
+              <span>{slide.isVisible ? "Verbergen" : "Tonen"}</span>
+            </button>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onEditSlide(slide);
+                setActionsOpen(false);
+              }}
+              className={`btn-icon slide-row__actions-panel-btn${slide.timeRestriction?.enabled ? " btn-icon--success" : ""}`}
+            >
+              <Clock size={16} />
+              <span>Tijdvenster</span>
+            </button>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onConfirmDeleteSlide(slide);
+                setActionsOpen(false);
+              }}
+              className="btn-icon btn-icon--danger slide-row__actions-panel-btn"
+            >
+              <Trash2 size={16} />
+              <span>Verwijderen</span>
+            </button>
+          </div>
+        )}
       </div>
     );
   };
