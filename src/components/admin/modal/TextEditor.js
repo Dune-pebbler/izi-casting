@@ -80,7 +80,6 @@ function TextEditor({ content, onContentChange }) {
         margin: 0.5em 0 0.25em 0;
         line-height: 1.2;
         color: #1a1a1a;
-        border-bottom: 2px solid #e1e5e9;
         padding-bottom: 0.3em;
       }
 
