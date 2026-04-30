@@ -8,6 +8,7 @@ import {
   ChevronDown,
   ChevronUp,
   Monitor,
+  SatelliteDish,
 } from "lucide-react";
 
 import {
@@ -242,6 +243,32 @@ function Devices({ setDeviceToDelete, deleteDevice }) {
     }
   };
 
+  // Handle device refresh
+  const handlePingDevice = async (deviceId) => {
+    setRefreshingDevices((prev) => new Set(prev).add(deviceId));
+
+    try {
+      // Send ping command to device_commands collection
+      await setDoc(doc(db, "device_commands", deviceId), {
+        command: "ping",
+        action: "ping_device",
+        timestamp: new Date(),
+        processed: false,
+      });
+
+      toast.success("Er is een ping verstuurd");
+    } catch (error) {
+      console.error("Error sending refresh command:", error);
+      toast.error("Fout bij verzenden van refresh commando");
+    } finally {
+      setRefreshingDevices((prev) => {
+        const newSet = new Set(prev);
+        newSet.delete(deviceId);
+        return newSet;
+      });
+    }
+  };
+
   // Utility functions
   const getDisplayName = (device) => {
     return device.customName || device.id;
@@ -324,23 +351,40 @@ function Devices({ setDeviceToDelete, deleteDevice }) {
                   <div key={device.id} className="device-item">
                     <div className="device-header">
                       <div className="device-header-left">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleRefreshDevice(device.id);
-                          }}
-                          className="device-refresh-btn"
-                          title="Slides opnieuw starten"
-                          disabled={refreshingDevices.has(device.id)}
-                        >
-                          <RotateCcw
-                            size={16}
-                            className={
-                              refreshingDevices.has(device.id) ? "rotating" : ""
-                            }
-                          />
-                          <span>Ververs</span>
-                        </button>
+                        <div>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleRefreshDevice(device.id);
+                            }}
+                            className="device-action-btn device-refresh-btn"
+                            title="Slides opnieuw starten"
+                            disabled={refreshingDevices.has(device.id)}
+                          >
+                            <RotateCcw
+                              size={16}
+                              className={
+                                refreshingDevices.has(device.id)
+                                  ? "rotating"
+                                  : ""
+                              }
+                            />
+                            <span>Ververs</span>
+                          </button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handlePingDevice(device.id);
+                            }}
+                            className="device-action-btn device-ping-btn"
+                            title="Slides opnieuw starten"
+                            disabled={refreshingDevices.has(device.id)}
+                          >
+                            <SatelliteDish size={16} />
+                            <span>Ping</span>
+                          </button>
+                        </div>
+
                         {editingDeviceId === device.id ? (
                           <input
                             type="text"

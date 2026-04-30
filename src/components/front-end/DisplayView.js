@@ -379,6 +379,46 @@ function DisplayView() {
     }
   }, [isPaired, deviceId]);
 
+  const handleDevicePing = useCallback(() => {
+    console.log("Restarting slides from beginning");
+
+    const PingIndicator = document.createElement("div");
+    PingIndicator.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: rgba(0, 123, 255, 0.9);
+      color: white;
+      padding: 10px 15px;
+      border-radius: 5px;
+      font-size: 14px;
+      z-index: 9999;
+      animation: fadeInOut 2s ease-in-out;
+    `;
+    PingIndicator.textContent = "Pong";
+
+    const style = document.createElement("style");
+    style.textContent = `
+      @keyframes fadeInOut {
+        0% { opacity: 0; transform: translateY(-20px); }
+        20% { opacity: 1; transform: translateY(0); }
+        80% { opacity: 1; transform: translateY(0); }
+        100% { opacity: 0; transform: translateY(-20px); }
+      }
+    `;
+    document.head.appendChild(style);
+
+    document.body.appendChild(PingIndicator);
+
+    setTimeout(() => {
+      if (PingIndicator.parentNode) {
+        PingIndicator.parentNode.removeChild(PingIndicator);
+      }
+
+      console.log("Force reloading browser...");
+    }, 3000);
+  }, []);
+
   const handleRefreshSlides = useCallback(() => {
     console.log("Restarting slides from beginning");
     setCurrentSlideIndex(0);
@@ -528,6 +568,12 @@ function DisplayView() {
                     "Refresh command received, restarting slides from beginning",
                   );
                   handleRefreshSlides();
+                }
+                break;
+              case "ping":
+                if (commandData.action === "ping_device") {
+                  console.log("Ping event is triggerd");
+                  handleDevicePing();
                 }
                 break;
 

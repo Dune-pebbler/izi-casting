@@ -248,7 +248,7 @@
             .device-last-seen {
               font-size: 0.75rem;
               color: var(--foreground-secondary);
-              padding-left: $spacing-md;
+              padding-left: $spacing-sm;
               font-weight: $font-weight-normal;
             }
           }
@@ -278,6 +278,28 @@
           }
 
           .device-refresh-btn {
+            margin-bottom: 10px;
+
+            &:hover {
+              svg {
+                animation: rotate-reverse 1s linear infinite;
+              }
+            }
+
+            &:disabled {
+              cursor: not-allowed;
+              opacity: 0.6;
+            }
+
+            .rotating {
+              animation: rotate 1s linear infinite;
+            }
+          }
+
+          .device-refresh-btn,
+          .device-ping-btn {
+            width: 110px;
+
             background-color: white;
             border: 1px solid var(--border);
             color: var(--foreground);
@@ -299,19 +321,6 @@
             &:hover {
               background-color: var(--muted);
               transform: scale(1.02);
-
-              svg {
-                animation: rotate-reverse 1s linear infinite;
-              }
-            }
-
-            &:disabled {
-              cursor: not-allowed;
-              opacity: 0.6;
-            }
-
-            .rotating {
-              animation: rotate 1s linear infinite;
             }
           }
 
