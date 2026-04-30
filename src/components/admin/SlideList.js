@@ -543,7 +543,10 @@ function SlideList({
       <div
         ref={setNodeRef}
         style={style}
-        className={`slide-row ${isDragging ? "dragging" : ""}`}
+        className={[
+          `slide-row ${isDragging ? "dragging" : ""}`,
+          slide.isVisible ? " mobile-green" : " mobile-red",
+        ]}
         onClick={() => onEditSlide(slide)}
       >
         <div className="slide-row__left" {...attributes} {...listeners}>

@@ -156,6 +156,15 @@
     box-shadow: $shadow-lg;
   }
 
+  @media (max-width: 768px) {
+    &.mobile-red {
+      background: var(--destructive-light);
+    }
+    &.mobile-green {
+      background: var(--success-light);
+    }
+  }
+
   // Row Left (Drag Handle)
   &__left {
     display: flex;
