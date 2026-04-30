@@ -86,6 +86,12 @@ function AdminView() {
   const [slideToDelete, setSlideToDelete] = useState(null);
   const [defaultSlideTransition, setDefaultSlideTransition] = useState("fade");
   const [enabledFonts, setEnabledFonts] = useState([]);
+  const [typography, setTypography] = useState({
+    p:  { fontSize: 27, fontFamily: "Roboto" },
+    h1: { fontSize: 64, fontFamily: "Roboto" },
+    h2: { fontSize: 53, fontFamily: "Roboto" },
+    h3: { fontSize: 43, fontFamily: "Roboto" },
+  });
 
   // Playlist editing state
   const [editingPlaylistNameId, setEditingPlaylistNameId] = useState(null);
@@ -138,6 +144,7 @@ function AdminView() {
           setDefaultSlideTransition(settings.defaultSlideTransition || "fade");
           setEnabledFonts(settings.enabledFonts || []);
           setTenantLogoUrl(settings.logoUrl || "");
+          if (settings.typography) setTypography(settings.typography);
         }
       } catch (error) {
         console.error("Error loading settings:", error);
@@ -1278,6 +1285,7 @@ function AdminView() {
           slideTransition={modalSlideTransition}
           onTransitionChange={setModalSlideTransition}
           enabledFonts={enabledFonts}
+          typography={typography}
           teletekstChannel={modalTeletekstChannel}
           teletekstTheme={modalTeletekstTheme}
           teletekstPageCount={modalTeletekstPageCount}

@@ -31,6 +31,7 @@ function EditModal({
   imageSide,
   slideTransition,
   enabledFonts,
+  typography,
   teletekstChannel,
   teletekstTheme,
   teletekstPageCount,
@@ -103,6 +104,7 @@ function EditModal({
                   content={modalTinyMCEContent}
                   onContentChange={onContentChange}
                   enabledFonts={enabledFonts}
+                  typography={typography}
                 />
               </div>
             </div>
@@ -149,6 +151,7 @@ function EditModal({
                   content={modalTinyMCEContent}
                   onContentChange={onContentChange}
                   enabledFonts={enabledFonts}
+                  typography={typography}
                 />
               </div>
             </div>

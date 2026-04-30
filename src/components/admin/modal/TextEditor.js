@@ -1,35 +1,66 @@
-import React from 'react';
-import { Editor } from '@tinymce/tinymce-react';
+import React from "react";
+import { Editor } from "@tinymce/tinymce-react";
 
 function TextEditor({ content, onContentChange }) {
   const editorConfig = {
-    height: '100%',
+    height: "100%",
     menubar: false,
     plugins: [
-      'anchor', 'autolink', 'charmap', 'codesample', 'emoticons', 'lists', 'searchreplace', 'table', 'visualblocks', 'wordcount'
+      "anchor",
+      "autolink",
+      "charmap",
+      "codesample",
+      "emoticons",
+      "lists",
+      "searchreplace",
+      "table",
+      "visualblocks",
+      "wordcount",
     ],
-    toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | forecolor backcolor | table | align lineheight | numlist bullist indent outdent | emoticons charmap | removeformat',
-    font_family_formats: 'Arial=arial,helvetica,sans-serif; Comic Neue=Comic Neue,cursive; Comic Sans MS=comic sans ms,cursive; Courier New=courier new,courier,monospace; Georgia=georgia,palatino,serif; Helvetica=helvetica,arial,sans-serif; Impact=impact,chicago; Lato=Lato,sans-serif; Montserrat=Montserrat,sans-serif; Nunito=Nunito,sans-serif; Open Sans=Open Sans,sans-serif; Poppins=Poppins,sans-serif; Roboto=Roboto,sans-serif; Source Sans Pro=Source Sans Pro,sans-serif; Times New Roman=times new roman,times,serif; Trebuchet MS=trebuchet ms,geneva; Verdana=verdana,geneva;',
+    toolbar:
+      "undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | forecolor backcolor | table | align lineheight | numlist bullist indent outdent | emoticons charmap | removeformat",
+    font_family_formats:
+      "Arial=arial,helvetica,sans-serif; Comic Neue=Comic Neue,cursive; Comic Sans MS=comic sans ms,cursive; Courier New=courier new,courier,monospace; Georgia=georgia,palatino,serif; Helvetica=helvetica,arial,sans-serif; Impact=impact,chicago; Lato=Lato,sans-serif; Montserrat=Montserrat,sans-serif; Nunito=Nunito,sans-serif; Open Sans=Open Sans,sans-serif; Poppins=Poppins,sans-serif; Roboto=Roboto,sans-serif; Source Sans Pro=Source Sans Pro,sans-serif; Times New Roman=times new roman,times,serif; Trebuchet MS=trebuchet ms,geneva; Verdana=verdana,geneva;",
+    block_formats: "Paragraaf=p; Header 1=h1; Header 2=h2; Header 3=h3",
     textcolor_map: [
-      '000000', 'Black',
-      '4D4D4D', 'Dim Gray',
-      '999999', 'Gray',
-      'E6E6E6', 'Light Gray',
-      'FFFFFF', 'White',
-      'FF0000', 'Red',
-      'FF6600', 'Orange',
-      'FFCC00', 'Yellow',
-      '00CC00', 'Green',
-      '0066FF', 'Blue',
-      '6600FF', 'Purple',
-      'FF0066', 'Pink',
-      'FF6600', 'Orange',
-      '00CCCC', 'Cyan',
-      '993300', 'Brown',
-      'FFCC99', 'Light Orange',
-      'CCFFCC', 'Light Green',
-      'CCCCFF', 'Light Blue',
-      'FFCCFF', 'Light Pink'
+      "000000",
+      "Black",
+      "4D4D4D",
+      "Dim Gray",
+      "999999",
+      "Gray",
+      "E6E6E6",
+      "Light Gray",
+      "FFFFFF",
+      "White",
+      "FF0000",
+      "Red",
+      "FF6600",
+      "Orange",
+      "FFCC00",
+      "Yellow",
+      "00CC00",
+      "Green",
+      "0066FF",
+      "Blue",
+      "6600FF",
+      "Purple",
+      "FF0066",
+      "Pink",
+      "FF6600",
+      "Orange",
+      "00CCCC",
+      "Cyan",
+      "993300",
+      "Brown",
+      "FFCC99",
+      "Light Orange",
+      "CCFFCC",
+      "Light Green",
+      "CCCCFF",
+      "Light Blue",
+      "FFCCFF",
+      "Light Pink",
     ],
     textcolor_cols: 6,
     textcolor_rows: 3,
@@ -63,30 +94,6 @@ function TextEditor({ content, onContentChange }) {
 
       h3 {
         font-size: 43px;
-        font-weight: 600;
-        margin: 0.5em 0 0.25em 0;
-        line-height: 1.4;
-        color: #1a1a1a;
-      }
-
-      h4 {
-        font-size: 32px;
-        font-weight: 600;
-        margin: 0.5em 0 0.25em 0;
-        line-height: 1.4;
-        color: #1a1a1a;
-      }
-
-      h5 {
-        font-size: 27px;
-        font-weight: 600;
-        margin: 0.5em 0 0.25em 0;
-        line-height: 1.4;
-        color: #1a1a1a;
-      }
-
-      h6 {
-        font-size: 27px;
         font-weight: 600;
         margin: 0.5em 0 0.25em 0;
         line-height: 1.4;
@@ -281,30 +288,30 @@ function TextEditor({ content, onContentChange }) {
     setup: (editor) => {
       // Strip inline font-size from headings so our CSS sizes take effect
       const stripHeadingFontSizes = () => {
-        editor.dom.select('h1,h2,h3,h4,h5,h6').forEach((el) => {
-          el.style.removeProperty('font-size');
-          editor.dom.select('*', el).forEach((child) => {
-            child.style.removeProperty('font-size');
+        editor.dom.select("h1,h2,h3").forEach((el) => {
+          el.style.removeProperty("font-size");
+          editor.dom.select("*", el).forEach((child) => {
+            child.style.removeProperty("font-size");
           });
         });
       };
 
-      editor.on('init', () => {
+      editor.on("init", () => {
         stripHeadingFontSizes();
         editor.focus();
       });
 
-      editor.on('FormatApply', ({ format }) => {
-        if (['h1','h2','h3','h4','h5','h6'].includes(format)) {
+      editor.on("FormatApply", ({ format }) => {
+        if (["h1", "h2", "h3"].includes(format)) {
           setTimeout(stripHeadingFontSizes, 0);
         }
       });
-    }
+    },
   };
 
   return (
     <Editor
-      apiKey='l1htx10scfunizdawurrb9j2njqukthv8eb30m6rr0r64177'
+      apiKey="l1htx10scfunizdawurrb9j2njqukthv8eb30m6rr0r64177"
       value={content}
       onEditorChange={onContentChange}
       init={editorConfig}

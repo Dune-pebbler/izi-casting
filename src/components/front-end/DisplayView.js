@@ -652,6 +652,15 @@ function DisplayView() {
           barStyle: data.barStyle || "onder",
         });
 
+        // Apply typography as CSS custom properties
+        const typo = data.typography || {};
+        const defaults = { p: { fontSize: 27, fontFamily: "Roboto" }, h1: { fontSize: 64, fontFamily: "Roboto" }, h2: { fontSize: 53, fontFamily: "Roboto" }, h3: { fontSize: 43, fontFamily: "Roboto" } };
+        ["p", "h1", "h2", "h3"].forEach((tag) => {
+          const t = typo[tag] || defaults[tag];
+          document.documentElement.style.setProperty(`--typo-${tag}-size`, `${t.fontSize}px`);
+          document.documentElement.style.setProperty(`--typo-${tag}-family`, t.fontFamily);
+        });
+
         if (data.feeds && Array.isArray(data.feeds)) {
           const enabledFeeds = data.feeds.filter(
             (feed) => feed.isEnabled !== false && feed.isVisible !== false,

@@ -53,6 +53,13 @@ function Settings({ onOpenTrash, trashedSlidesCount = 0 }) {
   const [isFontsExpanded, setIsFontsExpanded] = useState(false);
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const DEFAULT_TYPOGRAPHY = {
+    p:  { fontSize: 27, fontFamily: "Roboto" },
+    h1: { fontSize: 64, fontFamily: "Roboto" },
+    h2: { fontSize: 53, fontFamily: "Roboto" },
+    h3: { fontSize: 43, fontFamily: "Roboto" },
+  };
+
   const [settings, setSettings] = useState({
     logoUrl: "",
     logoName: "",
@@ -64,6 +71,7 @@ function Settings({ onOpenTrash, trashedSlidesCount = 0 }) {
     barStyle: "onder",
     defaultSlideTransition: "fade",
     enabledFonts: AVAILABLE_FONTS.map((f) => f.name),
+    typography: DEFAULT_TYPOGRAPHY,
   });
 
   // Load settings on component mount
@@ -92,6 +100,10 @@ function Settings({ onOpenTrash, trashedSlidesCount = 0 }) {
             // Ensure enabledFonts is always present, default to all fonts if missing
             enabledFonts:
               loadedSettings.enabledFonts || AVAILABLE_FONTS.map((f) => f.name),
+            typography: {
+              ...DEFAULT_TYPOGRAPHY,
+              ...(loadedSettings.typography || {}),
+            },
           }));
         }
       } catch (error) {
@@ -532,6 +544,64 @@ function Settings({ onOpenTrash, trashedSlidesCount = 0 }) {
                     ))}
                   </div>
                 )}
+              </div>
+            </div>
+
+            {/* Typography */}
+            <div className="settings-section">
+              <label className="settings-label">Typografie</label>
+              <div className="typography-grid">
+                <div className="typography-grid__header">
+                  <span />
+                  <span>Lettertype</span>
+                  <span>Grootte</span>
+                </div>
+                {[
+                  { key: "p",  label: "Paragraaf" },
+                  { key: "h1", label: "Kop 1" },
+                  { key: "h2", label: "Kop 2" },
+                  { key: "h3", label: "Kop 3" },
+                ].map(({ key, label }) => (
+                  <div key={key} className="typography-grid__row">
+                    <span className="typography-grid__label">{label}</span>
+                    <select
+                      className="typography-grid__select"
+                      value={settings.typography?.[key]?.fontFamily || "Roboto"}
+                      onChange={(e) =>
+                        setSettings((prev) => ({
+                          ...prev,
+                          typography: {
+                            ...prev.typography,
+                            [key]: { ...prev.typography?.[key], fontFamily: e.target.value },
+                          },
+                        }))
+                      }
+                    >
+                      {AVAILABLE_FONTS.map((f) => (
+                        <option key={f.name} value={f.name}>{f.name}</option>
+                      ))}
+                    </select>
+                    <div className="typography-grid__size">
+                      <input
+                        type="number"
+                        min={8}
+                        max={200}
+                        className="typography-grid__size-input"
+                        value={settings.typography?.[key]?.fontSize ?? 27}
+                        onChange={(e) =>
+                          setSettings((prev) => ({
+                            ...prev,
+                            typography: {
+                              ...prev.typography,
+                              [key]: { ...prev.typography?.[key], fontSize: parseInt(e.target.value) || 27 },
+                            },
+                          }))
+                        }
+                      />
+                      <span className="typography-grid__size-suffix">px</span>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
 

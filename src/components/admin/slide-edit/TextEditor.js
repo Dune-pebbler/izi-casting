@@ -1,61 +1,102 @@
-import React from 'react';
-import { Editor } from '@tinymce/tinymce-react';
+import React from "react";
+import { Editor } from "@tinymce/tinymce-react";
 
 // Available fonts mapping
 const AVAILABLE_FONTS = {
-  'Arial': 'Arial=arial,helvetica,sans-serif',
-  'Comic Neue': 'Comic Neue=Comic Neue,cursive',
-  'Comic Sans MS': 'Comic Sans MS=comic sans ms,cursive',
-  'Courier New': 'Courier New=courier new,courier,monospace',
-  'Georgia': 'Georgia=georgia,palatino,serif',
-  'Helvetica': 'Helvetica=helvetica,arial,sans-serif',
-  'Impact': 'Impact=impact,chicago',
-  'Lato': 'Lato=Lato,sans-serif',
-  'Montserrat': 'Montserrat=Montserrat,sans-serif',
-  'Nunito': 'Nunito=Nunito,sans-serif',
-  'Open Sans': 'Open Sans=Open Sans,sans-serif',
-  'Poppins': 'Poppins=Poppins,sans-serif',
-  'Roboto': 'Roboto=Roboto,sans-serif',
-  'Source Sans Pro': 'Source Sans Pro=Source Sans Pro,sans-serif',
-  'Times New Roman': 'Times New Roman=times new roman,times,serif',
-  'Trebuchet MS': 'Trebuchet MS=trebuchet ms,geneva',
-  'Verdana': 'Verdana=verdana,geneva',
+  Arial: "Arial=arial,helvetica,sans-serif",
+  "Comic Neue": "Comic Neue=Comic Neue,cursive",
+  "Comic Sans MS": "Comic Sans MS=comic sans ms,cursive",
+  "Courier New": "Courier New=courier new,courier,monospace",
+  Georgia: "Georgia=georgia,palatino,serif",
+  Helvetica: "Helvetica=helvetica,arial,sans-serif",
+  Impact: "Impact=impact,chicago",
+  Lato: "Lato=Lato,sans-serif",
+  Montserrat: "Montserrat=Montserrat,sans-serif",
+  Nunito: "Nunito=Nunito,sans-serif",
+  "Open Sans": "Open Sans=Open Sans,sans-serif",
+  Poppins: "Poppins=Poppins,sans-serif",
+  Roboto: "Roboto=Roboto,sans-serif",
+  "Source Sans Pro": "Source Sans Pro=Source Sans Pro,sans-serif",
+  "Times New Roman": "Times New Roman=times new roman,times,serif",
+  "Trebuchet MS": "Trebuchet MS=trebuchet ms,geneva",
+  Verdana: "Verdana=verdana,geneva",
 };
 
-function TextEditor({ content, onContentChange, enabledFonts }) {
+function TextEditor({ content, onContentChange, enabledFonts, typography }) {
+  const typo = {
+    p: { fontSize: 27, fontFamily: "Roboto", ...(typography?.p || {}) },
+    h1: { fontSize: 64, fontFamily: "Roboto", ...(typography?.h1 || {}) },
+    h2: { fontSize: 53, fontFamily: "Roboto", ...(typography?.h2 || {}) },
+    h3: { fontSize: 43, fontFamily: "Roboto", ...(typography?.h3 || {}) },
+  };
+
   // Build font_family_formats string from enabled fonts
-  const fontFormats = (enabledFonts && enabledFonts.length > 0)
-    ? enabledFonts.map(fontName => AVAILABLE_FONTS[fontName]).filter(Boolean).join('; ')
-    : Object.values(AVAILABLE_FONTS).join('; ');
+  const fontFormats =
+    enabledFonts && enabledFonts.length > 0
+      ? enabledFonts
+          .map((fontName) => AVAILABLE_FONTS[fontName])
+          .filter(Boolean)
+          .join("; ")
+      : Object.values(AVAILABLE_FONTS).join("; ");
 
   const editorConfig = {
-    height: '100%',
+    height: "100%",
     menubar: false,
     plugins: [
-      'anchor', 'autolink', 'charmap', 'codesample', 'emoticons', 'lists', 'searchreplace', 'table', 'visualblocks', 'wordcount'
+      "anchor",
+      "autolink",
+      "charmap",
+      "codesample",
+      "emoticons",
+      "lists",
+      "searchreplace",
+      "table",
+      "visualblocks",
+      "wordcount",
     ],
-    toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | forecolor backcolor | table | align lineheight | numlist bullist indent outdent | emoticons charmap | removeformat',
+    toolbar:
+      "undo redo | blocks | bold italic underline strikethrough | forecolor backcolor | table | align lineheight | numlist bullist indent outdent | emoticons charmap | removeformat",
+    block_formats: "Paragraaf=p; Header 1=h1; Header 2=h2; Header 3=h3",
     font_family_formats: fontFormats,
     textcolor_map: [
-      '000000', 'Black',
-      '4D4D4D', 'Dim Gray',
-      '999999', 'Gray',
-      'E6E6E6', 'Light Gray',
-      'FFFFFF', 'White',
-      'FF0000', 'Red',
-      'FF6600', 'Orange',
-      'FFCC00', 'Yellow',
-      '00CC00', 'Green',
-      '0066FF', 'Blue',
-      '6600FF', 'Purple',
-      'FF0066', 'Pink',
-      'FF6600', 'Orange',
-      '00CCCC', 'Cyan',
-      '993300', 'Brown',
-      'FFCC99', 'Light Orange',
-      'CCFFCC', 'Light Green',
-      'CCCCFF', 'Light Blue',
-      'FFCCFF', 'Light Pink'
+      "000000",
+      "Black",
+      "4D4D4D",
+      "Dim Gray",
+      "999999",
+      "Gray",
+      "E6E6E6",
+      "Light Gray",
+      "FFFFFF",
+      "White",
+      "FF0000",
+      "Red",
+      "FF6600",
+      "Orange",
+      "FFCC00",
+      "Yellow",
+      "00CC00",
+      "Green",
+      "0066FF",
+      "Blue",
+      "6600FF",
+      "Purple",
+      "FF0066",
+      "Pink",
+      "FF6600",
+      "Orange",
+      "00CCCC",
+      "Cyan",
+      "993300",
+      "Brown",
+      "FFCC99",
+      "Light Orange",
+      "CCFFCC",
+      "Light Green",
+      "CCCCFF",
+      "Light Blue",
+      "FFCCFF",
+      "Light Pink",
     ],
     textcolor_cols: 6,
     textcolor_rows: 3,
@@ -70,7 +111,8 @@ function TextEditor({ content, onContentChange, enabledFonts }) {
       }
 
       h1 {
-        font-size: 64px;
+        font-size: ${typo.h1.fontSize}px;
+        font-family: ${typo.h1.fontFamily}, sans-serif;
         font-weight: 600;
         margin: 0.5em 0 0.25em 0;
         line-height: 1.2;
@@ -80,7 +122,8 @@ function TextEditor({ content, onContentChange, enabledFonts }) {
       }
 
       h2 {
-        font-size: 53px;
+        font-size: ${typo.h2.fontSize}px;
+        font-family: ${typo.h2.fontFamily}, sans-serif;
         font-weight: 600;
         margin: 0.5em 0 0.25em 0;
         line-height: 1.3;
@@ -88,31 +131,8 @@ function TextEditor({ content, onContentChange, enabledFonts }) {
       }
 
       h3 {
-        font-size: 43px;
-        font-weight: 600;
-        margin: 0.5em 0 0.25em 0;
-        line-height: 1.4;
-        color: #1a1a1a;
-      }
-
-      h4 {
-        font-size: 32px;
-        font-weight: 600;
-        margin: 0.5em 0 0.25em 0;
-        line-height: 1.4;
-        color: #1a1a1a;
-      }
-
-      h5 {
-        font-size: 27px;
-        font-weight: 600;
-        margin: 0.5em 0 0.25em 0;
-        line-height: 1.4;
-        color: #1a1a1a;
-      }
-
-      h6 {
-        font-size: 27px;
+        font-size: ${typo.h3.fontSize}px;
+        font-family: ${typo.h3.fontFamily}, sans-serif;
         font-weight: 600;
         margin: 0.5em 0 0.25em 0;
         line-height: 1.4;
@@ -120,7 +140,8 @@ function TextEditor({ content, onContentChange, enabledFonts }) {
       }
 
       p {
-        font-size: 27px;
+        font-size: ${typo.p.fontSize}px;
+        font-family: ${typo.p.fontFamily}, sans-serif;
         margin: 0 0 1em 0;
         line-height: 1.6;
         color: #333;
@@ -307,31 +328,31 @@ function TextEditor({ content, onContentChange, enabledFonts }) {
     setup: (editor) => {
       // Strip inline font-size from headings so our CSS sizes take effect
       const stripHeadingFontSizes = () => {
-        editor.dom.select('h1,h2,h3,h4,h5,h6').forEach((el) => {
-          el.style.removeProperty('font-size');
-          editor.dom.select('*', el).forEach((child) => {
-            child.style.removeProperty('font-size');
+        editor.dom.select("h1,h2,h3").forEach((el) => {
+          el.style.removeProperty("font-size");
+          editor.dom.select("*", el).forEach((child) => {
+            child.style.removeProperty("font-size");
           });
         });
       };
 
-      editor.on('init', () => {
+      editor.on("init", () => {
         stripHeadingFontSizes();
         editor.focus();
       });
 
-      editor.on('FormatApply', ({ format }) => {
-        if (['h1','h2','h3','h4','h5','h6'].includes(format)) {
+      editor.on("FormatApply", ({ format }) => {
+        if (["h1", "h2", "h3"].includes(format)) {
           setTimeout(stripHeadingFontSizes, 0);
         }
       });
-    }
+    },
   };
 
   return (
     <Editor
       key={fontFormats} // Force re-render when fonts change
-      apiKey='l1htx10scfunizdawurrb9j2njqukthv8eb30m6rr0r64177'
+      apiKey="l1htx10scfunizdawurrb9j2njqukthv8eb30m6rr0r64177"
       value={content}
       onEditorChange={onContentChange}
       init={editorConfig}
