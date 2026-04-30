@@ -353,6 +353,7 @@ function AdminView() {
     setPlaylists(updatedPlaylists);
     await savePlaylistsToFirebase(updatedPlaylists);
     toast.success("Slide toegevoegd!");
+    openEditModal(newSlide, playlistId);
   };
 
   const copySlide = async (slideToCopy, playlistId) => {
