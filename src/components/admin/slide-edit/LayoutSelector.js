@@ -3,10 +3,10 @@ import {
   LayoutGrid,
   Image,
   FileText,
-  Type,
   Play,
   Tv,
-  Globe
+  Globe,
+  Images,
 } from 'lucide-react';
 
 function LayoutSelector({ currentLayout, onLayoutChange }) {
@@ -52,6 +52,12 @@ function LayoutSelector({ currentLayout, onLayoutChange }) {
       label: 'Website',
       icon: Globe,
       title: 'Website Weergeven (iframe)'
+    },
+    {
+      id: 'gallery',
+      label: 'Fotogalerij',
+      icon: Images,
+      title: 'Foto Galerij / Slideshow'
     }
   ];
 

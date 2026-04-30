@@ -1,9 +1,58 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { sanitizeHTMLContent } from "../../utils/sanitize";
 import TextPagination from "./TextPagination";
 import VideoPlayer from "./VideoPlayer";
 import TeletekstDisplay from "./TeletekstDisplay";
 import { getTextPaginationConfig } from "../../config/textPagination";
+
+function GallerySlideDisplay({ images }) {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [visible, setVisible] = useState(true);
+  const timerRef = useRef(null);
+
+  useEffect(() => {
+    if (images.length <= 1) return;
+    const duration = (images[currentIndex]?.duration || 3) * 1000;
+    const fadeOut = 500;
+
+    timerRef.current = setTimeout(() => {
+      setVisible(false);
+      setTimeout(() => {
+        setCurrentIndex((i) => (i + 1) % images.length);
+        setVisible(true);
+      }, fadeOut);
+    }, duration - fadeOut);
+
+    return () => clearTimeout(timerRef.current);
+  }, [currentIndex, images]);
+
+  if (!images.length) {
+    return (
+      <div className="display-gallery-placeholder">
+        <div className="placeholder-text">Geen foto's</div>
+      </div>
+    );
+  }
+
+  const current = images[currentIndex];
+  return (
+    <div className="display-gallery">
+      <img
+        key={current.id}
+        src={current.url}
+        alt={current.name}
+        className={`display-gallery__image ${visible ? "visible" : ""}`}
+      />
+      {images.length > 1 && (
+        <div className="display-gallery__dots">
+          {images.map((_, i) => (
+            <span key={i} className={`display-gallery__dot${i === currentIndex ? " active" : ""}`} />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 function SlideDisplay({ currentSlide, slideLayout, nextSlide, nextSlideLayout }) {
   // Get configuration for the current layout
@@ -298,6 +347,10 @@ function SlideDisplay({ currentSlide, slideLayout, nextSlide, nextSlideLayout })
               </div>
             )}
           </div>
+        )}
+
+        {layout === "gallery" && (
+          <GallerySlideDisplay images={slide.images || []} />
         )}
       </>
     );

@@ -74,6 +74,8 @@ function AdminView() {
   const [modalTeletekstTheme, setModalTeletekstTheme] = useState("classic");
   const [modalTeletekstPageCount, setModalTeletekstPageCount] = useState(1);
   const [modalIframeUrl, setModalIframeUrl] = useState("");
+  const [modalGalleryImages, setModalGalleryImages] = useState([]);
+  const [uploadingGalleryImage, setUploadingGalleryImage] = useState(false);
   const [modalTimeRestriction, setModalTimeRestriction] = useState({
     enabled: false,
     startTime: "08:00",
@@ -94,7 +96,7 @@ function AdminView() {
   const [editingPlaylistRepeatCountId, setEditingPlaylistRepeatCountId] =
     useState(null);
   const [playlistToDelete, setPlaylistToDelete] = useState(null);
-  const [globalLayout, setGlobalLayout] = useState("grid"); // 'grid' or 'list'
+  const [globalLayout, setGlobalLayout] = useState("list"); // 'grid' or 'list'
 
   // Add slide modal state
   const [addSlideModalOpen, setAddSlideModalOpen] = useState(false);
@@ -108,6 +110,7 @@ function AdminView() {
 
   // Image library modal state
   const [imageLibraryModalOpen, setImageLibraryModalOpen] = useState(false);
+  const [galleryLibraryModalOpen, setGalleryLibraryModalOpen] = useState(false);
 
   // Trash modal state
   const [trashModalOpen, setTrashModalOpen] = useState(false);
@@ -179,6 +182,17 @@ function AdminView() {
 
     loadTrashedSlides();
   }, []);
+
+  // Live gallery duration: update modalSlideDuration whenever images change
+  useEffect(() => {
+    if (slideLayout === "gallery") {
+      const total = modalGalleryImages.reduce(
+        (sum, img) => sum + (img.duration || 3),
+        0,
+      );
+      setModalSlideDuration(total || 0);
+    }
+  }, [modalGalleryImages, slideLayout]);
 
   // Calculate total statistics across all playlists
   const totalStats = useMemo(() => {
@@ -337,6 +351,7 @@ function AdminView() {
       teletekst: "teletekst",
       iframe: "iframe",
       "image-only": "image",
+      gallery: "gallery",
     };
     const newSlide = {
       id: Date.now(),
@@ -345,6 +360,7 @@ function AdminView() {
       text: "",
       imageUrl: "",
       imageName: "",
+      ...(slideLayout === "gallery" && { images: [] }),
       imagePosition: "center",
       layout: slideLayout,
       isVisible: false,
@@ -476,6 +492,7 @@ function AdminView() {
     setModalTeletekstTheme(slide.teletekstTheme || "classic");
     setModalTeletekstPageCount(slide.teletekstPageCount || 1);
     setModalIframeUrl(slide.iframeUrl || "");
+    setModalGalleryImages(slide.images || []);
     setModalTimeRestriction(
       slide.timeRestriction || {
         enabled: false,
@@ -497,6 +514,7 @@ function AdminView() {
     setModalShowBar(true);
     setModalTeletekstChannel("101");
     setModalIframeUrl("");
+    setModalGalleryImages([]);
     setModalTimeRestriction({
       enabled: false,
       startTime: "08:00",
@@ -578,6 +596,72 @@ function AdminView() {
     }
   };
 
+  const handleGalleryImageAdd = async (file) => {
+    if (!file.type.startsWith("image/")) {
+      toast.error("Selecteer een geldig afbeeldingsbestand.");
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Afbeelding moet kleiner zijn dan 5MB.");
+      return;
+    }
+
+    setUploadingGalleryImage(true);
+    const loadingToast = toast.loading(`${file.name} uploaden…`);
+    try {
+      const timestamp = Date.now();
+      const fileName = `${timestamp}_${file.name}`;
+      const storageRef = tenantStorageRef(
+        storage,
+        tenantId,
+        `slides/${fileName}`,
+      );
+      const snapshot = await uploadBytes(storageRef, file);
+      const downloadURL = await getDownloadURL(snapshot.ref);
+
+      await addDoc(tenantCollection(db, tenantId, "mediaLibrary"), {
+        name: file.name,
+        url: downloadURL,
+        storagePath: `tenants/${tenantId}/slides/${fileName}`,
+        size: file.size,
+        type: file.type,
+        uploadedAt: new Date(),
+      });
+
+      setModalGalleryImages((prev) => [
+        ...prev,
+        {
+          id: timestamp,
+          url: downloadURL,
+          name: file.name,
+          storagePath: `tenants/${tenantId}/slides/${fileName}`,
+          duration: 3,
+        },
+      ]);
+      toast.dismiss(loadingToast);
+      toast.success(`${file.name} toegevoegd!`);
+    } catch (error) {
+      toast.dismiss(loadingToast);
+      toast.error("Fout bij uploaden: " + error.message);
+    } finally {
+      setUploadingGalleryImage(false);
+    }
+  };
+
+  const handleGalleryImageRemove = (imageId) => {
+    setModalGalleryImages((prev) => prev.filter((img) => img.id !== imageId));
+  };
+
+  const handleGalleryImageDurationChange = (imageId, duration) => {
+    setModalGalleryImages((prev) =>
+      prev.map((img) => (img.id === imageId ? { ...img, duration } : img)),
+    );
+  };
+
+  const handleGalleryReorder = (reorderedImages) => {
+    setModalGalleryImages(reorderedImages);
+  };
+
   const handleSelectImageFromLibrary = (image) => {
     setModalImageUrl(image.url);
     toast.success("Afbeelding geselecteerd uit bibliotheek");
@@ -585,6 +669,20 @@ function AdminView() {
 
   const handleOpenImageLibrary = () => {
     setImageLibraryModalOpen(true);
+  };
+
+  const handleSelectGalleryImageFromLibrary = (image) => {
+    setModalGalleryImages((prev) => [
+      ...prev,
+      {
+        id: Date.now(),
+        url: image.url,
+        name: image.name || "Afbeelding",
+        storagePath: image.storagePath || "",
+        duration: 3,
+      },
+    ]);
+    toast.success(`${image.name || "Afbeelding"} toegevoegd aan galerij`);
   };
 
   const saveModalChanges = async () => {
@@ -596,48 +694,53 @@ function AdminView() {
       if (playlist.id === currentEditingPlaylistId) {
         const updatedSlides = playlist.slides.map((slide) => {
           if (slide.id === editingSlide.id) {
+            const isGallery = slideLayout === "gallery";
+            const galleryDuration = isGallery
+              ? modalGalleryImages.reduce(
+                  (sum, img) => sum + (img.duration || 3),
+                  0,
+                ) || 5
+              : null;
+
             const updatedSlide = {
               ...slide,
               name: modalSlideName,
-              text: sanitizeHTMLContent(modalTinyMCEContent),
-              tinyMCEContent: modalTinyMCEContent,
-              imageUrl: modalImageUrl,
-              videoUrl: modalVideoUrl,
-              teletekstChannel: modalTeletekstChannel,
-              teletekstTheme: modalTeletekstTheme,
-              teletekstPageCount: modalTeletekstPageCount,
-              iframeUrl: modalIframeUrl,
-              type:
-                slideLayout === "iframe"
-                  ? "iframe"
-                  : slideLayout === "teletekst"
-                    ? "teletekst"
-                    : modalVideoUrl
-                      ? "video"
-                      : modalImageUrl
-                        ? "image"
-                        : "text",
-              imagePosition: imagePosition,
-              imageSide: modalImageSide,
               layout: slideLayout,
-              duration: modalSlideDuration === "" ? 5 : modalSlideDuration,
               showBar: modalShowBar,
               transition: modalSlideTransition,
               timeRestriction: modalTimeRestriction,
+              ...(isGallery
+                ? {
+                    type: "gallery",
+                    images: modalGalleryImages,
+                    duration: galleryDuration,
+                  }
+                : {
+                    text: sanitizeHTMLContent(modalTinyMCEContent),
+                    tinyMCEContent: modalTinyMCEContent,
+                    imageUrl: modalImageUrl,
+                    videoUrl: modalVideoUrl,
+                    teletekstChannel: modalTeletekstChannel,
+                    teletekstTheme: modalTeletekstTheme,
+                    teletekstPageCount: modalTeletekstPageCount,
+                    iframeUrl: modalIframeUrl,
+                    type:
+                      slideLayout === "iframe"
+                        ? "iframe"
+                        : slideLayout === "teletekst"
+                          ? "teletekst"
+                          : modalVideoUrl
+                            ? "video"
+                            : modalImageUrl
+                              ? "image"
+                              : "text",
+                    imagePosition: imagePosition,
+                    imageSide: modalImageSide,
+                    duration:
+                      modalSlideDuration === "" ? 5 : modalSlideDuration,
+                  }),
             };
 
-            // Debug logging for slide updates
-            console.log("💾 Saving slide with data:", {
-              id: updatedSlide.id,
-              name: updatedSlide.name,
-              type: updatedSlide.type,
-              layout: updatedSlide.layout,
-              hasVideoUrl: !!updatedSlide.videoUrl,
-              videoUrl: updatedSlide.videoUrl,
-              hasImageUrl: !!updatedSlide.imageUrl,
-              hasText: !!updatedSlide.text,
-              isVisible: updatedSlide.isVisible,
-            });
             return updatedSlide;
           }
           return slide;
@@ -1186,6 +1289,13 @@ function AdminView() {
           onOpenLibrary={handleOpenImageLibrary}
           timeRestriction={modalTimeRestriction}
           onTimeRestrictionChange={setModalTimeRestriction}
+          galleryImages={modalGalleryImages}
+          onGalleryImageAdd={handleGalleryImageAdd}
+          onGalleryImageRemove={handleGalleryImageRemove}
+          onGalleryImageDurationChange={handleGalleryImageDurationChange}
+          uploadingGalleryImage={uploadingGalleryImage}
+          onOpenGalleryLibrary={() => setGalleryLibraryModalOpen(true)}
+          onGalleryReorder={handleGalleryReorder}
         />
       )}
 
@@ -1310,6 +1420,13 @@ function AdminView() {
         isOpen={imageLibraryModalOpen}
         onClose={() => setImageLibraryModalOpen(false)}
         onSelectImage={handleSelectImageFromLibrary}
+      />
+
+      {/* Gallery Image Library Modal */}
+      <ImageLibraryModal
+        isOpen={galleryLibraryModalOpen}
+        onClose={() => setGalleryLibraryModalOpen(false)}
+        onSelectImage={handleSelectGalleryImageFromLibrary}
       />
 
       {/* Trash Modal */}

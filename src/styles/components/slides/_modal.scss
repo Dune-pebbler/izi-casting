@@ -1092,3 +1092,193 @@
     }
   }
 }
+
+// -----------------------------------------------------------------------------
+// Gallery Input (Edit Modal)
+// -----------------------------------------------------------------------------
+.modal-gallery {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.gallery-input {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
+  &__empty {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: $spacing-md;
+    color: var(--foreground-secondary);
+    padding: $spacing-xl;
+
+    p {
+      margin: 0;
+      font-size: $font-size-base;
+    }
+  }
+
+  &__list {
+    flex: 1;
+    overflow-y: auto;
+    padding: $spacing-md;
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-sm;
+  }
+
+  &__item {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    padding: $spacing-sm;
+    border: 1px solid var(--border);
+    border-radius: $border-radius-md;
+    background: var(--surface);
+    transition: border-color 0.15s ease;
+
+    &:hover {
+      border-color: var(--primary);
+    }
+
+    &.dragging {
+      box-shadow: $shadow-lg;
+      border-color: var(--primary);
+    }
+  }
+
+  &__drag-handle {
+    display: flex;
+    align-items: center;
+    color: var(--foreground-secondary);
+    cursor: grab;
+    padding: $spacing-xs;
+    border-radius: $border-radius-sm;
+    flex-shrink: 0;
+    touch-action: none;
+
+    &:hover {
+      background-color: var(--muted);
+      color: var(--foreground);
+    }
+
+    &:active {
+      cursor: grabbing;
+    }
+  }
+
+  &__thumb {
+    width: 56px;
+    height: 40px;
+    border-radius: $border-radius-sm;
+    overflow: hidden;
+    flex-shrink: 0;
+    background: var(--muted);
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+  }
+
+  &__name {
+    flex: 1;
+    min-width: 0;
+    font-size: $font-size-sm;
+    color: var(--foreground);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__duration {
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+    flex-shrink: 0;
+  }
+
+  &__duration-input {
+    width: 56px;
+    padding: $spacing-xs $spacing-sm;
+    border: 1px solid var(--border);
+    border-radius: $border-radius-sm;
+    background: var(--background);
+    color: var(--foreground);
+    font-size: $font-size-sm;
+    font-weight: $font-weight-semibold;
+    text-align: right;
+
+    &:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+  }
+
+  &__duration-suffix {
+    font-size: $font-size-sm;
+    color: var(--foreground-secondary);
+    font-weight: $font-weight-medium;
+  }
+
+  &__remove {
+    flex-shrink: 0;
+  }
+
+  &__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: $spacing-md;
+    border-top: 1px solid var(--border);
+    background: var(--muted);
+    gap: $spacing-md;
+  }
+
+  &__total {
+    font-size: $font-size-sm;
+    color: var(--foreground-secondary);
+    font-weight: $font-weight-medium;
+    white-space: nowrap;
+  }
+
+  &__add-buttons {
+    display: flex;
+    gap: $spacing-sm;
+    flex-shrink: 0;
+  }
+
+  &__add-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: $spacing-xs;
+    padding: $spacing-sm $spacing-md;
+    border: 1px solid var(--border);
+    border-radius: $border-radius-md;
+    background: var(--surface);
+    color: var(--foreground);
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+    cursor: pointer;
+    transition: $transition-base;
+
+    &:hover:not(:disabled) {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+}

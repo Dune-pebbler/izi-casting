@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { X, LayoutGrid, Image, FileText, Play, Tv, Globe } from "lucide-react";
+import { X, LayoutGrid, Image, FileText, Play, Tv, Globe, Images } from "lucide-react";
 
 const SLIDE_TYPES = [
   { id: "side-by-side", label: "Afbeelding + Tekst", icon: LayoutGrid },
@@ -8,6 +8,7 @@ const SLIDE_TYPES = [
   { id: "video", label: "Video", icon: Play },
   { id: "teletekst", label: "Teletekst", icon: Tv },
   { id: "iframe", label: "Website", icon: Globe },
+  { id: "gallery", label: "Fotogalerij", icon: Images },
 ];
 
 const AddSlideModal = ({ isOpen, onClose, onConfirm }) => {

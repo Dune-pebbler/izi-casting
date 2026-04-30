@@ -11,6 +11,7 @@ import {
   Trash2,
   Globe,
   Clock,
+  Images,
   LayoutGrid,
   FileText,
   LucideImage,
@@ -24,6 +25,7 @@ const iconMap = {
   "text-only": <FileText />,
   "image-only": <LucideImage />,
   teletekst: <Tv />,
+  gallery: <Images />,
   // Voeg hier makkelijk nieuwe types toe in de toekomst
 };
 import { sanitizeHTMLContent } from "../../utils/sanitize";
@@ -333,6 +335,41 @@ function SlideList({
             </div>
           );
 
+        case "gallery": {
+          const images = slide.images || [];
+          const shown = images.slice(0, 4);
+          const extra = images.length - 4;
+          return (
+            <div className="slide-preview slide-preview--gallery">
+              {images.length === 0 ? (
+                <div className="placeholder">
+                  <div className="placeholder__icon">
+                    <LucideImage size={24} />
+                  </div>
+                  <span className="placeholder__text">Geen foto's</span>
+                </div>
+              ) : (
+                <div
+                  className={`gallery-preview gallery-preview--${Math.min(images.length, 4)}`}
+                >
+                  {shown.map((img, i) => (
+                    <div key={img.id} className="gallery-preview__cell">
+                      <img
+                        src={img.url}
+                        alt={img.name}
+                        className="gallery-preview__img"
+                      />
+                      {i === 3 && extra > 0 && (
+                        <div className="gallery-preview__more">+{extra}</div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          );
+        }
+
         case "side-by-side":
         default:
           return (
@@ -478,7 +515,6 @@ function SlideList({
 
     const getPlaceholderIcon = (layout) => {
       // Return het specifieke icoon, of een standaard icoon als fallback
-      console.log(layout);
       return iconMap[layout] || "Geen Icon";
     };
 

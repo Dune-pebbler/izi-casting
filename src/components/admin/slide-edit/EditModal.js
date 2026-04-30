@@ -15,6 +15,7 @@ import TextEditor from "./TextEditor";
 import VideoUrlInput from "./VideoUrlInput";
 import TeletekstInput from "./TeletekstInput";
 import IframeUrlInput from "./IframeUrlInput";
+import GalleryInput from "./GalleryInput";
 
 function EditModal({
   slide,
@@ -54,6 +55,13 @@ function EditModal({
   onOpenLibrary,
   timeRestriction,
   onTimeRestrictionChange,
+  galleryImages,
+  onGalleryImageAdd,
+  onGalleryImageRemove,
+  onGalleryImageDurationChange,
+  uploadingGalleryImage,
+  onOpenGalleryLibrary,
+  onGalleryReorder,
 }) {
   const [timePopupOpen, setTimePopupOpen] = useState(false);
 
@@ -203,6 +211,21 @@ function EditModal({
           </div>
         );
 
+      case "gallery":
+        return (
+          <div className="modal-gallery">
+            <GalleryInput
+              images={galleryImages || []}
+              onAddImage={onGalleryImageAdd}
+              onRemoveImage={onGalleryImageRemove}
+              onDurationChange={onGalleryImageDurationChange}
+              uploading={uploadingGalleryImage}
+              onOpenLibrary={onOpenGalleryLibrary}
+              onReorder={onGalleryReorder}
+            />
+          </div>
+        );
+
       default:
         return null;
     }
@@ -248,6 +271,8 @@ function EditModal({
                     }}
                     min="0"
                     step="1"
+                    disabled={slideLayout === "gallery"}
+                    title={slideLayout === "gallery" ? "Automatisch berekend op basis van foto-duraties" : undefined}
                   />
                   <span className="slide-modal__duration-suffix">s</span>
                 </div>

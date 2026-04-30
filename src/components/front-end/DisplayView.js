@@ -722,6 +722,7 @@ function DisplayView() {
               (slide.layout === "teletekst" && slide.teletekstChannel) ||
               (slide.type === "iframe" && slide.iframeUrl) ||
               (slide.layout === "iframe" && slide.iframeUrl) ||
+              (slide.layout === "gallery" && slide.images && slide.images.length > 0) ||
               (!slide.type && slide.text && slide.text.trim())),
         );
 
