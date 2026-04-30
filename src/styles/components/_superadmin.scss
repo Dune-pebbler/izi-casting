@@ -85,6 +85,24 @@
 
   @media (max-width: 640px) {
     padding: $spacing-md;
+    width: 100%;
+  }
+
+  .search-mobile {
+    display: none;
+    margin-bottom: 8px;
+  }
+  @media (max-width: 768px) {
+    .superadmin-toolbar {
+      .superadmin-toolbar-right {
+        .search-desktop {
+          display: none;
+        }
+      }
+    }
+    .search-mobile {
+      display: block;
+    }
   }
 }
 
@@ -142,6 +160,10 @@
 
     @media (max-width: 640px) {
       font-size: $font-size-lg;
+
+      .search-desktop {
+        display: none;
+      }
     }
   }
 }

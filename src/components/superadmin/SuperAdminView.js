@@ -382,7 +382,7 @@ function SuperAdminView() {
             <div className="superadmin-toolbar-right">
               <input
                 type="text"
-                className="form-input"
+                className="form-input search-desktop"
                 placeholder="Zoek omgeving..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -396,6 +396,14 @@ function SuperAdminView() {
               </button>
             </div>
           </div>
+
+          <input
+            type="text"
+            className="form-input search-mobile"
+            placeholder="Zoek omgeving..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
 
           {loading ? (
             <div className="loading">Tenants laden...</div>
