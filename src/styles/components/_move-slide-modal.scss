@@ -89,6 +89,40 @@
         font-weight: $font-weight-medium;
       }
 
+      .add-slide-type-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: $spacing-sm;
+
+        .add-slide-type-btn {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: $spacing-xs;
+          padding: $spacing-md $spacing-sm;
+          border: 1px solid var(--border);
+          border-radius: $border-radius-sm;
+          background-color: transparent;
+          color: var(--foreground-secondary);
+          font-size: $font-size-xs;
+          font-family: inherit;
+          cursor: pointer;
+          transition: $transition-base;
+
+          &:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background-color: var(--muted);
+          }
+
+          &.active {
+            border-color: var(--primary);
+            background-color: var(--primary);
+            color: white;
+          }
+        }
+      }
+
       .form-select {
         width: 100%;
         padding: $spacing-md;

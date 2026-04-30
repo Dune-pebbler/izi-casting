@@ -33,6 +33,7 @@ import { usePlaylistManager } from "./PlaylistManager";
 import PlaylistList from "./PlaylistList";
 import EditModal from "./slide-edit/EditModal";
 import MoveSlideModal from "./MoveSlideModal";
+import AddSlideModal from "./AddSlideModal";
 import ImageLibraryModal from "./modal/ImageLibraryModal";
 import TrashModal from "./TrashModal";
 import Sidebar from "./sidebar/Sidebar";
@@ -90,6 +91,10 @@ function AdminView() {
     useState(null);
   const [playlistToDelete, setPlaylistToDelete] = useState(null);
   const [globalLayout, setGlobalLayout] = useState("grid"); // 'grid' or 'list'
+
+  // Add slide modal state
+  const [addSlideModalOpen, setAddSlideModalOpen] = useState(false);
+  const [addSlideTargetPlaylistId, setAddSlideTargetPlaylistId] = useState(null);
 
   // Move slide modal state
   const [moveSlideModalOpen, setMoveSlideModalOpen] = useState(false);
@@ -295,11 +300,16 @@ function AdminView() {
   };
 
   // Slide management handlers
-  const addSlide = async (playlistId) => {
+  const addSlide = (playlistId) => {
+    setAddSlideTargetPlaylistId(playlistId);
+    setAddSlideModalOpen(true);
+  };
+
+  const confirmAddSlide = async (slideName, slideLayout = "side-by-side") => {
+    const playlistId = addSlideTargetPlaylistId;
     const playlist = playlists.find((p) => p.id === playlistId);
     if (!playlist) return;
 
-    // Fetch the latest settings (default transition and enabled fonts)
     let currentDefaultTransition = defaultSlideTransition;
     let currentEnabledFonts = enabledFonts;
     try {
@@ -317,15 +327,16 @@ function AdminView() {
       console.error("Error loading settings:", error);
     }
 
+    const typeFromLayout = { video: "video", teletekst: "teletekst", iframe: "iframe", "image-only": "image" };
     const newSlide = {
       id: Date.now(),
-      name: `Slide ${playlist.slides.length + 1}`,
-      type: "text",
+      name: slideName,
+      type: typeFromLayout[slideLayout] || "text",
       text: "",
       imageUrl: "",
       imageName: "",
       imagePosition: "center",
-      layout: "side-by-side",
+      layout: slideLayout,
       isVisible: false,
       showBar: true,
       transition: currentDefaultTransition,
@@ -341,7 +352,7 @@ function AdminView() {
     });
     setPlaylists(updatedPlaylists);
     await savePlaylistsToFirebase(updatedPlaylists);
-    toast.success("Slide added successfully!");
+    toast.success("Slide toegevoegd!");
   };
 
   const copySlide = async (slideToCopy, playlistId) => {
@@ -1219,6 +1230,13 @@ function AdminView() {
           </div>
         </div>
       )}
+
+      {/* Add Slide Modal */}
+      <AddSlideModal
+        isOpen={addSlideModalOpen}
+        onClose={() => setAddSlideModalOpen(false)}
+        onConfirm={confirmAddSlide}
+      />
 
       {/* Move Slide Modal */}
       <MoveSlideModal
