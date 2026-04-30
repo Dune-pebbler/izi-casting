@@ -877,3 +877,218 @@
     box-shadow: 0 0 0 1px var(--ring);
   }
 }
+
+// =============================================================================
+// MOBILE RESPONSIVE — SLIDE EDIT MODAL
+// =============================================================================
+
+// Mobile footer hidden on desktop
+.slide-modal__mobile-footer {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .slide-modal {
+    &__overlay {
+      padding: 0;
+      align-items: stretch;
+    }
+
+    &__content {
+      width: 100%;
+      height: 100dvh;
+      max-width: none;
+      max-height: none;
+      border-radius: 0;
+      overflow: hidden;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+    }
+
+    // ── Header: grid met naam + acties op rij 1, layout-selector op rij 2 ──
+    &__header {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      grid-template-rows: auto auto;
+      column-gap: $spacing-sm;
+      row-gap: $spacing-sm;
+      padding: $spacing-md;
+      min-height: auto;
+      border-bottom: 1px solid var(--border);
+    }
+
+    &__header-left {
+      grid-column: 1;
+      grid-row: 1;
+      flex-wrap: wrap;
+      gap: $spacing-sm;
+      height: auto;
+      align-content: flex-start;
+    }
+
+    &__header-actions {
+      grid-column: 2;
+      grid-row: 1;
+      align-items: flex-start;
+      gap: $spacing-xs;
+
+      // Save en delete knop verbergen — zitten in mobile footer
+      .btn-primary,
+      .btn-icon--danger {
+        display: none;
+      }
+    }
+
+    &__header-center {
+      grid-column: 1 / -1;
+      grid-row: 2;
+      justify-content: flex-start;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    // Naam veld: volle breedte, compacte hoogte
+    &__name-input-container {
+      width: 100%;
+      height: auto;
+    }
+
+    &__name-input {
+      width: 100%;
+      height: 40px;
+    }
+
+    // Settings-rij (duur + showbar + transitie) compacter
+    &__duration-container {
+      height: 36px;
+    }
+
+    &__duration-input {
+      width: 64px;
+      height: 36px;
+    }
+
+    &__showbar-container {
+      height: 36px;
+    }
+
+    &__showbar-slider {
+      height: 36px;
+      width: 68px;
+    }
+
+    &__transition-container {
+      height: 36px;
+    }
+
+    &__transition-select {
+      width: 110px;
+      height: 36px;
+    }
+
+    // Flip knop heeft geen nut bij gestapelde layout
+    &__flip-btn {
+      display: none;
+    }
+
+    // Body scrollt verticaal, panelen gestapeld
+    &__body {
+      flex-direction: column;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    &__body-left,
+    &__body-right {
+      width: 100%;
+      height: 280px;
+      flex-shrink: 0;
+      border-top: 1px solid var(--border);
+
+      &.flipped {
+        order: unset;
+      }
+    }
+
+    &__full-image {
+      height: 320px;
+    }
+
+    &__text-only {
+      flex: 1;
+      height: auto;
+    }
+
+    &__image-background {
+      height: 200px;
+      flex: none;
+    }
+
+    &__text-overlay {
+      height: auto;
+      min-height: 180px;
+    }
+  }
+
+  // TinyMCE vaste hoogte op mobiel
+  .text-input-section {
+    height: 280px;
+    min-height: 280px;
+
+    .tox-tinymce {
+      height: 280px !important;
+      min-height: 280px !important;
+    }
+  }
+
+  .text-input-section-full {
+    flex: 1;
+    height: calc(100dvh - 220px);
+
+    .tox-tinymce {
+      height: 100% !important;
+    }
+  }
+
+  // Video / teletekst / iframe: voldoende ruimte, scrollbaar
+  .modal-video,
+  .modal-teletekst,
+  .modal-iframe {
+    padding: $spacing-lg;
+    overflow-y: auto;
+  }
+
+  // ── Sticky save-balk onderaan ──
+  .slide-modal__mobile-footer {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    padding: $spacing-md;
+    border-top: 1px solid var(--border);
+    background-color: var(--surface);
+
+    &-delete {
+      flex-shrink: 0;
+      width: 40px;
+      height: 40px;
+      border: 1px solid var(--destructive-light);
+      border-radius: $border-radius-md;
+      background-color: var(--destructive-light);
+      color: var(--destructive);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    &-save {
+      flex: 1;
+      height: 40px;
+      font-size: $font-size-base;
+      font-weight: $font-weight-semibold;
+      border-radius: $border-radius-md;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+}

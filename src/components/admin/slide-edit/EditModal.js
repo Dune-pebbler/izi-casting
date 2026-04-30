@@ -394,6 +394,19 @@ function EditModal({
           </div>
 
           <div className="slide-modal__body">{renderLayoutContent()}</div>
+
+          <div className="slide-modal__mobile-footer">
+            <button
+              onClick={() => { onDelete(); }}
+              className="btn-icon btn-icon--danger slide-modal__mobile-footer-delete"
+              title="Slide verwijderen"
+            >
+              <Trash2 size={18} />
+            </button>
+            <button onClick={onSave} className="btn btn-primary slide-modal__mobile-footer-save">
+              Opslaan
+            </button>
+          </div>
         </div>
       </div>
     </div>
