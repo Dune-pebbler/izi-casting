@@ -74,7 +74,11 @@ function AdminView() {
   const [modalTeletekstTheme, setModalTeletekstTheme] = useState("classic");
   const [modalTeletekstPageCount, setModalTeletekstPageCount] = useState(1);
   const [modalIframeUrl, setModalIframeUrl] = useState("");
-  const [modalTimeRestriction, setModalTimeRestriction] = useState({ enabled: false, startTime: "08:00", endTime: "17:00" });
+  const [modalTimeRestriction, setModalTimeRestriction] = useState({
+    enabled: false,
+    startTime: "08:00",
+    endTime: "17:00",
+  });
   const [currentEditingPlaylistId, setCurrentEditingPlaylistId] =
     useState(null);
   const [slideToDelete, setSlideToDelete] = useState(null);
@@ -94,7 +98,8 @@ function AdminView() {
 
   // Add slide modal state
   const [addSlideModalOpen, setAddSlideModalOpen] = useState(false);
-  const [addSlideTargetPlaylistId, setAddSlideTargetPlaylistId] = useState(null);
+  const [addSlideTargetPlaylistId, setAddSlideTargetPlaylistId] =
+    useState(null);
 
   // Move slide modal state
   const [moveSlideModalOpen, setMoveSlideModalOpen] = useState(false);
@@ -327,7 +332,12 @@ function AdminView() {
       console.error("Error loading settings:", error);
     }
 
-    const typeFromLayout = { video: "video", teletekst: "teletekst", iframe: "iframe", "image-only": "image" };
+    const typeFromLayout = {
+      video: "video",
+      teletekst: "teletekst",
+      iframe: "iframe",
+      "image-only": "image",
+    };
     const newSlide = {
       id: Date.now(),
       name: slideName,
@@ -466,7 +476,13 @@ function AdminView() {
     setModalTeletekstTheme(slide.teletekstTheme || "classic");
     setModalTeletekstPageCount(slide.teletekstPageCount || 1);
     setModalIframeUrl(slide.iframeUrl || "");
-    setModalTimeRestriction(slide.timeRestriction || { enabled: false, startTime: "08:00", endTime: "17:00" });
+    setModalTimeRestriction(
+      slide.timeRestriction || {
+        enabled: false,
+        startTime: "08:00",
+        endTime: "17:00",
+      },
+    );
   };
 
   const closeEditModal = () => {
@@ -481,7 +497,11 @@ function AdminView() {
     setModalShowBar(true);
     setModalTeletekstChannel("101");
     setModalIframeUrl("");
-    setModalTimeRestriction({ enabled: false, startTime: "08:00", endTime: "17:00" });
+    setModalTimeRestriction({
+      enabled: false,
+      startTime: "08:00",
+      endTime: "17:00",
+    });
   };
 
   const handleContentChange = (content) => {
@@ -1171,34 +1191,47 @@ function AdminView() {
 
       {/* Unpair Confirmation Modal */}
       {deviceToDelete && (
-        <div className="delete-modal-overlay">
-          <div className="delete-modal">
-            <h3>Apparaat ontkoppelen</h3>
-            <p>
-              Weet je zeker dat je{" "}
-              <strong>
-                {deviceToDelete.customName ||
-                  `Display ${deviceToDelete.id.substring(0, 8)}`}
-              </strong>{" "}
-              wilt ontkoppelen?
-            </p>
-            <p className="delete-warning">
-              Dit apparaat zal niet meer gekoppeld zijn en moet opnieuw
-              gekoppeld worden om content te tonen.
-            </p>
-            <div className="delete-modal-actions">
-              <button
-                onClick={() => dispatch(clearDeviceToDelete())}
-                className="btn btn-secondary"
-              >
-                Annuleren
-              </button>
-              <button
-                onClick={() => deleteDevice(deviceToDelete.id)}
-                className="btn btn-danger"
-              >
-                Ontkoppelen
-              </button>
+        <div className="slide-delete-modal-wrapper">
+          <div className="modal-overlay" onClick={() => dispatch(clearDeviceToDelete())}>
+            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+              <div className="modal-header">
+                <h3>Apparaat ontkoppelen</h3>
+                <button
+                  onClick={() => dispatch(clearDeviceToDelete())}
+                  className="modal-close-btn"
+                  title="Sluiten"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+              <div className="modal-body">
+                <p className="modal-description">
+                  Weet je zeker dat je{" "}
+                  <strong>
+                    {deviceToDelete.customName ||
+                      `Display ${deviceToDelete.id.substring(0, 8)}`}
+                  </strong>{" "}
+                  wilt ontkoppelen?
+                </p>
+                <p className="delete-warning">
+                  Dit apparaat zal niet meer gekoppeld zijn en moet opnieuw
+                  gekoppeld worden om content te tonen.
+                </p>
+              </div>
+              <div className="modal-footer">
+                <button
+                  onClick={() => dispatch(clearDeviceToDelete())}
+                  className="btn btn-secondary"
+                >
+                  Annuleren
+                </button>
+                <button
+                  onClick={() => deleteDevice(deviceToDelete.id)}
+                  className="btn btn-danger"
+                >
+                  Ontkoppelen
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -1206,27 +1239,41 @@ function AdminView() {
 
       {/* Playlist Deletion Confirmation Modal */}
       {playlistToDelete && (
-        <div className="delete-modal-overlay">
-          <div className="delete-modal">
-            <h3>Playlist verwijderen</h3>
-            <p>
-              Weet je zeker dat je <strong>{playlistToDelete.name}</strong> wilt
-              verwijderen?
-            </p>
-            <p className="delete-warning">
-              Deze actie kan niet ongedaan worden gemaakt. Alle slides en
-              afbeeldingen in deze playlist zullen permanent worden verwijderd.
-            </p>
-            <div className="delete-modal-actions">
-              <button
-                onClick={() => setPlaylistToDelete(null)}
-                className="btn btn-secondary"
-              >
-                Annuleren
-              </button>
-              <button onClick={handleDeletePlaylist} className="btn btn-danger">
-                Verwijderen
-              </button>
+        <div className="slide-delete-modal-wrapper">
+          <div className="modal-overlay" onClick={() => setPlaylistToDelete(null)}>
+            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+              <div className="modal-header">
+                <h3>Playlist verwijderen</h3>
+                <button
+                  onClick={() => setPlaylistToDelete(null)}
+                  className="modal-close-btn"
+                  title="Sluiten"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+              <div className="modal-body">
+                <p className="modal-description">
+                  Weet je zeker dat je{" "}
+                  <strong>{playlistToDelete.name}</strong> wilt verwijderen?
+                </p>
+                <p className="delete-warning">
+                  Deze actie kan niet ongedaan worden gemaakt. Alle slides en
+                  afbeeldingen in deze playlist zullen permanent worden
+                  verwijderd.
+                </p>
+              </div>
+              <div className="modal-footer">
+                <button
+                  onClick={() => setPlaylistToDelete(null)}
+                  className="btn btn-secondary"
+                >
+                  Annuleren
+                </button>
+                <button onClick={handleDeletePlaylist} className="btn btn-danger">
+                  Verwijderen
+                </button>
+              </div>
             </div>
           </div>
         </div>

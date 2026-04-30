@@ -1,20 +1,22 @@
-import React, { useState } from 'react';
-import { X } from 'lucide-react';
+import React, { useState } from "react";
+import { X } from "lucide-react";
 
-const MoveSlideModal = ({ 
-  isOpen, 
-  onClose, 
-  slide, 
-  playlists, 
-  currentPlaylistId, 
-  onMoveSlide 
+const MoveSlideModal = ({
+  isOpen,
+  onClose,
+  slide,
+  playlists,
+  currentPlaylistId,
+  onMoveSlide,
 }) => {
-  const [selectedPlaylistId, setSelectedPlaylistId] = useState('');
+  const [selectedPlaylistId, setSelectedPlaylistId] = useState("");
 
   if (!isOpen) return null;
 
   // Filter out the current playlist from the options
-  const availablePlaylists = playlists.filter(playlist => playlist.id !== currentPlaylistId);
+  const availablePlaylists = playlists.filter(
+    (playlist) => playlist.id !== currentPlaylistId,
+  );
 
   const handleMove = () => {
     if (selectedPlaylistId && slide) {
@@ -24,63 +26,65 @@ const MoveSlideModal = ({
   };
 
   const handleClose = () => {
-    setSelectedPlaylistId('');
+    setSelectedPlaylistId("");
     onClose();
   };
 
   return (
     <div className="move-slide-modal">
       <div className="modal-overlay" onClick={handleClose}>
-        <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        <div className="modal-header">
-          <h3>Move to other playlist</h3>
-          <button 
-            onClick={handleClose}
-            className="modal-close-btn"
-            title="Close"
-          >
-            <X size={20} />
-          </button>
-        </div>
-        
-        <div className="modal-body">
-          <p className="modal-description">
-            Move <strong>"{slide?.name || 'Slide'}"</strong> to another playlist:
-          </p>
-          
-          <div className="form-group">
-            <label htmlFor="playlist-select">Select playlist:</label>
-            <select
-              id="playlist-select"
-              value={selectedPlaylistId}
-              onChange={(e) => setSelectedPlaylistId(e.target.value)}
-              className="form-select"
+        <div
+          className="modal-content"
+          style={{ padding: "0px" }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="modal-header">
+            <h3>Move to other playlist</h3>
+            <button
+              onClick={handleClose}
+              className="modal-close-btn"
+              title="Close"
             >
-              <option value="">Choose a playlist...</option>
-              {availablePlaylists.map(playlist => (
-                <option key={playlist.id} value={playlist.id}>
-                  {playlist.name}
-                </option>
-              ))}
-            </select>
+              <X size={20} />
+            </button>
           </div>
-        </div>
-        
-        <div className="modal-footer">
-          <button
-            onClick={handleClose}
-            className="btn btn-secondary"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={handleMove}
-            disabled={!selectedPlaylistId}
-            className="btn btn-primary"
-          >
-            Move Slide
-          </button>
-        </div>
+
+          <div className="modal-body">
+            <p className="modal-description">
+              Move <strong>"{slide?.name || "Slide"}"</strong> to another
+              playlist:
+            </p>
+
+            <div className="form-group">
+              <label htmlFor="playlist-select">Select playlist:</label>
+              <select
+                id="playlist-select"
+                value={selectedPlaylistId}
+                onChange={(e) => setSelectedPlaylistId(e.target.value)}
+                className="form-select"
+              >
+                <option value="">Choose a playlist...</option>
+                {availablePlaylists.map((playlist) => (
+                  <option key={playlist.id} value={playlist.id}>
+                    {playlist.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div className="modal-footer">
+            <button onClick={handleClose} className="btn btn-secondary">
+              Cancel
+            </button>
+            <button
+              onClick={handleMove}
+              disabled={!selectedPlaylistId}
+              className="btn btn-primary"
+            >
+              Move Slide
+            </button>
+          </div>
         </div>
       </div>
     </div>
