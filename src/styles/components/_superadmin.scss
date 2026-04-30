@@ -82,10 +82,10 @@
   flex: 1;
   min-width: 0;
   padding: $spacing-xl;
+  width: 100%;
 
   @media (max-width: 640px) {
     padding: $spacing-md;
-    width: 100%;
   }
 
   .search-mobile {
