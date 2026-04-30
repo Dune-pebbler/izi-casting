@@ -5196,6 +5196,7 @@ a:hover {
   font-size: 14px;
   color: var(--foreground-secondary);
   font-weight: 500;
+  width: 100px;
 }
 .slide-row__duration {
   font-size: 14px;
