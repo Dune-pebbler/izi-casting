@@ -311,6 +311,10 @@
             gap: 16px;
             width: 100%;
             grid-template-columns: auto auto auto auto;
+
+            @media (max-width: 576px) {
+              grid-template-columns: auto auto;
+            }
           }
 
           .device-previous-btn {

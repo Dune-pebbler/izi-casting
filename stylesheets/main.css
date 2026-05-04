@@ -3427,6 +3427,11 @@ a:hover {
   width: 100%;
   grid-template-columns: auto auto auto auto;
 }
+@media (max-width: 576px) {
+  .sidebar-devices .devices-content .devices-list .device-item .device-header .device-header-actions {
+    grid-template-columns: auto auto;
+  }
+}
 .sidebar-devices .devices-content .devices-list .device-item .device-header .device-previous-btn {
   margin-bottom: 0px !important;
 }
