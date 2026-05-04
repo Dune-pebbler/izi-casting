@@ -3323,6 +3323,7 @@ a:hover {
   margin-top: 8px;
 }
 .sidebar-devices .devices-content .devices-list .device-item {
+  position: relative;
   margin-bottom: 8px;
   padding: 16px;
   border: 1px solid #50b83c;
@@ -3344,12 +3345,15 @@ a:hover {
 }
 .sidebar-devices .devices-content .devices-list .device-item .device-header .device-header-left {
   display: flex;
-  align-items: center;
-  gap: 8px;
+  gap: 16px;
   flex: 1;
+  flex-direction: column;
   min-width: 0;
 }
 .sidebar-devices .devices-content .devices-list .device-item .device-header .device-header-right {
+  right: 16px;
+  position: absolute;
+  top: 16px;
   display: flex;
   align-items: center;
   gap: 4px;
@@ -3364,7 +3368,6 @@ a:hover {
   font-size: 0.875rem;
   font-weight: 600;
   cursor: pointer;
-  padding: 8px;
   border-radius: 200px;
   transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   align-self: flex-start;
@@ -3375,7 +3378,6 @@ a:hover {
 .sidebar-devices .devices-content .devices-list .device-item .device-header .device-name-display .device-last-seen {
   font-size: 0.75rem;
   color: var(--foreground-secondary);
-  padding-left: 8px;
   font-weight: 400;
 }
 .sidebar-devices .devices-content .devices-list .device-item .device-header .device-name-input {
@@ -3403,9 +3405,6 @@ a:hover {
   color: var(--muted-foreground);
   font-weight: 400;
 }
-.sidebar-devices .devices-content .devices-list .device-item .device-header .device-refresh-btn {
-  margin-bottom: 10px;
-}
 .sidebar-devices .devices-content .devices-list .device-item .device-header .device-refresh-btn:hover svg {
   animation: rotate-reverse 1s linear infinite;
 }
@@ -3416,6 +3415,12 @@ a:hover {
 .sidebar-devices .devices-content .devices-list .device-item .device-header .device-refresh-btn .rotating {
   animation: rotate 1s linear infinite;
 }
+.sidebar-devices .devices-content .devices-list .device-item .device-header .device-header-actions {
+  display: grid;
+  gap: 16px;
+  width: 100%;
+  grid-template-columns: auto auto auto auto;
+}
 .sidebar-devices .devices-content .devices-list .device-item .device-header .device-previous-btn {
   margin-bottom: 0px !important;
 }
@@ -3423,8 +3428,7 @@ a:hover {
 .sidebar-devices .devices-content .devices-list .device-item .device-header .device-ping-btn,
 .sidebar-devices .devices-content .devices-list .device-item .device-header .device-next-btn,
 .sidebar-devices .devices-content .devices-list .device-item .device-header .device-previous-btn {
-  width: 110px;
-  margin-bottom: 10px;
+  flex-wrap: wrap;
   background-color: white;
   border: 1px solid var(--border);
   color: var(--foreground);
@@ -3451,6 +3455,14 @@ a:hover {
 .sidebar-devices .devices-content .devices-list .device-item .device-header .device-previous-btn:hover {
   background-color: var(--muted);
   transform: scale(1.02);
+}
+.sidebar-devices .devices-content .devices-list .device-item .device-header .device-refresh-btn span,
+.sidebar-devices .devices-content .devices-list .device-item .device-header .device-ping-btn span,
+.sidebar-devices .devices-content .devices-list .device-item .device-header .device-next-btn span,
+.sidebar-devices .devices-content .devices-list .device-item .device-header .device-previous-btn span {
+  display: block;
+  width: 100%;
+  font-size: 11px;
 }
 .sidebar-devices .devices-content .devices-list .device-item .device-header .device-delete-btn {
   background: none;

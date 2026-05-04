@@ -379,7 +379,42 @@ function Devices({ setDeviceToDelete, deleteDevice }) {
                   <div key={device.id} className="device-item">
                     <div className="device-header">
                       <div className="device-header-left">
-                        <div>
+                        {editingDeviceId === device.id ? (
+                          <input
+                            type="text"
+                            value={editingDeviceName}
+                            onChange={(e) =>
+                              setEditingDeviceName(e.target.value)
+                            }
+                            onBlur={() => handleSaveName(device.id)}
+                            onKeyPress={(e) => {
+                              if (e.key === "Enter") {
+                                handleSaveName(device.id);
+                              } else if (e.key === "Escape") {
+                                handleCancelEdit();
+                              }
+                            }}
+                            onClick={(e) => e.stopPropagation()}
+                            className="device-name-input"
+                            placeholder="Voer display naam in..."
+                            maxLength={30}
+                            autoFocus
+                          />
+                        ) : (
+                          <div className="device-name-display">
+                            <strong
+                              className="device-name-title"
+                              onClick={() => handleEditName(device)}
+                            >
+                              {getDisplayName(device)}
+                            </strong>
+                            <div className="device-last-seen">
+                              Laatst gezien: {formatLastSeen(device.lastSeen)}
+                            </div>
+                          </div>
+                        )}
+
+                        <div className="device-header-actions">
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
@@ -438,41 +473,6 @@ function Devices({ setDeviceToDelete, deleteDevice }) {
                             <span>Vorige</span>
                           </button>
                         </div>
-
-                        {editingDeviceId === device.id ? (
-                          <input
-                            type="text"
-                            value={editingDeviceName}
-                            onChange={(e) =>
-                              setEditingDeviceName(e.target.value)
-                            }
-                            onBlur={() => handleSaveName(device.id)}
-                            onKeyPress={(e) => {
-                              if (e.key === "Enter") {
-                                handleSaveName(device.id);
-                              } else if (e.key === "Escape") {
-                                handleCancelEdit();
-                              }
-                            }}
-                            onClick={(e) => e.stopPropagation()}
-                            className="device-name-input"
-                            placeholder="Voer display naam in..."
-                            maxLength={30}
-                            autoFocus
-                          />
-                        ) : (
-                          <div className="device-name-display">
-                            <strong
-                              className="device-name-title"
-                              onClick={() => handleEditName(device)}
-                            >
-                              {getDisplayName(device)}
-                            </strong>
-                            <div className="device-last-seen">
-                              Laatst gezien: {formatLastSeen(device.lastSeen)}
-                            </div>
-                          </div>
-                        )}
                       </div>
                       <div className="device-header-right">
                         <button
