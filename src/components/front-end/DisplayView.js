@@ -62,6 +62,7 @@ function DisplayView() {
     feedUrl: "",
     showClock: true,
     barStyle: "onder",
+    backgroundMusic: null,
   });
   const [feeds, setFeeds] = useState([]);
 
@@ -69,6 +70,7 @@ function DisplayView() {
   const [fullscreenSupported, setFullscreenSupported] = useState(false);
 
   const [animationStep, setAnimationStep] = useState(0);
+  const [showAudioPrompt, setShowAudioPrompt] = useState(false);
 
   const hasInitializedRef = useRef(false);
   const generateDisplayPairingCodeRef = useRef();
@@ -650,6 +652,7 @@ function DisplayView() {
           feedUrl: data.feedUrl || "",
           showClock: data.showClock !== undefined ? data.showClock : true,
           barStyle: data.barStyle || "onder",
+          backgroundMusic: data.backgroundMusic || null,
         });
 
         // Apply typography as CSS custom properties
@@ -737,8 +740,13 @@ function DisplayView() {
 
         const repeatCount = playlist.repeatCount || 1;
         const repeatedSlides = [];
+        const taggedSlides = visibleSlides.map((slide) => ({
+          ...slide,
+          _playlistId: playlist.id,
+          _playlistMusic: playlist.backgroundMusic || null,
+        }));
         for (let i = 0; i < repeatCount; i++) {
-          repeatedSlides.push(...visibleSlides);
+          repeatedSlides.push(...taggedSlides);
         }
 
         return [...acc, ...repeatedSlides];
@@ -872,6 +880,93 @@ function DisplayView() {
   const currentSlideRef = useRef(0);
   const progressRef = useRef(0);
   const progressBarRef = useRef(null);
+  const audioRef = useRef(null);
+  const activeAudioUrlRef = useRef(null);
+  const audioUnlockedRef = useRef(false);
+  const pendingMusicRef = useRef(null);
+
+  const playAudio = useCallback((music) => {
+    const newUrl = music?.enabled && music?.url ? music.url : null;
+
+    // Only restart if URL actually changed
+    if (newUrl === activeAudioUrlRef.current) {
+      // URL unchanged — just update volume if audio is playing
+      if (audioRef.current && newUrl) {
+        audioRef.current.volume = music.volume ?? 0.7;
+      }
+      return;
+    }
+
+    activeAudioUrlRef.current = newUrl;
+
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.src = '';
+      audioRef.current = null;
+    }
+
+    if (!newUrl) {
+      setShowAudioPrompt(false);
+      return;
+    }
+
+    const audio = new Audio(newUrl);
+    audio.loop = true;
+    audio.volume = music.volume ?? 0.7;
+    audioRef.current = audio;
+
+    if (audioUnlockedRef.current) {
+      audio.play().catch(() => {});
+    } else {
+      pendingMusicRef.current = music;
+      setShowAudioPrompt(true);
+    }
+  }, []);
+
+  // Unlock audio on first user interaction (browser autoplay policy)
+  useEffect(() => {
+    const unlock = () => {
+      if (audioUnlockedRef.current) return;
+      audioUnlockedRef.current = true;
+      setShowAudioPrompt(false);
+
+      if (pendingMusicRef.current) {
+        const m = pendingMusicRef.current;
+        pendingMusicRef.current = null;
+        if (audioRef.current) {
+          audioRef.current.play().catch(() => {});
+        } else {
+          playAudio(m);
+        }
+      } else if (audioRef.current) {
+        audioRef.current.play().catch(() => {});
+      }
+    };
+
+    document.addEventListener('click', unlock, { once: true });
+    document.addEventListener('touchstart', unlock, { once: true });
+    document.addEventListener('keydown', unlock, { once: true });
+
+    return () => {
+      document.removeEventListener('click', unlock);
+      document.removeEventListener('touchstart', unlock);
+      document.removeEventListener('keydown', unlock);
+    };
+  }, [playAudio]);
+
+  // React to global background music settings changes
+  useEffect(() => {
+    playAudio(settings.backgroundMusic);
+  }, [settings.backgroundMusic, playAudio]);
+
+  useEffect(() => {
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+    };
+  }, []);
 
   useEffect(() => {
     if (slides.length === 0) return;
@@ -1066,6 +1161,12 @@ function DisplayView() {
         settings={settings}
         feeds={feeds}
       />
+
+      {showAudioPrompt && (
+        <div className="audio-unlock-prompt">
+          <span>🔊 Klik ergens om audio in te schakelen</span>
+        </div>
+      )}
     </div>
   );
 }

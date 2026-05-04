@@ -14,6 +14,7 @@ import { useTenant } from "../../../context/TenantContext";
 import { auth } from "../../../firebase";
 import Devices from "./Devices";
 import FeedList from "./FeedList";
+import AudioSettings from "./AudioSettings";
 import Settings from "./Settings";
 import { toast } from "sonner";
 
@@ -228,6 +229,8 @@ function Sidebar({
       />
       <FeedList />
       {tenantId && isAdmin && <UsersPanel tenantId={tenantId} />}
+      {/* TODO Check if the tenant has this module enabled */}
+      <AudioSettings />
       {isAdmin && (
         <Settings
           onOpenTrash={onOpenTrash}

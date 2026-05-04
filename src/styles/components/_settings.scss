@@ -555,6 +555,24 @@
   }
 }
 
+// "of" divider used in AudioSettings
+.music-divider {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  padding: 0 $spacing-lg;
+  color: var(--muted-foreground);
+  font-size: $font-size-xs;
+
+  &::before,
+  &::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background-color: var(--border);
+  }
+}
+
 // Typography settings grid
 .typography-grid {
   display: flex;

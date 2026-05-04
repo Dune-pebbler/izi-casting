@@ -54,7 +54,7 @@ function Settings({ onOpenTrash, trashedSlidesCount = 0 }) {
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const DEFAULT_TYPOGRAPHY = {
-    p:  { fontSize: 27, fontFamily: "Roboto" },
+    p: { fontSize: 27, fontFamily: "Roboto" },
     h1: { fontSize: 64, fontFamily: "Roboto" },
     h2: { fontSize: 53, fontFamily: "Roboto" },
     h3: { fontSize: 43, fontFamily: "Roboto" },
@@ -557,7 +557,7 @@ function Settings({ onOpenTrash, trashedSlidesCount = 0 }) {
                   <span>Grootte</span>
                 </div>
                 {[
-                  { key: "p",  label: "Paragraaf" },
+                  { key: "p", label: "Paragraaf" },
                   { key: "h1", label: "Kop 1" },
                   { key: "h2", label: "Kop 2" },
                   { key: "h3", label: "Kop 3" },
@@ -572,13 +572,18 @@ function Settings({ onOpenTrash, trashedSlidesCount = 0 }) {
                           ...prev,
                           typography: {
                             ...prev.typography,
-                            [key]: { ...prev.typography?.[key], fontFamily: e.target.value },
+                            [key]: {
+                              ...prev.typography?.[key],
+                              fontFamily: e.target.value,
+                            },
                           },
                         }))
                       }
                     >
                       {AVAILABLE_FONTS.map((f) => (
-                        <option key={f.name} value={f.name}>{f.name}</option>
+                        <option key={f.name} value={f.name}>
+                          {f.name}
+                        </option>
                       ))}
                     </select>
                     <div className="typography-grid__size">
@@ -593,7 +598,10 @@ function Settings({ onOpenTrash, trashedSlidesCount = 0 }) {
                             ...prev,
                             typography: {
                               ...prev.typography,
-                              [key]: { ...prev.typography?.[key], fontSize: parseInt(e.target.value) || 27 },
+                              [key]: {
+                                ...prev.typography?.[key],
+                                fontSize: parseInt(e.target.value) || 27,
+                              },
                             },
                           }))
                         }

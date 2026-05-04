@@ -55,6 +55,7 @@ function AdminView() {
     reorderPlaylists,
     calculatePlaylistDuration,
     savePlaylistsToFirebase,
+    updatePlaylistMusic,
   } = usePlaylistManager();
 
   // Modal and editing state

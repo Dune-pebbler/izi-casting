@@ -596,6 +596,33 @@ a:hover {
   padding: 24px;
 }
 
+.audio-unlock-prompt {
+  position: fixed;
+  bottom: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(0, 0, 0, 0.7);
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 24px;
+  font-size: 14px;
+  pointer-events: none;
+  z-index: 100;
+  backdrop-filter: blur(6px);
+  white-space: nowrap;
+  animation: fadeInUp 0.3s ease;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
 .pairing-content {
   display: flex;
   flex-direction: column;
@@ -4195,6 +4222,49 @@ a:hover {
   border: 1px solid var(--border);
 }
 
+.music-volume-slider {
+  width: 100%;
+  accent-color: var(--primary);
+  cursor: pointer;
+  height: 4px;
+  border-radius: 2px;
+  margin-top: 4px;
+}
+
+.music-panel-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.music-save-btn {
+  padding: 4px 16px;
+  background-color: #8b5cf6;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+.music-save-btn:hover {
+  background-color: #7c3aed;
+}
+
+.logo-upload-placeholder {
+  border-radius: 6px;
+  border: 1px dashed var(--border);
+  min-height: auto;
+  padding: 0.5rem 0.6rem;
+  font-size: 12px;
+  vertical-align: middle;
+  margin-top: 4px;
+}
+.logo-upload-placeholder .logo-upload-label {
+  margin-bottom: 0px !important;
+  font-size: 12px !important;
+}
+
 @media (max-width: 768px) {
   .playlist-header {
     flex-direction: column;
@@ -4654,6 +4724,21 @@ a:hover {
   cursor: not-allowed;
   transform: none;
   box-shadow: none;
+}
+
+.music-divider {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 24px;
+  color: var(--muted-foreground);
+  font-size: 10px;
+}
+.music-divider::before, .music-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background-color: var(--border);
 }
 
 .typography-grid {

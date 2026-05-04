@@ -192,6 +192,16 @@ export const usePlaylistManager = () => {
     await savePlaylistsToFirebase(newPlaylists);
   };
 
+  const updatePlaylistMusic = async (playlistId, musicConfig) => {
+    const updatedPlaylists = playlists.map(playlist =>
+      playlist.id === playlistId
+        ? { ...playlist, backgroundMusic: musicConfig }
+        : playlist
+    );
+    setPlaylists(updatedPlaylists);
+    await savePlaylistsToFirebase(updatedPlaylists);
+  };
+
   return {
     playlists,
     hasLoaded,
@@ -204,6 +214,7 @@ export const usePlaylistManager = () => {
     copyPlaylist,
     reorderPlaylists,
     calculatePlaylistDuration,
-    savePlaylistsToFirebase
+    savePlaylistsToFirebase,
+    updatePlaylistMusic
   };
 };
