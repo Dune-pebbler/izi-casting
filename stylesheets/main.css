@@ -3163,6 +3163,12 @@ a:hover {
   align-items: center;
   gap: 8px;
 }
+.settings-toggle-left.music-active {
+  color: var(--success);
+}
+.settings-toggle-left.music-active svg {
+  color: var(--success) !important;
+}
 
 .collapsible-wrapper {
   display: grid;

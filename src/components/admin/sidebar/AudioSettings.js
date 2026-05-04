@@ -76,7 +76,9 @@ function AudioSettings() {
             className="settings-toggle-btn"
             onClick={() => setIsExpanded(!isExpanded)}
           >
-            <div className="settings-toggle-left">
+            <div
+              className={`settings-toggle-left ${music.enabled ? "music-active" : ""}`}
+            >
               <Music2 size={16} />
               <span>Achtergrondmuziek</span>
             </div>
