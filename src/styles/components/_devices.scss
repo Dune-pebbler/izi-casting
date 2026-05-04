@@ -296,10 +296,16 @@
             }
           }
 
-          .device-refresh-btn,
-          .device-ping-btn {
-            width: 110px;
+          .device-previous-btn {
+            margin-bottom: 0px !important;
+          }
 
+          .device-refresh-btn,
+          .device-ping-btn,
+          .device-next-btn,
+          .device-previous-btn {
+            width: 110px;
+            margin-bottom: 10px;
             background-color: white;
             border: 1px solid var(--border);
             color: var(--foreground);

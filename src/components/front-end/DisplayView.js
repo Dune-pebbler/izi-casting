@@ -382,6 +382,56 @@ function DisplayView() {
     }
   }, [isPaired, deviceId]);
 
+  const handleChangeSlide = useCallback((action) => {
+    const total = slidesRef.current.length;
+    if (total === 0) return;
+
+    const current = currentSlideRef.current;
+    const newIndex =
+      action === "next" ? (current + 1) % total : (current - 1 + total) % total;
+
+    if (rotationRestartRef.current) {
+      rotationRestartRef.current(newIndex);
+    }
+    setSlideProgress(0);
+
+    const PingIndicator = document.createElement("div");
+    PingIndicator.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: rgba(0, 123, 255, 0.9);
+      color: white;
+      padding: 10px 15px;
+      border-radius: 5px;
+      font-size: 14px;
+      z-index: 9999;
+      animation: fadeInOut 3s ease-in-out;
+    `;
+
+    const message = action === "next" ? "Volgende slide" : "Vorige slide";
+    PingIndicator.textContent = message;
+
+    const style = document.createElement("style");
+    style.textContent = `
+      @keyframes fadeInOut {
+        0% { opacity: 0; transform: translateY(-20px); }
+        20% { opacity: 1; transform: translateY(0); }
+        80% { opacity: 1; transform: translateY(0); }
+        100% { opacity: 0; transform: translateY(-20px); }
+      }
+    `;
+    document.head.appendChild(style);
+
+    document.body.appendChild(PingIndicator);
+
+    setTimeout(() => {
+      if (PingIndicator.parentNode) {
+        PingIndicator.parentNode.removeChild(PingIndicator);
+      }
+    }, 3000);
+  }, []);
+
   const handleDevicePing = useCallback(() => {
     console.log("Restarting slides from beginning");
 
@@ -578,6 +628,17 @@ function DisplayView() {
                 }
                 break;
 
+              case "change_slide":
+                if (commandData.action === "next") {
+                  console.log("Ping event is triggerd");
+                  handleChangeSlide(commandData.action);
+                }
+                if (commandData.action === "previous") {
+                  console.log("Ping event is triggerd");
+                  handleChangeSlide(commandData.action);
+                }
+                break;
+
               default:
                 console.log("Unknown command type:", commandData.command);
             }
@@ -600,7 +661,7 @@ function DisplayView() {
       console.log("Cleaning up device commands listener");
       unsubscribeCommands();
     };
-  }, [deviceId, handleRefreshSlides]);
+  }, [deviceId, handleRefreshSlides, handleChangeSlide]);
 
   useEffect(() => {
     console.log(
@@ -665,11 +726,22 @@ function DisplayView() {
 
         // Apply typography as CSS custom properties
         const typo = data.typography || {};
-        const defaults = { p: { fontSize: 27, fontFamily: "Roboto" }, h1: { fontSize: 64, fontFamily: "Roboto" }, h2: { fontSize: 53, fontFamily: "Roboto" }, h3: { fontSize: 43, fontFamily: "Roboto" } };
+        const defaults = {
+          p: { fontSize: 27, fontFamily: "Roboto" },
+          h1: { fontSize: 64, fontFamily: "Roboto" },
+          h2: { fontSize: 53, fontFamily: "Roboto" },
+          h3: { fontSize: 43, fontFamily: "Roboto" },
+        };
         ["p", "h1", "h2", "h3"].forEach((tag) => {
           const t = typo[tag] || defaults[tag];
-          document.documentElement.style.setProperty(`--typo-${tag}-size`, `${t.fontSize}px`);
-          document.documentElement.style.setProperty(`--typo-${tag}-family`, t.fontFamily);
+          document.documentElement.style.setProperty(
+            `--typo-${tag}-size`,
+            `${t.fontSize}px`,
+          );
+          document.documentElement.style.setProperty(
+            `--typo-${tag}-family`,
+            t.fontFamily,
+          );
         });
 
         if (data.feeds && Array.isArray(data.feeds)) {
@@ -743,7 +815,9 @@ function DisplayView() {
               (slide.layout === "teletekst" && slide.teletekstChannel) ||
               (slide.type === "iframe" && slide.iframeUrl) ||
               (slide.layout === "iframe" && slide.iframeUrl) ||
-              (slide.layout === "gallery" && slide.images && slide.images.length > 0) ||
+              (slide.layout === "gallery" &&
+                slide.images &&
+                slide.images.length > 0) ||
               (!slide.type && slide.text && slide.text.trim())),
         );
 
@@ -839,6 +913,7 @@ function DisplayView() {
     );
     if (slides.length === 0) return;
 
+    slidesRef.current = slides;
     let currentIndex = 0;
     let timeoutId = null;
 
@@ -877,9 +952,17 @@ function DisplayView() {
       }, slideDuration);
     };
 
+    // Expose a restart function so handleChangeSlide can jump to any index
+    rotationRestartRef.current = (newIndex) => {
+      if (timeoutId) clearTimeout(timeoutId);
+      currentIndex = newIndex;
+      rotateSlides();
+    };
+
     rotateSlides();
 
     return () => {
+      rotationRestartRef.current = null;
       if (timeoutId) {
         clearTimeout(timeoutId);
       }
@@ -887,6 +970,8 @@ function DisplayView() {
   }, [slides]);
 
   const currentSlideRef = useRef(0);
+  const slidesRef = useRef([]);
+  const rotationRestartRef = useRef(null);
   const progressRef = useRef(0);
   const progressBarRef = useRef(null);
   const audioRef = useRef(null);
@@ -910,7 +995,7 @@ function DisplayView() {
 
     if (audioRef.current) {
       audioRef.current.pause();
-      audioRef.current.src = '';
+      audioRef.current.src = "";
       audioRef.current = null;
     }
 
@@ -952,14 +1037,14 @@ function DisplayView() {
       }
     };
 
-    document.addEventListener('click', unlock, { once: true });
-    document.addEventListener('touchstart', unlock, { once: true });
-    document.addEventListener('keydown', unlock, { once: true });
+    document.addEventListener("click", unlock, { once: true });
+    document.addEventListener("touchstart", unlock, { once: true });
+    document.addEventListener("keydown", unlock, { once: true });
 
     return () => {
-      document.removeEventListener('click', unlock);
-      document.removeEventListener('touchstart', unlock);
-      document.removeEventListener('keydown', unlock);
+      document.removeEventListener("click", unlock);
+      document.removeEventListener("touchstart", unlock);
+      document.removeEventListener("keydown", unlock);
     };
   }, [playAudio]);
 
@@ -1172,13 +1257,25 @@ function DisplayView() {
       />
 
       {showAudioPrompt && (
-        <div className="audio-unlock-overlay" onClick={() => document.dispatchEvent(new MouseEvent("click"))}>
+        <div
+          className="audio-unlock-overlay"
+          onClick={() => document.dispatchEvent(new MouseEvent("click"))}
+        >
           <div className="audio-unlock-card">
             <div className="audio-unlock-icon">
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
-                <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
-                <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+              <svg
+                width="32"
+                height="32"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+                <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
               </svg>
             </div>
             <span className="audio-unlock-text">Klik om muziek te starten</span>

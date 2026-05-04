@@ -9,6 +9,8 @@ import {
   ChevronUp,
   Monitor,
   SatelliteDish,
+  ArrowBigLeftDash,
+  ArrowBigRightDash,
 } from "lucide-react";
 
 import {
@@ -244,6 +246,32 @@ function Devices({ setDeviceToDelete, deleteDevice }) {
   };
 
   // Handle device refresh
+  const handleSlideDevice = async (deviceId, action) => {
+    setRefreshingDevices((prev) => new Set(prev).add(deviceId));
+
+    try {
+      // Send ping command to device_commands collection
+      await setDoc(doc(db, "device_commands", deviceId), {
+        command: "change_slide",
+        action: action,
+        timestamp: new Date(),
+        processed: false,
+      });
+
+      toast.success("Er is een ping verstuurd");
+    } catch (error) {
+      console.error("Error sending refresh command:", error);
+      toast.error("Fout bij verzenden van refresh commando");
+    } finally {
+      setRefreshingDevices((prev) => {
+        const newSet = new Set(prev);
+        newSet.delete(deviceId);
+        return newSet;
+      });
+    }
+  };
+
+  // Handle device refresh
   const handlePingDevice = async (deviceId) => {
     setRefreshingDevices((prev) => new Set(prev).add(deviceId));
 
@@ -382,6 +410,32 @@ function Devices({ setDeviceToDelete, deleteDevice }) {
                           >
                             <SatelliteDish size={16} />
                             <span>Ping</span>
+                          </button>
+
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleSlideDevice(device.id, "next");
+                            }}
+                            className="device-action-btn device-next-btn"
+                            title="Slides opnieuw starten"
+                            disabled={refreshingDevices.has(device.id)}
+                          >
+                            <ArrowBigRightDash size={16} />
+                            <span>Volgende</span>
+                          </button>
+
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleSlideDevice(device.id, "previous");
+                            }}
+                            className="device-action-btn device-previous-btn"
+                            title="Slides opnieuw starten"
+                            disabled={refreshingDevices.has(device.id)}
+                          >
+                            <ArrowBigLeftDash size={16} />
+                            <span>Vorige</span>
                           </button>
                         </div>
 
