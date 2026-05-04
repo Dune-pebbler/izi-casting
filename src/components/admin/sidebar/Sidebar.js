@@ -126,15 +126,17 @@ function UsersPanel({ tenantId }) {
                       <option value="admin">Admin</option>
                       <option value="editor">Editor</option>
                     </select>
-                    {email !== currentUserEmail && (
-                      <button
-                        className="user-remove-btn"
-                        onClick={() => handleRemoveUser(email)}
-                        title="Verwijderen"
-                      >
-                        <X size={14} />
-                      </button>
-                    )}
+                    <div style={{ width: "24px" }}>
+                      {email !== currentUserEmail && (
+                        <button
+                          className="user-remove-btn"
+                          onClick={() => handleRemoveUser(email)}
+                          title="Verwijderen"
+                        >
+                          <X size={14} />
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </li>
               ))}
