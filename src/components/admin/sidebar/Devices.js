@@ -450,19 +450,6 @@ function Devices({ setDeviceToDelete, deleteDevice }) {
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              handleSlideDevice(device.id, "next");
-                            }}
-                            className="device-action-btn device-next-btn"
-                            title="Slides opnieuw starten"
-                            disabled={refreshingDevices.has(device.id)}
-                          >
-                            <ArrowBigRightDash size={16} />
-                            <span>Volgende</span>
-                          </button>
-
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
                               handleSlideDevice(device.id, "previous");
                             }}
                             className="device-action-btn device-previous-btn"
@@ -471,6 +458,19 @@ function Devices({ setDeviceToDelete, deleteDevice }) {
                           >
                             <ArrowBigLeftDash size={16} />
                             <span>Vorige</span>
+                          </button>
+
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleSlideDevice(device.id, "next");
+                            }}
+                            className="device-action-btn device-next-btn"
+                            title="Slides opnieuw starten"
+                            disabled={refreshingDevices.has(device.id)}
+                          >
+                            <ArrowBigRightDash size={16} />
+                            <span>Volgende</span>
                           </button>
                         </div>
                       </div>
