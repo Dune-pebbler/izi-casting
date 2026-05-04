@@ -37,7 +37,15 @@ import AddSlideModal from "./AddSlideModal";
 import ImageLibraryModal from "./modal/ImageLibraryModal";
 import TrashModal from "./TrashModal";
 import Sidebar from "./sidebar/Sidebar";
-import { Monitor, Clock, X, Settings, LayoutGrid, List } from "lucide-react";
+import {
+  Monitor,
+  Clock,
+  X,
+  Settings,
+  LayoutGrid,
+  List,
+  Undo2,
+} from "lucide-react";
 
 function AdminView() {
   const { tenantId } = useTenant();
@@ -88,7 +96,7 @@ function AdminView() {
   const [defaultSlideTransition, setDefaultSlideTransition] = useState("fade");
   const [enabledFonts, setEnabledFonts] = useState([]);
   const [typography, setTypography] = useState({
-    p:  { fontSize: 27, fontFamily: "Roboto" },
+    p: { fontSize: 27, fontFamily: "Roboto" },
     h1: { fontSize: 64, fontFamily: "Roboto" },
     h2: { fontSize: 53, fontFamily: "Roboto" },
     h3: { fontSize: 43, fontFamily: "Roboto" },
@@ -1154,7 +1162,15 @@ function AdminView() {
       <div className="admin-main-content">
         <div className="admin-header-section">
           <div className="admin-header-content">
-            <div className="d-flex">
+            <button
+              className="admin-layout-btn"
+              title="Terug naar overzicht"
+              onClick={() => { window.location.href = "/admin"; }}
+            >
+              <Undo2 size={16} />
+            </button>
+
+            <div className="d-flex" style={{ flexGrow: "1" }}>
               {tenantLogoUrl && (
                 <img
                   src={tenantLogoUrl}
