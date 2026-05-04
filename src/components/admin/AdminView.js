@@ -85,6 +85,15 @@ function AdminView() {
   const [modalIframeUrl, setModalIframeUrl] = useState("");
   const [modalGalleryImages, setModalGalleryImages] = useState([]);
   const [uploadingGalleryImage, setUploadingGalleryImage] = useState(false);
+  const [modalCountdownTitle, setModalCountdownTitle] = useState("");
+  const [modalCountdownTargetDate, setModalCountdownTargetDate] = useState("");
+  const [modalCountdownBgImage, setModalCountdownBgImage] = useState("");
+  const [modalCountdownBgImagePosition, setModalCountdownBgImagePosition] = useState("center");
+  const [modalCountdownTextColor, setModalCountdownTextColor] = useState("#ffffff");
+  const [modalCountdownNumberColor, setModalCountdownNumberColor] = useState("#ffffff");
+  const [modalCountdownBlockBg, setModalCountdownBlockBg] = useState("#1a1a2e");
+  const [modalCountdownLabelColor, setModalCountdownLabelColor] = useState("#aaaaaa");
+  const [imageLibraryTarget, setImageLibraryTarget] = useState("main");
   const [modalTimeRestriction, setModalTimeRestriction] = useState({
     enabled: false,
     startTime: "08:00",
@@ -368,6 +377,7 @@ function AdminView() {
       iframe: "iframe",
       "image-only": "image",
       gallery: "gallery",
+      countdown: "countdown",
     };
     const newSlide = {
       id: Date.now(),
@@ -377,6 +387,17 @@ function AdminView() {
       imageUrl: "",
       imageName: "",
       ...(slideLayout === "gallery" && { images: [] }),
+      ...(slideLayout === "countdown" && {
+        countdownTitle: "",
+        countdownTargetDate: "",
+        countdownBgImage: "",
+        countdownBgImagePosition: "center",
+        countdownTextColor: "#ffffff",
+        countdownNumberColor: "#ffffff",
+        countdownBlockBg: "#1a1a2e",
+        countdownLabelColor: "#aaaaaa",
+        duration: 30,
+      }),
       imagePosition: "center",
       layout: slideLayout,
       isVisible: false,
@@ -509,6 +530,14 @@ function AdminView() {
     setModalTeletekstPageCount(slide.teletekstPageCount || 1);
     setModalIframeUrl(slide.iframeUrl || "");
     setModalGalleryImages(slide.images || []);
+    setModalCountdownTitle(slide.countdownTitle || "");
+    setModalCountdownTargetDate(slide.countdownTargetDate || "");
+    setModalCountdownBgImage(slide.countdownBgImage || "");
+    setModalCountdownBgImagePosition(slide.countdownBgImagePosition || "center");
+    setModalCountdownTextColor(slide.countdownTextColor || "#ffffff");
+    setModalCountdownNumberColor(slide.countdownNumberColor || "#ffffff");
+    setModalCountdownBlockBg(slide.countdownBlockBg || "#1a1a2e");
+    setModalCountdownLabelColor(slide.countdownLabelColor || "#aaaaaa");
     setModalTimeRestriction(
       slide.timeRestriction || {
         enabled: false,
@@ -531,6 +560,14 @@ function AdminView() {
     setModalTeletekstChannel("101");
     setModalIframeUrl("");
     setModalGalleryImages([]);
+    setModalCountdownTitle("");
+    setModalCountdownTargetDate("");
+    setModalCountdownBgImage("");
+    setModalCountdownBgImagePosition("center");
+    setModalCountdownTextColor("#ffffff");
+    setModalCountdownNumberColor("#ffffff");
+    setModalCountdownBlockBg("#1a1a2e");
+    setModalCountdownLabelColor("#aaaaaa");
     setModalTimeRestriction({
       enabled: false,
       startTime: "08:00",
@@ -679,12 +716,70 @@ function AdminView() {
   };
 
   const handleSelectImageFromLibrary = (image) => {
-    setModalImageUrl(image.url);
+    if (imageLibraryTarget === "countdown") {
+      setModalCountdownBgImage(image.url);
+    } else {
+      setModalImageUrl(image.url);
+    }
     toast.success("Afbeelding geselecteerd uit bibliotheek");
   };
 
   const handleOpenImageLibrary = () => {
+    setImageLibraryTarget("main");
     setImageLibraryModalOpen(true);
+  };
+
+  const handleOpenCountdownBgLibrary = () => {
+    setImageLibraryTarget("countdown");
+    setImageLibraryModalOpen(true);
+  };
+
+  const handleModalCountdownBgImageUpload = async (file) => {
+    if (!file) {
+      setModalCountdownBgImage("");
+      return;
+    }
+
+    if (!file.type.startsWith("image/")) {
+      toast.error("Selecteer een geldig afbeeldingsbestand.");
+      return;
+    }
+
+    const maxSize = 5 * 1024 * 1024;
+    if (file.size > maxSize) {
+      toast.error("Afbeelding moet kleiner zijn dan 5MB.");
+      return;
+    }
+
+    setUploadingImage(true);
+    const loadingToast = toast.loading("Afbeelding uploaden...");
+
+    try {
+      const timestamp = Date.now();
+      const fileName = `${timestamp}_${file.name}`;
+      const storageRef = tenantStorageRef(storage, tenantId, `slides/${fileName}`);
+      const snapshot = await uploadBytes(storageRef, file);
+      const downloadURL = await getDownloadURL(snapshot.ref);
+
+      await addDoc(tenantCollection(db, tenantId, "mediaLibrary"), {
+        name: file.name,
+        url: downloadURL,
+        storagePath: `tenants/${tenantId}/slides/${fileName}`,
+        size: file.size,
+        type: file.type,
+        uploadedAt: new Date(),
+      });
+
+      setModalCountdownBgImage(downloadURL);
+      toast.dismiss(loadingToast);
+      toast.success("Afbeelding succesvol geüpload!");
+    } catch (error) {
+      console.error("Error uploading countdown background:", error);
+      toast.dismiss(loadingToast);
+      toast.error("Fout bij uploaden: " + error.message);
+    } finally {
+      setUploadingImage(false);
+    }
   };
 
   const handleSelectGalleryImageFromLibrary = (image) => {
@@ -711,6 +806,7 @@ function AdminView() {
         const updatedSlides = playlist.slides.map((slide) => {
           if (slide.id === editingSlide.id) {
             const isGallery = slideLayout === "gallery";
+            const isCountdown = slideLayout === "countdown";
             const galleryDuration = isGallery
               ? modalGalleryImages.reduce(
                   (sum, img) => sum + (img.duration || 3),
@@ -730,6 +826,19 @@ function AdminView() {
                     type: "gallery",
                     images: modalGalleryImages,
                     duration: galleryDuration,
+                  }
+                : isCountdown
+                ? {
+                    type: "countdown",
+                    countdownTitle: modalCountdownTitle,
+                    countdownTargetDate: modalCountdownTargetDate,
+                    countdownBgImage: modalCountdownBgImage,
+                    countdownBgImagePosition: modalCountdownBgImagePosition,
+                    countdownTextColor: modalCountdownTextColor,
+                    countdownNumberColor: modalCountdownNumberColor,
+                    countdownBlockBg: modalCountdownBlockBg,
+                    countdownLabelColor: modalCountdownLabelColor,
+                    duration: modalSlideDuration === "" ? 30 : modalSlideDuration,
                   }
                 : {
                     text: sanitizeHTMLContent(modalTinyMCEContent),
@@ -1321,6 +1430,23 @@ function AdminView() {
           uploadingGalleryImage={uploadingGalleryImage}
           onOpenGalleryLibrary={() => setGalleryLibraryModalOpen(true)}
           onGalleryReorder={handleGalleryReorder}
+          countdownTitle={modalCountdownTitle}
+          onCountdownTitleChange={setModalCountdownTitle}
+          countdownTargetDate={modalCountdownTargetDate}
+          onCountdownTargetDateChange={setModalCountdownTargetDate}
+          countdownBgImage={modalCountdownBgImage}
+          onCountdownBgImageUpload={handleModalCountdownBgImageUpload}
+          countdownBgImagePosition={modalCountdownBgImagePosition}
+          onCountdownBgImagePositionChange={setModalCountdownBgImagePosition}
+          countdownTextColor={modalCountdownTextColor}
+          onCountdownTextColorChange={setModalCountdownTextColor}
+          countdownNumberColor={modalCountdownNumberColor}
+          onCountdownNumberColorChange={setModalCountdownNumberColor}
+          countdownBlockBg={modalCountdownBlockBg}
+          onCountdownBlockBgChange={setModalCountdownBlockBg}
+          countdownLabelColor={modalCountdownLabelColor}
+          onCountdownLabelColorChange={setModalCountdownLabelColor}
+          onOpenCountdownLibrary={handleOpenCountdownBgLibrary}
         />
       )}
 

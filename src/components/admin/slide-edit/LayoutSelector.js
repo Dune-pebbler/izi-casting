@@ -7,6 +7,7 @@ import {
   Tv,
   Globe,
   Images,
+  Timer,
 } from 'lucide-react';
 
 function LayoutSelector({ currentLayout, onLayoutChange }) {
@@ -58,6 +59,12 @@ function LayoutSelector({ currentLayout, onLayoutChange }) {
       label: 'Fotogalerij',
       icon: Images,
       title: 'Foto Galerij / Slideshow'
+    },
+    {
+      id: 'countdown',
+      label: 'Afteltimer',
+      icon: Timer,
+      title: 'Afteltimer'
     }
   ];
 

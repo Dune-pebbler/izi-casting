@@ -5,6 +5,92 @@ import VideoPlayer from "./VideoPlayer";
 import TeletekstDisplay from "./TeletekstDisplay";
 import { getTextPaginationConfig } from "../../config/textPagination";
 
+function CountdownDisplay({ slide }) {
+  const [timeLeft, setTimeLeft] = useState(null);
+
+  useEffect(() => {
+    if (!slide.countdownTargetDate) return;
+
+    const tick = () => {
+      const target = new Date(slide.countdownTargetDate).getTime();
+      const now = Date.now();
+      const diff = target - now;
+      if (diff <= 0) {
+        setTimeLeft(null);
+      } else {
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+        setTimeLeft({ days, hours, minutes, seconds });
+      }
+    };
+
+    tick();
+    const interval = setInterval(tick, 1000);
+    return () => clearInterval(interval);
+  }, [slide.countdownTargetDate]);
+
+  const textColor = slide.countdownTextColor || "#ffffff";
+  const numberColor = slide.countdownNumberColor || "#ffffff";
+  const blockBg = slide.countdownBlockBg || "#1a1a2e";
+  const labelColor = slide.countdownLabelColor || "#aaaaaa";
+
+  const units = timeLeft
+    ? [
+        { value: timeLeft.days, label: "Dagen" },
+        { value: timeLeft.hours, label: "Uren" },
+        { value: timeLeft.minutes, label: "Minuten" },
+        { value: timeLeft.seconds, label: "Seconden" },
+      ]
+    : null;
+
+  return (
+    <div
+      className="display-countdown"
+      style={{
+        backgroundImage: slide.countdownBgImage ? `url(${slide.countdownBgImage})` : undefined,
+        backgroundPosition: slide.countdownBgImagePosition || "center",
+        backgroundSize: "cover",
+        backgroundRepeat: "no-repeat",
+      }}
+    >
+      {slide.countdownBgImage && <div className="display-countdown__overlay" />}
+
+      <div className="display-countdown__inner">
+        {slide.countdownTitle && (
+          <h2 className="display-countdown__title" style={{ color: textColor }}>
+            {slide.countdownTitle}
+          </h2>
+        )}
+
+        {units ? (
+          <div className="display-countdown__blocks">
+            {units.map(({ value, label }) => (
+              <div
+                key={label}
+                className="display-countdown__block"
+                style={{ backgroundColor: blockBg }}
+              >
+                <span className="display-countdown__number" style={{ color: numberColor }}>
+                  {String(value).padStart(2, "0")}
+                </span>
+                <span className="display-countdown__label" style={{ color: labelColor }}>
+                  {label}
+                </span>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="display-countdown__expired" style={{ color: textColor }}>
+            Verstreken
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function GallerySlideDisplay({ images }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [visible, setVisible] = useState(true);
@@ -351,6 +437,10 @@ function SlideDisplay({ currentSlide, slideLayout, nextSlide, nextSlideLayout })
 
         {layout === "gallery" && (
           <GallerySlideDisplay images={slide.images || []} />
+        )}
+
+        {layout === "countdown" && (
+          <CountdownDisplay slide={slide} />
         )}
       </>
     );

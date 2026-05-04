@@ -818,6 +818,7 @@ function DisplayView() {
               (slide.layout === "gallery" &&
                 slide.images &&
                 slide.images.length > 0) ||
+              (slide.layout === "countdown" && slide.countdownTargetDate) ||
               (!slide.type && slide.text && slide.text.trim())),
         );
 

@@ -16,6 +16,7 @@ import VideoUrlInput from "./VideoUrlInput";
 import TeletekstInput from "./TeletekstInput";
 import IframeUrlInput from "./IframeUrlInput";
 import GalleryInput from "./GalleryInput";
+import CountdownInput from "./CountdownInput";
 
 function EditModal({
   slide,
@@ -63,6 +64,23 @@ function EditModal({
   uploadingGalleryImage,
   onOpenGalleryLibrary,
   onGalleryReorder,
+  countdownTitle,
+  onCountdownTitleChange,
+  countdownTargetDate,
+  onCountdownTargetDateChange,
+  countdownBgImage,
+  onCountdownBgImageUpload,
+  countdownBgImagePosition,
+  onCountdownBgImagePositionChange,
+  countdownTextColor,
+  onCountdownTextColorChange,
+  countdownNumberColor,
+  onCountdownNumberColorChange,
+  countdownBlockBg,
+  onCountdownBlockBgChange,
+  countdownLabelColor,
+  onCountdownLabelColorChange,
+  onOpenCountdownLibrary,
 }) {
   const [timePopupOpen, setTimePopupOpen] = useState(false);
 
@@ -225,6 +243,32 @@ function EditModal({
               uploading={uploadingGalleryImage}
               onOpenLibrary={onOpenGalleryLibrary}
               onReorder={onGalleryReorder}
+            />
+          </div>
+        );
+
+      case "countdown":
+        return (
+          <div className="modal-countdown">
+            <CountdownInput
+              countdownTitle={countdownTitle}
+              onCountdownTitleChange={onCountdownTitleChange}
+              countdownTargetDate={countdownTargetDate}
+              onCountdownTargetDateChange={onCountdownTargetDateChange}
+              countdownBgImage={countdownBgImage}
+              onCountdownBgImageUpload={onCountdownBgImageUpload}
+              countdownBgImagePosition={countdownBgImagePosition}
+              onCountdownBgImagePositionChange={onCountdownBgImagePositionChange}
+              countdownTextColor={countdownTextColor}
+              onCountdownTextColorChange={onCountdownTextColorChange}
+              countdownNumberColor={countdownNumberColor}
+              onCountdownNumberColorChange={onCountdownNumberColorChange}
+              countdownBlockBg={countdownBlockBg}
+              onCountdownBlockBgChange={onCountdownBlockBgChange}
+              countdownLabelColor={countdownLabelColor}
+              onCountdownLabelColorChange={onCountdownLabelColorChange}
+              uploadingImage={uploadingImage}
+              onOpenLibrary={onOpenCountdownLibrary}
             />
           </div>
         );

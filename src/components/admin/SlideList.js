@@ -16,6 +16,7 @@ import {
   FileText,
   LucideImage,
   MoreVertical,
+  Timer,
 } from "lucide-react";
 
 const iconMap = {
@@ -26,7 +27,7 @@ const iconMap = {
   "image-only": <LucideImage />,
   teletekst: <Tv />,
   gallery: <Images />,
-  // Voeg hier makkelijk nieuwe types toe in de toekomst
+  countdown: <Timer />,
 };
 import { sanitizeHTMLContent } from "../../utils/sanitize";
 import { extractVideoInfo } from "../../utils/videoMetadata";
@@ -370,6 +371,29 @@ function SlideList({
           );
         }
 
+        case "countdown":
+          return (
+            <div className="slide-preview slide-preview--countdown"
+              style={{
+                background: slide.countdownBgImage
+                  ? `url(${slide.countdownBgImage}) center/cover`
+                  : "#1a1a2e",
+              }}
+            >
+              <div className="preview-countdown">
+                <Timer size={20} color={slide.countdownTextColor || "#ffffff"} />
+                <span className="preview-countdown__title" style={{ color: slide.countdownTextColor || "#ffffff" }}>
+                  {slide.countdownTitle || "Afteltimer"}
+                </span>
+                {slide.countdownTargetDate && (
+                  <span className="preview-countdown__date">
+                    {new Date(slide.countdownTargetDate).toLocaleDateString("nl-NL")}
+                  </span>
+                )}
+              </div>
+            </div>
+          );
+
         case "side-by-side":
         default:
           return (
@@ -533,6 +557,8 @@ function SlideList({
           return `Teletekst ${slide.teletekstChannel || ""}`;
         case "iframe":
           return "Website";
+        case "countdown":
+          return "Afteltimer";
         case "side-by-side":
         default:
           return "Side by Side";
