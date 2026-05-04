@@ -55,6 +55,7 @@ function DisplayView() {
   const [slides, setSlides] = useState([]);
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
   const [slideProgress, setSlideProgress] = useState(0);
+  const [tenantModules, setTenantModules] = useState({});
   const [settings, setSettings] = useState({
     logoUrl: "",
     backgroundColor: "#FAFAFA",
@@ -618,6 +619,13 @@ function DisplayView() {
       "settings",
     );
 
+    const unsubscribeTenant = onSnapshot(
+      doc(db, "tenants", displayTenantId),
+      (snap) => {
+        setTenantModules(snap.exists() ? snap.data().modules || {} : {});
+      },
+    );
+
     const unsubscribeContent = onSnapshot(displayDocRef, (doc) => {
       if (doc.exists()) {
         const data = doc.data();
@@ -686,6 +694,7 @@ function DisplayView() {
     });
 
     return () => {
+      unsubscribeTenant();
       unsubscribeContent();
       unsubscribeSettings();
     };
@@ -956,8 +965,8 @@ function DisplayView() {
 
   // React to global background music settings changes
   useEffect(() => {
-    playAudio(settings.backgroundMusic);
-  }, [settings.backgroundMusic, playAudio]);
+    playAudio(tenantModules.backgroundMusic ? settings.backgroundMusic : null);
+  }, [settings.backgroundMusic, tenantModules.backgroundMusic, playAudio]);
 
   useEffect(() => {
     return () => {

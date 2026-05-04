@@ -16,6 +16,7 @@ import Devices from "./Devices";
 import FeedList from "./FeedList";
 import AudioSettings from "./AudioSettings";
 import Settings from "./Settings";
+import { useTenantModules } from "../../../hooks/useTenantModules";
 import { toast } from "sonner";
 
 // Normalise a raw authorizedUsers entry to { email, role }
@@ -184,6 +185,7 @@ function Sidebar({
   tenantName = "",
 }) {
   const { tenantId } = useTenant();
+  const { modules } = useTenantModules();
   const [isAdmin, setIsAdmin] = useState(false);
   const [logoUrl, setLogoUrl] = useState("");
   useEffect(() => {
@@ -229,8 +231,7 @@ function Sidebar({
       />
       <FeedList />
       {tenantId && isAdmin && <UsersPanel tenantId={tenantId} />}
-      {/* TODO Check if the tenant has this module enabled */}
-      <AudioSettings />
+      {modules.backgroundMusic && <AudioSettings />}
       {isAdmin && (
         <Settings
           onOpenTrash={onOpenTrash}
