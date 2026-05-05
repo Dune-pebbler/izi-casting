@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
+import { createPortal } from "react-dom";
 import { doc, setDoc, onSnapshot } from "firebase/firestore";
 import { db } from "../../../firebase";
 import { useTenant } from "../../../context/TenantContext";
@@ -13,6 +14,7 @@ import {
   ChevronDown,
   ChevronUp,
   MessageSquareText,
+  X,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -707,30 +709,43 @@ function FeedList() {
       </div>
 
       {/* Feed Deletion Confirmation Modal */}
-      {feedToDelete && (
-        <div className="delete-modal-overlay">
-          <div className="delete-modal">
-            <h3>Feed verwijderen</h3>
-            <p>
-              Weet je zeker dat je <strong>{feedToDelete.name}</strong> wilt
-              verwijderen?
-            </p>
-            <p className="delete-warning">
-              Deze actie kan niet ongedaan worden gemaakt.
-            </p>
-            <div className="delete-modal-actions">
-              <button
-                onClick={() => setFeedToDelete(null)}
-                className="btn btn-secondary"
-              >
-                Annuleren
-              </button>
-              <button onClick={handleDeleteFeed} className="btn btn-danger">
-                Verwijderen
-              </button>
+      {feedToDelete && createPortal(
+        <div className="slide-delete-modal-wrapper">
+          <div className="modal-overlay" onClick={() => setFeedToDelete(null)}>
+            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+              <div className="modal-header">
+                <h3>Feed verwijderen</h3>
+                <button
+                  onClick={() => setFeedToDelete(null)}
+                  className="modal-close-btn"
+                  title="Sluiten"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+              <div className="modal-body">
+                <p className="modal-description">
+                  Weet je zeker dat je <strong>{feedToDelete.name}</strong> wilt verwijderen?
+                </p>
+                <p className="delete-warning">
+                  Deze actie kan niet ongedaan worden gemaakt.
+                </p>
+              </div>
+              <div className="modal-footer">
+                <button
+                  onClick={() => setFeedToDelete(null)}
+                  className="btn btn-secondary"
+                >
+                  Annuleren
+                </button>
+                <button onClick={handleDeleteFeed} className="btn btn-danger">
+                  Verwijderen
+                </button>
+              </div>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
