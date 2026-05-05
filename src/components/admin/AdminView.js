@@ -50,7 +50,7 @@ import {
 
 function AdminView() {
   const { tenantId } = useTenant();
-  const { slideTypes } = useTenantModules();
+  const { slideTypes, modules } = useTenantModules();
   // Playlist management hook
   const {
     playlists,
@@ -966,6 +966,20 @@ function AdminView() {
     await savePlaylistsToFirebase(updatedPlaylists);
   };
 
+  const saveSlideEffects = async (playlistId, slideId, effects) => {
+    const updatedPlaylists = playlists.map((playlist) => {
+      if (playlist.id !== playlistId) return playlist;
+      return {
+        ...playlist,
+        slides: playlist.slides.map((slide) =>
+          slide.id === slideId ? { ...slide, effects } : slide
+        ),
+      };
+    });
+    setPlaylists(updatedPlaylists);
+    await savePlaylistsToFirebase(updatedPlaylists);
+  };
+
   const confirmDeleteSlide = (slide, playlistId) => {
     setSlideToDelete({ slide, playlistId });
   };
@@ -1391,6 +1405,8 @@ function AdminView() {
           onTogglePlaylistEnabled={togglePlaylistEnabled}
           onCopyPlaylist={copyPlaylist}
           onConfirmDeletePlaylist={confirmDeletePlaylist}
+          modules={modules}
+          onSaveSlideEffects={saveSlideEffects}
           onEditSlide={openEditModal}
           onUpdateSlideType={updateSlideType}
           onToggleSlideVisibility={toggleSlideVisibility}

@@ -1,0 +1,306 @@
+// Slide Effects Modal — admin UI
+
+.slide-effects-modal {
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: $spacing-lg;
+  }
+
+  &__content {
+    background: var(--surface);
+    border-radius: $border-radius-lg;
+    box-shadow: $shadow-lg;
+    width: 100%;
+    max-width: 560px;
+    max-height: 88vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: modalSlideIn 0.2s ease-out;
+  }
+
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: $spacing-lg;
+    border-bottom: 1px solid var(--border);
+
+    &__title {
+      display: flex;
+      align-items: center;
+      gap: $spacing-sm;
+      color: var(--foreground);
+
+      h3 {
+        margin: 0;
+        font-size: $font-size-lg;
+        font-weight: $font-weight-semibold;
+        font-family: $font-family-heading;
+      }
+    }
+
+    .modal-close-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border: none;
+      background: none;
+      border-radius: $border-radius-md;
+      color: var(--foreground-secondary);
+      cursor: pointer;
+      transition: $transition-base;
+
+      &:hover {
+        background: var(--muted);
+        color: var(--foreground);
+      }
+    }
+  }
+
+  &__body {
+    padding: $spacing-lg;
+    overflow-y: auto;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-lg;
+  }
+
+  &__empty {
+    color: var(--foreground-secondary);
+    font-size: $font-size-sm;
+    text-align: center;
+    padding: $spacing-xl 0;
+    margin: 0;
+  }
+
+  &__effect {
+    background: var(--background);
+    border: 1px solid var(--border);
+    border-radius: $border-radius-md;
+    padding: $spacing-md;
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-md;
+  }
+
+  &__effect-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  &__effect-number {
+    font-size: $font-size-sm;
+    font-weight: $font-weight-semibold;
+    color: var(--foreground-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  &__row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: $spacing-md;
+
+    @media (max-width: 480px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    label {
+      font-size: $font-size-xs;
+      font-weight: $font-weight-medium;
+      color: var(--foreground-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    select {
+      width: 100%;
+      padding: 6px 10px;
+      border: 1px solid var(--border);
+      border-radius: $border-radius-sm;
+      background: var(--surface);
+      color: var(--foreground);
+      font-size: $font-size-sm;
+      transition: $transition-base;
+      box-sizing: border-box;
+
+      &:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 2px rgba(var(--primary-rgb, 70, 188, 202), 0.2);
+      }
+    }
+  }
+
+  &__bg-color {
+    width: 34px;
+    height: 34px;
+    padding: 2px;
+    border: 1px solid var(--border);
+    border-radius: $border-radius-sm;
+    background: var(--surface);
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  &__color-row {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+
+    input[type="color"] {
+      width: 36px;
+      height: 34px;
+      padding: 2px;
+      border: 1px solid var(--border);
+      border-radius: $border-radius-sm;
+      background: var(--surface);
+      cursor: pointer;
+    }
+  }
+
+  &__color-value {
+    font-size: $font-size-sm;
+    color: var(--foreground-secondary);
+    font-family: monospace;
+  }
+
+  &__toggles {
+    display: flex;
+    gap: 6px;
+  }
+
+  &__position-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 36px);
+    gap: 4px;
+  }
+
+  &__effect-title {
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+    color: var(--foreground-secondary);
+  }
+
+  &__image-row {
+    display: flex;
+    gap: $spacing-md;
+    align-items: flex-start;
+  }
+
+  &__image-preview {
+    width: 64px;
+    height: 64px;
+    object-fit: cover;
+    border-radius: $border-radius-sm;
+    border: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+
+  &__image-inputs {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xs;
+    flex: 1;
+  }
+
+  &__add-buttons {
+    display: flex;
+    gap: $spacing-sm;
+  }
+
+  .modal-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: $spacing-md $spacing-lg;
+    border-top: 1px solid var(--border);
+    gap: $spacing-md;
+
+    &__right {
+      display: flex;
+      gap: $spacing-sm;
+    }
+  }
+}
+
+// Position grid cell
+.position-cell {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border);
+  border-radius: $border-radius-sm;
+  background: var(--surface);
+  cursor: pointer;
+  font-size: 16px;
+  transition: $transition-base;
+  color: var(--foreground-secondary);
+
+  &:hover {
+    background: var(--muted);
+    border-color: var(--primary);
+    color: var(--foreground);
+  }
+
+  &--active {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: #fff;
+  }
+}
+
+// Toggle button (bold/italic/bg)
+.btn-toggle {
+  min-width: 34px;
+  height: 34px;
+  padding: 0 $spacing-sm;
+  border: 1px solid var(--border);
+  border-radius: $border-radius-sm;
+  background: var(--surface);
+  color: var(--foreground-secondary);
+  cursor: pointer;
+  font-size: $font-size-sm;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: $transition-base;
+
+  &:hover {
+    background: var(--muted);
+    color: var(--foreground);
+  }
+
+  &--active {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: #fff;
+  }
+}
+
+// Effects icon — active state when effects are present
+.btn-icon--effects-active {
+  color: #f59e0b;
+}

@@ -459,6 +459,26 @@ function SlideDisplay({
   const [displaySlide, setDisplaySlide] = useState(currentSlide);
   const [displayLayout, setDisplayLayout] = useState(slideLayout);
 
+  // Effect exit state
+  const [exitedEffects, setExitedEffects] = useState(new Set());
+
+  useEffect(() => {
+    setExitedEffects(new Set());
+    if (!displaySlide?.effects?.length) return;
+
+    const timers = displaySlide.effects
+      .filter((e) => e.exitAfter > 0)
+      .map((e) => {
+        const ms = ((e.delay || 0) + e.exitAfter) * 1000;
+        return setTimeout(
+          () => setExitedEffects((prev) => new Set([...prev, e.id])),
+          ms
+        );
+      });
+
+    return () => timers.forEach(clearTimeout);
+  }, [displaySlide?.id]);
+
   // Handle slide changes and transitions
   useEffect(() => {
     if (currentSlide && currentSlide.id !== displaySlide?.id) {
@@ -796,9 +816,64 @@ function SlideDisplay({
     );
   }
 
+  const hexToRgba = (hex, opacity) => {
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    return `rgba(${r},${g},${b},${opacity})`;
+  };
+
+  const renderEffects = (slide) => {
+    if (!slide?.effects?.length) return null;
+    return slide.effects.map((effect) => {
+      const isImage = effect.type === "image";
+      return (
+        <div
+          key={effect.id}
+          className={`slide-effect slide-effect--${effect.position} slide-effect--${effect.animation}${exitedEffects.has(effect.id) ? " slide-effect--exit" : ""}`}
+          style={{ animationDelay: `${effect.delay || 0}s` }}
+        >
+          {isImage ? (
+            <img
+              src={effect.imageUrl}
+              alt=""
+              className="slide-effect__image"
+              style={{
+                width: `${effect.imageWidth || 200}px`,
+                borderRadius: effect.imageRounded ? "12px" : "0",
+              }}
+            />
+          ) : (
+            <span
+              className="slide-effect__text"
+              style={{
+                fontSize: `${effect.fontSize || 48}px`,
+                color: effect.color || "#ffffff",
+                fontWeight: effect.bold ? "bold" : "normal",
+                fontStyle: effect.italic ? "italic" : "normal",
+                ...(effect.background && {
+                  background: hexToRgba(
+                    effect.backgroundColor || "#000000",
+                    (effect.backgroundOpacity ?? 45) / 100
+                  ),
+                  padding: "0.15em 0.4em",
+                  borderRadius: "6px",
+                  backdropFilter: "blur(4px)",
+                }),
+              }}
+            >
+              {effect.content}
+            </span>
+          )}
+        </div>
+      );
+    });
+  };
+
   return (
     <div className="display-content">
       {renderSlideContent(displaySlide, displayLayout)}
+      {renderEffects(displaySlide)}
 
       {/* Pre-rendered next slide (hidden) */}
       {nextSlide && (

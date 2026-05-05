@@ -18,7 +18,9 @@ import {
   MoreVertical,
   Timer,
   CalendarDays,
+  Sparkles,
 } from "lucide-react";
+import SlideEffectsModal from "./SlideEffectsModal";
 
 const iconMap = {
   video: <Play />,
@@ -65,7 +67,10 @@ function SlideList({
   onReorderSlides,
   onAddSlide,
   onMoveSlide,
+  modules = {},
+  onSaveSlideEffects,
 }) {
+  const [effectsSlide, setEffectsSlide] = useState(null);
   // Function to strip HTML tags and get clean text
   const stripHtml = (html) => {
     if (!html) return "";
@@ -505,6 +510,19 @@ function SlideList({
               <Trash2 size={16} />
             </button>
 
+            {modules.slideEffects && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setEffectsSlide(slide);
+                }}
+                className={`btn-icon ${slide.effects?.length > 0 ? "btn-icon--effects-active" : ""}`}
+                title="Slide effecten"
+              >
+                <Sparkles size={16} />
+              </button>
+            )}
+
             <span
               className={`btn-icon btn-icon--time ${slide.timeRestriction?.enabled ? "btn-icon--success" : ""}`}
               title={`Tijdvenster: ${slide.timeRestriction?.startTime} – ${slide.timeRestriction?.endTime}`}
@@ -656,6 +674,19 @@ function SlideList({
             <Trash2 size={16} />
           </button>
 
+          {modules.slideEffects && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setEffectsSlide(slide);
+              }}
+              className={`btn-icon ${slide.effects?.length > 0 ? "btn-icon--effects-active" : ""}`}
+              title="Slide effecten"
+            >
+              <Sparkles size={16} />
+            </button>
+          )}
+
           <span
             className={`btn-icon btn-icon--time ${slide.timeRestriction?.enabled ? "btn-icon--success" : ""}`}
             title={`Tijdvenster: ${slide.timeRestriction?.startTime} – ${slide.timeRestriction?.endTime}`}
@@ -788,6 +819,7 @@ function SlideList({
   }, []);
 
   return (
+    <>
     <DndContext
       sensors={sensors}
       collisionDetection={closestCenter}
@@ -830,6 +862,19 @@ function SlideList({
         )}
       </SortableContext>
     </DndContext>
+
+    {effectsSlide && (
+      <SlideEffectsModal
+        slide={effectsSlide}
+        onClose={() => setEffectsSlide(null)}
+        onSave={(effects) => {
+          if (onSaveSlideEffects) {
+            onSaveSlideEffects(effectsSlide.id, effects);
+          }
+        }}
+      />
+    )}
+    </>
   );
 }
 

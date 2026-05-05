@@ -20,6 +20,7 @@ import {
   MoreVertical,
   Timer,
   CalendarDays,
+  Sparkles,
 } from "lucide-react";
 import { doc, setDoc } from "firebase/firestore";
 import { db } from "../../firebase";
@@ -31,6 +32,12 @@ const MODULES = [
     label: "Achtergrondmuziek",
     description: "Speel achtergrondmuziek af op het display",
     icon: Music2,
+  },
+  {
+    key: "slideEffects",
+    label: "Slide effects",
+    description: "Voeg effecten toe op de slide!",
+    icon: Sparkles,
   },
 ];
 
@@ -98,7 +105,7 @@ function EditTenantModal({ tenant, onClose }) {
   const [slideTypes, setSlideTypes] = useState(
     hasSlideTypeConfig
       ? tenant.slideTypes
-      : Object.fromEntries(SLIDETYPES.map(({ key }) => [key, true]))
+      : Object.fromEntries(SLIDETYPES.map(({ key }) => [key, true])),
   );
   const [isSaving, setIsSaving] = useState(false);
 
@@ -119,7 +126,7 @@ function EditTenantModal({ tenant, onClose }) {
     setIsSaving(true);
 
     const normalizedSlideTypes = Object.fromEntries(
-      SLIDETYPES.map(({ key }) => [key, slideTypes[key] === true])
+      SLIDETYPES.map(({ key }) => [key, slideTypes[key] === true]),
     );
 
     try {

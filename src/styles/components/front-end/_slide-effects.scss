@@ -1,0 +1,183 @@
+// Slide Effects — animated text overlays on display slides
+
+.display-content {
+  position: relative;
+}
+
+.slide-effect {
+  position: absolute;
+  z-index: 10;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  // Positions
+  &--top-left    { top: 5%; left: 5%; }
+  &--top-center  { top: 5%; left: 50%; transform: translateX(-50%); }
+  &--top-right   { top: 5%; right: 5%; }
+  &--center-left { top: 50%; left: 5%; transform: translateY(-50%); }
+  &--center      { top: 50%; left: 50%; transform: translate(-50%, -50%); }
+  &--center-right{ top: 50%; right: 5%; transform: translateY(-50%); }
+  &--bottom-left { bottom: 5%; left: 5%; }
+  &--bottom-center{ bottom: 5%; left: 50%; transform: translateX(-50%); }
+  &--bottom-right{ bottom: 5%; right: 5%; }
+}
+
+.slide-effect__text {
+  display: block;
+  line-height: 1.2;
+  white-space: pre-wrap;
+  text-align: center;
+}
+
+.slide-effect__image {
+  display: block;
+  height: auto;
+  max-width: 100%;
+  object-fit: contain;
+}
+
+// Exit animation — only fades opacity so positioning transforms stay intact
+.slide-effect--exit {
+  animation: effectExit 0.5s ease forwards !important;
+  animation-delay: 0s !important;
+}
+
+@keyframes effectExit {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+// Animation: fade-in
+.slide-effect--fade-in {
+  opacity: 0;
+  animation: effectFadeIn 0.8s ease forwards;
+}
+
+// Animation: slide-up
+.slide-effect--slide-up {
+  opacity: 0;
+  animation: effectSlideUp 0.7s ease forwards;
+}
+
+// Animation: slide-down
+.slide-effect--slide-down {
+  opacity: 0;
+  animation: effectSlideDown 0.7s ease forwards;
+}
+
+// Animation: slide-left
+.slide-effect--slide-left {
+  opacity: 0;
+  animation: effectSlideLeft 0.7s ease forwards;
+}
+
+// Animation: slide-right
+.slide-effect--slide-right {
+  opacity: 0;
+  animation: effectSlideRight 0.7s ease forwards;
+}
+
+// Animation: zoom-in
+.slide-effect--zoom-in {
+  opacity: 0;
+  animation: effectZoomIn 0.6s ease forwards;
+}
+
+// Animation: bounce
+.slide-effect--bounce {
+  opacity: 0;
+  animation: effectBounce 0.9s cubic-bezier(0.36, 0.07, 0.19, 0.97) forwards;
+}
+
+@keyframes effectFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes effectSlideUp {
+  from { opacity: 0; transform: translateY(40px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes effectSlideDown {
+  from { opacity: 0; transform: translateY(-40px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes effectSlideLeft {
+  from { opacity: 0; transform: translateX(50px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes effectSlideRight {
+  from { opacity: 0; transform: translateX(-50px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes effectZoomIn {
+  from { opacity: 0; transform: scale(0.5); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes effectBounce {
+  0%   { opacity: 0; transform: scale(0.6); }
+  60%  { opacity: 1; transform: scale(1.15); }
+  80%  { transform: scale(0.95); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+// Position corrections for centered elements with animations
+.slide-effect--center {
+  &.slide-effect--slide-up    { animation-name: effectSlideUpCenter; }
+  &.slide-effect--slide-down  { animation-name: effectSlideDownCenter; }
+  &.slide-effect--slide-left  { animation-name: effectSlideLeftCenter; }
+  &.slide-effect--slide-right { animation-name: effectSlideRightCenter; }
+  &.slide-effect--zoom-in     { animation-name: effectZoomInCenter; }
+  &.slide-effect--bounce      { animation-name: effectBounceCenter; }
+}
+
+.slide-effect--top-center,
+.slide-effect--bottom-center {
+  &.slide-effect--slide-left  { animation-name: effectSlideLeftCenter; }
+  &.slide-effect--slide-right { animation-name: effectSlideRightCenter; }
+}
+
+.slide-effect--center-left,
+.slide-effect--center-right {
+  &.slide-effect--slide-up    { animation-name: effectSlideUpCenter; }
+  &.slide-effect--slide-down  { animation-name: effectSlideDownCenter; }
+}
+
+@keyframes effectSlideUpCenter {
+  from { opacity: 0; transform: translate(-50%, calc(-50% + 40px)); }
+  to   { opacity: 1; transform: translate(-50%, -50%); }
+}
+
+@keyframes effectSlideDownCenter {
+  from { opacity: 0; transform: translate(-50%, calc(-50% - 40px)); }
+  to   { opacity: 1; transform: translate(-50%, -50%); }
+}
+
+@keyframes effectSlideLeftCenter {
+  from { opacity: 0; transform: translate(calc(-50% + 50px), -50%); }
+  to   { opacity: 1; transform: translate(-50%, -50%); }
+}
+
+@keyframes effectSlideRightCenter {
+  from { opacity: 0; transform: translate(calc(-50% - 50px), -50%); }
+  to   { opacity: 1; transform: translate(-50%, -50%); }
+}
+
+@keyframes effectZoomInCenter {
+  from { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+  to   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+
+@keyframes effectBounceCenter {
+  0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.6); }
+  60%  { opacity: 1; transform: translate(-50%, -50%) scale(1.15); }
+  80%  { transform: translate(-50%, -50%) scale(0.95); }
+  100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
