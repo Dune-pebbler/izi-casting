@@ -1,4 +1,5 @@
 import React, { useMemo, useCallback, useState } from "react";
+import ReactDOM from "react-dom";
 import {
   Copy,
   GripVertical,
@@ -69,6 +70,7 @@ function SlideList({
   onMoveSlide,
   modules = {},
   onSaveSlideEffects,
+  playlistCount = 1,
 }) {
   const [effectsSlide, setEffectsSlide] = useState(null);
   // Function to strip HTML tags and get clean text
@@ -479,16 +481,19 @@ function SlideList({
             </div>
           </div>
           <div className="slide-card__actions">
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onMoveSlide(slide);
-              }}
-              className="btn-icon"
-              title="Move to other playlist"
-            >
-              <ChevronsUpDown size={16} />
-            </button>
+            {playlistCount > 1 && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onMoveSlide(slide);
+                }}
+                className="btn-icon"
+                title="Move to other playlist"
+              >
+                <ChevronsUpDown size={16} />
+              </button>
+            )}
+
             <button
               onClick={(e) => {
                 e.stopPropagation();
@@ -643,16 +648,18 @@ function SlideList({
           </div>
         </div>
         <div className="slide-row__actions">
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onMoveSlide(slide);
-            }}
-            className="btn-icon"
-            title="Move to other playlist"
-          >
-            <ChevronsUpDown size={16} />
-          </button>
+          {playlistCount > 1 && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onMoveSlide(slide);
+              }}
+              className="btn-icon"
+              title="Move to other playlist"
+            >
+              <ChevronsUpDown size={16} />
+            </button>
+          )}
           <button
             onClick={(e) => {
               e.stopPropagation();
@@ -722,17 +729,19 @@ function SlideList({
             className="slide-row__actions-panel"
             onClick={(e) => e.stopPropagation()}
           >
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onMoveSlide(slide);
-                setActionsOpen(false);
-              }}
-              className="btn-icon slide-row__actions-panel-btn"
-            >
-              <ChevronsUpDown size={16} />
-              <span>Verplaatsen</span>
-            </button>
+            {playlistCount > 1 && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onMoveSlide(slide);
+                  setActionsOpen(false);
+                }}
+                className="btn-icon slide-row__actions-panel-btn"
+              >
+                <ChevronsUpDown size={16} />
+                <span>Verplaatsen</span>
+              </button>
+            )}
             <button
               onClick={(e) => {
                 e.stopPropagation();
@@ -820,60 +829,68 @@ function SlideList({
 
   return (
     <>
-    <DndContext
-      sensors={sensors}
-      collisionDetection={closestCenter}
-      onDragStart={handleDragStart}
-      onDragEnd={handleDragEnd}
-    >
-      <SortableContext items={slideIds} strategy={verticalListSortingStrategy}>
-        {layout === "list" ? (
-          <div className="slides-list">
-            {slides.map((slide, index) => (
-              <SortableSlideRow key={slide.id} slide={slide} index={index} />
-            ))}
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
+      >
+        <SortableContext
+          items={slideIds}
+          strategy={verticalListSortingStrategy}
+        >
+          {layout === "list" ? (
+            <div className="slides-list">
+              {slides.map((slide, index) => (
+                <SortableSlideRow key={slide.id} slide={slide} index={index} />
+              ))}
 
-            {/* Add Slide Button */}
-            {onAddSlide && (
-              <div className="add-button add-button--list" onClick={onAddSlide}>
-                <div className="add-button__content">
-                  <Plus size={24} />
-                  <span>Add Slide</span>
+              {/* Add Slide Button */}
+              {onAddSlide && (
+                <div
+                  className="add-button add-button--list"
+                  onClick={onAddSlide}
+                >
+                  <div className="add-button__content">
+                    <Plus size={24} />
+                    <span>Add Slide</span>
+                  </div>
                 </div>
-              </div>
-            )}
-          </div>
-        ) : (
-          <div className="slides-grid">
-            {slides.map((slide, index) => (
-              <SortableSlideCard key={slide.id} slide={slide} index={index} />
-            ))}
+              )}
+            </div>
+          ) : (
+            <div className="slides-grid">
+              {slides.map((slide, index) => (
+                <SortableSlideCard key={slide.id} slide={slide} index={index} />
+              ))}
 
-            {/* Add Slide Button */}
-            {onAddSlide && (
-              <div className="add-button" onClick={onAddSlide}>
-                <div className="add-button__content">
-                  <Plus size={24} />
-                  <span>Add Slide</span>
+              {/* Add Slide Button */}
+              {onAddSlide && (
+                <div className="add-button" onClick={onAddSlide}>
+                  <div className="add-button__content">
+                    <Plus size={24} />
+                    <span>Add Slide</span>
+                  </div>
                 </div>
-              </div>
-            )}
-          </div>
+              )}
+            </div>
+          )}
+        </SortableContext>
+      </DndContext>
+
+      {effectsSlide &&
+        ReactDOM.createPortal(
+          <SlideEffectsModal
+            slide={effectsSlide}
+            onClose={() => setEffectsSlide(null)}
+            onSave={(effects) => {
+              if (onSaveSlideEffects) {
+                onSaveSlideEffects(effectsSlide.id, effects);
+              }
+            }}
+          />,
+          document.body,
         )}
-      </SortableContext>
-    </DndContext>
-
-    {effectsSlide && (
-      <SlideEffectsModal
-        slide={effectsSlide}
-        onClose={() => setEffectsSlide(null)}
-        onSave={(effects) => {
-          if (onSaveSlideEffects) {
-            onSaveSlideEffects(effectsSlide.id, effects);
-          }
-        }}
-      />
-    )}
     </>
   );
 }

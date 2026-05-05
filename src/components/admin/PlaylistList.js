@@ -166,6 +166,7 @@ const PlaylistList = ({
                 }
                 onAddSlide={() => onAddSlide(playlist.id)}
                 onMoveSlide={(slide) => onMoveSlide(slide, playlist.id)}
+                playlistCount={playlists.length}
                 modules={modules}
                 onSaveSlideEffects={(slideId, effects) =>
                   onSaveSlideEffects && onSaveSlideEffects(playlist.id, slideId, effects)

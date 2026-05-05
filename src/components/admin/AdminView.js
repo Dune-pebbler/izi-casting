@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect } from "react";
+import ReactDOM from "react-dom";
 import {
   doc,
   setDoc,
@@ -1664,7 +1665,7 @@ function AdminView() {
       />
 
       {/* Slide Delete Confirmation Modal */}
-      {slideToDelete && (
+      {slideToDelete && ReactDOM.createPortal(
         <div className="slide-delete-modal-wrapper">
           <div className="modal-overlay" onClick={() => setSlideToDelete(null)}>
             <div className="modal-content" onClick={(e) => e.stopPropagation()}>
@@ -1714,7 +1715,8 @@ function AdminView() {
               </div>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
