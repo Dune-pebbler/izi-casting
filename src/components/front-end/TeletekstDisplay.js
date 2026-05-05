@@ -34,7 +34,10 @@ function TeletekstDisplay({ channel = '101', theme = 'classic', pageCount = 1, d
 
       // Extract text content from the JSON response
       if (data && data.content) {
-        setContent(data.content);
+        // NOS teletekst uses Private Use Area chars (&#xF0xx;) for mosaic graphics.
+        // These only render with a dedicated teletext font — replace with spaces.
+        const cleaned = data.content.replace(/&#xF[0-9A-Fa-f]{3};/g, ' ');
+        setContent(cleaned);
       } else {
         throw new Error('No content available');
       }
