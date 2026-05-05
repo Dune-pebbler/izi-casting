@@ -32,6 +32,7 @@
 
   &:hover:not(:disabled) {
     background-color: var(--primary-hover);
+    color: #e7fcff !important;
   }
 
   &:active:not(:disabled) {
@@ -45,6 +46,7 @@
 
   &:hover:not(:disabled) {
     background-color: var(--success-hover);
+    color: #e7fcff !important;
   }
 
   &:active:not(:disabled) {
@@ -67,7 +69,6 @@
   &:hover:not(:disabled) {
     background-color: var(--destructive-light);
     color: var(--destructive);
-    
   }
 
   &:active:not(:disabled) {
@@ -83,7 +84,7 @@
 
   &:hover:not(:disabled) {
     background-color: var(--muted);
-    border-color: var(--primary)
+    border-color: var(--primary);
   }
 
   &:active:not(:disabled) {
