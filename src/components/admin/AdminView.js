@@ -85,6 +85,7 @@ function AdminView() {
   const [modalTeletekstChannel, setModalTeletekstChannel] = useState("101");
   const [modalTeletekstTheme, setModalTeletekstTheme] = useState("classic");
   const [modalTeletekstPageCount, setModalTeletekstPageCount] = useState(1);
+  const [modalTeletekstSkipLines, setModalTeletekstSkipLines] = useState(0);
   const [modalIframeUrl, setModalIframeUrl] = useState("");
   const [modalGalleryImages, setModalGalleryImages] = useState([]);
   const [uploadingGalleryImage, setUploadingGalleryImage] = useState(false);
@@ -547,6 +548,7 @@ function AdminView() {
     setModalTeletekstChannel(slide.teletekstChannel || "101");
     setModalTeletekstTheme(slide.teletekstTheme || "classic");
     setModalTeletekstPageCount(slide.teletekstPageCount || 1);
+    setModalTeletekstSkipLines(slide.teletekstSkipLines || 0);
     setModalIframeUrl(slide.iframeUrl || "");
     setModalGalleryImages(slide.images || []);
     setModalCountdownTitle(slide.countdownTitle || "");
@@ -583,6 +585,7 @@ function AdminView() {
     setModalSlideDuration(5);
     setModalShowBar(true);
     setModalTeletekstChannel("101");
+    setModalTeletekstSkipLines(0);
     setModalIframeUrl("");
     setModalGalleryImages([]);
     setModalCountdownTitle("");
@@ -891,6 +894,7 @@ function AdminView() {
                     teletekstChannel: modalTeletekstChannel,
                     teletekstTheme: modalTeletekstTheme,
                     teletekstPageCount: modalTeletekstPageCount,
+                    teletekstSkipLines: modalTeletekstSkipLines,
                     iframeUrl: modalIframeUrl,
                     type:
                       slideLayout === "iframe"
@@ -1475,9 +1479,11 @@ function AdminView() {
           teletekstChannel={modalTeletekstChannel}
           teletekstTheme={modalTeletekstTheme}
           teletekstPageCount={modalTeletekstPageCount}
+          teletekstSkipLines={modalTeletekstSkipLines}
           onTeletekstChannelChange={setModalTeletekstChannel}
           onTeletekstThemeChange={setModalTeletekstTheme}
           onTeletekstPageCountChange={setModalTeletekstPageCount}
+          onTeletekstSkipLinesChange={setModalTeletekstSkipLines}
           iframeUrl={modalIframeUrl}
           onIframeUrlChange={setModalIframeUrl}
           onOpenLibrary={handleOpenImageLibrary}

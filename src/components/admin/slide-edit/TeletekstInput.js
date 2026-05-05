@@ -132,7 +132,7 @@ export const TELETEKST_THEMES = [
   },
 ];
 
-function TeletekstInput({ channel = '101', theme = 'classic', pageCount = 1, onChannelChange, onThemeChange, onPageCountChange }) {
+function TeletekstInput({ channel = '101', theme = 'classic', pageCount = 1, skipLines = 0, onChannelChange, onThemeChange, onPageCountChange, onSkipLinesChange }) {
   const [maxPages, setMaxPages] = useState(1);
   const [detectingPages, setDetectingPages] = useState(false);
 
@@ -246,6 +246,37 @@ function TeletekstInput({ channel = '101', theme = 'classic', pageCount = 1, onC
           )}
         </div>
       )}
+
+      <div className="teletekst-input-section">
+        <label className="input-label">
+          <Tv size={16} />
+          Bovenste regels overslaan
+        </label>
+        <div className="page-count-selector">
+          <button
+            type="button"
+            className="page-count-btn"
+            onClick={() => onSkipLinesChange && onSkipLinesChange(Math.max(0, skipLines - 1))}
+            disabled={skipLines <= 0}
+          >
+            <ChevronLeft size={16} />
+          </button>
+          <span className="page-count-value">{skipLines}</span>
+          <button
+            type="button"
+            className="page-count-btn"
+            onClick={() => onSkipLinesChange && onSkipLinesChange(Math.min(20, skipLines + 1))}
+            disabled={skipLines >= 20}
+          >
+            <ChevronRight size={16} />
+          </button>
+        </div>
+        <p className="input-hint">
+          {skipLines === 0
+            ? 'Hele pagina wordt getoond.'
+            : `De bovenste ${skipLines} ${skipLines === 1 ? 'regel wordt' : 'regels worden'} afgekapt.`}
+        </p>
+      </div>
 
       <div className="teletekst-theme-section">
         <label className="input-label">

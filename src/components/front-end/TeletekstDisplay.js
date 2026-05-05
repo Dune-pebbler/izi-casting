@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Tv, RefreshCw, AlertCircle } from 'lucide-react';
 import { TELETEKST_THEMES } from '../admin/slide-edit/TeletekstInput';
 
-function TeletekstDisplay({ channel = '101', theme = 'classic', pageCount = 1, duration = 10 }) {
+function TeletekstDisplay({ channel = '101', theme = 'classic', pageCount = 1, duration = 10, skipLines = 0 }) {
   const [content, setContent] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -164,6 +164,7 @@ function TeletekstDisplay({ channel = '101', theme = 'classic', pageCount = 1, d
         key={currentPage}
         ref={contentRef}
         className={`teletekst-content ${shouldScroll ? 'auto-scroll' : ''}`}
+        style={skipLines > 0 ? { marginTop: `${skipLines * -2.8}rem` } : undefined}
         dangerouslySetInnerHTML={{ __html: content }}
       />
     </div>

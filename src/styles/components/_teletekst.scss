@@ -3,13 +3,16 @@
   display: flex;
   flex-direction: column;
   width: 100%;
+  overflow-y: scroll;
 
   .teletekst-input-section {
     flex: 1;
-    padding: 2rem;
+    padding: 16px;
     display: flex;
     align-items: center;
     justify-content: center;
+    border-radius: 16px;
+    border: 1px dashed var(--border);
   }
 }
 
@@ -157,7 +160,7 @@
         border-radius: 4px;
         font-weight: 700;
         font-size: 1.4rem;
-        font-family: 'Courier New', monospace;
+        font-family: "Courier New", monospace;
         border: 2px solid var(--border-color);
       }
 
@@ -283,7 +286,7 @@
 .teletekst-display {
   width: 100%;
   height: 100%;
-  font-family: 'Courier New', monospace;
+  font-family: "Courier New", monospace;
   display: flex;
   overflow: hidden;
   justify-content: center;
@@ -291,7 +294,7 @@
   .teletekst-content {
     padding: 1.5rem;
     overflow: visible;
-    font-family: 'Courier New', Courier, monospace;
+    font-family: "Courier New", Courier, monospace;
     font-size: 2rem;
     line-height: 1.4;
     white-space: pre;
@@ -302,24 +305,56 @@
     }
 
     // Color classes - use theme colors
-    .red { color: var(--color-red, #ff0000); }
-    .green { color: var(--color-green, #00ff00); }
-    .yellow { color: var(--color-yellow, #ffff00); }
-    .blue { color: var(--color-blue, #0000ff); }
-    .cyan { color: var(--color-cyan, #00ffff); }
-    .magenta { color: var(--color-magenta, #ff00ff); }
-    .white { color: var(--color-white, #ffffff); }
-    .black { color: var(--color-black, #000000); }
+    .red {
+      color: var(--color-red, #ff0000);
+    }
+    .green {
+      color: var(--color-green, #00ff00);
+    }
+    .yellow {
+      color: var(--color-yellow, #ffff00);
+    }
+    .blue {
+      color: var(--color-blue, #0000ff);
+    }
+    .cyan {
+      color: var(--color-cyan, #00ffff);
+    }
+    .magenta {
+      color: var(--color-magenta, #ff00ff);
+    }
+    .white {
+      color: var(--color-white, #ffffff);
+    }
+    .black {
+      color: var(--color-black, #000000);
+    }
 
     // Background color classes
-    .bg-red { background-color: var(--color-red, #ff0000); }
-    .bg-green { background-color: var(--color-green, #00ff00); }
-    .bg-yellow { background-color: var(--color-yellow, #ffff00); }
-    .bg-blue { background-color: var(--color-blue, #0000ff); }
-    .bg-cyan { background-color: var(--color-cyan, #00ffff); }
-    .bg-magenta { background-color: var(--color-magenta, #ff00ff); }
-    .bg-white { background-color: var(--color-white, #ffffff); }
-    .bg-black { background-color: var(--color-black, #000000); }
+    .bg-red {
+      background-color: var(--color-red, #ff0000);
+    }
+    .bg-green {
+      background-color: var(--color-green, #00ff00);
+    }
+    .bg-yellow {
+      background-color: var(--color-yellow, #ffff00);
+    }
+    .bg-blue {
+      background-color: var(--color-blue, #0000ff);
+    }
+    .bg-cyan {
+      background-color: var(--color-cyan, #00ffff);
+    }
+    .bg-magenta {
+      background-color: var(--color-magenta, #ff00ff);
+    }
+    .bg-white {
+      background-color: var(--color-white, #ffffff);
+    }
+    .bg-black {
+      background-color: var(--color-black, #000000);
+    }
 
     // Link styling
     a {
@@ -376,7 +411,7 @@
       background: transparent;
       border: 2px solid;
       border-radius: 4px;
-      font-family: 'Courier New', monospace;
+      font-family: "Courier New", monospace;
       font-weight: 600;
       cursor: pointer;
       transition: all 0.2s;
@@ -419,4 +454,3 @@
     }
   }
 }
-
