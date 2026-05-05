@@ -41,7 +41,7 @@ function VideoPlayer({ videoUrl, autoplay = true, loop = true, muted = true }) {
           id: match[1],
           embedUrl: `https://www.youtube.com/embed/${match[1]}?autoplay=${
             autoplay ? 1 : 0
-          }&loop=${loop ? 1 : 0}&mute=${
+          }&loop=${loop ? 1 : 0}&playlist=${match[1]}&mute=${
             muted ? 1 : 0
           }&controls=0&showinfo=0&rel=0&modestbranding=1&iv_load_policy=3&fs=0&cc_load_policy=0&disablekb=1&playsinline=1&start=0&end=0&enablejsapi=1&origin=${
             window.location.origin
