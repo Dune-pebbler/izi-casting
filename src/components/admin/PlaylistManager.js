@@ -78,7 +78,6 @@ export const usePlaylistManager = () => {
       console.log('Saving playlists to Firebase:', playlistsToSave.map(p => ({ id: p.id, slideCount: p.slides.length })));
       await setDoc(displayDocRef, { playlists: playlistsToSave }, { merge: true });
       console.log('Playlists saved to Firebase successfully');
-      toast.success('Changes saved successfully!');
     } catch (error) {
       console.error('Error saving playlists to Firebase:', error);
       toast.error('Error saving changes: ' + error.message);
