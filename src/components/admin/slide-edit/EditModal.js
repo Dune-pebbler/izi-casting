@@ -21,6 +21,7 @@ import AgendaInput from "./AgendaInput";
 
 function EditModal({
   slide,
+  slideTypes = {},
   modalImageUrl,
   modalTinyMCEContent,
   imagePosition,
@@ -401,6 +402,7 @@ function EditModal({
               <LayoutSelector
                 currentLayout={slideLayout}
                 onLayoutChange={onLayoutChange}
+                slideTypes={slideTypes}
               />
             </div>
 

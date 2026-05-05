@@ -30,6 +30,7 @@ import {
   setIsSidebarCollapsed,
 } from "../../store/slices/deviceSlice";
 import { usePlaylistManager } from "./PlaylistManager";
+import { useTenantModules } from "../../hooks/useTenantModules";
 import PlaylistList from "./PlaylistList";
 import EditModal from "./slide-edit/EditModal";
 import MoveSlideModal from "./MoveSlideModal";
@@ -49,6 +50,7 @@ import {
 
 function AdminView() {
   const { tenantId } = useTenant();
+  const { slideTypes } = useTenantModules();
   // Playlist management hook
   const {
     playlists,
@@ -1421,6 +1423,7 @@ function AdminView() {
       {editingSlide && (
         <EditModal
           slide={editingSlide}
+          slideTypes={slideTypes}
           modalImageUrl={modalImageUrl}
           modalTinyMCEContent={modalTinyMCEContent}
           imagePosition={imagePosition}
@@ -1606,6 +1609,7 @@ function AdminView() {
         isOpen={addSlideModalOpen}
         onClose={() => setAddSlideModalOpen(false)}
         onConfirm={confirmAddSlide}
+        slideTypes={slideTypes}
       />
 
       {/* Move Slide Modal */}

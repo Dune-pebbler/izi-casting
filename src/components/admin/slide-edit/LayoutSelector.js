@@ -11,8 +11,8 @@ import {
   CalendarDays,
 } from 'lucide-react';
 
-function LayoutSelector({ currentLayout, onLayoutChange }) {
-  const layouts = [
+function LayoutSelector({ currentLayout, onLayoutChange, slideTypes = {} }) {
+  const allLayouts = [
     {
       id: 'side-by-side',
       label: 'Side by Side',
@@ -74,6 +74,11 @@ function LayoutSelector({ currentLayout, onLayoutChange }) {
       title: 'Agenda (iCal)'
     }
   ];
+
+  const hasSlideTypeConfig = Object.keys(slideTypes).length > 0;
+  const layouts = hasSlideTypeConfig
+    ? allLayouts.filter(({ id }) => slideTypes[id])
+    : allLayouts;
 
   return (
     <div className="slide-modal__layout-selector">

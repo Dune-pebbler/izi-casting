@@ -13,7 +13,7 @@ const SLIDE_TYPES = [
   { id: "agenda", label: "Agenda", icon: CalendarDays },
 ];
 
-const AddSlideModal = ({ isOpen, onClose, onConfirm }) => {
+const AddSlideModal = ({ isOpen, onClose, onConfirm, slideTypes = {} }) => {
   const [name, setName] = useState("");
   const [layout, setLayout] = useState("side-by-side");
   const inputRef = useRef(null);
@@ -21,12 +21,21 @@ const AddSlideModal = ({ isOpen, onClose, onConfirm }) => {
   useEffect(() => {
     if (isOpen) {
       setName("");
-      setLayout("side-by-side");
+      const hasSlideTypeConfig = Object.keys(slideTypes).length > 0;
+      const firstAllowed = hasSlideTypeConfig
+        ? SLIDE_TYPES.find(({ id }) => slideTypes[id])?.id
+        : "side-by-side";
+      setLayout(firstAllowed || "side-by-side");
       setTimeout(() => inputRef.current?.focus(), 50);
     }
-  }, [isOpen]);
+  }, [isOpen, slideTypes]);
 
   if (!isOpen) return null;
+
+  const hasSlideTypeConfig = Object.keys(slideTypes).length > 0;
+  const visibleTypes = hasSlideTypeConfig
+    ? SLIDE_TYPES.filter(({ id }) => slideTypes[id])
+    : SLIDE_TYPES;
 
   const handleConfirm = () => {
     const trimmed = name.trim();
@@ -77,7 +86,7 @@ const AddSlideModal = ({ isOpen, onClose, onConfirm }) => {
             <div className="form-group">
               <label>Type</label>
               <div className="add-slide-type-grid">
-                {SLIDE_TYPES.map(({ id, label, icon: Icon }) => (
+                {visibleTypes.map(({ id, label, icon: Icon }) => (
                   <button
                     key={id}
                     type="button"

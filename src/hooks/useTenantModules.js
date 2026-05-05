@@ -6,6 +6,7 @@ import { useTenant } from "../context/TenantContext";
 export function useTenantModules() {
   const { tenantId } = useTenant();
   const [modules, setModules] = useState({});
+  const [slideTypes, setSlideTypes] = useState({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -15,12 +16,14 @@ export function useTenantModules() {
     }
 
     const unsubscribe = onSnapshot(doc(db, "tenants", tenantId), (snap) => {
-      setModules(snap.exists() ? snap.data().modules || {} : {});
+      const data = snap.exists() ? snap.data() : {};
+      setModules(data.modules || {});
+      setSlideTypes(data.slideTypes || {});
       setLoading(false);
     });
 
     return () => unsubscribe();
   }, [tenantId]);
 
-  return { modules, loading };
+  return { modules, slideTypes, loading };
 }

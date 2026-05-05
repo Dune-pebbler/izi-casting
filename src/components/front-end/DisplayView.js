@@ -56,6 +56,7 @@ function DisplayView() {
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
   const [slideProgress, setSlideProgress] = useState(0);
   const [tenantModules, setTenantModules] = useState({});
+  const [tenantSlideTypes, setTenantSlideTypes] = useState({});
   const [settings, setSettings] = useState({
     logoUrl: "",
     backgroundColor: "#FAFAFA",
@@ -683,7 +684,9 @@ function DisplayView() {
     const unsubscribeTenant = onSnapshot(
       doc(db, "tenants", displayTenantId),
       (snap) => {
-        setTenantModules(snap.exists() ? snap.data().modules || {} : {});
+        const tenantData = snap.exists() ? snap.data() : {};
+        setTenantModules(tenantData.modules || {});
+        setTenantSlideTypes(tenantData.slideTypes || {});
       },
     );
 
@@ -804,10 +807,18 @@ function DisplayView() {
             : currentMinutes >= start || currentMinutes <= end;
         };
 
+        const hasSlideTypeConfig = Object.keys(tenantSlideTypes).length > 0;
+        const isSlideTypeAllowed = (slide) => {
+          if (!hasSlideTypeConfig) return true;
+          const typeKey = slide.layout || slide.type;
+          return typeKey ? tenantSlideTypes[typeKey] : true;
+        };
+
         const visibleSlides = playlist.slides.filter(
           (slide) =>
             slide.isVisible &&
             isTimeActive(slide) &&
+            isSlideTypeAllowed(slide) &&
             ((slide.type === "text" && slide.text && slide.text.trim()) ||
               (slide.type === "image" && slide.imageUrl) ||
               (slide.type === "video" && slide.videoUrl) ||
@@ -906,7 +917,7 @@ function DisplayView() {
     console.log("🎬 Setting slides:", allSlides.length, "slides");
     setSlides(allSlides);
     setCurrentSlideIndex(0);
-  }, [playlists]);
+  }, [playlists, tenantSlideTypes]);
 
   useEffect(() => {
     console.log(

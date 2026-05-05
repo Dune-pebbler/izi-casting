@@ -286,8 +286,6 @@ function AgendaDisplay({ slide }) {
       const scrollDistance = content.scrollHeight - body.clientHeight;
       if (scrollDistance <= 0) return;
 
-      // Total cycle: scrollDown(60%) + pauseBottom(15%) + snapToTop + pauseTop(25%)
-      // Speed ~50px/s for the scroll-down portion
       const scrollDuration = scrollDistance / 50;
       const totalDuration = scrollDuration / 0.6;
 
