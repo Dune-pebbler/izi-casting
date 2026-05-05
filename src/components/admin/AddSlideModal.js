@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { X, LayoutGrid, Image, FileText, Play, Tv, Globe, Images, Timer } from "lucide-react";
+import { X, LayoutGrid, Image, FileText, Play, Tv, Globe, Images, Timer, CalendarDays } from "lucide-react";
 
 const SLIDE_TYPES = [
   { id: "side-by-side", label: "Afbeelding + Tekst", icon: LayoutGrid },
@@ -10,6 +10,7 @@ const SLIDE_TYPES = [
   { id: "iframe", label: "Website", icon: Globe },
   { id: "gallery", label: "Fotogalerij", icon: Images },
   { id: "countdown", label: "Afteltimer", icon: Timer },
+  { id: "agenda", label: "Agenda", icon: CalendarDays },
 ];
 
 const AddSlideModal = ({ isOpen, onClose, onConfirm }) => {

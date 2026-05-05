@@ -93,6 +93,12 @@ function AdminView() {
   const [modalCountdownNumberColor, setModalCountdownNumberColor] = useState("#ffffff");
   const [modalCountdownBlockBg, setModalCountdownBlockBg] = useState("#1a1a2e");
   const [modalCountdownLabelColor, setModalCountdownLabelColor] = useState("#aaaaaa");
+  const [modalAgendaCalendars, setModalAgendaCalendars] = useState([]);
+  const [modalAgendaTitle, setModalAgendaTitle] = useState("Agenda");
+  const [modalAgendaDaysAhead, setModalAgendaDaysAhead] = useState(14);
+  const [modalAgendaMaxEvents, setModalAgendaMaxEvents] = useState(8);
+  const [modalAgendaBgColor, setModalAgendaBgColor] = useState("#0f172a");
+  const [modalAgendaTextColor, setModalAgendaTextColor] = useState("#ffffff");
   const [imageLibraryTarget, setImageLibraryTarget] = useState("main");
   const [modalTimeRestriction, setModalTimeRestriction] = useState({
     enabled: false,
@@ -378,6 +384,7 @@ function AdminView() {
       "image-only": "image",
       gallery: "gallery",
       countdown: "countdown",
+      agenda: "agenda",
     };
     const newSlide = {
       id: Date.now(),
@@ -387,6 +394,15 @@ function AdminView() {
       imageUrl: "",
       imageName: "",
       ...(slideLayout === "gallery" && { images: [] }),
+      ...(slideLayout === "agenda" && {
+        agendaCalendars: [],
+        agendaTitle: "Agenda",
+        agendaDaysAhead: 14,
+        agendaMaxEvents: 8,
+        agendaBgColor: "#0f172a",
+        agendaTextColor: "#ffffff",
+        duration: 30,
+      }),
       ...(slideLayout === "countdown" && {
         countdownTitle: "",
         countdownTargetDate: "",
@@ -538,6 +554,12 @@ function AdminView() {
     setModalCountdownNumberColor(slide.countdownNumberColor || "#ffffff");
     setModalCountdownBlockBg(slide.countdownBlockBg || "#1a1a2e");
     setModalCountdownLabelColor(slide.countdownLabelColor || "#aaaaaa");
+    setModalAgendaCalendars(slide.agendaCalendars || []);
+    setModalAgendaTitle(slide.agendaTitle || "Agenda");
+    setModalAgendaDaysAhead(slide.agendaDaysAhead || 14);
+    setModalAgendaMaxEvents(slide.agendaMaxEvents || 8);
+    setModalAgendaBgColor(slide.agendaBgColor || "#0f172a");
+    setModalAgendaTextColor(slide.agendaTextColor || "#ffffff");
     setModalTimeRestriction(
       slide.timeRestriction || {
         enabled: false,
@@ -568,6 +590,12 @@ function AdminView() {
     setModalCountdownNumberColor("#ffffff");
     setModalCountdownBlockBg("#1a1a2e");
     setModalCountdownLabelColor("#aaaaaa");
+    setModalAgendaCalendars([]);
+    setModalAgendaTitle("Agenda");
+    setModalAgendaDaysAhead(14);
+    setModalAgendaMaxEvents(8);
+    setModalAgendaBgColor("#0f172a");
+    setModalAgendaTextColor("#ffffff");
     setModalTimeRestriction({
       enabled: false,
       startTime: "08:00",
@@ -807,6 +835,7 @@ function AdminView() {
           if (slide.id === editingSlide.id) {
             const isGallery = slideLayout === "gallery";
             const isCountdown = slideLayout === "countdown";
+            const isAgenda = slideLayout === "agenda";
             const galleryDuration = isGallery
               ? modalGalleryImages.reduce(
                   (sum, img) => sum + (img.duration || 3),
@@ -838,6 +867,17 @@ function AdminView() {
                     countdownNumberColor: modalCountdownNumberColor,
                     countdownBlockBg: modalCountdownBlockBg,
                     countdownLabelColor: modalCountdownLabelColor,
+                    duration: modalSlideDuration === "" ? 30 : modalSlideDuration,
+                  }
+                : isAgenda
+                ? {
+                    type: "agenda",
+                    agendaCalendars: modalAgendaCalendars,
+                    agendaTitle: modalAgendaTitle,
+                    agendaDaysAhead: modalAgendaDaysAhead,
+                    agendaMaxEvents: modalAgendaMaxEvents,
+                    agendaBgColor: modalAgendaBgColor,
+                    agendaTextColor: modalAgendaTextColor,
                     duration: modalSlideDuration === "" ? 30 : modalSlideDuration,
                   }
                 : {
@@ -1447,6 +1487,18 @@ function AdminView() {
           countdownLabelColor={modalCountdownLabelColor}
           onCountdownLabelColorChange={setModalCountdownLabelColor}
           onOpenCountdownLibrary={handleOpenCountdownBgLibrary}
+          agendaCalendars={modalAgendaCalendars}
+          onAgendaCalendarsChange={setModalAgendaCalendars}
+          agendaTitle={modalAgendaTitle}
+          onAgendaTitleChange={setModalAgendaTitle}
+          agendaDaysAhead={modalAgendaDaysAhead}
+          onAgendaDaysAheadChange={setModalAgendaDaysAhead}
+          agendaMaxEvents={modalAgendaMaxEvents}
+          onAgendaMaxEventsChange={setModalAgendaMaxEvents}
+          agendaBgColor={modalAgendaBgColor}
+          onAgendaBgColorChange={setModalAgendaBgColor}
+          agendaTextColor={modalAgendaTextColor}
+          onAgendaTextColorChange={setModalAgendaTextColor}
         />
       )}
 

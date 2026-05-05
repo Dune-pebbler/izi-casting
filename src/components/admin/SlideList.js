@@ -17,6 +17,7 @@ import {
   LucideImage,
   MoreVertical,
   Timer,
+  CalendarDays,
 } from "lucide-react";
 
 const iconMap = {
@@ -28,6 +29,7 @@ const iconMap = {
   teletekst: <Tv />,
   gallery: <Images />,
   countdown: <Timer />,
+  agenda: <CalendarDays />,
 };
 import { sanitizeHTMLContent } from "../../utils/sanitize";
 import { extractVideoInfo } from "../../utils/videoMetadata";
@@ -373,7 +375,8 @@ function SlideList({
 
         case "countdown":
           return (
-            <div className="slide-preview slide-preview--countdown"
+            <div
+              className="slide-preview slide-preview--countdown"
               style={{
                 background: slide.countdownBgImage
                   ? `url(${slide.countdownBgImage}) center/cover`
@@ -381,13 +384,21 @@ function SlideList({
               }}
             >
               <div className="preview-countdown">
-                <Timer size={20} color={slide.countdownTextColor || "#ffffff"} />
-                <span className="preview-countdown__title" style={{ color: slide.countdownTextColor || "#ffffff" }}>
+                <Timer
+                  size={20}
+                  color={slide.countdownTextColor || "#ffffff"}
+                />
+                <span
+                  className="preview-countdown__title"
+                  style={{ color: slide.countdownTextColor || "#ffffff" }}
+                >
                   {slide.countdownTitle || "Afteltimer"}
                 </span>
                 {slide.countdownTargetDate && (
                   <span className="preview-countdown__date">
-                    {new Date(slide.countdownTargetDate).toLocaleDateString("nl-NL")}
+                    {new Date(slide.countdownTargetDate).toLocaleDateString(
+                      "nl-NL",
+                    )}
                   </span>
                 )}
               </div>

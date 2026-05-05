@@ -17,6 +17,7 @@ import TeletekstInput from "./TeletekstInput";
 import IframeUrlInput from "./IframeUrlInput";
 import GalleryInput from "./GalleryInput";
 import CountdownInput from "./CountdownInput";
+import AgendaInput from "./AgendaInput";
 
 function EditModal({
   slide,
@@ -81,6 +82,18 @@ function EditModal({
   countdownLabelColor,
   onCountdownLabelColorChange,
   onOpenCountdownLibrary,
+  agendaCalendars,
+  onAgendaCalendarsChange,
+  agendaTitle,
+  onAgendaTitleChange,
+  agendaDaysAhead,
+  onAgendaDaysAheadChange,
+  agendaMaxEvents,
+  onAgendaMaxEventsChange,
+  agendaBgColor,
+  onAgendaBgColorChange,
+  agendaTextColor,
+  onAgendaTextColorChange,
 }) {
   const [timePopupOpen, setTimePopupOpen] = useState(false);
 
@@ -269,6 +282,26 @@ function EditModal({
               onCountdownLabelColorChange={onCountdownLabelColorChange}
               uploadingImage={uploadingImage}
               onOpenLibrary={onOpenCountdownLibrary}
+            />
+          </div>
+        );
+
+      case "agenda":
+        return (
+          <div className="modal-agenda">
+            <AgendaInput
+              agendaCalendars={agendaCalendars}
+              onCalendarsChange={onAgendaCalendarsChange}
+              agendaTitle={agendaTitle}
+              onAgendaTitleChange={onAgendaTitleChange}
+              agendaDaysAhead={agendaDaysAhead}
+              onAgendaDaysAheadChange={onAgendaDaysAheadChange}
+              agendaMaxEvents={agendaMaxEvents}
+              onAgendaMaxEventsChange={onAgendaMaxEventsChange}
+              agendaBgColor={agendaBgColor}
+              onAgendaBgColorChange={onAgendaBgColorChange}
+              agendaTextColor={agendaTextColor}
+              onAgendaTextColorChange={onAgendaTextColorChange}
             />
           </div>
         );

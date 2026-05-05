@@ -8,6 +8,7 @@ import {
   Globe,
   Images,
   Timer,
+  CalendarDays,
 } from 'lucide-react';
 
 function LayoutSelector({ currentLayout, onLayoutChange }) {
@@ -65,6 +66,12 @@ function LayoutSelector({ currentLayout, onLayoutChange }) {
       label: 'Afteltimer',
       icon: Timer,
       title: 'Afteltimer'
+    },
+    {
+      id: 'agenda',
+      label: 'Agenda',
+      icon: CalendarDays,
+      title: 'Agenda (iCal)'
     }
   ];
 
