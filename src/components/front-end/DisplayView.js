@@ -1253,6 +1253,7 @@ function DisplayView() {
         slideLayout={slideLayout}
         nextSlide={nextSlide}
         nextSlideLayout={nextSlideLayout}
+        effectsEnabled={!!tenantModules.slideEffects}
       />
 
       <ProgressBar

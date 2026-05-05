@@ -448,6 +448,7 @@ function SlideDisplay({
   slideLayout,
   nextSlide,
   nextSlideLayout,
+  effectsEnabled = false,
 }) {
   // Get configuration for the current layout
   const textConfig = getTextPaginationConfig(slideLayout);
@@ -824,7 +825,7 @@ function SlideDisplay({
   };
 
   const renderEffects = (slide) => {
-    if (!slide?.effects?.length) return null;
+    if (!effectsEnabled || !slide?.effects?.length) return null;
     return slide.effects.map((effect) => {
       const isImage = effect.type === "image";
       return (
