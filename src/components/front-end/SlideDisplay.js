@@ -178,6 +178,7 @@ function AgendaDisplay({ slide }) {
     const fetchAll = async () => {
       setLoading(true);
       const now = new Date();
+      now.setHours(0, 0, 0, 0);
       const cutoff = new Date(now.getTime() + daysAhead * 24 * 60 * 60 * 1000);
       const allEvents = [];
 
@@ -232,6 +233,24 @@ function AgendaDisplay({ slide }) {
                   calName: cal.name,
                   calColor: cal.color || "#4f87ff",
                 });
+              } else if (ev.rrule && ev.rrule.includes("FREQ=YEARLY")) {
+                const until = ev.rrule.match(/UNTIL=(\d{8})/);
+                const untilDate = until ? parseICSDate(until[1]) : null;
+                const month = ev.start.getMonth();
+                const day = ev.start.getDate();
+                for (const year of [now.getFullYear(), now.getFullYear() + 1]) {
+                  const occ = new Date(year, month, day);
+                  if (untilDate && occ > untilDate) continue;
+                  if (occ >= now && occ <= cutoff) {
+                    allEvents.push({
+                      ...ev,
+                      start: occ,
+                      end: ev.end ? new Date(year, ev.end.getMonth(), ev.end.getDate()) : null,
+                      calName: cal.name,
+                      calColor: cal.color || "#4f87ff",
+                    });
+                  }
+                }
               }
             });
           } catch (err) {
@@ -416,6 +435,8 @@ function parseICS(icsText) {
       } else if (line.match(/^DTEND(;[^:]*)?:/)) {
         const val = line.replace(/^DTEND[^:]*:/, "").trim();
         current.end = parseICSDate(val);
+      } else if (line.startsWith("RRULE:")) {
+        current.rrule = line.replace("RRULE:", "").trim();
       }
     }
   }
