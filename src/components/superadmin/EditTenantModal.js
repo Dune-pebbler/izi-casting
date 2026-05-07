@@ -21,6 +21,7 @@ import {
   Timer,
   CalendarDays,
   Sparkles,
+  Mail,
 } from "lucide-react";
 import { doc, setDoc } from "firebase/firestore";
 import { db } from "../../firebase";
@@ -95,6 +96,13 @@ const SLIDETYPES = [
     label: "Agenda",
     description: "Laat de klant agenda's toevoegen met ICal links",
     icon: CalendarDays,
+  },
+  {
+    key: "email",
+    label: "Gmail",
+    description:
+      "Laat een overzicht zien van de meest recente ongelezen emails.",
+    icon: Mail,
   },
 ];
 

@@ -9,6 +9,7 @@ import {
   Images,
   Timer,
   CalendarDays,
+  Mail,
 } from 'lucide-react';
 
 function LayoutSelector({ currentLayout, onLayoutChange, slideTypes = {} }) {
@@ -72,6 +73,12 @@ function LayoutSelector({ currentLayout, onLayoutChange, slideTypes = {} }) {
       label: 'Agenda',
       icon: CalendarDays,
       title: 'Agenda (iCal)'
+    },
+    {
+      id: 'email',
+      label: 'Gmail',
+      icon: Mail,
+      title: 'Gmail inbox'
     }
   ];
 
