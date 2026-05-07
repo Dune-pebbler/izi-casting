@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import {
   ChevronLeft,
   ChevronRight,
@@ -7,6 +8,8 @@ import {
   ChevronDown,
   ChevronUp,
   Users,
+  UserSearch,
+  ShieldCheck,
 } from "lucide-react";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "../../../firebase";
@@ -189,6 +192,7 @@ function Sidebar({
   const { modules } = useTenantModules();
   const [isAdmin, setIsAdmin] = useState(false);
   const [logoUrl, setLogoUrl] = useState("");
+  const [privacyOpen, setPrivacyOpen] = useState(false);
   useEffect(() => {
     if (!tenantId) {
       setIsAdmin(true);
@@ -218,32 +222,95 @@ function Sidebar({
       >
         {isCollapsed ? <ChevronLeft size={24} /> : <ChevronRight size={24} />}
       </button>
-      <div className="sidebar-logo">
-        <img
-          src="/izicasting-logo.svg"
-          alt="iziCasting"
-          className="logo-image"
+      <div className="sidebar-scroll-area">
+        <div className="sidebar-logo">
+          <img
+            src="/izicasting-logo.svg"
+            alt="iziCasting"
+            className="logo-image"
+          />
+          {tenantName && <h2 className="sidebar-tenant-name">{tenantName}</h2>}
+        </div>
+        <Devices
+          setDeviceToDelete={setDeviceToDelete}
+          deleteDevice={deleteDevice}
+          isAdmin={isAdmin}
         />
-        {tenantName && <h2 className="sidebar-tenant-name">{tenantName}</h2>}
-      </div>
-      <Devices
-        setDeviceToDelete={setDeviceToDelete}
-        deleteDevice={deleteDevice}
-        isAdmin={isAdmin}
-      />
-      <FeedList />
-      {tenantId && isAdmin && <UsersPanel tenantId={tenantId} />}
-      {modules.backgroundMusic && <AudioSettings />}
-      <SlideArchive
-        onOpenTrash={onOpenTrash}
-        trashedSlidesCount={trashedSlidesCount}
-      />
-      {isAdmin && (
-        <Settings
+        <FeedList />
+        {tenantId && isAdmin && <UsersPanel tenantId={tenantId} />}
+        {modules.backgroundMusic && <AudioSettings />}
+        <SlideArchive
           onOpenTrash={onOpenTrash}
           trashedSlidesCount={trashedSlidesCount}
         />
-      )}
+        {isAdmin && (
+          <Settings
+            onOpenTrash={onOpenTrash}
+            trashedSlidesCount={trashedSlidesCount}
+          />
+        )}
+      </div>
+      <div className="sidebar__footer">
+        {isAdmin && (
+          <button
+            className="sidebar__footer-btn"
+            onClick={() => setPrivacyOpen(true)}
+          >
+            <ShieldCheck size={15} />
+            <span>Privacyverklaring</span>
+          </button>
+        )}
+        <a
+          className="sidebar__footer-btn"
+          href="https://www.dunepebbler.nl/contact"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <UserSearch size={15} />
+          <span>Contact</span>
+        </a>
+      </div>
+
+      {privacyOpen &&
+        createPortal(
+          <div
+            className="sidebar__privacy-overlay"
+            onClick={() => setPrivacyOpen(false)}
+          >
+            <div
+              className="sidebar__privacy-modal"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="sidebar__privacy-header">
+                <h2>Privacyverklaring</h2>
+                <button onClick={() => setPrivacyOpen(false)}>
+                  <X size={18} />
+                </button>
+              </div>
+              <div className="sidebar__privacy-body">
+                <p>
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
+                  do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                  Ut enim ad minim veniam, quis nostrud exercitation ullamco
+                  laboris nisi ut aliquip ex ea commodo consequat.
+                </p>
+                <p>
+                  Duis aute irure dolor in reprehenderit in voluptate velit esse
+                  cillum dolore eu fugiat nulla pariatur. Excepteur sint
+                  occaecat cupidatat non proident, sunt in culpa qui officia
+                  deserunt mollit anim id est laborum.
+                </p>
+                <p>
+                  Sed ut perspiciatis unde omnis iste natus error sit voluptatem
+                  accusantium doloremque laudantium, totam rem aperiam, eaque
+                  ipsa quae ab illo inventore veritatis et quasi architecto
+                  beatae vitae dicta sunt explicabo.
+                </p>
+              </div>
+            </div>
+          </div>,
+          document.body,
+        )}
     </div>
   );
 }
