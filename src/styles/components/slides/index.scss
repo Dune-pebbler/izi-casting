@@ -2,12 +2,12 @@
 // SLIDES MODULE - Main Entry Point
 // =============================================================================
 
-@import '../../variables_new';
-@import 'base';
-@import 'cards';
-@import 'modal';
-@import 'previews';
-@import 'preview-text';
+@import "../../variables_new";
+@import "base";
+@import "cards";
+@import "modal";
+@import "previews";
+@import "preview-text";
 
 // =============================================================================
 // COUNTDOWN SLIDE - Admin Input
@@ -280,5 +280,183 @@
   &__date {
     font-size: 10px;
     color: rgba(255, 255, 255, 0.6);
+  }
+}
+
+// =============================================================================
+// EMAIL SLIDE - Admin Input
+// =============================================================================
+
+.modal-email {
+  display: flex;
+  flex: 1;
+  height: 100%;
+  overflow: auto;
+}
+
+.email-input {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+  padding: 24px;
+
+  &__section {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  &__section-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted-foreground);
+    margin: 0 0 4px;
+  }
+
+  &__help-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--primary);
+    text-decoration: none;
+    text-transform: none;
+    letter-spacing: 0;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  &__providers {
+    display: flex;
+    gap: 8px;
+  }
+
+  &__provider-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--background);
+    color: var(--foreground);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+
+    &.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: white;
+    }
+
+    &:hover:not(.active) {
+      background: var(--accent);
+    }
+  }
+
+  &__credentials {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    label {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--foreground);
+    }
+  }
+
+  &__row {
+    display: flex;
+    gap: 12px;
+
+    .email-input__field {
+      flex: 1;
+    }
+  }
+
+  &__toggle-secrets {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: none;
+    border: none;
+    color: var(--muted-foreground);
+    font-size: 12px;
+    cursor: pointer;
+    padding: 0;
+    width: fit-content;
+
+    &:hover {
+      color: var(--foreground);
+    }
+  }
+
+  &__toggle-btn {
+    padding: 6px 14px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--background);
+    color: var(--foreground);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    height: 38px;
+
+    &.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: white;
+    }
+  }
+
+  &__info {
+    padding: 12px 16px;
+    background: var(--accent);
+    border-radius: 8px;
+    font-size: 12px;
+    color: var(--muted-foreground);
+    line-height: 1.6;
+
+    strong {
+      color: var(--foreground);
+      display: block;
+      margin-bottom: 6px;
+      color: white;
+    }
+
+    ol {
+      margin: 0;
+      padding-left: 18px;
+      display: flex;
+      flex-direction: column;
+      color: white;
+      gap: 4px;
+    }
+
+    code {
+      background: var(--background);
+      padding: 1px 5px;
+      border-radius: 3px;
+      font-size: 11px;
+    }
   }
 }

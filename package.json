@@ -7,8 +7,10 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "api": "node local-api.js"
   },
+  "proxy": "http://localhost:3001",
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
     "@dnd-kit/sortable": "^10.0.0",
@@ -42,5 +44,9 @@
   "devDependencies": {
     "@xmldom/xmldom": "^0.8.11",
     "node-fetch": "^2.7.0"
+  },
+  "optionalDependencies": {
+    "imapflow": "^1.3.3",
+    "mailparser": "^3.9.8"
   }
 }

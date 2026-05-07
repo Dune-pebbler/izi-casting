@@ -23,3 +23,5 @@ yarn-error.log*
 
 # Firebase
 .env
+.vercel
+.env*.local

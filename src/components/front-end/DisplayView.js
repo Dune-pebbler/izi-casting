@@ -831,6 +831,7 @@ function DisplayView() {
                 slide.images.length > 0) ||
               (slide.layout === "countdown" && slide.countdownTargetDate) ||
               (slide.layout === "agenda" && slide.agendaCalendars && slide.agendaCalendars.length > 0) ||
+              (slide.layout === "email" && slide.emailProvider) ||
               (!slide.type && slide.text && slide.text.trim())),
         );
 

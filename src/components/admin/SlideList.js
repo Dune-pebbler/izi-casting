@@ -19,6 +19,7 @@ import {
   MoreVertical,
   Timer,
   CalendarDays,
+  Mail,
   Sparkles,
 } from "lucide-react";
 import SlideEffectsModal from "./SlideEffectsModal";
@@ -33,6 +34,7 @@ const iconMap = {
   gallery: <Images />,
   countdown: <Timer />,
   agenda: <CalendarDays />,
+  email: <Mail />,
 };
 import { sanitizeHTMLContent } from "../../utils/sanitize";
 import { extractVideoInfo } from "../../utils/videoMetadata";

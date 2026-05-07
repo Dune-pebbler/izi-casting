@@ -103,6 +103,13 @@ function AdminView() {
   const [modalAgendaMaxEvents, setModalAgendaMaxEvents] = useState(8);
   const [modalAgendaBgColor, setModalAgendaBgColor] = useState("#0f172a");
   const [modalAgendaTextColor, setModalAgendaTextColor] = useState("#ffffff");
+  const [modalEmailProvider, setModalEmailProvider] = useState("gmail");
+  const [modalEmailCredentials, setModalEmailCredentials] = useState({});
+  const [modalEmailMaxItems, setModalEmailMaxItems] = useState(10);
+  const [modalEmailShowUnreadOnly, setModalEmailShowUnreadOnly] = useState(true);
+  const [modalEmailBgColor, setModalEmailBgColor] = useState("#0f172a");
+  const [modalEmailTextColor, setModalEmailTextColor] = useState("#ffffff");
+  const [modalEmailAccentColor, setModalEmailAccentColor] = useState("#4f87ff");
   const [imageLibraryTarget, setImageLibraryTarget] = useState("main");
   const [modalTimeRestriction, setModalTimeRestriction] = useState({
     enabled: false,
@@ -389,6 +396,7 @@ function AdminView() {
       gallery: "gallery",
       countdown: "countdown",
       agenda: "agenda",
+      email: "email",
     };
     const newSlide = {
       id: Date.now(),
@@ -416,6 +424,16 @@ function AdminView() {
         countdownNumberColor: "#ffffff",
         countdownBlockBg: "#1a1a2e",
         countdownLabelColor: "#aaaaaa",
+        duration: 30,
+      }),
+      ...(slideLayout === "email" && {
+        emailProvider: "gmail",
+        emailCredentials: {},
+        emailMaxItems: 10,
+        emailShowUnreadOnly: true,
+        emailBgColor: "#0f172a",
+        emailTextColor: "#ffffff",
+        emailAccentColor: "#4f87ff",
         duration: 30,
       }),
       imagePosition: "center",
@@ -565,6 +583,13 @@ function AdminView() {
     setModalAgendaMaxEvents(slide.agendaMaxEvents || 8);
     setModalAgendaBgColor(slide.agendaBgColor || "#0f172a");
     setModalAgendaTextColor(slide.agendaTextColor || "#ffffff");
+    setModalEmailProvider(slide.emailProvider || "gmail");
+    setModalEmailCredentials(slide.emailCredentials || {});
+    setModalEmailMaxItems(slide.emailMaxItems ?? 10);
+    setModalEmailShowUnreadOnly(slide.emailShowUnreadOnly ?? true);
+    setModalEmailBgColor(slide.emailBgColor || "#0f172a");
+    setModalEmailTextColor(slide.emailTextColor || "#ffffff");
+    setModalEmailAccentColor(slide.emailAccentColor || "#4f87ff");
     setModalTimeRestriction(
       slide.timeRestriction || {
         enabled: false,
@@ -842,6 +867,7 @@ function AdminView() {
             const isGallery = slideLayout === "gallery";
             const isCountdown = slideLayout === "countdown";
             const isAgenda = slideLayout === "agenda";
+            const isEmail = slideLayout === "email";
             const galleryDuration = isGallery
               ? modalGalleryImages.reduce(
                   (sum, img) => sum + (img.duration || 3),
@@ -884,6 +910,18 @@ function AdminView() {
                     agendaMaxEvents: modalAgendaMaxEvents,
                     agendaBgColor: modalAgendaBgColor,
                     agendaTextColor: modalAgendaTextColor,
+                    duration: modalSlideDuration === "" ? 30 : modalSlideDuration,
+                  }
+                : isEmail
+                ? {
+                    type: "email",
+                    emailProvider: modalEmailProvider,
+                    emailCredentials: modalEmailCredentials,
+                    emailMaxItems: modalEmailMaxItems,
+                    emailShowUnreadOnly: modalEmailShowUnreadOnly,
+                    emailBgColor: modalEmailBgColor,
+                    emailTextColor: modalEmailTextColor,
+                    emailAccentColor: modalEmailAccentColor,
                     duration: modalSlideDuration === "" ? 30 : modalSlideDuration,
                   }
                 : {
@@ -1525,6 +1563,20 @@ function AdminView() {
           onAgendaBgColorChange={setModalAgendaBgColor}
           agendaTextColor={modalAgendaTextColor}
           onAgendaTextColorChange={setModalAgendaTextColor}
+          emailProvider={modalEmailProvider}
+          onEmailProviderChange={setModalEmailProvider}
+          emailCredentials={modalEmailCredentials}
+          onEmailCredentialsChange={setModalEmailCredentials}
+          emailMaxItems={modalEmailMaxItems}
+          onEmailMaxItemsChange={setModalEmailMaxItems}
+          emailShowUnreadOnly={modalEmailShowUnreadOnly}
+          onEmailShowUnreadOnlyChange={setModalEmailShowUnreadOnly}
+          emailBgColor={modalEmailBgColor}
+          onEmailBgColorChange={setModalEmailBgColor}
+          emailTextColor={modalEmailTextColor}
+          onEmailTextColorChange={setModalEmailTextColor}
+          emailAccentColor={modalEmailAccentColor}
+          onEmailAccentColorChange={setModalEmailAccentColor}
         />
       )}
 

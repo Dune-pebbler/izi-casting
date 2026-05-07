@@ -18,6 +18,7 @@ import IframeUrlInput from "./IframeUrlInput";
 import GalleryInput from "./GalleryInput";
 import CountdownInput from "./CountdownInput";
 import AgendaInput from "./AgendaInput";
+import EmailInput from "./EmailInput";
 
 function EditModal({
   slide,
@@ -97,6 +98,20 @@ function EditModal({
   onAgendaBgColorChange,
   agendaTextColor,
   onAgendaTextColorChange,
+  emailProvider,
+  onEmailProviderChange,
+  emailCredentials,
+  onEmailCredentialsChange,
+  emailMaxItems,
+  onEmailMaxItemsChange,
+  emailShowUnreadOnly,
+  onEmailShowUnreadOnlyChange,
+  emailBgColor,
+  onEmailBgColorChange,
+  emailTextColor,
+  onEmailTextColorChange,
+  emailAccentColor,
+  onEmailAccentColorChange,
 }) {
   const [timePopupOpen, setTimePopupOpen] = useState(false);
 
@@ -307,6 +322,26 @@ function EditModal({
               onAgendaBgColorChange={onAgendaBgColorChange}
               agendaTextColor={agendaTextColor}
               onAgendaTextColorChange={onAgendaTextColorChange}
+            />
+          </div>
+        );
+
+      case "email":
+        return (
+          <div className="modal-email">
+            <EmailInput
+              emailCredentials={emailCredentials}
+              onEmailCredentialsChange={onEmailCredentialsChange}
+              emailMaxItems={emailMaxItems}
+              onEmailMaxItemsChange={onEmailMaxItemsChange}
+              emailShowUnreadOnly={emailShowUnreadOnly}
+              onEmailShowUnreadOnlyChange={onEmailShowUnreadOnlyChange}
+              emailBgColor={emailBgColor}
+              onEmailBgColorChange={onEmailBgColorChange}
+              emailTextColor={emailTextColor}
+              onEmailTextColorChange={onEmailTextColorChange}
+              emailAccentColor={emailAccentColor}
+              onEmailAccentColorChange={onEmailAccentColorChange}
             />
           </div>
         );

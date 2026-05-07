@@ -409,6 +409,150 @@ function AgendaDisplay({ slide }) {
   );
 }
 
+function EmailSlideDisplay({ slide }) {
+  const [emails, setEmails] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [shouldScroll, setShouldScroll] = useState(false);
+  const bodyRef = useRef(null);
+  const contentRef = useRef(null);
+
+  const credentials = slide.emailCredentials || {};
+  const maxItems = slide.emailMaxItems || 10;
+  const unreadOnly = slide.emailShowUnreadOnly ?? true;
+  const bgColor = slide.emailBgColor || "#0f172a";
+  const textColor = slide.emailTextColor || "#ffffff";
+  const accentColor = slide.emailAccentColor || "#4f87ff";
+
+  const hasCredentials = Object.values(credentials).some(Boolean);
+
+  useEffect(() => {
+    if (!hasCredentials) {
+      setLoading(false);
+      return;
+    }
+
+    const fetchEmails = async () => {
+      try {
+        const res = await fetch("/api/email/fetch", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ credentials, maxItems, unreadOnly }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Ophalen mislukt");
+        setEmails(data.emails || []);
+        setError(null);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchEmails();
+    const interval = setInterval(fetchEmails, 5 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, [JSON.stringify(credentials), maxItems, unreadOnly, hasCredentials]);
+
+  useEffect(() => {
+    if (loading || !contentRef.current || !bodyRef.current) return;
+
+    const timer = setTimeout(() => {
+      const contentHeight = contentRef.current.scrollHeight;
+      const containerHeight = bodyRef.current.clientHeight;
+
+      if (contentHeight > containerHeight) {
+        const scrollDistance = contentHeight - containerHeight;
+        const duration = scrollDistance / 30;
+        contentRef.current.style.setProperty("--email-scroll-dist", `-${scrollDistance}px`);
+        contentRef.current.style.setProperty("--email-scroll-duration", `${duration}s`);
+        setShouldScroll(true);
+      } else {
+        setShouldScroll(false);
+      }
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, [loading, emails]);
+
+  const formatFrom = (from) => {
+    const match = from?.match(/^"?([^"<]+)"?\s*<?[^>]*>?$/);
+    return match ? match[1].trim() : from || "Onbekend";
+  };
+
+  const formatDate = (dateStr) => {
+    if (!dateStr) return "";
+    try {
+      const d = new Date(dateStr);
+      const now = new Date();
+      const diffMs = now - d;
+      const diffMin = Math.floor(diffMs / 60000);
+      const diffHour = Math.floor(diffMin / 60);
+      const diffDay = Math.floor(diffHour / 24);
+      if (diffMin < 60) return `${diffMin}m geleden`;
+      if (diffHour < 24) return `${diffHour}u geleden`;
+      if (diffDay === 1) return "gisteren";
+      return d.toLocaleDateString("nl-NL", { day: "numeric", month: "short" });
+    } catch {
+      return "";
+    }
+  };
+
+  return (
+    <div
+      className="email-slide"
+      style={{ backgroundColor: bgColor, color: textColor }}
+    >
+      <div className="email-slide__header" style={{ borderBottomColor: accentColor }}>
+        <span className="email-slide__title">Inbox</span>
+        {unreadOnly && (
+          <span className="email-slide__badge" style={{ backgroundColor: accentColor }}>
+            Ongelezen
+          </span>
+        )}
+      </div>
+
+      <div className="email-slide__body" ref={bodyRef}>
+        {loading && (
+          <div className="email-slide__state">Emails ophalen...</div>
+        )}
+        {!loading && error && (
+          <div className="email-slide__state email-slide__state--error">
+            {error}
+          </div>
+        )}
+        {!loading && !error && !hasCredentials && (
+          <div className="email-slide__state">Geen credentials ingesteld</div>
+        )}
+        {!loading && !error && hasCredentials && emails.length === 0 && (
+          <div className="email-slide__state">Geen emails gevonden</div>
+        )}
+        {!loading && !error && emails.length > 0 && (
+          <div
+            ref={contentRef}
+            className={`email-slide__content${shouldScroll ? " email-slide__content--scroll" : ""}`}
+          >
+            {emails.map((email, i) => (
+              <div
+                key={email.id || i}
+                className={`email-slide__item${!email.isRead ? " email-slide__item--unread" : ""}`}
+                style={{ borderLeftColor: !email.isRead ? accentColor : "transparent" }}
+              >
+                <div className="email-slide__item-subject">{email.subject}</div>
+                <div className="email-slide__item-meta" style={{ color: `${textColor}99` }}>
+                  <span className="email-slide__item-from">{formatFrom(email.from)}</span>
+                  <span className="email-slide__item-date">{formatDate(email.receivedAt)}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function parseICS(icsText) {
   const events = [];
   // Unfold lines: iCal folds long lines with CRLF+space or CRLF+tab.
@@ -816,6 +960,8 @@ function SlideDisplay({
         {layout === "countdown" && <CountdownDisplay slide={slide} />}
 
         {layout === "agenda" && <AgendaDisplay slide={slide} />}
+
+        {layout === "email" && <EmailSlideDisplay slide={slide} />}
       </>
     );
   };
