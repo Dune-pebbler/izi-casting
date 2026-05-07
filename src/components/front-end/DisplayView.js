@@ -1275,6 +1275,9 @@ function DisplayView() {
         <div
           className="audio-unlock-overlay"
           onClick={() => document.dispatchEvent(new MouseEvent("click"))}
+          onKeyDown={() => document.dispatchEvent(new KeyboardEvent("keydown"))}
+          tabIndex={0}
+          ref={(el) => el && el.focus()}
         >
           <div className="audio-unlock-card">
             <div className="audio-unlock-icon">
@@ -1293,7 +1296,7 @@ function DisplayView() {
                 <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
               </svg>
             </div>
-            <span className="audio-unlock-text">Klik om muziek te starten</span>
+            <span className="audio-unlock-text">Klik of druk op een toets om muziek te starten</span>
           </div>
         </div>
       )}
