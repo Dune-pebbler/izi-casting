@@ -239,12 +239,14 @@ function Sidebar({
         <FeedList />
         {tenantId && isAdmin && <UsersPanel tenantId={tenantId} />}
         {modules.backgroundMusic && <AudioSettings />}
-        <SlideArchive
-          onOpenTrash={onOpenTrash}
-          trashedSlidesCount={trashedSlidesCount}
-        />
         {isAdmin && (
           <Settings
+            onOpenTrash={onOpenTrash}
+            trashedSlidesCount={trashedSlidesCount}
+          />
+        )}
+        {trashedSlidesCount > 0 && (
+          <SlideArchive
             onOpenTrash={onOpenTrash}
             trashedSlidesCount={trashedSlidesCount}
           />
