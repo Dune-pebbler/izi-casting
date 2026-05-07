@@ -137,6 +137,7 @@ function AdminView() {
   const [editingPlaylistRepeatCountId, setEditingPlaylistRepeatCountId] =
     useState(null);
   const [playlistToDelete, setPlaylistToDelete] = useState(null);
+  const [playlistToCopy, setPlaylistToCopy] = useState(null);
   const [globalLayout, setGlobalLayout] = useState("list"); // 'grid' or 'list'
 
   // Add slide modal state
@@ -351,6 +352,17 @@ function AdminView() {
 
   const confirmDeletePlaylist = (playlist) => {
     setPlaylistToDelete(playlist);
+  };
+
+  const confirmCopyPlaylist = (playlist) => {
+    setPlaylistToCopy(playlist);
+  };
+
+  const handleCopyPlaylist = async () => {
+    if (playlistToCopy) {
+      await copyPlaylist(playlistToCopy);
+      setPlaylistToCopy(null);
+    }
   };
 
   const handleDeletePlaylist = async () => {
@@ -1446,7 +1458,7 @@ function AdminView() {
           onUpdatePlaylistName={updatePlaylistName}
           onUpdatePlaylistRepeatCount={updatePlaylistRepeatCount}
           onTogglePlaylistEnabled={togglePlaylistEnabled}
-          onCopyPlaylist={copyPlaylist}
+          onCopyPlaylist={confirmCopyPlaylist}
           onConfirmDeletePlaylist={confirmDeletePlaylist}
           modules={modules}
           slideTypes={slideTypes}
@@ -1673,6 +1685,53 @@ function AdminView() {
                   className="btn btn-danger"
                 >
                   Verwijderen
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Playlist Copy Confirmation Modal */}
+      {playlistToCopy && (
+        <div className="slide-delete-modal-wrapper">
+          <div
+            className="modal-overlay"
+            onClick={() => setPlaylistToCopy(null)}
+          >
+            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+              <div className="modal-header">
+                <h3>Playlist kopiëren</h3>
+                <button
+                  onClick={() => setPlaylistToCopy(null)}
+                  className="modal-close-btn"
+                  title="Sluiten"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+              <div className="modal-body">
+                <p className="modal-description">
+                  Weet je zeker dat je
+                  <strong> {playlistToCopy.name}</strong> wilt kopiëren?
+                </p>
+                <p>
+                  Er wordt een kopie aangemaakt met de naam{" "}
+                  <strong>{playlistToCopy.name} (Copy)</strong>.
+                </p>
+              </div>
+              <div className="modal-footer">
+                <button
+                  onClick={() => setPlaylistToCopy(null)}
+                  className="btn btn-secondary"
+                >
+                  Annuleren
+                </button>
+                <button
+                  onClick={handleCopyPlaylist}
+                  className="btn btn-primary"
+                >
+                  Kopiëren
                 </button>
               </div>
             </div>
