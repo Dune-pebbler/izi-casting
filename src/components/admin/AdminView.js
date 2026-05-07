@@ -1449,6 +1449,7 @@ function AdminView() {
           onCopyPlaylist={copyPlaylist}
           onConfirmDeletePlaylist={confirmDeletePlaylist}
           modules={modules}
+          slideTypes={slideTypes}
           onSaveSlideEffects={saveSlideEffects}
           onEditSlide={openEditModal}
           onUpdateSlideType={updateSlideType}

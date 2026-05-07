@@ -71,9 +71,16 @@ function SlideList({
   onAddSlide,
   onMoveSlide,
   modules = {},
+  slideTypes = {},
   onSaveSlideEffects,
   playlistCount = 1,
 }) {
+  const hasSlideTypeConfig = Object.keys(slideTypes).length > 0;
+  const isSlideTypeDisabled = (slide) => {
+    if (!hasSlideTypeConfig) return false;
+    const layout = slide.layout || "side-by-side";
+    return slideTypes[layout] === false;
+  };
   const [effectsSlide, setEffectsSlide] = useState(null);
   // Function to strip HTML tags and get clean text
   const stripHtml = (html) => {
@@ -156,10 +163,11 @@ function SlideList({
       isDragging,
     } = useSortable({ id: slide.id });
 
+    const disabled = isSlideTypeDisabled(slide);
     const style = {
       transform: CSS.Transform.toString(transform),
       transition,
-      opacity: isDragging ? 0.5 : 1,
+      opacity: isDragging ? 0.5 : disabled ? 0.4 : 1,
     };
 
     const renderSlidePreview = (slide) => {
@@ -567,10 +575,11 @@ function SlideList({
       isDragging,
     } = useSortable({ id: slide.id });
 
+    const disabled = isSlideTypeDisabled(slide);
     const style = {
       transform: CSS.Transform.toString(transform),
       transition,
-      opacity: isDragging ? 0.5 : 1,
+      opacity: isDragging ? 0.5 : disabled ? 0.4 : 1,
     };
 
     const getPlaceholderIcon = (layout) => {

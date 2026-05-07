@@ -30,6 +30,7 @@ const PlaylistList = ({
   onCopyPlaylist,
   onConfirmDeletePlaylist,
   modules,
+  slideTypes,
   onSaveSlideEffects,
   onEditSlide,
   onUpdateSlideType,
@@ -168,6 +169,7 @@ const PlaylistList = ({
                 onMoveSlide={(slide) => onMoveSlide(slide, playlist.id)}
                 playlistCount={playlists.length}
                 modules={modules}
+                slideTypes={slideTypes}
                 onSaveSlideEffects={(slideId, effects) =>
                   onSaveSlideEffects && onSaveSlideEffects(playlist.id, slideId, effects)
                 }
