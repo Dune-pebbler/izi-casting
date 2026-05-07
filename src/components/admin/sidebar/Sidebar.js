@@ -228,6 +228,7 @@ function Sidebar({
       <Devices
         setDeviceToDelete={setDeviceToDelete}
         deleteDevice={deleteDevice}
+        isAdmin={isAdmin}
       />
       <FeedList />
       {tenantId && isAdmin && <UsersPanel tenantId={tenantId} />}

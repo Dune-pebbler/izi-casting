@@ -36,7 +36,7 @@ import {
   clearPairingError,
 } from "../../../store/slices/deviceSlice";
 
-function Devices({ setDeviceToDelete, deleteDevice }) {
+function Devices({ setDeviceToDelete, deleteDevice, isAdmin }) {
   const { tenantId } = useTenant();
   // Redux state
   const dispatch = useAppDispatch();
@@ -490,7 +490,7 @@ function Devices({ setDeviceToDelete, deleteDevice }) {
           )}
 
           {/* Extra Screen Button - only show when devices are connected and not showing pairing form */}
-          {onlineDevices.length > 0 && !showPairingForm && (
+          {onlineDevices.length > 0 && !showPairingForm && isAdmin && (
             <div
               className="extra-screen-button"
               onClick={() => dispatch(setShowPairingForm(true))}
