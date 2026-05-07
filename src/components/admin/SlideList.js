@@ -21,8 +21,10 @@ import {
   CalendarDays,
   Mail,
   Sparkles,
+  MonitorPlay,
 } from "lucide-react";
 import SlideEffectsModal from "./SlideEffectsModal";
+import SlidePreviewModal from "./slide-edit/SlidePreviewModal";
 
 const iconMap = {
   video: <Play />,
@@ -82,6 +84,7 @@ function SlideList({
     return slideTypes[layout] === false;
   };
   const [effectsSlide, setEffectsSlide] = useState(null);
+  const [previewSlide, setPreviewSlide] = useState(null);
   // Function to strip HTML tags and get clean text
   const stripHtml = (html) => {
     if (!html) return "";
@@ -507,6 +510,17 @@ function SlideList({
             <button
               onClick={(e) => {
                 e.stopPropagation();
+                setPreviewSlide(slide);
+              }}
+              className="btn-icon"
+              title="Voorbeeld bekijken"
+            >
+              <MonitorPlay size={16} />
+            </button>
+
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
                 onCopySlide(slide);
               }}
               className="btn-icon"
@@ -671,6 +685,16 @@ function SlideList({
               <ChevronsUpDown size={16} />
             </button>
           )}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setPreviewSlide(slide);
+            }}
+            className="btn-icon"
+            title="Voorbeeld bekijken"
+          >
+            <MonitorPlay size={16} />
+          </button>
           <button
             onClick={(e) => {
               e.stopPropagation();
@@ -899,6 +923,15 @@ function SlideList({
                 onSaveSlideEffects(effectsSlide.id, effects);
               }
             }}
+          />,
+          document.body,
+        )}
+
+      {previewSlide &&
+        ReactDOM.createPortal(
+          <SlidePreviewModal
+            slide={previewSlide}
+            onClose={() => setPreviewSlide(null)}
           />,
           document.body,
         )}
