@@ -5012,7 +5012,7 @@ a:hover {
   font-size: 1rem;
   position: relative;
 }
-.settings-container .settings-content .sidebar-trash-btn .trash-count-badge {
+.settings-container .trash-count-badge {
   margin-left: auto;
   background: var(--destructive);
   color: white;

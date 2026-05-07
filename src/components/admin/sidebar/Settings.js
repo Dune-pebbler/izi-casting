@@ -46,7 +46,7 @@ const AVAILABLE_FONTS = [
   { name: "Verdana", value: "Verdana=verdana,geneva" },
 ];
 
-function Settings({ onOpenTrash, trashedSlidesCount = 0 }) {
+function Settings() {
   const { tenantId } = useTenant();
   const [isAdvancedSettingsExpanded, setIsAdvancedSettingsExpanded] =
     useState(false);
@@ -611,23 +611,6 @@ function Settings({ onOpenTrash, trashedSlidesCount = 0 }) {
                   </div>
                 ))}
               </div>
-            </div>
-
-            {/* Trash Button */}
-            <div className="settings-section">
-              <button
-                className="sidebar-trash-btn"
-                onClick={onOpenTrash}
-                title="Prullenbak openen"
-              >
-                <Trash2 size={20} />
-                <span>Prullenbak</span>
-                {trashedSlidesCount > 0 && (
-                  <span className="trash-count-badge">
-                    {trashedSlidesCount}
-                  </span>
-                )}
-              </button>
             </div>
 
             {/* Save Button */}

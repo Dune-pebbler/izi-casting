@@ -76,18 +76,18 @@
       color: var(--foreground);
       font-size: 1rem;
       position: relative;
-
-      .trash-count-badge {
-        margin-left: auto;
-        background: var(--destructive);
-        color: white;
-        padding: 2px 8px;
-        border-radius: 12px;
-        font-size: 0.75rem;
-        min-width: 20px;
-        text-align: center;
-      }
     }
+  }
+
+  .trash-count-badge {
+    margin-left: auto;
+    background: var(--destructive);
+    color: white;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    min-width: 20px;
+    text-align: center;
   }
 
   // Settings Sections - matches form styling patterns
@@ -566,7 +566,7 @@
 
   &::before,
   &::after {
-    content: '';
+    content: "";
     flex: 1;
     height: 1px;
     background-color: var(--border);

@@ -15,6 +15,7 @@ import { auth } from "../../../firebase";
 import Devices from "./Devices";
 import FeedList from "./FeedList";
 import AudioSettings from "./AudioSettings";
+import SlideArchive from "./SlideArchive";
 import Settings from "./Settings";
 import { useTenantModules } from "../../../hooks/useTenantModules";
 import { toast } from "sonner";
@@ -233,6 +234,10 @@ function Sidebar({
       <FeedList />
       {tenantId && isAdmin && <UsersPanel tenantId={tenantId} />}
       {modules.backgroundMusic && <AudioSettings />}
+      <SlideArchive
+        onOpenTrash={onOpenTrash}
+        trashedSlidesCount={trashedSlidesCount}
+      />
       {isAdmin && (
         <Settings
           onOpenTrash={onOpenTrash}
