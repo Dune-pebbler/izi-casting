@@ -75,6 +75,7 @@ function SlideList({
   modules = {},
   slideTypes = {},
   onSaveSlideEffects,
+  onToggleSlideTimeRestriction,
   playlistCount = 1,
 }) {
   const hasSlideTypeConfig = Object.keys(slideTypes).length > 0;
@@ -552,12 +553,16 @@ function SlideList({
               </button>
             )}
 
-            <span
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onToggleSlideTimeRestriction(slide.id);
+              }}
               className={`btn-icon btn-icon--time ${slide.timeRestriction?.enabled ? "btn-icon--success" : ""}`}
-              title={`Tijdvenster: ${slide.timeRestriction?.startTime} – ${slide.timeRestriction?.endTime}`}
+              title={slide.timeRestriction?.enabled ? `Tijdvenster aan: ${slide.timeRestriction?.startTime} – ${slide.timeRestriction?.endTime}` : "Tijdvenster uitgeschakeld"}
             >
               <Clock size={16} />
-            </span>
+            </button>
 
             <button
               onClick={(e) => {
@@ -729,12 +734,16 @@ function SlideList({
             </button>
           )}
 
-          <span
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onToggleSlideTimeRestriction(slide.id);
+            }}
             className={`btn-icon btn-icon--time ${slide.timeRestriction?.enabled ? "btn-icon--success" : ""}`}
-            title={`Tijdvenster: ${slide.timeRestriction?.startTime} – ${slide.timeRestriction?.endTime}`}
+            title={slide.timeRestriction?.enabled ? `Tijdvenster aan: ${slide.timeRestriction?.startTime} – ${slide.timeRestriction?.endTime}` : "Tijdvenster uitgeschakeld"}
           >
             <Clock size={16} />
-          </span>
+          </button>
 
           <button
             onClick={(e) => {
@@ -802,13 +811,13 @@ function SlideList({
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                onEditSlide(slide);
+                onToggleSlideTimeRestriction(slide.id);
                 setActionsOpen(false);
               }}
               className={`btn-icon slide-row__actions-panel-btn${slide.timeRestriction?.enabled ? " btn-icon--success" : ""}`}
             >
               <Clock size={16} />
-              <span>Tijdvenster</span>
+              <span>Tijdvenster {slide.timeRestriction?.enabled ? "uit" : "aan"}</span>
             </button>
             <button
               onClick={(e) => {

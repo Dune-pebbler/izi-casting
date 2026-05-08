@@ -92,11 +92,15 @@ function AdminView() {
   const [modalCountdownTitle, setModalCountdownTitle] = useState("");
   const [modalCountdownTargetDate, setModalCountdownTargetDate] = useState("");
   const [modalCountdownBgImage, setModalCountdownBgImage] = useState("");
-  const [modalCountdownBgImagePosition, setModalCountdownBgImagePosition] = useState("center");
-  const [modalCountdownTextColor, setModalCountdownTextColor] = useState("#ffffff");
-  const [modalCountdownNumberColor, setModalCountdownNumberColor] = useState("#ffffff");
+  const [modalCountdownBgImagePosition, setModalCountdownBgImagePosition] =
+    useState("center");
+  const [modalCountdownTextColor, setModalCountdownTextColor] =
+    useState("#ffffff");
+  const [modalCountdownNumberColor, setModalCountdownNumberColor] =
+    useState("#ffffff");
   const [modalCountdownBlockBg, setModalCountdownBlockBg] = useState("#1a1a2e");
-  const [modalCountdownLabelColor, setModalCountdownLabelColor] = useState("#aaaaaa");
+  const [modalCountdownLabelColor, setModalCountdownLabelColor] =
+    useState("#aaaaaa");
   const [modalAgendaCalendars, setModalAgendaCalendars] = useState([]);
   const [modalAgendaTitle, setModalAgendaTitle] = useState("Agenda");
   const [modalAgendaDaysAhead, setModalAgendaDaysAhead] = useState(14);
@@ -106,7 +110,8 @@ function AdminView() {
   const [modalEmailProvider, setModalEmailProvider] = useState("gmail");
   const [modalEmailCredentials, setModalEmailCredentials] = useState({});
   const [modalEmailMaxItems, setModalEmailMaxItems] = useState(10);
-  const [modalEmailShowUnreadOnly, setModalEmailShowUnreadOnly] = useState(true);
+  const [modalEmailShowUnreadOnly, setModalEmailShowUnreadOnly] =
+    useState(true);
   const [modalEmailBgColor, setModalEmailBgColor] = useState("#0f172a");
   const [modalEmailTextColor, setModalEmailTextColor] = useState("#ffffff");
   const [modalEmailAccentColor, setModalEmailAccentColor] = useState("#4f87ff");
@@ -584,7 +589,9 @@ function AdminView() {
     setModalCountdownTitle(slide.countdownTitle || "");
     setModalCountdownTargetDate(slide.countdownTargetDate || "");
     setModalCountdownBgImage(slide.countdownBgImage || "");
-    setModalCountdownBgImagePosition(slide.countdownBgImagePosition || "center");
+    setModalCountdownBgImagePosition(
+      slide.countdownBgImagePosition || "center",
+    );
     setModalCountdownTextColor(slide.countdownTextColor || "#ffffff");
     setModalCountdownNumberColor(slide.countdownNumberColor || "#ffffff");
     setModalCountdownBlockBg(slide.countdownBlockBg || "#1a1a2e");
@@ -828,7 +835,11 @@ function AdminView() {
     try {
       const timestamp = Date.now();
       const fileName = `${timestamp}_${file.name}`;
-      const storageRef = tenantStorageRef(storage, tenantId, `slides/${fileName}`);
+      const storageRef = tenantStorageRef(
+        storage,
+        tenantId,
+        `slides/${fileName}`,
+      );
       const snapshot = await uploadBytes(storageRef, file);
       const downloadURL = await getDownloadURL(snapshot.ref);
 
@@ -901,66 +912,69 @@ function AdminView() {
                     duration: galleryDuration,
                   }
                 : isCountdown
-                ? {
-                    type: "countdown",
-                    countdownTitle: modalCountdownTitle,
-                    countdownTargetDate: modalCountdownTargetDate,
-                    countdownBgImage: modalCountdownBgImage,
-                    countdownBgImagePosition: modalCountdownBgImagePosition,
-                    countdownTextColor: modalCountdownTextColor,
-                    countdownNumberColor: modalCountdownNumberColor,
-                    countdownBlockBg: modalCountdownBlockBg,
-                    countdownLabelColor: modalCountdownLabelColor,
-                    duration: modalSlideDuration === "" ? 30 : modalSlideDuration,
-                  }
-                : isAgenda
-                ? {
-                    type: "agenda",
-                    agendaCalendars: modalAgendaCalendars,
-                    agendaTitle: modalAgendaTitle,
-                    agendaDaysAhead: modalAgendaDaysAhead,
-                    agendaMaxEvents: modalAgendaMaxEvents,
-                    agendaBgColor: modalAgendaBgColor,
-                    agendaTextColor: modalAgendaTextColor,
-                    duration: modalSlideDuration === "" ? 30 : modalSlideDuration,
-                  }
-                : isEmail
-                ? {
-                    type: "email",
-                    emailProvider: modalEmailProvider,
-                    emailCredentials: modalEmailCredentials,
-                    emailMaxItems: modalEmailMaxItems,
-                    emailShowUnreadOnly: modalEmailShowUnreadOnly,
-                    emailBgColor: modalEmailBgColor,
-                    emailTextColor: modalEmailTextColor,
-                    emailAccentColor: modalEmailAccentColor,
-                    duration: modalSlideDuration === "" ? 30 : modalSlideDuration,
-                  }
-                : {
-                    text: sanitizeHTMLContent(modalTinyMCEContent),
-                    tinyMCEContent: modalTinyMCEContent,
-                    imageUrl: modalImageUrl,
-                    videoUrl: modalVideoUrl,
-                    teletekstChannel: modalTeletekstChannel,
-                    teletekstTheme: modalTeletekstTheme,
-                    teletekstPageCount: modalTeletekstPageCount,
-                    teletekstSkipLines: modalTeletekstSkipLines,
-                    iframeUrl: modalIframeUrl,
-                    type:
-                      slideLayout === "iframe"
-                        ? "iframe"
-                        : slideLayout === "teletekst"
-                          ? "teletekst"
-                          : modalVideoUrl
-                            ? "video"
-                            : modalImageUrl
-                              ? "image"
-                              : "text",
-                    imagePosition: imagePosition,
-                    imageSide: modalImageSide,
-                    duration:
-                      modalSlideDuration === "" ? 5 : modalSlideDuration,
-                  }),
+                  ? {
+                      type: "countdown",
+                      countdownTitle: modalCountdownTitle,
+                      countdownTargetDate: modalCountdownTargetDate,
+                      countdownBgImage: modalCountdownBgImage,
+                      countdownBgImagePosition: modalCountdownBgImagePosition,
+                      countdownTextColor: modalCountdownTextColor,
+                      countdownNumberColor: modalCountdownNumberColor,
+                      countdownBlockBg: modalCountdownBlockBg,
+                      countdownLabelColor: modalCountdownLabelColor,
+                      duration:
+                        modalSlideDuration === "" ? 30 : modalSlideDuration,
+                    }
+                  : isAgenda
+                    ? {
+                        type: "agenda",
+                        agendaCalendars: modalAgendaCalendars,
+                        agendaTitle: modalAgendaTitle,
+                        agendaDaysAhead: modalAgendaDaysAhead,
+                        agendaMaxEvents: modalAgendaMaxEvents,
+                        agendaBgColor: modalAgendaBgColor,
+                        agendaTextColor: modalAgendaTextColor,
+                        duration:
+                          modalSlideDuration === "" ? 30 : modalSlideDuration,
+                      }
+                    : isEmail
+                      ? {
+                          type: "email",
+                          emailProvider: modalEmailProvider,
+                          emailCredentials: modalEmailCredentials,
+                          emailMaxItems: modalEmailMaxItems,
+                          emailShowUnreadOnly: modalEmailShowUnreadOnly,
+                          emailBgColor: modalEmailBgColor,
+                          emailTextColor: modalEmailTextColor,
+                          emailAccentColor: modalEmailAccentColor,
+                          duration:
+                            modalSlideDuration === "" ? 30 : modalSlideDuration,
+                        }
+                      : {
+                          text: sanitizeHTMLContent(modalTinyMCEContent),
+                          tinyMCEContent: modalTinyMCEContent,
+                          imageUrl: modalImageUrl,
+                          videoUrl: modalVideoUrl,
+                          teletekstChannel: modalTeletekstChannel,
+                          teletekstTheme: modalTeletekstTheme,
+                          teletekstPageCount: modalTeletekstPageCount,
+                          teletekstSkipLines: modalTeletekstSkipLines,
+                          iframeUrl: modalIframeUrl,
+                          type:
+                            slideLayout === "iframe"
+                              ? "iframe"
+                              : slideLayout === "teletekst"
+                                ? "teletekst"
+                                : modalVideoUrl
+                                  ? "video"
+                                  : modalImageUrl
+                                    ? "image"
+                                    : "text",
+                          imagePosition: imagePosition,
+                          imageSide: modalImageSide,
+                          duration:
+                            modalSlideDuration === "" ? 5 : modalSlideDuration,
+                        }),
             };
 
             return updatedSlide;
@@ -1027,7 +1041,7 @@ function AdminView() {
       return {
         ...playlist,
         slides: playlist.slides.map((slide) =>
-          slide.id === slideId ? { ...slide, effects } : slide
+          slide.id === slideId ? { ...slide, effects } : slide,
         ),
       };
     });
@@ -1048,6 +1062,37 @@ function AdminView() {
     if (slideToRemove) {
       await moveSlideToTrash(slideToRemove, playlistId);
     }
+  };
+
+  const toggleSlideTimeRestriction = async (playlistId, slideId) => {
+    const playlist = playlists.find((p) => p.id === playlistId);
+    const slide = playlist?.slides.find((s) => s.id === slideId);
+    const willEnable = !slide?.timeRestriction?.enabled;
+    const slideName = slide?.name || "Slide";
+
+    const updatedPlaylists = playlists.map((p) => {
+      if (p.id === playlistId) {
+        const updatedSlides = p.slides.map((s) =>
+          s.id === slideId
+            ? {
+                ...s,
+                timeRestriction: {
+                  ...s.timeRestriction,
+                  enabled: willEnable,
+                },
+              }
+            : s,
+        );
+        return { ...p, slides: updatedSlides };
+      }
+      return p;
+    });
+
+    toast.success(
+      `"${slideName}" tijdvenster ${willEnable ? "ingeschakeld" : "uitgeschakeld"}`,
+    );
+    setPlaylists(updatedPlaylists);
+    await savePlaylistsToFirebase(updatedPlaylists);
   };
 
   const toggleSlideVisibility = async (playlistId, slideId) => {
@@ -1385,7 +1430,9 @@ function AdminView() {
             <button
               className="admin-layout-btn"
               title="Terug naar overzicht"
-              onClick={() => { window.location.href = "/admin"; }}
+              onClick={() => {
+                window.location.href = "/admin";
+              }}
             >
               <Undo2 size={16} />
             </button>
@@ -1466,6 +1513,7 @@ function AdminView() {
           onEditSlide={openEditModal}
           onUpdateSlideType={updateSlideType}
           onToggleSlideVisibility={toggleSlideVisibility}
+          onToggleSlideTimeRestriction={toggleSlideTimeRestriction}
           onConfirmDeleteSlide={confirmDeleteSlide}
           onRemoveSlide={removeSlide}
           onImageUpload={handleImageUpload}
@@ -1783,59 +1831,66 @@ function AdminView() {
       />
 
       {/* Slide Delete Confirmation Modal */}
-      {slideToDelete && ReactDOM.createPortal(
-        <div className="slide-delete-modal-wrapper">
-          <div className="modal-overlay" onClick={() => setSlideToDelete(null)}>
-            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-              <div className="modal-header">
-                <h3>Slide verwijderen</h3>
-                <button
-                  onClick={() => setSlideToDelete(null)}
-                  className="modal-close-btn"
-                  title="Close"
-                >
-                  <X size={20} />
-                </button>
-              </div>
+      {slideToDelete &&
+        ReactDOM.createPortal(
+          <div className="slide-delete-modal-wrapper">
+            <div
+              className="modal-overlay"
+              onClick={() => setSlideToDelete(null)}
+            >
+              <div
+                className="modal-content"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="modal-header">
+                  <h3>Slide verwijderen</h3>
+                  <button
+                    onClick={() => setSlideToDelete(null)}
+                    className="modal-close-btn"
+                    title="Close"
+                  >
+                    <X size={20} />
+                  </button>
+                </div>
 
-              <div className="modal-body">
-                <p className="modal-description">
-                  Weet je zeker dat je{" "}
-                  <strong>{slideToDelete.slide.name || "Slide"}</strong> wilt
-                  verwijderen?
-                </p>
-                <p className="delete-warning">
-                  De slide wordt verplaatst naar de prullenbak en kan later
-                  worden hersteld.
-                </p>
-              </div>
+                <div className="modal-body">
+                  <p className="modal-description">
+                    Weet je zeker dat je{" "}
+                    <strong>{slideToDelete.slide.name || "Slide"}</strong> wilt
+                    verwijderen?
+                  </p>
+                  <p className="delete-warning">
+                    De slide wordt verplaatst naar de prullenbak en kan later
+                    worden hersteld.
+                  </p>
+                </div>
 
-              <div className="modal-footer">
-                <button
-                  onClick={() => setSlideToDelete(null)}
-                  className="btn btn-secondary"
-                >
-                  Annuleren
-                </button>
-                <button
-                  onClick={() => {
-                    deleteSlide(
-                      slideToDelete.slide.id,
-                      slideToDelete.playlistId,
-                    );
-                    setSlideToDelete(null);
-                    closeEditModal();
-                  }}
-                  className="btn btn-danger"
-                >
-                  Verwijderen
-                </button>
+                <div className="modal-footer">
+                  <button
+                    onClick={() => setSlideToDelete(null)}
+                    className="btn btn-secondary"
+                  >
+                    Annuleren
+                  </button>
+                  <button
+                    onClick={() => {
+                      deleteSlide(
+                        slideToDelete.slide.id,
+                        slideToDelete.playlistId,
+                      );
+                      setSlideToDelete(null);
+                      closeEditModal();
+                    }}
+                    className="btn btn-danger"
+                  >
+                    Verwijderen
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        </div>,
-        document.body
-      )}
+          </div>,
+          document.body,
+        )}
     </div>
   );
 }

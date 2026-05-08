@@ -35,6 +35,7 @@ const PlaylistList = ({
   onEditSlide,
   onUpdateSlideType,
   onToggleSlideVisibility,
+  onToggleSlideTimeRestriction,
   onConfirmDeleteSlide,
   onRemoveSlide,
   onImageUpload,
@@ -153,6 +154,9 @@ const PlaylistList = ({
                 }
                 onToggleSlideVisibility={(slideId) =>
                   onToggleSlideVisibility(playlist.id, slideId)
+                }
+                onToggleSlideTimeRestriction={(slideId) =>
+                  onToggleSlideTimeRestriction(playlist.id, slideId)
                 }
                 onConfirmDeleteSlide={(slide) => onConfirmDeleteSlide(slide, playlist.id)}
                 onRemoveSlide={(slideId) => onRemoveSlide(playlist.id, slideId)}
