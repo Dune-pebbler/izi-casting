@@ -5,8 +5,14 @@ import {
   doc,
   setDoc,
   getDoc,
+  getDocs,
+  deleteDoc,
+  updateDoc,
+  query,
+  where,
 } from "firebase/firestore";
-import { db, auth } from "../../firebase";
+import { ref, listAll, deleteObject } from "firebase/storage";
+import { db, auth, storage } from "../../firebase";
 import { signOut } from "firebase/auth";
 import {
   Plus,
@@ -18,6 +24,9 @@ import {
   ShieldCheck,
   ChevronDown,
   ChevronUp,
+  Trash2,
+  RotateCcw,
+  AlertTriangle,
 } from "lucide-react";
 import CreateTenantModal from "./CreateTenantModal";
 import EditTenantModal from "./EditTenantModal";
@@ -28,9 +37,52 @@ function normaliseUser(u) {
   return { email: u.email, role: u.role || "admin" };
 }
 
+async function permanentDeleteTenant(tenantId) {
+  // Delete tenant subcollections
+  const subcollections = ["trash", "mediaLibrary", "devices", "feeds"];
+  for (const sub of subcollections) {
+    const snap = await getDocs(collection(db, "tenants", tenantId, sub));
+    await Promise.all(snap.docs.map((d) => deleteDoc(d.ref)));
+  }
+  for (const displayDoc of ["settings", "content"]) {
+    await deleteDoc(doc(db, "tenants", tenantId, "display", displayDoc)).catch(() => {});
+  }
+
+  // Delete global devices linked to this tenant + their command queues
+  const devicesSnap = await getDocs(
+    query(collection(db, "devices"), where("tenantId", "==", tenantId)),
+  );
+  await Promise.all(
+    devicesSnap.docs.map((d) =>
+      Promise.all([
+        deleteDoc(d.ref),
+        deleteDoc(doc(db, "device_commands", d.id)).catch(() => {}),
+      ]),
+    ),
+  );
+
+  // Delete storage files
+  try {
+    const storageRef = ref(storage, `tenants/${tenantId}`);
+    const listed = await listAll(storageRef);
+    await Promise.all([
+      ...listed.items.map((item) => deleteObject(item)),
+      ...listed.prefixes.map(async (prefix) => {
+        const nested = await listAll(prefix);
+        return Promise.all(nested.items.map((item) => deleteObject(item)));
+      }),
+    ]);
+  } catch {
+    // Storage folder may not exist
+  }
+
+  await deleteDoc(doc(db, "tenants", tenantId));
+}
+
 function TenantCard({ tenant, onEdit }) {
   const baseUrl = process.env.REACT_APP_BASE_URL || "https://izi-casting.com";
   const url = `${baseUrl}/${tenant.id}`;
+  const isDeleted = !!tenant.deletedAt;
   const [users, setUsers] = useState(
     (tenant.authorizedUsers || []).map(normaliseUser),
   );
@@ -39,6 +91,7 @@ function TenantCard({ tenant, onEdit }) {
   const [isSaving, setIsSaving] = useState(false);
   const [isUsersExpanded, setIsUsersExpanded] = useState(false);
   const [logoUrl, setLogoUrl] = useState("");
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   useEffect(() => {
     getDoc(doc(db, "tenants", tenant.id, "display", "settings")).then(
@@ -99,8 +152,39 @@ function TenantCard({ tenant, onEdit }) {
     }
   };
 
+  const handleSoftDelete = async () => {
+    try {
+      await updateDoc(doc(db, "tenants", tenant.id), {
+        deletedAt: new Date().toISOString(),
+      });
+      toast.success(`${tenant.name} verwijderd`);
+    } catch (e) {
+      toast.error("Fout: " + e.message);
+    }
+  };
+
+  const handleRestore = async () => {
+    try {
+      await updateDoc(doc(db, "tenants", tenant.id), { deletedAt: null });
+      toast.success(`${tenant.name} hersteld`);
+    } catch (e) {
+      toast.error("Fout: " + e.message);
+    }
+  };
+
+  const handlePermanentDelete = async () => {
+    setIsSaving(true);
+    try {
+      await permanentDeleteTenant(tenant.id);
+      toast.success(`${tenant.name} permanent verwijderd`);
+    } catch (e) {
+      toast.error("Fout: " + e.message);
+      setIsSaving(false);
+    }
+  };
+
   return (
-    <div className="tenant-card">
+    <div className={`tenant-card${isDeleted ? " tenant-card--deleted" : ""}`}>
       <div className="tenant-card-header">
         <div className="tenant-card-header-info">
           <div>
@@ -112,23 +196,77 @@ function TenantCard({ tenant, onEdit }) {
           )}
         </div>
         <div className="tenant-card-header-actions">
-          <button
-            className="btn btn-sm btn-outline"
-            title="Bewerken"
-            onClick={() => onEdit(tenant)}
-          >
-            <Pencil size={14} />
-          </button>
-          <a
-            href={url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn btn-sm btn-primary"
-            title="Open admin"
-          >
-            <ExternalLink size={14} />
-            <span>Open Admin</span>
-          </a>
+          {isDeleted ? (
+            <>
+              <button
+                className="btn btn-sm btn-outline"
+                title="Herstellen"
+                onClick={handleRestore}
+                disabled={isSaving}
+              >
+                <RotateCcw size={14} />
+                <span>Herstellen</span>
+              </button>
+              {confirmDelete ? (
+                <>
+                  <button
+                    className="btn btn-sm btn-danger"
+                    onClick={handlePermanentDelete}
+                    disabled={isSaving}
+                  >
+                    <AlertTriangle size={14} />
+                    <span>Bevestig</span>
+                  </button>
+                  <button
+                    className="btn btn-sm btn-outline"
+                    onClick={() => setConfirmDelete(false)}
+                    disabled={isSaving}
+                  >
+                    Annuleer
+                  </button>
+                </>
+              ) : (
+                <button
+                  className="btn btn-sm btn-danger"
+                  title="Permanent verwijderen"
+                  onClick={() => setConfirmDelete(true)}
+                  disabled={isSaving}
+                >
+                  <Trash2 size={14} />
+                  <span>Permanent</span>
+                </button>
+              )}
+            </>
+          ) : (
+            <>
+              <div className="tenant-card-header-actions-left">
+                <button
+                  className="btn btn-sm btn-outline"
+                  title="Bewerken"
+                  onClick={() => onEdit(tenant)}
+                >
+                  <Pencil size={14} />
+                </button>
+                <a
+                  href={url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-sm btn-primary"
+                  title="Open admin"
+                >
+                  <ExternalLink size={14} />
+                  <span>Open Admin</span>
+                </a>
+              </div>
+              <button
+                className="btn btn-sm btn-outline btn-icon-only"
+                title="Verwijderen"
+                onClick={handleSoftDelete}
+              >
+                <Trash2 size={14} />
+              </button>
+            </>
+          )}
         </div>
       </div>
 

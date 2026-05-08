@@ -77,6 +77,7 @@ function DisplayView() {
   const hasInitializedRef = useRef(false);
   const generateDisplayPairingCodeRef = useRef();
   const isPairedRef = useRef(isPaired);
+  const tenantDeletedRef = useRef(false);
   const isGeneratingCodeRef = useRef(isGeneratingCode);
   const displayPairingCodeRef = useRef(displayPairingCode);
   const isGeneratingCodeInternalRef = useRef(false);
@@ -681,97 +682,121 @@ function DisplayView() {
       "settings",
     );
 
-    const unsubscribeTenant = onSnapshot(
-      doc(db, "tenants", displayTenantId),
-      (snap) => {
-        const tenantData = snap.exists() ? snap.data() : {};
-        setTenantModules(tenantData.modules || {});
-        setTenantSlideTypes(tenantData.slideTypes || {});
-      },
-    );
+    let unsubscribeTenant;
+    let unsubscribeContent;
+    let unsubscribeSettings;
 
-    const unsubscribeContent = onSnapshot(displayDocRef, (doc) => {
-      if (doc.exists()) {
-        const data = doc.data();
+    const setup = async () => {
+      // Check tenant deletion status before setting up the content listener
+      // so we never show slides for a deleted tenant, even briefly on refresh.
+      const tenantSnap = await getDoc(doc(db, "tenants", displayTenantId));
+      const initialTenantData = tenantSnap.exists() ? tenantSnap.data() : {};
+      tenantDeletedRef.current = !!initialTenantData.deletedAt;
+      if (tenantDeletedRef.current) {
+        setPlaylists([]);
+      }
 
-        if (Date.now() % 10000 < 100) {
-          console.log("Raw Firebase data:", data);
-        }
-
+      const applyContentDoc = (snap) => {
+        if (!snap.exists()) return;
+        const data = snap.data();
         if (data.playlists) {
           setPlaylists(data.playlists);
         } else if (data.slides) {
-          const defaultPlaylist = {
-            id: "default",
-            name: "Default Playlist",
-            slides: data.slides || [],
-          };
-          setPlaylists([defaultPlaylist]);
+          setPlaylists([{ id: "default", name: "Default Playlist", slides: data.slides || [] }]);
         } else {
           setPlaylists([]);
         }
-      }
-    });
+      };
 
-    const unsubscribeSettings = onSnapshot(settingsDocRef, (doc) => {
-      if (doc.exists()) {
-        const data = doc.data();
-        setSettings({
-          logoUrl: data.logoUrl || "",
-          backgroundColor: data.backgroundColor || "#FAFAFA",
-          foregroundColor: data.foregroundColor || "#212121",
-          progressBarColor: data.progressBarColor || "#3dbcc9",
-          feedUrl: data.feedUrl || "",
-          showClock: data.showClock !== undefined ? data.showClock : true,
-          barStyle: data.barStyle || "onder",
-          backgroundMusic: data.backgroundMusic || null,
-        });
+      unsubscribeTenant = onSnapshot(
+        doc(db, "tenants", displayTenantId),
+        (snap) => {
+          const tenantData = snap.exists() ? snap.data() : {};
+          if (tenantData.deletedAt) {
+            tenantDeletedRef.current = true;
+            setPlaylists([]);
+            return;
+          }
+          const wasDeleted = tenantDeletedRef.current;
+          tenantDeletedRef.current = false;
+          setTenantModules(tenantData.modules || {});
+          setTenantSlideTypes(tenantData.slideTypes || {});
+          if (wasDeleted) {
+            getDoc(displayDocRef).then(applyContentDoc);
+          }
+        },
+      );
 
-        // Apply typography as CSS custom properties
-        const typo = data.typography || {};
-        const defaults = {
-          p: { fontSize: 27, fontFamily: "Roboto" },
-          h1: { fontSize: 64, fontFamily: "Roboto" },
-          h2: { fontSize: 53, fontFamily: "Roboto" },
-          h3: { fontSize: 43, fontFamily: "Roboto" },
-        };
-        ["p", "h1", "h2", "h3"].forEach((tag) => {
-          const t = typo[tag] || defaults[tag];
-          document.documentElement.style.setProperty(
-            `--typo-${tag}-size`,
-            `${t.fontSize}px`,
-          );
-          document.documentElement.style.setProperty(
-            `--typo-${tag}-family`,
-            t.fontFamily,
-          );
-        });
-
-        if (data.feeds && Array.isArray(data.feeds)) {
-          const enabledFeeds = data.feeds.filter(
-            (feed) => feed.isEnabled !== false && feed.isVisible !== false,
-          );
-          setFeeds(enabledFeeds);
-        } else if (data.feedUrl) {
-          const migratedFeed = {
-            id: "legacy",
-            name: "Legacy Feed",
-            url: data.feedUrl,
-            isEnabled: true,
-            duration: 10,
-            isVisible: true,
-          };
-          setFeeds([migratedFeed]);
-        } else {
-          setFeeds([]);
+      unsubscribeContent = onSnapshot(displayDocRef, (snap) => {
+        if (tenantDeletedRef.current) return;
+        if (Date.now() % 10000 < 100) {
+          console.log("Raw Firebase data:", snap.data());
         }
-      }
-    });
+        applyContentDoc(snap);
+      });
+
+      unsubscribeSettings = onSnapshot(settingsDocRef, (doc) => {
+        if (doc.exists()) {
+          const data = doc.data();
+          setSettings({
+            logoUrl: data.logoUrl || "",
+            backgroundColor: data.backgroundColor || "#FAFAFA",
+            foregroundColor: data.foregroundColor || "#212121",
+            progressBarColor: data.progressBarColor || "#3dbcc9",
+            feedUrl: data.feedUrl || "",
+            showClock: data.showClock !== undefined ? data.showClock : true,
+            barStyle: data.barStyle || "onder",
+            backgroundMusic: data.backgroundMusic || null,
+          });
+
+          // Apply typography as CSS custom properties
+          const typo = data.typography || {};
+          const defaults = {
+            p: { fontSize: 27, fontFamily: "Roboto" },
+            h1: { fontSize: 64, fontFamily: "Roboto" },
+            h2: { fontSize: 53, fontFamily: "Roboto" },
+            h3: { fontSize: 43, fontFamily: "Roboto" },
+          };
+          ["p", "h1", "h2", "h3"].forEach((tag) => {
+            const t = typo[tag] || defaults[tag];
+            document.documentElement.style.setProperty(
+              `--typo-${tag}-size`,
+              `${t.fontSize}px`,
+            );
+            document.documentElement.style.setProperty(
+              `--typo-${tag}-family`,
+              t.fontFamily,
+            );
+          });
+
+          if (data.feeds && Array.isArray(data.feeds)) {
+            const enabledFeeds = data.feeds.filter(
+              (feed) => feed.isEnabled !== false && feed.isVisible !== false,
+            );
+            setFeeds(enabledFeeds);
+          } else if (data.feedUrl) {
+            const migratedFeed = {
+              id: "legacy",
+              name: "Legacy Feed",
+              url: data.feedUrl,
+              isEnabled: true,
+              duration: 10,
+              isVisible: true,
+            };
+            setFeeds([migratedFeed]);
+          } else {
+            setFeeds([]);
+          }
+        }
+      });
+    };
+
+    setup();
 
     return () => {
-      unsubscribeTenant();
-      unsubscribeContent();
-      unsubscribeSettings();
+      unsubscribeTenant?.();
+      unsubscribeContent?.();
+      unsubscribeSettings?.();
     };
   }, [isPaired, displayTenantId]);
 

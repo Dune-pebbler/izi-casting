@@ -224,6 +224,21 @@
     box-shadow: $shadow-md;
     border-color: var(--border-hover);
   }
+
+  &.tenant-card--deleted {
+    opacity: 0.4;
+    border-color: var(--border);
+    border-style: dashed;
+
+    &:hover {
+      opacity: 0.7;
+    }
+  }
+}
+
+.btn-icon-only {
+  padding-left: $spacing-xs;
+  padding-right: $spacing-xs;
 }
 
 .tenant-card-header {
@@ -251,6 +266,13 @@
 }
 
 .tenant-card-header-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $spacing-xs;
+}
+
+.tenant-card-header-actions-left {
   display: flex;
   align-items: center;
   gap: $spacing-xs;
