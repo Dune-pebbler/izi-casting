@@ -20,10 +20,8 @@ import {
   Timer,
   CalendarDays,
   Mail,
-  Sparkles,
   MonitorPlay,
 } from "lucide-react";
-import SlideEffectsModal from "./SlideEffectsModal";
 
 const iconMap = {
   video: <Play />,
@@ -85,7 +83,7 @@ function SlideList({
     return slideTypes[layout] === false;
   };
   const { tenantId } = useTenant();
-  const [effectsSlide, setEffectsSlide] = useState(null);
+
 
   const openSlidePreview = (slide) => {
     window.open(`/preview/${tenantId}/slide/${slide.id}`, "_blank");
@@ -544,19 +542,6 @@ function SlideList({
               <Trash2 size={16} />
             </button>
 
-            {modules.slideEffects && (
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setEffectsSlide(slide);
-                }}
-                className={`btn-icon ${slide.effects?.length > 0 ? "btn-icon--effects-active" : ""}`}
-                title="Slide effecten"
-              >
-                <Sparkles size={16} />
-              </button>
-            )}
-
             <button
               onClick={(e) => {
                 e.stopPropagation();
@@ -724,19 +709,6 @@ function SlideList({
           >
             <Trash2 size={16} />
           </button>
-
-          {modules.slideEffects && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setEffectsSlide(slide);
-              }}
-              className={`btn-icon ${slide.effects?.length > 0 ? "btn-icon--effects-active" : ""}`}
-              title="Slide effecten"
-            >
-              <Sparkles size={16} />
-            </button>
-          )}
 
           <button
             onClick={(e) => {
@@ -925,20 +897,6 @@ function SlideList({
           )}
         </SortableContext>
       </DndContext>
-
-      {effectsSlide &&
-        ReactDOM.createPortal(
-          <SlideEffectsModal
-            slide={effectsSlide}
-            onClose={() => setEffectsSlide(null)}
-            onSave={(effects) => {
-              if (onSaveSlideEffects) {
-                onSaveSlideEffects(effectsSlide.id, effects);
-              }
-            }}
-          />,
-          document.body,
-        )}
 
     </>
   );

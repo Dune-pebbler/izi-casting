@@ -1663,6 +1663,15 @@ function AdminView() {
           onEmailTextColorChange={setModalEmailTextColor}
           emailAccentColor={modalEmailAccentColor}
           onEmailAccentColorChange={setModalEmailAccentColor}
+          modules={modules}
+          onSaveSlideEffects={(effects) => {
+            saveSlideEffects(
+              currentEditingPlaylistId,
+              editingSlide.id,
+              effects,
+            );
+            setEditingSlide((prev) => ({ ...prev, effects }));
+          }}
         />
       )}
 

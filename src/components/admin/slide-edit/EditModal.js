@@ -9,6 +9,7 @@ import {
   Zap,
   Eye,
   EyeOff,
+  Sparkles,
 } from "lucide-react";
 import LayoutSelector from "./LayoutSelector";
 import ImageUpload from "./ImageUpload";
@@ -21,6 +22,7 @@ import GalleryInput from "./GalleryInput";
 import CountdownInput from "./CountdownInput";
 import AgendaInput from "./AgendaInput";
 import EmailInput from "./EmailInput";
+import SlideEffectsModal from "../SlideEffectsModal";
 
 function EditModal({
   slide,
@@ -115,8 +117,11 @@ function EditModal({
   onEmailTextColorChange,
   emailAccentColor,
   onEmailAccentColorChange,
+  modules = {},
+  onSaveSlideEffects,
 }) {
   const [timePopupOpen, setTimePopupOpen] = useState(false);
+  const [effectsOpen, setEffectsOpen] = useState(false);
 
   const renderLayoutContent = () => {
     switch (slideLayout) {
@@ -567,11 +572,14 @@ function EditModal({
                               className="time-popup__time-input"
                             />
                           </div>
-                          {timeRestriction.startDate && timeRestriction.endDate && timeRestriction.startDate > timeRestriction.endDate && (
-                            <p className="time-popup__midnight-note">
-                              ⚠ Einddatum ligt voor de startdatum
-                            </p>
-                          )}
+                          {timeRestriction.startDate &&
+                            timeRestriction.endDate &&
+                            timeRestriction.startDate >
+                              timeRestriction.endDate && (
+                              <p className="time-popup__midnight-note">
+                                ⚠ Einddatum ligt voor de startdatum
+                              </p>
+                            )}
                         </div>
 
                         <div className="time-popup__date-section">
@@ -586,15 +594,26 @@ function EditModal({
                               { key: "sat", label: "Za" },
                               { key: "sun", label: "Zo" },
                             ].map(({ key, label }) => (
-                              <label key={key} className="time-popup__day-label">
+                              <label
+                                key={key}
+                                className="time-popup__day-label"
+                              >
                                 <input
                                   type="checkbox"
-                                  checked={timeRestriction.days?.[key] !== false}
+                                  checked={
+                                    timeRestriction.days?.[key] !== false
+                                  }
                                   onChange={(e) =>
                                     onTimeRestrictionChange({
                                       ...timeRestriction,
                                       days: {
-                                        mon: true, tue: true, wed: true, thu: true, fri: true, sat: true, sun: true,
+                                        mon: true,
+                                        tue: true,
+                                        wed: true,
+                                        thu: true,
+                                        fri: true,
+                                        sat: true,
+                                        sun: true,
                                         ...timeRestriction.days,
                                         [key]: e.target.checked,
                                       },
@@ -611,6 +630,19 @@ function EditModal({
                   </div>
                 )}
               </div>
+
+              {modules.slideEffects && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setEffectsOpen(true);
+                  }}
+                  className={`btn-icon ${slide.effects?.length > 0 ? "btn-icon--effects-active" : ""}`}
+                  title="Slide effecten"
+                >
+                  <Sparkles size={16} />
+                </button>
+              )}
 
               <button
                 onClick={() => {
@@ -652,6 +684,17 @@ function EditModal({
           </div>
         </div>
       </div>
+
+      {effectsOpen && (
+        <SlideEffectsModal
+          slide={slide}
+          onClose={() => setEffectsOpen(false)}
+          onSave={(effects) => {
+            if (onSaveSlideEffects) onSaveSlideEffects(effects);
+            setEffectsOpen(false);
+          }}
+        />
+      )}
     </div>
   );
 }
