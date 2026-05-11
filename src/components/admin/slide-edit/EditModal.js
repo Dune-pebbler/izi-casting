@@ -7,6 +7,8 @@ import {
   Layout,
   ArrowLeftRight,
   Zap,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 import LayoutSelector from "./LayoutSelector";
 import ImageUpload from "./ImageUpload";
@@ -59,6 +61,7 @@ function EditModal({
   onTeletekstPageCountChange,
   onTeletekstSkipLinesChange,
   onIframeUrlChange,
+  onToggleSlideVisibility,
   onOpenLibrary,
   timeRestriction,
   onTimeRestrictionChange,
@@ -291,7 +294,9 @@ function EditModal({
               countdownBgImage={countdownBgImage}
               onCountdownBgImageUpload={onCountdownBgImageUpload}
               countdownBgImagePosition={countdownBgImagePosition}
-              onCountdownBgImagePositionChange={onCountdownBgImagePositionChange}
+              onCountdownBgImagePositionChange={
+                onCountdownBgImagePositionChange
+              }
               countdownTextColor={countdownTextColor}
               onCountdownTextColorChange={onCountdownTextColorChange}
               countdownNumberColor={countdownNumberColor}
@@ -392,7 +397,11 @@ function EditModal({
                     min="0"
                     step="1"
                     disabled={slideLayout === "gallery"}
-                    title={slideLayout === "gallery" ? "Automatisch berekend op basis van foto-duraties" : undefined}
+                    title={
+                      slideLayout === "gallery"
+                        ? "Automatisch berekend op basis van foto-duraties"
+                        : undefined
+                    }
                   />
                   <span className="slide-modal__duration-suffix">s</span>
                 </div>
@@ -446,6 +455,17 @@ function EditModal({
             </div>
 
             <div className="slide-modal__header-actions">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onToggleSlideVisibility(slide.id);
+                }}
+                className={`btn-icon btn-icon--time ${slide.isVisible ? "btn-icon--success" : ""}`}
+                title="Toggle slide"
+              >
+                {slide.isVisible ? <Eye size={16} /> : <EyeOff size={16} />}
+              </button>
+
               <div className="slide-modal__time-popup-wrapper">
                 <button
                   className={`btn-icon btn-icon--time ${timeRestriction?.enabled ? "btn-icon--success" : ""}`}
@@ -543,13 +563,18 @@ function EditModal({
 
           <div className="slide-modal__mobile-footer">
             <button
-              onClick={() => { onDelete(); }}
+              onClick={() => {
+                onDelete();
+              }}
               className="btn-icon btn-icon--danger slide-modal__mobile-footer-delete"
               title="Slide verwijderen"
             >
               <Trash2 size={18} />
             </button>
-            <button onClick={onSave} className="btn btn-primary slide-modal__mobile-footer-save">
+            <button
+              onClick={onSave}
+              className="btn btn-primary slide-modal__mobile-footer-save"
+            >
               Opslaan
             </button>
           </div>

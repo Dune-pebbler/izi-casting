@@ -1585,6 +1585,10 @@ function AdminView() {
           onTeletekstSkipLinesChange={setModalTeletekstSkipLines}
           iframeUrl={modalIframeUrl}
           onIframeUrlChange={setModalIframeUrl}
+          onToggleSlideVisibility={(slideId) => {
+            toggleSlideVisibility(currentEditingPlaylistId, slideId);
+            setEditingSlide((prev) => ({ ...prev, isVisible: !prev.isVisible }));
+          }}
           onOpenLibrary={handleOpenImageLibrary}
           timeRestriction={modalTimeRestriction}
           onTimeRestrictionChange={setModalTimeRestriction}
