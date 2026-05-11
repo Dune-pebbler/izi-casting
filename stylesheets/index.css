@@ -1327,19 +1327,27 @@
   flex-direction: column;
   gap: 8px;
 }
-.slide-modal__time-popup-wrapper .slide-modal__time-popup .time-popup__field {
+.slide-modal__time-popup-wrapper .slide-modal__time-popup .time-popup__row {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
   gap: 8px;
 }
+.slide-modal__time-popup-wrapper .slide-modal__time-popup .time-popup__row .time-popup__field {
+  flex: 1;
+}
+.slide-modal__time-popup-wrapper .slide-modal__time-popup .time-popup__field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
 .slide-modal__time-popup-wrapper .slide-modal__time-popup .time-popup__field label {
-  font-size: 12px;
+  font-size: 10px;
+  font-weight: 500;
   color: var(--foreground-secondary);
-  min-width: 28px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 .slide-modal__time-popup-wrapper .slide-modal__time-popup .time-popup__field .time-popup__time-input {
-  flex: 1;
+  width: 100%;
   padding: 4px 8px;
   border: 1px solid var(--border);
   border-radius: 4px;
@@ -1351,6 +1359,22 @@
 .slide-modal__time-popup-wrapper .slide-modal__time-popup .time-popup__field .time-popup__time-input:focus {
   outline: none;
   border-color: var(--primary);
+}
+.slide-modal__time-popup-wrapper .slide-modal__time-popup .time-popup__date-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+}
+.slide-modal__time-popup-wrapper .slide-modal__time-popup .time-popup__date-section small {
+  font-size: 10px;
+  color: var(--foreground-secondary);
+}
+.slide-modal__time-popup-wrapper .slide-modal__time-popup .time-popup__date-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 .slide-modal__time-popup-wrapper .slide-modal__time-popup .time-popup__midnight-note {
   font-size: 10px;

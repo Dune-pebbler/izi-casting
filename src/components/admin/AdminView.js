@@ -121,6 +121,8 @@ function AdminView() {
     enabled: false,
     startTime: "08:00",
     endTime: "17:00",
+    startDate: "",
+    endDate: "",
   });
   const [currentEditingPlaylistId, setCurrentEditingPlaylistId] =
     useState(null);
@@ -615,6 +617,8 @@ function AdminView() {
         enabled: false,
         startTime: "08:00",
         endTime: "17:00",
+        startDate: "",
+        endDate: "",
       },
     );
   };

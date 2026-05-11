@@ -500,33 +500,35 @@ function EditModal({
                     </label>
                     {timeRestriction?.enabled && (
                       <div className="time-popup__inputs">
-                        <div className="time-popup__field">
-                          <label>Van</label>
-                          <input
-                            type="time"
-                            value={timeRestriction.startTime || "08:00"}
-                            onChange={(e) =>
-                              onTimeRestrictionChange({
-                                ...timeRestriction,
-                                startTime: e.target.value,
-                              })
-                            }
-                            className="time-popup__time-input"
-                          />
-                        </div>
-                        <div className="time-popup__field">
-                          <label>Tot</label>
-                          <input
-                            type="time"
-                            value={timeRestriction.endTime || "17:00"}
-                            onChange={(e) =>
-                              onTimeRestrictionChange({
-                                ...timeRestriction,
-                                endTime: e.target.value,
-                              })
-                            }
-                            className="time-popup__time-input"
-                          />
+                        <div className="time-popup__row">
+                          <div className="time-popup__field">
+                            <label>Van</label>
+                            <input
+                              type="time"
+                              value={timeRestriction.startTime || "08:00"}
+                              onChange={(e) =>
+                                onTimeRestrictionChange({
+                                  ...timeRestriction,
+                                  startTime: e.target.value,
+                                })
+                              }
+                              className="time-popup__time-input"
+                            />
+                          </div>
+                          <div className="time-popup__field">
+                            <label>Tot</label>
+                            <input
+                              type="time"
+                              value={timeRestriction.endTime || "17:00"}
+                              onChange={(e) =>
+                                onTimeRestrictionChange({
+                                  ...timeRestriction,
+                                  endTime: e.target.value,
+                                })
+                              }
+                              className="time-popup__time-input"
+                            />
+                          </div>
                         </div>
                         {timeRestriction.startTime >
                           timeRestriction.endTime && (
@@ -534,6 +536,43 @@ function EditModal({
                             ↻ Loopt over middernacht
                           </p>
                         )}
+
+                        <div className="time-popup__date-section">
+                          <small>Datumvenster (optioneel)</small>
+                          <div className="time-popup__field">
+                            <label>Vanaf</label>
+                            <input
+                              type="date"
+                              value={timeRestriction.startDate || ""}
+                              onChange={(e) =>
+                                onTimeRestrictionChange({
+                                  ...timeRestriction,
+                                  startDate: e.target.value,
+                                })
+                              }
+                              className="time-popup__time-input"
+                            />
+                          </div>
+                          <div className="time-popup__field">
+                            <label>Tot en met</label>
+                            <input
+                              type="date"
+                              value={timeRestriction.endDate || ""}
+                              onChange={(e) =>
+                                onTimeRestrictionChange({
+                                  ...timeRestriction,
+                                  endDate: e.target.value,
+                                })
+                              }
+                              className="time-popup__time-input"
+                            />
+                          </div>
+                          {timeRestriction.startDate && timeRestriction.endDate && timeRestriction.startDate > timeRestriction.endDate && (
+                            <p className="time-popup__midnight-note">
+                              ⚠ Einddatum ligt voor de startdatum
+                            </p>
+                          )}
+                        </div>
                       </div>
                     )}
                   </div>

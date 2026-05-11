@@ -914,20 +914,30 @@
       gap: $spacing-sm;
     }
 
-    .time-popup__field {
+    .time-popup__row {
       display: flex;
-      align-items: center;
-      justify-content: space-between;
       gap: $spacing-sm;
 
+      .time-popup__field {
+        flex: 1;
+      }
+    }
+
+    .time-popup__field {
+      display: flex;
+      flex-direction: column;
+      gap: $spacing-xs;
+
       label {
-        font-size: $font-size-sm;
+        font-size: $font-size-xs;
+        font-weight: $font-weight-medium;
         color: var(--foreground-secondary);
-        min-width: 28px;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
       }
 
       .time-popup__time-input {
-        flex: 1;
+        width: 100%;
         padding: $spacing-xs $spacing-sm;
         border: 1px solid var(--border);
         border-radius: $border-radius-sm;
@@ -941,6 +951,25 @@
           border-color: var(--primary);
         }
       }
+    }
+
+    .time-popup__date-section {
+      display: flex;
+      flex-direction: column;
+      gap: $spacing-sm;
+      padding-top: $spacing-sm;
+      border-top: 1px solid var(--border);
+
+      small {
+        font-size: $font-size-xs;
+        color: var(--foreground-secondary);
+      }
+    }
+
+    .time-popup__date-inputs {
+      display: flex;
+      flex-direction: column;
+      gap: $spacing-sm;
     }
 
     .time-popup__midnight-note {
