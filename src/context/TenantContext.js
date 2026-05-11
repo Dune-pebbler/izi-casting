@@ -18,7 +18,7 @@ export function TenantProvider({ children }) {
 
     // Tenant admin: /:tenantId (any first path segment that isn't reserved)
     const match = pathname.match(/^\/([a-zA-Z0-9_-]+)/);
-    if (match && !['login', 'test', 'my-izi'].includes(match[1])) {
+    if (match && !['login', 'test', 'my-izi', 'preview'].includes(match[1])) {
       return { tenantId: match[1], isSuperAdmin: false, isMyAdmin: false };
     }
 

@@ -47,6 +47,7 @@ import {
   LayoutGrid,
   List,
   Undo2,
+  MonitorPlay,
 } from "lucide-react";
 
 function AdminView() {
@@ -1486,6 +1487,14 @@ function AdminView() {
             </button>
 
             <button
+              className="admin-layout-btn"
+              onClick={() => window.open(`/preview/${tenantId}`, "_blank")}
+              title="Preview afspeellijsten"
+            >
+              <MonitorPlay size={18} />
+            </button>
+
+            <button
               className="admin-settings-btn"
               onClick={toggleSidebarCollapse}
               title={isSidebarCollapsed ? "Open settings" : "Close settings"}
@@ -1587,7 +1596,10 @@ function AdminView() {
           onIframeUrlChange={setModalIframeUrl}
           onToggleSlideVisibility={(slideId) => {
             toggleSlideVisibility(currentEditingPlaylistId, slideId);
-            setEditingSlide((prev) => ({ ...prev, isVisible: !prev.isVisible }));
+            setEditingSlide((prev) => ({
+              ...prev,
+              isVisible: !prev.isVisible,
+            }));
           }}
           onOpenLibrary={handleOpenImageLibrary}
           timeRestriction={modalTimeRestriction}
