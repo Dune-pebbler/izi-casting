@@ -28,7 +28,7 @@ function StatusBar({ currentSlide, settings, feeds }) {
       const baseStyle = {
         color: settings.foregroundColor,
         display: shouldShowBar ? "flex" : "none",
-        position: "fixed",
+        position: "absolute",
         zIndex: 5,
       };
 

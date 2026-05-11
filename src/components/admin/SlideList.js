@@ -24,7 +24,6 @@ import {
   MonitorPlay,
 } from "lucide-react";
 import SlideEffectsModal from "./SlideEffectsModal";
-import SlidePreviewModal from "./slide-edit/SlidePreviewModal";
 
 const iconMap = {
   video: <Play />,
@@ -38,6 +37,7 @@ const iconMap = {
   agenda: <CalendarDays />,
   email: <Mail />,
 };
+import { useTenant } from "../../context/TenantContext";
 import { sanitizeHTMLContent } from "../../utils/sanitize";
 import { extractVideoInfo } from "../../utils/videoMetadata";
 import {
@@ -84,8 +84,12 @@ function SlideList({
     const layout = slide.layout || "side-by-side";
     return slideTypes[layout] === false;
   };
+  const { tenantId } = useTenant();
   const [effectsSlide, setEffectsSlide] = useState(null);
-  const [previewSlide, setPreviewSlide] = useState(null);
+
+  const openSlidePreview = (slide) => {
+    window.open(`/preview/${tenantId}/slide/${slide.id}`, "_blank");
+  };
   // Function to strip HTML tags and get clean text
   const stripHtml = (html) => {
     if (!html) return "";
@@ -511,7 +515,7 @@ function SlideList({
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                setPreviewSlide(slide);
+                openSlidePreview(slide);
               }}
               className="btn-icon"
               title="Voorbeeld bekijken"
@@ -693,7 +697,7 @@ function SlideList({
           <button
             onClick={(e) => {
               e.stopPropagation();
-              setPreviewSlide(slide);
+              openSlidePreview(slide);
             }}
             className="btn-icon"
             title="Voorbeeld bekijken"
@@ -936,14 +940,6 @@ function SlideList({
           document.body,
         )}
 
-      {previewSlide &&
-        ReactDOM.createPortal(
-          <SlidePreviewModal
-            slide={previewSlide}
-            onClose={() => setPreviewSlide(null)}
-          />,
-          document.body,
-        )}
     </>
   );
 }

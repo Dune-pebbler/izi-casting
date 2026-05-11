@@ -11,6 +11,7 @@ import SuperAdminView from './components/superadmin/SuperAdminView';
 import MyAdminView from './components/myadmin/MyAdminView';
 import DisplayView from './components/front-end/DisplayView';
 import PlaylistPreviewView from './components/front-end/PlaylistPreviewView';
+import SlidePreviewPage from './components/front-end/SlidePreviewPage';
 import FeedTest from './components/front-end/FeedTest';
 import './styles/main.scss';
 
@@ -45,6 +46,7 @@ function App() {
               <Route path="/admin" element={<AdminRoute />} />
               <Route path="/my-izi" element={<MyAdminRoute />} />
               <Route path="/preview/:tenantId" element={<PlaylistPreviewView />} />
+              <Route path="/preview/:tenantId/slide/:slideId" element={<SlidePreviewPage />} />
               <Route path="/:tenantId" element={<AdminRoute />} />
               <Route path="/:tenantId/admin" element={<AdminRoute />} />
             </Routes>

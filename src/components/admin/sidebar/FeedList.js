@@ -684,8 +684,8 @@ function FeedList() {
         className={`collapsible-wrapper${isFeedSettingsExpanded ? " expanded" : ""}`}
       >
         <div className="feed-list__warning">
-          Let op: U bent verantwoordelijk voor de inhoud van externe feeds.
-          Controleer altijd de bron
+          <strong>Let op:</strong> U bent verantwoordelijk voor de inhoud van
+          externe feeds. Controleer altijd de bron
         </div>
         <div className="feed-collapse-inner">
           <DndContext
