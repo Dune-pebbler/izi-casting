@@ -258,7 +258,7 @@ function Sidebar({
           onClick={() => setPrivacyOpen(true)}
         >
           <ShieldCheck size={15} />
-          <span>Privacyverklaring</span>
+          <span>Disclaimer</span>
         </button>
 
         <a
@@ -283,7 +283,7 @@ function Sidebar({
               onClick={(e) => e.stopPropagation()}
             >
               <div className="sidebar__privacy-header">
-                <h2>Privacyverklaring</h2>
+                <h2>Disclaimer</h2>
                 <button onClick={() => setPrivacyOpen(false)}>
                   <X size={18} />
                 </button>
