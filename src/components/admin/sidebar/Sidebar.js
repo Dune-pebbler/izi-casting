@@ -253,15 +253,14 @@ function Sidebar({
         )}
       </div>
       <div className="sidebar__footer">
-        {isAdmin && (
-          <button
-            className="sidebar__footer-btn"
-            onClick={() => setPrivacyOpen(true)}
-          >
-            <ShieldCheck size={15} />
-            <span>Privacyverklaring</span>
-          </button>
-        )}
+        <button
+          className="sidebar__footer-btn"
+          onClick={() => setPrivacyOpen(true)}
+        >
+          <ShieldCheck size={15} />
+          <span>Privacyverklaring</span>
+        </button>
+
         <a
           className="sidebar__footer-btn"
           href="https://www.dunepebbler.nl/contact"
@@ -290,23 +289,60 @@ function Sidebar({
                 </button>
               </div>
               <div className="sidebar__privacy-body">
+                <div>
+                  <h2>Juridische Disclaimer: Verantwoordelijkheid Content</h2>
+                  <strong>Artikel: Gebruik en Contentbeheer</strong>
+                </div>
+
                 <p>
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
-                  do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                  Ut enim ad minim veniam, quis nostrud exercitation ullamco
-                  laboris nisi ut aliquip ex ea commodo consequat.
+                  Door gebruik te maken van het IZI-Casting platform, verklaart
+                  de Gebruiker expliciet akkoord te gaan met de volgende
+                  bepalingen omtrent content en publicatie:
                 </p>
+
                 <p>
-                  Duis aute irure dolor in reprehenderit in voluptate velit esse
-                  cillum dolore eu fugiat nulla pariatur. Excepteur sint
-                  occaecat cupidatat non proident, sunt in culpa qui officia
-                  deserunt mollit anim id est laborum.
+                  <strong>Eigen Verantwoordelijkheid:</strong> De Gebruiker
+                  draagt de volledige en exclusieve verantwoordelijkheid voor
+                  alle content die via het IZI-Casting systeem wordt
+                  gepubliceerd, waaronder begrepen maar niet beperkt tot
+                  teksten, afbeeldingen, audiofragmenten en video's (al dan niet
+                  afkomstig van platforms zoals YouTube en Vimeo).
                 </p>
+
                 <p>
-                  Sed ut perspiciatis unde omnis iste natus error sit voluptatem
-                  accusantium doloremque laudantium, totam rem aperiam, eaque
-                  ipsa quae ab illo inventore veritatis et quasi architecto
-                  beatae vitae dicta sunt explicabo.
+                  <strong>Rechten van Derden:</strong> De Gebruiker garandeert
+                  dat de gepubliceerde content geen inbreuk maakt op
+                  intellectuele eigendomsrechten (zoals auteursrechten,
+                  merkrechten of naburige rechten) van derden. Bij het gebruik
+                  van externe bronnen, zoals RSS-feeds of video-embeds, dient de
+                  Gebruiker zelf zorg te dragen voor de benodigde licenties of
+                  toestemmingen.
+                </p>
+
+                <p>
+                  <strong>Vrijwaring:</strong> De Gebruiker vrijwaart
+                  IZI-Casting (en haar ontwikkelaar: Dune Pebbler B.V.) tegen
+                  alle aanspraken van derden, evenals alle schade en kosten
+                  (inclusief juridische bijstand), die voortvloeien uit of
+                  verband houden met de door de Gebruiker geplaatste content.
+                </p>
+
+                <p>
+                  <strong>Onrechtmatige Content:</strong> Het is strikt verboden
+                  content te publiceren die in strijd is met de wet, de goede
+                  zeden, of die een discriminerend, beledigend of aanstootgevend
+                  karakter heeft. IZI-Casting behoudt zich het recht voor om bij
+                  overtreding de toegang tot het platform direct te blokkeren,
+                  zonder dat dit leidt tot enige plicht tot schadevergoeding
+                  jegens de Gebruiker.
+                </p>
+
+                <p>
+                  <strong>Externe Bronnen:</strong> IZI-Casting biedt technische
+                  koppelingen met externe diensten (o.a. RSS, YouTube, Vimeo,
+                  Teletekst). Wij aanvaarden geen enkele aansprakelijkheid voor
+                  de beschikbaarheid, juistheid of inhoud van deze externe
+                  bronnen.
                 </p>
               </div>
             </div>
