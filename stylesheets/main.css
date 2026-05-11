@@ -6955,7 +6955,7 @@ a:hover {
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
   padding: 16px;
-  width: 220px;
+  width: 300px;
   z-index: 100;
   display: flex;
   flex-direction: column;
@@ -7059,6 +7059,47 @@ a:hover {
   font-size: 10px;
   color: var(--primary);
   margin: 0;
+}
+.slide-modal__time-popup-wrapper .slide-modal__time-popup .time-popup__days {
+  display: flex;
+  gap: 3px;
+}
+.slide-modal__time-popup-wrapper .slide-modal__time-popup .time-popup__day-label {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 26px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--foreground-muted);
+  background: var(--muted);
+  border: 1px solid transparent;
+  cursor: pointer;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
+  transition: all 0.1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  letter-spacing: 0.01em;
+}
+.slide-modal__time-popup-wrapper .slide-modal__time-popup .time-popup__day-label input[type=checkbox] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+.slide-modal__time-popup-wrapper .slide-modal__time-popup .time-popup__day-label:has(input:checked) {
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border-color: var(--primary);
+}
+.slide-modal__time-popup-wrapper .slide-modal__time-popup .time-popup__day-label:hover:not(:has(input:checked)) {
+  background: var(--muted-hover);
+  color: var(--foreground);
+  border-color: var(--border);
 }
 
 .modal-textarea-overlay {

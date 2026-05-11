@@ -858,7 +858,7 @@
     border-radius: $border-radius-lg;
     box-shadow: $shadow-lg;
     padding: $spacing-md;
-    width: 220px;
+    width: 300px;
     z-index: 100;
     display: flex;
     flex-direction: column;
@@ -980,28 +980,45 @@
 
     .time-popup__days {
       display: flex;
-      gap: $spacing-xs;
-      flex-wrap: wrap;
+      gap: 3px;
     }
 
     .time-popup__day-label {
+      position: relative;
+      flex: 1;
       display: flex;
-      flex-direction: column;
       align-items: center;
-      gap: 2px;
+      justify-content: center;
+      height: 26px;
+      border-radius: $border-radius-sm;
       font-size: $font-size-xs;
-      color: var(--foreground-secondary);
+      font-weight: $font-weight-medium;
+      color: var(--foreground-muted);
+      background: var(--muted);
+      border: 1px solid transparent;
       cursor: pointer;
       user-select: none;
+      transition: $transition-fast;
+      letter-spacing: 0.01em;
 
       input[type="checkbox"] {
-        cursor: pointer;
-        width: 16px;
-        height: 16px;
+        position: absolute;
+        opacity: 0;
+        width: 0;
+        height: 0;
+        pointer-events: none;
       }
 
-      &:hover {
+      &:has(input:checked) {
+        background: var(--primary);
+        color: var(--primary-foreground);
+        border-color: var(--primary);
+      }
+
+      &:hover:not(:has(input:checked)) {
+        background: var(--muted-hover);
         color: var(--foreground);
+        border-color: var(--border);
       }
     }
   }
@@ -1456,7 +1473,10 @@
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
     display: flex;
     flex-direction: column;
-    width: min(90vw, calc((90vh - 48px - 2 * #{$spacing-md}) * 16 / 9 + 2 * #{$spacing-md}));
+    width: min(
+      90vw,
+      calc((90vh - 48px - 2 * #{$spacing-md}) * 16 / 9 + 2 * #{$spacing-md})
+    );
     max-height: 90vh;
     overflow: hidden;
   }
