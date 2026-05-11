@@ -123,6 +123,7 @@ function AdminView() {
     endTime: "17:00",
     startDate: "",
     endDate: "",
+    days: { mon: true, tue: true, wed: true, thu: true, fri: true, sat: true, sun: true },
   });
   const [currentEditingPlaylistId, setCurrentEditingPlaylistId] =
     useState(null);
@@ -619,6 +620,7 @@ function AdminView() {
         endTime: "17:00",
         startDate: "",
         endDate: "",
+        days: { mon: true, tue: true, wed: true, thu: true, fri: true, sat: true, sun: true },
       },
     );
   };
@@ -655,6 +657,9 @@ function AdminView() {
       enabled: false,
       startTime: "08:00",
       endTime: "17:00",
+      startDate: "",
+      endDate: "",
+      days: { mon: true, tue: true, wed: true, thu: true, fri: true, sat: true, sun: true },
     });
   };
 

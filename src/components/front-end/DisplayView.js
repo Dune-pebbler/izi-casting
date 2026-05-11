@@ -819,6 +819,12 @@ function DisplayView() {
             if (endStr && todayStr > endStr) return false;
           }
 
+          if (tr.days) {
+            const dayKeys = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
+            const key = dayKeys[now.getDay()];
+            if (tr.days[key] === false) return false;
+          }
+
           const [sh, sm] = tr.startTime.split(":").map(Number);
           const [eh, em] = tr.endTime.split(":").map(Number);
           const start = sh * 60 + sm;

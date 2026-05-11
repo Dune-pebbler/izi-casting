@@ -573,6 +573,39 @@ function EditModal({
                             </p>
                           )}
                         </div>
+
+                        <div className="time-popup__date-section">
+                          <small>Dagen (optioneel)</small>
+                          <div className="time-popup__days">
+                            {[
+                              { key: "mon", label: "Ma" },
+                              { key: "tue", label: "Di" },
+                              { key: "wed", label: "Wo" },
+                              { key: "thu", label: "Do" },
+                              { key: "fri", label: "Vr" },
+                              { key: "sat", label: "Za" },
+                              { key: "sun", label: "Zo" },
+                            ].map(({ key, label }) => (
+                              <label key={key} className="time-popup__day-label">
+                                <input
+                                  type="checkbox"
+                                  checked={timeRestriction.days?.[key] !== false}
+                                  onChange={(e) =>
+                                    onTimeRestrictionChange({
+                                      ...timeRestriction,
+                                      days: {
+                                        mon: true, tue: true, wed: true, thu: true, fri: true, sat: true, sun: true,
+                                        ...timeRestriction.days,
+                                        [key]: e.target.checked,
+                                      },
+                                    })
+                                  }
+                                />
+                                {label}
+                              </label>
+                            ))}
+                          </div>
+                        </div>
                       </div>
                     )}
                   </div>
