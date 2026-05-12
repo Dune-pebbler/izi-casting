@@ -32,6 +32,7 @@ import {
 } from "../../store/slices/deviceSlice";
 import { usePlaylistManager } from "./PlaylistManager";
 import { useTenantModules } from "../../hooks/useTenantModules";
+import DisclaimerModal, { hasAcceptedDisclaimer } from "./DisclaimerModal";
 import PlaylistList from "./PlaylistList";
 import EditModal from "./slide-edit/EditModal";
 import MoveSlideModal from "./MoveSlideModal";
@@ -176,6 +177,11 @@ function AdminView() {
   // Trash modal state
   const [trashModalOpen, setTrashModalOpen] = useState(false);
   const [trashedSlides, setTrashedSlides] = useState([]);
+
+  // Disclaimer state
+  const [disclaimerAccepted, setDisclaimerAccepted] = useState(
+    hasAcceptedDisclaimer
+  );
 
   // Redux hooks
   const dispatch = useAppDispatch();
@@ -1483,6 +1489,10 @@ function AdminView() {
     <div
       className={`admin-layout ${isSidebarCollapsed ? "sidebar-collapsed" : ""}`}
     >
+      {!disclaimerAccepted && (
+        <DisclaimerModal onAccept={() => setDisclaimerAccepted(true)} />
+      )}
+
       {/* Fixed Left Sidebar */}
       <Sidebar
         setDeviceToDelete={(device) => dispatch(setDeviceToDelete(device))}
