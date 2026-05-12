@@ -660,6 +660,34 @@ function SportlinkDisplay({ slide }) {
           }),
         );
 
+        if (dataType === "poulestand") {
+          // Group by unique poulecode — teams in the same poule share one table
+          const pouleMap = new Map();
+          teams.forEach((team, i) => {
+            const result = settled[i];
+            if (result.status === "rejected") {
+              console.warn("[Sportlink] team fout:", result.reason);
+              return;
+            }
+            if (!result.value.length) return;
+            if (!pouleMap.has(team.poulecode)) {
+              const seen = new Set();
+              const deduped = result.value.filter((row) => {
+                const key = row.teamnaam;
+                if (seen.has(key)) return false;
+                seen.add(key);
+                return true;
+              });
+              pouleMap.set(team.poulecode, {
+                teamNaam: team.teamnaam,
+                rows: deduped.slice(0, maxItems),
+              });
+            }
+          });
+          setData([...pouleMap.values()]);
+          return;
+        }
+
         const results = settled
           .filter((r) => {
             if (r.status === "rejected") {
@@ -671,17 +699,7 @@ function SportlinkDisplay({ slide }) {
 
         const merged = results.flat();
 
-        if (dataType === "poulestand") {
-          // deduplicate poulestand rows by teamnaam
-          const seen = new Set();
-          const deduped = merged.filter((row) => {
-            const key = row.teamnaam || row.teamnaam;
-            if (seen.has(key)) return false;
-            seen.add(key);
-            return true;
-          });
-          setData(deduped.slice(0, maxItems));
-        } else {
+        {
           // sort by date (ISO 8601 strings sort lexicographically)
           const sorted = merged.sort((a, b) => {
             if (!a.wedstrijddatum) return 1;
@@ -804,97 +822,109 @@ function SportlinkDisplay({ slide }) {
         {!loading && !error && data.length > 0 && (
           <div ref={contentRef}>
             {dataType === "poulestand" ? (
-              <table className="display-sportlink__table">
-                <thead>
-                  <tr
-                    style={{
-                      color: `${textColor}99`,
-                      borderBottomColor: `${textColor}20`,
-                    }}
-                  >
-                    <th>#</th>
-                    <th className="team">Team</th>
-                    <th>Gespeeld</th>
-                    <th>Gewonnen</th>
-                    <th>Gelijk</th>
-                    <th>Verloren</th>
-                    <th>Punten</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {data.map((row, i) => {
-                    const isOwn =
-                      row.eigenteam === "true" ||
-                      teams.some((t) => t.teamnaam === row.teamnaam);
-                    return (
+              data.map((group, gi) => (
+                <div key={gi} className="display-sportlink__poule-group">
+                  {data.length > 1 && (
+                    <div
+                      className="display-sportlink__poule-header"
+                      style={{ color: accentColor }}
+                    >
+                      {group.teamNaam}
+                    </div>
+                  )}
+                  <table className="display-sportlink__table">
+                    <thead>
                       <tr
-                        key={i}
                         style={{
+                          color: `${textColor}99`,
                           borderBottomColor: `${textColor}20`,
-                          backgroundColor: isOwn
-                            ? `${accentColor}20`
-                            : "transparent",
                         }}
                       >
-                        <td
-                          style={{
-                            color: `${textColor}99`,
-                            borderBottom: `1px solid ${textColor}20`,
-                          }}
-                        >
-                          {row.positie || i + 1}
-                        </td>
-                        <td
-                          style={{
-                            fontWeight: isOwn ? 700 : 400,
-                            borderBottom: `1px solid ${textColor}20`,
-                          }}
-                        >
-                          <div className="display-sportlink__standing-team">
-                            {row.clublogo && (
-                              <img
-                                src={row.clublogo}
-                                alt=""
-                                className="display-sportlink__team-logo"
-                              />
-                            )}
-                            {row.teamnaam}
-                          </div>
-                        </td>
-                        <td
-                          style={{ borderBottom: `1px solid ${textColor}20` }}
-                        >
-                          {row.gespeeldewedstrijden ?? "—"}
-                        </td>
-                        <td
-                          style={{ borderBottom: `1px solid ${textColor}20` }}
-                        >
-                          {row.gewonnen ?? "—"}
-                        </td>
-                        <td
-                          style={{ borderBottom: `1px solid ${textColor}20` }}
-                        >
-                          {row.gelijk ?? "—"}
-                        </td>
-                        <td
-                          style={{ borderBottom: `1px solid ${textColor}20` }}
-                        >
-                          {row.verloren ?? "—"}
-                        </td>
-                        <td
-                          style={{
-                            fontWeight: 700,
-                            color: accentColor,
-                            borderBottom: `1px solid ${textColor}20`,
-                          }}
-                        >
-                          {row.punten ?? "—"}
-                        </td>
+                        <th>#</th>
+                        <th className="team">Team</th>
+                        <th>Gespeeld</th>
+                        <th>Gewonnen</th>
+                        <th>Gelijk</th>
+                        <th>Verloren</th>
+                        <th>Punten</th>
                       </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+                    </thead>
+                    <tbody>
+                      {group.rows.map((row, i) => {
+                        const isOwn =
+                          row.eigenteam === "true" ||
+                          teams.some((t) => t.teamnaam === row.teamnaam);
+                        return (
+                          <tr
+                            key={i}
+                            style={{
+                              borderBottomColor: `${textColor}20`,
+                              backgroundColor: isOwn
+                                ? `${accentColor}20`
+                                : "transparent",
+                            }}
+                          >
+                            <td
+                              style={{
+                                color: `${textColor}99`,
+                                borderBottom: `1px solid ${textColor}20`,
+                              }}
+                            >
+                              {row.positie || i + 1}
+                            </td>
+                            <td
+                              style={{
+                                fontWeight: isOwn ? 700 : 400,
+                                borderBottom: `1px solid ${textColor}20`,
+                              }}
+                            >
+                              <div className="display-sportlink__standing-team">
+                                {row.clublogo && (
+                                  <img
+                                    src={row.clublogo}
+                                    alt=""
+                                    className="display-sportlink__team-logo"
+                                  />
+                                )}
+                                {row.teamnaam}
+                              </div>
+                            </td>
+                            <td
+                              style={{ borderBottom: `1px solid ${textColor}20` }}
+                            >
+                              {row.gespeeldewedstrijden ?? "—"}
+                            </td>
+                            <td
+                              style={{ borderBottom: `1px solid ${textColor}20` }}
+                            >
+                              {row.gewonnen ?? "—"}
+                            </td>
+                            <td
+                              style={{ borderBottom: `1px solid ${textColor}20` }}
+                            >
+                              {row.gelijk ?? "—"}
+                            </td>
+                            <td
+                              style={{ borderBottom: `1px solid ${textColor}20` }}
+                            >
+                              {row.verloren ?? "—"}
+                            </td>
+                            <td
+                              style={{
+                                fontWeight: 700,
+                                color: accentColor,
+                                borderBottom: `1px solid ${textColor}20`,
+                              }}
+                            >
+                              {row.punten ?? "—"}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              ))
             ) : (
               <div className="display-sportlink__matches">
                 {data.map((row, i) => (
