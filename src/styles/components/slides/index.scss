@@ -851,7 +851,9 @@
     color: var(--muted-foreground);
     cursor: pointer;
     flex-shrink: 0;
-    transition: background 0.12s, color 0.12s;
+    transition:
+      background 0.12s,
+      color 0.12s;
 
     &--remove {
       &:hover {
@@ -935,7 +937,7 @@
   }
 
   &__poule-header {
-    font-size: clamp(0.75rem, 1.4vw, 1rem);
+    font-size: clamp(1.5rem, 2.2vw, 1.7rem);
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.06em;
@@ -954,7 +956,7 @@
 
     th {
       padding: 8px 12px;
-      font-size: clamp(0.6rem, 1.2vw, 0.9rem);
+      font-size: clamp(1.5rem, 2.2vw, 1.7rem);
       font-weight: 600;
       text-align: center;
       border-bottom: 1px solid;
@@ -976,7 +978,7 @@
     td {
       padding: 4px 12px;
 
-      font-size: clamp(0.6rem, 1.2vw, 0.9rem);
+      font-size: clamp(1.5rem, 2.2vw, 1.7rem);
       font-weight: 600;
       text-align: center;
       letter-spacing: 0.06em;
@@ -1030,7 +1032,7 @@
   }
 
   &__match-date {
-    font-size: clamp(0.6rem, 1.1vw, 0.85rem);
+    font-size: clamp(1rem, 1.1vw, 1.2rem);
     font-weight: 500;
   }
 
@@ -1038,7 +1040,7 @@
     display: flex;
     align-items: center;
     gap: 12px;
-    font-size: clamp(0.75rem, 1.5vw, 1.05rem);
+    font-size: clamp(1.5rem, 1.5vw, 1.7rem);
     font-weight: 600;
   }
 
@@ -1079,7 +1081,7 @@
   }
 
   &__match-location {
-    font-size: clamp(0.55rem, 1vw, 0.8rem);
+    font-size: clamp(1.2rem, 1vw, 1.5rem);
   }
 
   &__team-logo {
@@ -1093,6 +1095,7 @@
     display: flex;
     align-items: center;
     gap: 10px;
+    text-transform: uppercase;
   }
 }
 
