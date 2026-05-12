@@ -553,6 +553,248 @@ function EmailSlideDisplay({ slide }) {
   );
 }
 
+function SportlinkDisplay({ slide }) {
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const bodyRef = useRef(null);
+  const contentRef = useRef(null);
+
+  const apiKey = slide.sportlinkApiKey || "";
+  const dataType = slide.sportlinkDataType || "programma";
+  const teams = slide.sportlinkTeams || [];
+  const aantalDagen = slide.sportlinkAantalDagen || 14;
+  const maxItems = slide.sportlinkMaxItems || 10;
+  const bgColor = slide.sportlinkBgColor || "#0f172a";
+  const textColor = slide.sportlinkTextColor || "#ffffff";
+  const accentColor = slide.sportlinkAccentColor || "#ff6600";
+
+  useEffect(() => {
+    if (!apiKey || !teams.length) {
+      setLoading(false);
+      return;
+    }
+
+    const fetchData = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const results = await Promise.all(
+          teams.map(async (team) => {
+            const params = new URLSearchParams({ client_id: apiKey });
+            if (dataType === "poulestand") {
+              if (!team.poulecode) return [];
+              params.set("poulecode", team.poulecode);
+              const res = await fetch(`https://data.sportlink.com/${dataType}?${params}`);
+              if (!res.ok) throw new Error(`HTTP ${res.status}`);
+              const json = await res.json();
+              return Array.isArray(json) ? json.map((row) => ({ ...row, _teamNaam: team.teamnaam })) : [];
+            } else if (dataType === "uitslagen") {
+              // weekoffset=0 fetches the current week; filter client-side to today only
+              params.set("teamcode", team.teamcode);
+              params.set("aantaldagen", 7);
+              params.set("weekoffset", 0);
+              const res = await fetch(`https://data.sportlink.com/${dataType}?${params}`);
+              if (!res.ok) throw new Error(`HTTP ${res.status}`);
+              const json = await res.json();
+              if (!Array.isArray(json)) return [];
+              const today = new Date().toISOString().slice(0, 10);
+              return json
+                .filter((row) => row.wedstrijddatum && row.wedstrijddatum.slice(0, 10) === today)
+                .map((row) => ({ ...row, _teamNaam: team.teamnaam }));
+            } else {
+              // programma: fetch current week and filter to today only
+              params.set("teamcode", team.teamcode);
+              params.set("aantaldagen", 7);
+              params.set("weekoffset", 0);
+              const res = await fetch(`https://data.sportlink.com/${dataType}?${params}`);
+              if (!res.ok) throw new Error(`HTTP ${res.status}`);
+              const json = await res.json();
+              if (!Array.isArray(json)) return [];
+              const today = new Date().toISOString().slice(0, 10);
+              return json
+                .filter((row) => row.wedstrijddatum && row.wedstrijddatum.slice(0, 10) === today)
+                .map((row) => ({ ...row, _teamNaam: team.teamnaam }));
+            }
+          })
+        );
+
+        const merged = results.flat();
+
+        if (dataType === "poulestand") {
+          // deduplicate poulestand rows by teamnaam
+          const seen = new Set();
+          const deduped = merged.filter((row) => {
+            const key = row.teamnaam || row.teamnaam;
+            if (seen.has(key)) return false;
+            seen.add(key);
+            return true;
+          });
+          setData(deduped.slice(0, maxItems));
+        } else {
+          // sort by date (ISO 8601 strings sort lexicographically)
+          const sorted = merged.sort((a, b) => {
+            if (!a.wedstrijddatum) return 1;
+            if (!b.wedstrijddatum) return -1;
+            return a.wedstrijddatum.localeCompare(b.wedstrijddatum);
+          });
+          setData(sorted.slice(0, maxItems));
+        }
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+    const interval = setInterval(fetchData, 5 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, [slide.sportlinkApiKey, slide.sportlinkTeams, slide.sportlinkDataType, slide.sportlinkAantalDagen, slide.sportlinkMaxItems]); // eslint-disable-line
+
+  useEffect(() => {
+    if (loading || !data.length) return;
+    const timeoutId = setTimeout(() => {
+      const body = bodyRef.current;
+      const content = contentRef.current;
+      if (!body || !content) return;
+      const scrollDistance = content.scrollHeight - body.clientHeight;
+      if (scrollDistance <= 0) return;
+      const totalDuration = (scrollDistance / 50) / 0.6;
+      content.style.setProperty("--sportlink-scroll-dist", `-${scrollDistance}px`);
+      content.style.animation = `sportlinkScroll ${totalDuration}s linear infinite`;
+    }, 400);
+    return () => {
+      clearTimeout(timeoutId);
+      if (contentRef.current) {
+        contentRef.current.style.animation = "";
+        contentRef.current.style.removeProperty("--sportlink-scroll-dist");
+      }
+    };
+  }, [loading, data]);
+
+  const formatDate = (dateStr) => {
+    if (!dateStr) return "";
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return dateStr;
+    return d.toLocaleDateString("nl-NL", { weekday: "short", day: "numeric", month: "short" });
+  };
+
+  const dataTypeLabel = { programma: "Programma", uitslagen: "Uitslagen", poulestand: "Poulestand" }[dataType] || dataType;
+  const title = slide.sportlinkTitle || dataTypeLabel;
+
+  return (
+    <div className="display-sportlink" style={{ backgroundColor: bgColor, color: textColor }}>
+      <div className="display-sportlink__header" style={{ borderBottomColor: `${accentColor}40` }}>
+        <h2 className="display-sportlink__title" style={{ color: textColor }}>{title}</h2>
+        <span className="display-sportlink__badge" style={{ backgroundColor: accentColor }}>{dataTypeLabel}</span>
+      </div>
+
+      <div className="display-sportlink__body" ref={bodyRef}>
+        {loading && (
+          <div className="display-sportlink__loading" style={{ color: `${textColor}88` }}>
+            Gegevens laden…
+          </div>
+        )}
+        {!loading && error && (
+          <div className="display-sportlink__error" style={{ color: "#ff6b6b" }}>
+            Fout bij laden: {error}
+          </div>
+        )}
+        {!loading && !error && data.length === 0 && (
+          <div className="display-sportlink__empty" style={{ color: `${textColor}88` }}>
+            {!apiKey || !teams.length ? "Geen koppeling geconfigureerd" : "Geen gegevens beschikbaar"}
+          </div>
+        )}
+
+        {!loading && !error && data.length > 0 && (
+          <div ref={contentRef}>
+            {dataType === "poulestand" ? (
+              <table className="display-sportlink__table">
+                <thead>
+                  <tr style={{ color: `${textColor}99`, borderBottomColor: `${textColor}20` }}>
+                    <th>#</th>
+                    <th>Team</th>
+                    <th>G</th>
+                    <th>W</th>
+                    <th>D</th>
+                    <th>V</th>
+                    <th>Pnt</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {data.map((row, i) => {
+                    const isOwn = row.eigenteam === "true" || teams.some(t => t.teamnaam === row.teamnaam);
+                    return (
+                    <tr
+                      key={i}
+                      style={{
+                        borderBottomColor: `${textColor}10`,
+                        backgroundColor: isOwn ? `${accentColor}20` : "transparent",
+                      }}
+                    >
+                      <td style={{ color: `${textColor}99` }}>{row.positie || i + 1}</td>
+                      <td style={{ fontWeight: isOwn ? 700 : 400 }}>
+                        <div className="display-sportlink__standing-team">
+                          {row.clublogo && <img src={row.clublogo} alt="" className="display-sportlink__team-logo" />}
+                          {row.teamnaam}
+                        </div>
+                      </td>
+                      <td>{row.gespeeldewedstrijden ?? "—"}</td>
+                      <td>{row.gewonnen ?? "—"}</td>
+                      <td>{row.gelijk ?? "—"}</td>
+                      <td>{row.verloren ?? "—"}</td>
+                      <td style={{ fontWeight: 700, color: accentColor }}>{row.punten ?? "—"}</td>
+                    </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            ) : (
+              <div className="display-sportlink__matches">
+                {data.map((row, i) => (
+                  <div key={i} className="display-sportlink__match" style={{ borderBottomColor: `${textColor}10` }}>
+                    <div className="display-sportlink__match-info">
+                      <div className="display-sportlink__match-date" style={{ color: `${textColor}88` }}>
+                        {formatDate(row.wedstrijddatum)}
+                        {row.aanvangstijd && <span> · {row.aanvangstijd}</span>}
+                      </div>
+                      <div className="display-sportlink__match-teams" style={{ color: textColor }}>
+                        <div className="display-sportlink__match-team">
+                          {row.thuisteamlogo && (
+                            <img src={row.thuisteamlogo} alt="" className="display-sportlink__team-logo" />
+                          )}
+                          <span className="display-sportlink__match-home">{row.thuisteam}</span>
+                        </div>
+                        {dataType === "uitslagen" && row.uitslag ? (
+                          <span className="display-sportlink__match-score" style={{ backgroundColor: `${accentColor}22`, color: accentColor }}>{row.uitslag}</span>
+                        ) : (
+                          <span className="display-sportlink__match-vs" style={{ color: `${textColor}44` }}>vs</span>
+                        )}
+                        <div className="display-sportlink__match-team display-sportlink__match-team--away">
+                          <span className="display-sportlink__match-away">{row.uitteam}</span>
+                          {row.uitteamlogo && (
+                            <img src={row.uitteamlogo} alt="" className="display-sportlink__team-logo" />
+                          )}
+                        </div>
+                      </div>
+                      {row.accommodatie && (
+                        <div className="display-sportlink__match-location" style={{ color: `${textColor}55` }}>
+                          {row.accommodatie}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function parseICS(icsText) {
   const events = [];
   // Unfold lines: iCal folds long lines with CRLF+space or CRLF+tab.
@@ -962,6 +1204,8 @@ function SlideDisplay({
         {layout === "agenda" && <AgendaDisplay slide={slide} />}
 
         {layout === "email" && <EmailSlideDisplay slide={slide} />}
+
+        {layout === "sportlink" && <SportlinkDisplay slide={slide} />}
       </>
     );
   };

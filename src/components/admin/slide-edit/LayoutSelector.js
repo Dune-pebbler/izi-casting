@@ -10,6 +10,7 @@ import {
   Timer,
   CalendarDays,
   Mail,
+  Trophy,
   ChevronDown,
 } from 'lucide-react';
 
@@ -28,6 +29,7 @@ function LayoutSelector({ currentLayout, onLayoutChange, slideTypes = {} }) {
     { id: 'countdown',    label: 'Afteltimer',     icon: Timer,       title: 'Afteltimer' },
     { id: 'agenda',       label: 'Agenda',         icon: CalendarDays,title: 'Agenda (iCal)' },
     { id: 'email',        label: 'Gmail',          icon: Mail,        title: 'Gmail inbox' },
+    { id: 'sportlink',    label: 'Sportlink',      icon: Trophy,      title: 'Sportlink Club.Dataservice' },
   ];
 
   const hasSlideTypeConfig = Object.keys(slideTypes).length > 0;

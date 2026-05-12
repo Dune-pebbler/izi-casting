@@ -460,3 +460,418 @@
     }
   }
 }
+
+// =============================================================================
+// SPORTLINK SLIDE - Admin Input
+// =============================================================================
+
+.modal-sportlink {
+  display: flex;
+  flex: 1;
+  height: 100%;
+  overflow: auto;
+}
+
+.sportlink-input {
+  display: flex;
+  gap: 24px;
+  width: 100%;
+  padding: 24px;
+  flex-wrap: wrap;
+
+  &__left {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    flex: 1;
+    min-width: 240px;
+    max-width: 340px;
+  }
+
+  &__right {
+    flex: 2;
+    min-width: 320px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  &__section {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  &__section-title {
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted-foreground);
+    margin: 0 0 4px;
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    label {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--foreground);
+    }
+  }
+
+  &__row {
+    display: flex;
+    gap: 12px;
+
+    .sportlink-input__field {
+      flex: 1;
+    }
+  }
+
+  &__hint {
+    font-size: 12px;
+    color: var(--muted-foreground);
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  &__error {
+    font-size: 12px;
+    color: #ff6b6b;
+    padding: 8px 12px;
+    background: rgba(255, 107, 107, 0.1);
+    border-radius: 6px;
+  }
+
+  &__data-types {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  &__type-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--background);
+    color: var(--foreground);
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.15s;
+
+    &.active {
+      border-color: var(--primary);
+      background: color-mix(in srgb, var(--primary) 12%, transparent);
+    }
+
+    &:hover:not(.active) {
+      background: var(--accent);
+    }
+  }
+
+  &__type-label {
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  &__type-desc {
+    font-size: 11px;
+    color: var(--muted-foreground);
+  }
+
+  &__api-row {
+    display: flex;
+    gap: 8px;
+  }
+
+  &__api-key {
+    flex: 1;
+  }
+
+  &__fetch-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  &__team-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-height: 280px;
+    overflow-y: auto;
+  }
+
+  &__team-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--background);
+    color: var(--foreground);
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.15s;
+
+    &.active {
+      border-color: var(--primary);
+      background: color-mix(in srgb, var(--primary) 12%, transparent);
+    }
+
+    &:hover:not(.active) {
+      background: var(--accent);
+    }
+  }
+
+  &__team-check {
+    color: var(--primary);
+    flex-shrink: 0;
+  }
+
+  &__team-name {
+    flex: 1;
+    font-size: 13px;
+    font-weight: 500;
+  }
+
+  &__team-meta {
+    font-size: 11px;
+    color: var(--muted-foreground);
+  }
+
+  &__selected-teams {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  &__selected-team {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 13px;
+  }
+}
+
+.spinning {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// =============================================================================
+// SPORTLINK SLIDE - Display (Front-end)
+// =============================================================================
+
+.display-sportlink {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24px 32px 16px;
+    border-bottom: 1px solid;
+    flex-shrink: 0;
+  }
+
+  &__title {
+    font-size: clamp(1.2rem, 2.5vw, 2rem);
+    font-weight: 700;
+    margin: 0;
+  }
+
+  &__badge {
+    font-size: 0.7em;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 4px 12px;
+    border-radius: 20px;
+    color: white;
+    flex-shrink: 0;
+  }
+
+  &__body {
+    flex: 1;
+    overflow: hidden;
+    padding: 0 32px 24px;
+  }
+
+  &__loading,
+  &__empty,
+  &__error {
+    padding: 40px 0;
+    font-size: 1rem;
+    text-align: center;
+  }
+
+  // Standings table
+  &__table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 16px;
+
+    th {
+      padding: 8px 12px;
+      font-size: clamp(0.6rem, 1.2vw, 0.9rem);
+      font-weight: 600;
+      text-align: left;
+      border-bottom: 1px solid;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+
+      &:first-child {
+        width: 40px;
+      }
+      &:last-child {
+        text-align: right;
+      }
+    }
+  }
+
+  &__row {
+    td {
+      padding: 10px 12px;
+      font-size: clamp(0.7rem, 1.4vw, 1rem);
+      border-bottom: 1px solid;
+      vertical-align: middle;
+
+      &:first-child {
+        font-size: 0.9em;
+        width: 40px;
+      }
+      &:last-child {
+        text-align: right;
+      }
+    }
+  }
+
+  // Program/results list
+  &__matches {
+    margin-top: 12px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__match {
+    display: flex;
+    align-items: stretch;
+    border-bottom: 1px solid;
+    padding: 14px 0;
+  }
+
+  &__match-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  &__match-date {
+    font-size: clamp(0.6rem, 1.1vw, 0.85rem);
+    font-weight: 500;
+  }
+
+  &__match-teams {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: clamp(0.75rem, 1.5vw, 1.05rem);
+    font-weight: 600;
+  }
+
+  &__match-team {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    &--away {
+      justify-content: flex-end;
+      flex-direction: row;
+    }
+  }
+
+  &__match-home,
+  &__match-away {
+    flex: 1;
+  }
+
+  &__match-away {
+    text-align: right;
+  }
+
+  &__match-vs {
+    font-size: 0.85em;
+    font-weight: 400;
+    flex-shrink: 0;
+  }
+
+  &__match-score {
+    font-size: 1em;
+    font-weight: 800;
+    flex-shrink: 0;
+    letter-spacing: 0.05em;
+    padding: 4px 12px;
+    border-radius: 6px;
+  }
+
+  &__match-location {
+    font-size: clamp(0.55rem, 1vw, 0.8rem);
+  }
+
+  &__team-logo {
+    width: clamp(24px, 3.5vw, 44px);
+    height: clamp(24px, 3.5vw, 44px);
+    object-fit: contain;
+    flex-shrink: 0;
+  }
+
+  &__standing-team {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+}
+
+@keyframes sportlinkScroll {
+  0% {
+    transform: translateY(0);
+  }
+  10% {
+    transform: translateY(0);
+  }
+  90% {
+    transform: translateY(var(--sportlink-scroll-dist));
+  }
+  100% {
+    transform: translateY(var(--sportlink-scroll-dist));
+  }
+}

@@ -21,6 +21,7 @@ import {
   CalendarDays,
   Mail,
   MonitorPlay,
+  Trophy,
 } from "lucide-react";
 
 const iconMap = {
@@ -34,6 +35,7 @@ const iconMap = {
   countdown: <Timer />,
   agenda: <CalendarDays />,
   email: <Mail />,
+  sportlink: <Trophy />,
 };
 import { useTenant } from "../../context/TenantContext";
 import { sanitizeHTMLContent } from "../../utils/sanitize";
@@ -83,7 +85,6 @@ function SlideList({
     return slideTypes[layout] === false;
   };
   const { tenantId } = useTenant();
-
 
   const openSlidePreview = (slide) => {
     window.open(`/preview/${tenantId}/slide/${slide.id}`, "_blank");
@@ -548,7 +549,11 @@ function SlideList({
                 onToggleSlideTimeRestriction(slide.id);
               }}
               className={`btn-icon btn-icon--time ${slide.timeRestriction?.enabled ? "btn-icon--success" : ""}`}
-              title={slide.timeRestriction?.enabled ? `Tijdvenster aan: ${slide.timeRestriction?.startTime} – ${slide.timeRestriction?.endTime}` : "Tijdvenster uitgeschakeld"}
+              title={
+                slide.timeRestriction?.enabled
+                  ? `Tijdvenster aan: ${slide.timeRestriction?.startTime} – ${slide.timeRestriction?.endTime}`
+                  : "Tijdvenster uitgeschakeld"
+              }
             >
               <Clock size={16} />
             </button>
@@ -716,7 +721,11 @@ function SlideList({
               onToggleSlideTimeRestriction(slide.id);
             }}
             className={`btn-icon btn-icon--time ${slide.timeRestriction?.enabled ? "btn-icon--success" : ""}`}
-            title={slide.timeRestriction?.enabled ? `Tijdvenster aan: ${slide.timeRestriction?.startTime} – ${slide.timeRestriction?.endTime}` : "Tijdvenster uitgeschakeld"}
+            title={
+              slide.timeRestriction?.enabled
+                ? `Tijdvenster aan: ${slide.timeRestriction?.startTime} – ${slide.timeRestriction?.endTime}`
+                : "Tijdvenster uitgeschakeld"
+            }
           >
             <Clock size={16} />
           </button>
@@ -793,7 +802,9 @@ function SlideList({
               className={`btn-icon slide-row__actions-panel-btn${slide.timeRestriction?.enabled ? " btn-icon--success" : ""}`}
             >
               <Clock size={16} />
-              <span>Tijdvenster {slide.timeRestriction?.enabled ? "uit" : "aan"}</span>
+              <span>
+                Tijdvenster {slide.timeRestriction?.enabled ? "uit" : "aan"}
+              </span>
             </button>
             <button
               onClick={(e) => {
@@ -897,7 +908,6 @@ function SlideList({
           )}
         </SortableContext>
       </DndContext>
-
     </>
   );
 }

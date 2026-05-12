@@ -22,6 +22,7 @@ import GalleryInput from "./GalleryInput";
 import CountdownInput from "./CountdownInput";
 import AgendaInput from "./AgendaInput";
 import EmailInput from "./EmailInput";
+import SportlinkInput from "./SportlinkInput";
 import SlideEffectsModal from "../SlideEffectsModal";
 
 function EditModal({
@@ -117,6 +118,24 @@ function EditModal({
   onEmailTextColorChange,
   emailAccentColor,
   onEmailAccentColorChange,
+  sportlinkApiKey,
+  onSportlinkApiKeyChange,
+  sportlinkDataType,
+  onSportlinkDataTypeChange,
+  sportlinkTeams,
+  onSportlinkTeamsChange,
+  sportlinkTitle,
+  onSportlinkTitleChange,
+  sportlinkAantalDagen,
+  onSportlinkAantalDagenChange,
+  sportlinkMaxItems,
+  onSportlinkMaxItemsChange,
+  sportlinkBgColor,
+  onSportlinkBgColorChange,
+  sportlinkTextColor,
+  onSportlinkTextColorChange,
+  sportlinkAccentColor,
+  onSportlinkAccentColorChange,
   modules = {},
   onSaveSlideEffects,
 }) {
@@ -352,6 +371,32 @@ function EditModal({
               onEmailTextColorChange={onEmailTextColorChange}
               emailAccentColor={emailAccentColor}
               onEmailAccentColorChange={onEmailAccentColorChange}
+            />
+          </div>
+        );
+
+      case "sportlink":
+        return (
+          <div className="modal-sportlink">
+            <SportlinkInput
+              sportlinkApiKey={sportlinkApiKey}
+              onApiKeyChange={onSportlinkApiKeyChange}
+              sportlinkDataType={sportlinkDataType}
+              onDataTypeChange={onSportlinkDataTypeChange}
+              sportlinkTeams={sportlinkTeams}
+              onTeamsChange={onSportlinkTeamsChange}
+              sportlinkTitle={sportlinkTitle}
+              onTitleChange={onSportlinkTitleChange}
+              sportlinkAantalDagen={sportlinkAantalDagen}
+              onAantalDagenChange={onSportlinkAantalDagenChange}
+              sportlinkMaxItems={sportlinkMaxItems}
+              onMaxItemsChange={onSportlinkMaxItemsChange}
+              sportlinkBgColor={sportlinkBgColor}
+              onBgColorChange={onSportlinkBgColorChange}
+              sportlinkTextColor={sportlinkTextColor}
+              onTextColorChange={onSportlinkTextColorChange}
+              sportlinkAccentColor={sportlinkAccentColor}
+              onAccentColorChange={onSportlinkAccentColorChange}
             />
           </div>
         );

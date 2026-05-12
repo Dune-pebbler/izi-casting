@@ -116,6 +116,15 @@ function AdminView() {
   const [modalEmailBgColor, setModalEmailBgColor] = useState("#0f172a");
   const [modalEmailTextColor, setModalEmailTextColor] = useState("#ffffff");
   const [modalEmailAccentColor, setModalEmailAccentColor] = useState("#4f87ff");
+  const [modalSportlinkApiKey, setModalSportlinkApiKey] = useState("");
+  const [modalSportlinkDataType, setModalSportlinkDataType] = useState("programma");
+  const [modalSportlinkTeams, setModalSportlinkTeams] = useState([]);
+  const [modalSportlinkTitle, setModalSportlinkTitle] = useState("");
+  const [modalSportlinkAantalDagen, setModalSportlinkAantalDagen] = useState(14);
+  const [modalSportlinkMaxItems, setModalSportlinkMaxItems] = useState(10);
+  const [modalSportlinkBgColor, setModalSportlinkBgColor] = useState("#0f172a");
+  const [modalSportlinkTextColor, setModalSportlinkTextColor] = useState("#ffffff");
+  const [modalSportlinkAccentColor, setModalSportlinkAccentColor] = useState("#ff6600");
   const [imageLibraryTarget, setImageLibraryTarget] = useState("main");
   const [modalTimeRestriction, setModalTimeRestriction] = useState({
     enabled: false,
@@ -418,6 +427,7 @@ function AdminView() {
       countdown: "countdown",
       agenda: "agenda",
       email: "email",
+      sportlink: "sportlink",
     };
     const newSlide = {
       id: Date.now(),
@@ -455,6 +465,18 @@ function AdminView() {
         emailBgColor: "#0f172a",
         emailTextColor: "#ffffff",
         emailAccentColor: "#4f87ff",
+        duration: 30,
+      }),
+      ...(slideLayout === "sportlink" && {
+        sportlinkApiKey: "",
+        sportlinkDataType: "programma",
+        sportlinkTeams: [],
+        sportlinkTitle: "",
+        sportlinkAantalDagen: 14,
+        sportlinkMaxItems: 10,
+        sportlinkBgColor: "#0f172a",
+        sportlinkTextColor: "#ffffff",
+        sportlinkAccentColor: "#ff6600",
         duration: 30,
       }),
       imagePosition: "center",
@@ -613,6 +635,15 @@ function AdminView() {
     setModalEmailBgColor(slide.emailBgColor || "#0f172a");
     setModalEmailTextColor(slide.emailTextColor || "#ffffff");
     setModalEmailAccentColor(slide.emailAccentColor || "#4f87ff");
+    setModalSportlinkApiKey(slide.sportlinkApiKey || "");
+    setModalSportlinkDataType(slide.sportlinkDataType || "programma");
+    setModalSportlinkTeams(slide.sportlinkTeams || []);
+    setModalSportlinkTitle(slide.sportlinkTitle || "");
+    setModalSportlinkAantalDagen(slide.sportlinkAantalDagen || 14);
+    setModalSportlinkMaxItems(slide.sportlinkMaxItems || 10);
+    setModalSportlinkBgColor(slide.sportlinkBgColor || "#0f172a");
+    setModalSportlinkTextColor(slide.sportlinkTextColor || "#ffffff");
+    setModalSportlinkAccentColor(slide.sportlinkAccentColor || "#ff6600");
     setModalTimeRestriction(
       slide.timeRestriction || {
         enabled: false,
@@ -653,6 +684,15 @@ function AdminView() {
     setModalAgendaMaxEvents(8);
     setModalAgendaBgColor("#0f172a");
     setModalAgendaTextColor("#ffffff");
+    setModalSportlinkApiKey("");
+    setModalSportlinkDataType("programma");
+    setModalSportlinkTeams([]);
+    setModalSportlinkTitle("");
+    setModalSportlinkAantalDagen(14);
+    setModalSportlinkMaxItems(10);
+    setModalSportlinkBgColor("#0f172a");
+    setModalSportlinkTextColor("#ffffff");
+    setModalSportlinkAccentColor("#ff6600");
     setModalTimeRestriction({
       enabled: false,
       startTime: "08:00",
@@ -901,6 +941,7 @@ function AdminView() {
             const isCountdown = slideLayout === "countdown";
             const isAgenda = slideLayout === "agenda";
             const isEmail = slideLayout === "email";
+            const isSportlink = slideLayout === "sportlink";
             const galleryDuration = isGallery
               ? modalGalleryImages.reduce(
                   (sum, img) => sum + (img.duration || 3),
@@ -960,7 +1001,22 @@ function AdminView() {
                           duration:
                             modalSlideDuration === "" ? 30 : modalSlideDuration,
                         }
-                      : {
+                      : isSportlink
+                        ? {
+                            type: "sportlink",
+                            sportlinkApiKey: modalSportlinkApiKey,
+                            sportlinkDataType: modalSportlinkDataType,
+                            sportlinkTeams: modalSportlinkTeams,
+                            sportlinkTitle: modalSportlinkTitle,
+                            sportlinkAantalDagen: modalSportlinkAantalDagen,
+                            sportlinkMaxItems: modalSportlinkMaxItems,
+                            sportlinkBgColor: modalSportlinkBgColor,
+                            sportlinkTextColor: modalSportlinkTextColor,
+                            sportlinkAccentColor: modalSportlinkAccentColor,
+                            duration:
+                              modalSlideDuration === "" ? 30 : modalSlideDuration,
+                          }
+                        : {
                           text: sanitizeHTMLContent(modalTinyMCEContent),
                           tinyMCEContent: modalTinyMCEContent,
                           imageUrl: modalImageUrl,
@@ -1663,6 +1719,24 @@ function AdminView() {
           onEmailTextColorChange={setModalEmailTextColor}
           emailAccentColor={modalEmailAccentColor}
           onEmailAccentColorChange={setModalEmailAccentColor}
+          sportlinkApiKey={modalSportlinkApiKey}
+          onSportlinkApiKeyChange={setModalSportlinkApiKey}
+          sportlinkDataType={modalSportlinkDataType}
+          onSportlinkDataTypeChange={setModalSportlinkDataType}
+          sportlinkTeams={modalSportlinkTeams}
+          onSportlinkTeamsChange={setModalSportlinkTeams}
+          sportlinkTitle={modalSportlinkTitle}
+          onSportlinkTitleChange={setModalSportlinkTitle}
+          sportlinkAantalDagen={modalSportlinkAantalDagen}
+          onSportlinkAantalDagenChange={setModalSportlinkAantalDagen}
+          sportlinkMaxItems={modalSportlinkMaxItems}
+          onSportlinkMaxItemsChange={setModalSportlinkMaxItems}
+          sportlinkBgColor={modalSportlinkBgColor}
+          onSportlinkBgColorChange={setModalSportlinkBgColor}
+          sportlinkTextColor={modalSportlinkTextColor}
+          onSportlinkTextColorChange={setModalSportlinkTextColor}
+          sportlinkAccentColor={modalSportlinkAccentColor}
+          onSportlinkAccentColorChange={setModalSportlinkAccentColor}
           modules={modules}
           onSaveSlideEffects={(effects) => {
             saveSlideEffects(
