@@ -700,8 +700,15 @@ function SportlinkDisplay({ slide }) {
         const merged = results.flat();
 
         {
+          const seen = new Set();
+          const deduped = merged.filter((row) => {
+            const key = `${row.wedstrijddatum}|${row.thuisteam}|${row.uitteam}`;
+            if (seen.has(key)) return false;
+            seen.add(key);
+            return true;
+          });
           // sort by date (ISO 8601 strings sort lexicographically)
-          const sorted = merged.sort((a, b) => {
+          const sorted = deduped.sort((a, b) => {
             if (!a.wedstrijddatum) return 1;
             if (!b.wedstrijddatum) return -1;
             return a.wedstrijddatum.localeCompare(b.wedstrijddatum);
