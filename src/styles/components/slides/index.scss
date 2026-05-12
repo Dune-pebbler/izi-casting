@@ -898,7 +898,7 @@
   }
 
   &__title {
-    font-size: clamp(1.2rem, 2.5vw, 2rem);
+    font-size: clamp(2rem, 3vw, 3rem);
     font-weight: 700;
     margin: 0;
   }
@@ -937,7 +937,7 @@
   }
 
   &__poule-header {
-    font-size: clamp(1.5rem, 2.2vw, 1.7rem);
+    font-size: clamp(1.8rem, 2.5vw, 2.5rem);
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.06em;
@@ -956,7 +956,7 @@
 
     th {
       padding: 8px 12px;
-      font-size: clamp(1.5rem, 2.2vw, 1.7rem);
+      font-size: clamp(1.8rem, 2vw, 2.5rem);
       font-weight: 600;
       text-align: center;
       border-bottom: 1px solid;
@@ -978,7 +978,7 @@
     td {
       padding: 4px 12px;
 
-      font-size: clamp(1.5rem, 2.2vw, 1.7rem);
+      font-size: clamp(1.8rem, 2vw, 2.5rem);
       font-weight: 600;
       text-align: center;
       letter-spacing: 0.06em;
@@ -996,7 +996,7 @@
   &__row {
     td {
       padding: 10px 12px;
-      font-size: clamp(0.7rem, 1.4vw, 1rem);
+      font-size: clamp(1.4rem, 2vw, 2rem);
       border-bottom: 1px solid;
       vertical-align: middle;
 
@@ -1032,7 +1032,7 @@
   }
 
   &__match-date {
-    font-size: clamp(1rem, 1.1vw, 1.2rem);
+    font-size: clamp(1.4rem, 1.8vw, 2rem);
     font-weight: 500;
   }
 
@@ -1040,7 +1040,7 @@
     display: flex;
     align-items: center;
     gap: 12px;
-    font-size: clamp(1.5rem, 1.5vw, 1.7rem);
+    font-size: clamp(1.8rem, 2.5vw, 2.5rem);
     font-weight: 600;
   }
 
@@ -1081,7 +1081,7 @@
   }
 
   &__match-location {
-    font-size: clamp(1.2rem, 1vw, 1.5rem);
+    font-size: clamp(1.4rem, 1.8vw, 2rem);
   }
 
   &__team-logo {
