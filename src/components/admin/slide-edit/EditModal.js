@@ -136,6 +136,8 @@ function EditModal({
   onSportlinkTextColorChange,
   sportlinkAccentColor,
   onSportlinkAccentColorChange,
+  sportlinkDate,
+  onSportlinkDateChange,
   modules = {},
   onSaveSlideEffects,
 }) {
@@ -397,6 +399,8 @@ function EditModal({
               onTextColorChange={onSportlinkTextColorChange}
               sportlinkAccentColor={sportlinkAccentColor}
               onAccentColorChange={onSportlinkAccentColorChange}
+              sportlinkDate={sportlinkDate}
+              onDateChange={onSportlinkDateChange}
             />
           </div>
         );

@@ -31,20 +31,13 @@ const Clock = memo(({ settings }) => {
     return { dateString, timeString };
   }, [currentDateTime]);
 
-  console.log("clock component rerendered");
   return (
     <div className="display-bottom-clock">
       <div className="date-time-display">
-        <div 
-          className="date-line"
-          style={{ color: settings.foregroundColor }}
-        >
+        <div className="date-line" style={{ color: settings.foregroundColor }}>
           {formatDateTime.dateString}
         </div>
-        <div 
-          className="time-line"
-          style={{ color: settings.foregroundColor }}
-        >
+        <div className="time-line" style={{ color: settings.foregroundColor }}>
           {formatDateTime.timeString}
         </div>
       </div>

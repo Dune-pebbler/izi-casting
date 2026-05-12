@@ -125,6 +125,7 @@ function AdminView() {
   const [modalSportlinkBgColor, setModalSportlinkBgColor] = useState("#0f172a");
   const [modalSportlinkTextColor, setModalSportlinkTextColor] = useState("#ffffff");
   const [modalSportlinkAccentColor, setModalSportlinkAccentColor] = useState("#ff6600");
+  const [modalSportlinkDate, setModalSportlinkDate] = useState("");
   const [imageLibraryTarget, setImageLibraryTarget] = useState("main");
   const [modalTimeRestriction, setModalTimeRestriction] = useState({
     enabled: false,
@@ -477,6 +478,7 @@ function AdminView() {
         sportlinkBgColor: "#0f172a",
         sportlinkTextColor: "#ffffff",
         sportlinkAccentColor: "#ff6600",
+        sportlinkDate: "",
         duration: 30,
       }),
       imagePosition: "center",
@@ -644,6 +646,7 @@ function AdminView() {
     setModalSportlinkBgColor(slide.sportlinkBgColor || "#0f172a");
     setModalSportlinkTextColor(slide.sportlinkTextColor || "#ffffff");
     setModalSportlinkAccentColor(slide.sportlinkAccentColor || "#ff6600");
+    setModalSportlinkDate(slide.sportlinkDate || "");
     setModalTimeRestriction(
       slide.timeRestriction || {
         enabled: false,
@@ -693,6 +696,7 @@ function AdminView() {
     setModalSportlinkBgColor("#0f172a");
     setModalSportlinkTextColor("#ffffff");
     setModalSportlinkAccentColor("#ff6600");
+    setModalSportlinkDate("");
     setModalTimeRestriction({
       enabled: false,
       startTime: "08:00",
@@ -1013,6 +1017,7 @@ function AdminView() {
                             sportlinkBgColor: modalSportlinkBgColor,
                             sportlinkTextColor: modalSportlinkTextColor,
                             sportlinkAccentColor: modalSportlinkAccentColor,
+                            sportlinkDate: modalSportlinkDate,
                             duration:
                               modalSlideDuration === "" ? 30 : modalSlideDuration,
                           }
@@ -1737,6 +1742,8 @@ function AdminView() {
           onSportlinkTextColorChange={setModalSportlinkTextColor}
           sportlinkAccentColor={modalSportlinkAccentColor}
           onSportlinkAccentColorChange={setModalSportlinkAccentColor}
+          sportlinkDate={modalSportlinkDate}
+          onSportlinkDateChange={setModalSportlinkDate}
           modules={modules}
           onSaveSlideEffects={(effects) => {
             saveSlideEffects(

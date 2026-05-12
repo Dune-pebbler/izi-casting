@@ -34,10 +34,13 @@ function SportlinkInput({
   onTextColorChange,
   sportlinkAccentColor,
   onAccentColorChange,
+  sportlinkDate,
+  onDateChange,
 }) {
   const [availableTeams, setAvailableTeams] = useState([]);
   const [loadingTeams, setLoadingTeams] = useState(false);
   const [teamLoadError, setTeamLoadError] = useState(null);
+  const [teamSearch, setTeamSearch] = useState("");
 
   const selectedTeams = sportlinkTeams || [];
 
@@ -52,7 +55,13 @@ function SportlinkInput({
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
       if (!Array.isArray(data)) throw new Error("Onverwacht antwoord van API");
-      setAvailableTeams(data);
+      const seen = new Set();
+      const unique = data.filter((t) => {
+        if (seen.has(t.teamcode)) return false;
+        seen.add(t.teamcode);
+        return true;
+      });
+      setAvailableTeams(unique);
     } catch (err) {
       setTeamLoadError(`Fout bij ophalen teams: ${err.message}`);
     } finally {
@@ -67,7 +76,11 @@ function SportlinkInput({
     } else {
       onTeamsChange([
         ...selectedTeams,
-        { teamcode: team.teamcode, poulecode: team.poulecode, teamnaam: team.teamnaam },
+        {
+          teamcode: team.teamcode,
+          poulecode: team.poulecode,
+          teamnaam: team.teamnaam,
+        },
       ]);
     }
   };
@@ -109,6 +122,19 @@ function SportlinkInput({
                 </button>
               ))}
             </div>
+          </div>
+
+          <div className="sportlink-input__field">
+            <label>Datum (optioneel)</label>
+            <input
+              type="date"
+              className="form-input"
+              value={sportlinkDate || ""}
+              onChange={(e) => onDateChange(e.target.value)}
+            />
+            <p className="sportlink-input__hint">
+              Laat leeg om resultaten van vandaag te tonen.
+            </p>
           </div>
 
           {sportlinkDataType !== "poulestand" && (
@@ -230,8 +256,18 @@ function SportlinkInput({
           {availableTeams.length > 0 && (
             <div className="sportlink-input__field">
               <label>Teams selecteren</label>
+              <input
+                type="text"
+                className="form-input"
+                placeholder="Zoeken..."
+                value={teamSearch}
+                onChange={(e) => setTeamSearch(e.target.value)}
+                style={{ marginBottom: "8px" }}
+              />
               <div className="sportlink-input__team-list">
-                {availableTeams.map((team) => {
+                {availableTeams.filter((t) =>
+                  t.teamnaam.toLowerCase().includes(teamSearch.toLowerCase())
+                ).map((team) => {
                   const selected = isSelected(team.teamcode);
                   return (
                     <button
@@ -250,8 +286,7 @@ function SportlinkInput({
                         {team.teamnaam}
                       </span>
                       <span className="sportlink-input__team-meta">
-                        #{team.teamcode}
-                        {team.klasse && ` · ${team.klasse}`}
+                        {team.klasse && ` ${team.klasse}`}
                       </span>
                     </button>
                   );
