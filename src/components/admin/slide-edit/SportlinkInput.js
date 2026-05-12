@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { RefreshCw, Check, X } from "lucide-react";
+import { RefreshCw, Check, X, Eye, EyeOff } from "lucide-react";
 
 const DATA_TYPES = [
   {
@@ -41,6 +41,7 @@ function SportlinkInput({
   const [loadingTeams, setLoadingTeams] = useState(false);
   const [teamLoadError, setTeamLoadError] = useState(null);
   const [teamSearch, setTeamSearch] = useState("");
+  const [showApiKey, setShowApiKey] = useState(false);
 
   const selectedTeams = sportlinkTeams || [];
 
@@ -224,13 +225,23 @@ function SportlinkInput({
           <div className="sportlink-input__field">
             <label>API key (Client ID)</label>
             <div className="sportlink-input__api-row">
-              <input
-                type="text"
-                className="form-input sportlink-input__api-key"
-                value={sportlinkApiKey}
-                onChange={(e) => onApiKeyChange(e.target.value)}
-                placeholder="API key..."
-              />
+              <div className="sportlink-input__api-key-wrapper">
+                <input
+                  type={showApiKey ? "text" : "password"}
+                  className="form-input sportlink-input__api-key"
+                  value={sportlinkApiKey}
+                  onChange={(e) => onApiKeyChange(e.target.value)}
+                  placeholder="API key..."
+                />
+                <button
+                  type="button"
+                  className="sportlink-input__api-key-toggle"
+                  onClick={() => setShowApiKey((v) => !v)}
+                  title={showApiKey ? "Verberg API key" : "Toon API key"}
+                >
+                  {showApiKey ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
               <button
                 type="button"
                 className="btn btn-secondary sportlink-input__fetch-btn"
