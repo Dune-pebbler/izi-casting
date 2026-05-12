@@ -717,7 +717,8 @@ function SportlinkDisplay({ slide }) {
       if (!body || !content) return;
       const scrollDistance = content.scrollHeight - body.clientHeight;
       if (scrollDistance <= 0) return;
-      const totalDuration = scrollDistance / 50 / 0.6;
+      const scrollDuration = scrollDistance / 50 / 0.6;
+      const totalDuration = scrollDuration * 2;
       content.style.setProperty(
         "--sportlink-scroll-dist",
         `-${scrollDistance}px`,
