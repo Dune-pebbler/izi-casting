@@ -525,6 +525,10 @@ function EmailSlideDisplay({ slide }) {
             Ongelezen
           </span>
         )}
+
+        {credentials.email && (
+          <span className="email-slide__account">{credentials.email}</span>
+        )}
       </div>
 
       <div className="email-slide__body" ref={bodyRef}>
@@ -897,22 +901,30 @@ function SportlinkDisplay({ slide }) {
                               </div>
                             </td>
                             <td
-                              style={{ borderBottom: `1px solid ${textColor}20` }}
+                              style={{
+                                borderBottom: `1px solid ${textColor}20`,
+                              }}
                             >
                               {row.gespeeldewedstrijden ?? "—"}
                             </td>
                             <td
-                              style={{ borderBottom: `1px solid ${textColor}20` }}
+                              style={{
+                                borderBottom: `1px solid ${textColor}20`,
+                              }}
                             >
                               {row.gewonnen ?? "—"}
                             </td>
                             <td
-                              style={{ borderBottom: `1px solid ${textColor}20` }}
+                              style={{
+                                borderBottom: `1px solid ${textColor}20`,
+                              }}
                             >
                               {row.gelijk ?? "—"}
                             </td>
                             <td
-                              style={{ borderBottom: `1px solid ${textColor}20` }}
+                              style={{
+                                borderBottom: `1px solid ${textColor}20`,
+                              }}
                             >
                               {row.verloren ?? "—"}
                             </td>
