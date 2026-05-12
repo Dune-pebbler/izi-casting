@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { RefreshCw, Check } from "lucide-react";
+import { RefreshCw, Check, X } from "lucide-react";
 
 const DATA_TYPES = [
   {
@@ -124,18 +124,20 @@ function SportlinkInput({
             </div>
           </div>
 
-          <div className="sportlink-input__field">
-            <label>Datum (optioneel)</label>
-            <input
-              type="date"
-              className="form-input"
-              value={sportlinkDate || ""}
-              onChange={(e) => onDateChange(e.target.value)}
-            />
-            <p className="sportlink-input__hint">
-              Laat leeg om resultaten van vandaag te tonen.
-            </p>
-          </div>
+          {sportlinkDataType !== "poulestand" && (
+            <div className="sportlink-input__field">
+              <label>Datum (optioneel)</label>
+              <input
+                type="date"
+                className="form-input"
+                value={sportlinkDate || ""}
+                onChange={(e) => onDateChange(e.target.value)}
+              />
+              <p className="sportlink-input__hint">
+                Laat leeg om resultaten van vandaag te tonen.
+              </p>
+            </div>
+          )}
 
           {sportlinkDataType !== "poulestand" && (
             <div className="sportlink-input__field">
@@ -255,15 +257,56 @@ function SportlinkInput({
 
           {availableTeams.length > 0 && (
             <div className="sportlink-input__field">
-              <label>Teams selecteren</label>
-              <input
-                type="text"
-                className="form-input"
-                placeholder="Zoeken..."
-                value={teamSearch}
-                onChange={(e) => setTeamSearch(e.target.value)}
-                style={{ marginBottom: "8px" }}
-              />
+              <label>
+                Teams selecteren
+                {selectedTeams.length > 0 && (
+                  <span className="sportlink-input__selected-count">
+                    {selectedTeams.length} geselecteerd
+                  </span>
+                )}
+              </label>
+              <div className="sportlink-input__team-search-row">
+                <input
+                  type="text"
+                  className="form-input"
+                  placeholder="Zoeken..."
+                  value={teamSearch}
+                  onChange={(e) => setTeamSearch(e.target.value)}
+                />
+                <button
+                  type="button"
+                  className="btn btn-secondary sportlink-input__select-all-btn"
+                  onClick={() => {
+                    const filtered = availableTeams.filter((t) =>
+                      t.teamnaam.toLowerCase().includes(teamSearch.toLowerCase())
+                    );
+                    const allSelected = filtered.every((t) => isSelected(t.teamcode));
+                    if (allSelected) {
+                      onTeamsChange(
+                        selectedTeams.filter(
+                          (s) => !filtered.some((f) => f.teamcode === s.teamcode)
+                        )
+                      );
+                    } else {
+                      const toAdd = filtered.filter((t) => !isSelected(t.teamcode)).map((t) => ({
+                        teamcode: t.teamcode,
+                        poulecode: t.poulecode,
+                        teamnaam: t.teamnaam,
+                      }));
+                      onTeamsChange([...selectedTeams, ...toAdd]);
+                    }
+                  }}
+                >
+                  {(() => {
+                    const filtered = availableTeams.filter((t) =>
+                      t.teamnaam.toLowerCase().includes(teamSearch.toLowerCase())
+                    );
+                    return filtered.every((t) => isSelected(t.teamcode))
+                      ? "Deselecteer alles"
+                      : "Selecteer alles";
+                  })()}
+                </button>
+              </div>
               <div className="sportlink-input__team-list">
                 {availableTeams.filter((t) =>
                   t.teamnaam.toLowerCase().includes(teamSearch.toLowerCase())
@@ -297,28 +340,31 @@ function SportlinkInput({
 
           {selectedTeams.length > 0 && availableTeams.length === 0 && (
             <div className="sportlink-input__field">
-              <label>Geselecteerde teams</label>
-              <div className="sportlink-input__selected-teams">
+              <div className="sportlink-input__chips-header">
+                <label>{selectedTeams.length} {selectedTeams.length === 1 ? "team" : "teams"} geselecteerd</label>
+                <button
+                  type="button"
+                  className="sportlink-input__chips-clear"
+                  onClick={() => onTeamsChange([])}
+                >
+                  Wis alles
+                </button>
+              </div>
+              <div className="sportlink-input__team-chips">
                 {selectedTeams.map((team) => (
-                  <div
-                    key={team.teamcode}
-                    className="sportlink-input__selected-team"
-                  >
-                    <span>{team.teamnaam}</span>
+                  <span key={team.teamcode} className="sportlink-input__team-chip">
+                    {team.teamnaam}
                     <button
                       type="button"
-                      className="btn-icon btn-icon--danger"
+                      className="sportlink-input__chip-remove"
                       onClick={() =>
-                        onTeamsChange(
-                          selectedTeams.filter(
-                            (t) => t.teamcode !== team.teamcode,
-                          ),
-                        )
+                        onTeamsChange(selectedTeams.filter((t) => t.teamcode !== team.teamcode))
                       }
+                      title={`${team.teamnaam} verwijderen`}
                     >
-                      ×
+                      <X size={10} />
                     </button>
-                  </div>
+                  </span>
                 ))}
               </div>
             </div>

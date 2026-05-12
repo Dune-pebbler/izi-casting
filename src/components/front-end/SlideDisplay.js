@@ -812,12 +812,12 @@ function SportlinkDisplay({ slide }) {
                     }}
                   >
                     <th>#</th>
-                    <th>Team</th>
-                    <th>G</th>
-                    <th>W</th>
-                    <th>D</th>
-                    <th>V</th>
-                    <th>Pnt</th>
+                    <th className="team">Team</th>
+                    <th>Gespeeld</th>
+                    <th>Gewonnen</th>
+                    <th>Gelijk</th>
+                    <th>Verloren</th>
+                    <th>Punten</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -829,16 +829,26 @@ function SportlinkDisplay({ slide }) {
                       <tr
                         key={i}
                         style={{
-                          borderBottomColor: `${textColor}10`,
+                          borderBottomColor: `${textColor}20`,
                           backgroundColor: isOwn
                             ? `${accentColor}20`
                             : "transparent",
                         }}
                       >
-                        <td style={{ color: `${textColor}99` }}>
+                        <td
+                          style={{
+                            color: `${textColor}99`,
+                            borderBottom: `1px solid ${textColor}20`,
+                          }}
+                        >
                           {row.positie || i + 1}
                         </td>
-                        <td style={{ fontWeight: isOwn ? 700 : 400 }}>
+                        <td
+                          style={{
+                            fontWeight: isOwn ? 700 : 400,
+                            borderBottom: `1px solid ${textColor}20`,
+                          }}
+                        >
                           <div className="display-sportlink__standing-team">
                             {row.clublogo && (
                               <img
@@ -850,11 +860,33 @@ function SportlinkDisplay({ slide }) {
                             {row.teamnaam}
                           </div>
                         </td>
-                        <td>{row.gespeeldewedstrijden ?? "—"}</td>
-                        <td>{row.gewonnen ?? "—"}</td>
-                        <td>{row.gelijk ?? "—"}</td>
-                        <td>{row.verloren ?? "—"}</td>
-                        <td style={{ fontWeight: 700, color: accentColor }}>
+                        <td
+                          style={{ borderBottom: `1px solid ${textColor}20` }}
+                        >
+                          {row.gespeeldewedstrijden ?? "—"}
+                        </td>
+                        <td
+                          style={{ borderBottom: `1px solid ${textColor}20` }}
+                        >
+                          {row.gewonnen ?? "—"}
+                        </td>
+                        <td
+                          style={{ borderBottom: `1px solid ${textColor}20` }}
+                        >
+                          {row.gelijk ?? "—"}
+                        </td>
+                        <td
+                          style={{ borderBottom: `1px solid ${textColor}20` }}
+                        >
+                          {row.verloren ?? "—"}
+                        </td>
+                        <td
+                          style={{
+                            fontWeight: 700,
+                            color: accentColor,
+                            borderBottom: `1px solid ${textColor}20`,
+                          }}
+                        >
                           {row.punten ?? "—"}
                         </td>
                       </tr>
@@ -871,13 +903,27 @@ function SportlinkDisplay({ slide }) {
                     style={{ borderBottomColor: `${textColor}10` }}
                   >
                     <div className="display-sportlink__match-info">
-                      <div
-                        className="display-sportlink__match-date"
-                        style={{ color: `${textColor}88` }}
-                      >
-                        {formatDate(row.wedstrijddatum)}
-                        {row.aanvangstijd && <span> · {row.aanvangstijd}</span>}
+                      <div className="display-sportlink__match-teams">
+                        <div
+                          className="display-sportlink__match-date display-sportlink__match-team"
+                          style={{ color: `${textColor}88` }}
+                        >
+                          {formatDate(row.wedstrijddatum)}
+                          {row.aanvangstijd && (
+                            <span> · {row.aanvangstijd}</span>
+                          )}
+                        </div>
+                        {row.accommodatie && (
+                          <div
+                            className="display-sportlink__match-location"
+                            style={{ color: `${textColor}55` }}
+                          >
+                            {row.accommodatie}
+                          </div>
+                        )}
+                        <div className="display-sportlink__match-team"></div>
                       </div>
+
                       <div
                         className="display-sportlink__match-teams"
                         style={{ color: textColor }}
@@ -925,14 +971,6 @@ function SportlinkDisplay({ slide }) {
                           )}
                         </div>
                       </div>
-                      {row.accommodatie && (
-                        <div
-                          className="display-sportlink__match-location"
-                          style={{ color: `${textColor}55` }}
-                        >
-                          {row.accommodatie}
-                        </div>
-                      )}
                     </div>
                   </div>
                 ))}
