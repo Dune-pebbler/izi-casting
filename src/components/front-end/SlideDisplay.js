@@ -525,6 +525,10 @@ function EmailSlideDisplay({ slide }) {
             Ongelezen
           </span>
         )}
+
+        {credentials.email && (
+          <span className="email-slide__account">{credentials.email}</span>
+        )}
       </div>
 
       <div className="email-slide__body" ref={bodyRef}>
@@ -700,8 +704,15 @@ function SportlinkDisplay({ slide }) {
         const merged = results.flat();
 
         {
+          const seen = new Set();
+          const deduped = merged.filter((row) => {
+            const key = `${row.wedstrijddatum}|${row.thuisteam}|${row.uitteam}`;
+            if (seen.has(key)) return false;
+            seen.add(key);
+            return true;
+          });
           // sort by date (ISO 8601 strings sort lexicographically)
-          const sorted = merged.sort((a, b) => {
+          const sorted = deduped.sort((a, b) => {
             if (!a.wedstrijddatum) return 1;
             if (!b.wedstrijddatum) return -1;
             return a.wedstrijddatum.localeCompare(b.wedstrijddatum);
@@ -890,22 +901,30 @@ function SportlinkDisplay({ slide }) {
                               </div>
                             </td>
                             <td
-                              style={{ borderBottom: `1px solid ${textColor}20` }}
+                              style={{
+                                borderBottom: `1px solid ${textColor}20`,
+                              }}
                             >
                               {row.gespeeldewedstrijden ?? "—"}
                             </td>
                             <td
-                              style={{ borderBottom: `1px solid ${textColor}20` }}
+                              style={{
+                                borderBottom: `1px solid ${textColor}20`,
+                              }}
                             >
                               {row.gewonnen ?? "—"}
                             </td>
                             <td
-                              style={{ borderBottom: `1px solid ${textColor}20` }}
+                              style={{
+                                borderBottom: `1px solid ${textColor}20`,
+                              }}
                             >
                               {row.gelijk ?? "—"}
                             </td>
                             <td
-                              style={{ borderBottom: `1px solid ${textColor}20` }}
+                              style={{
+                                borderBottom: `1px solid ${textColor}20`,
+                              }}
                             >
                               {row.verloren ?? "—"}
                             </td>

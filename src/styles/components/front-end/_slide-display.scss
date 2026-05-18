@@ -1480,9 +1480,19 @@
   }
 
   &__title {
+    display: flex;
+    align-items: baseline;
+    gap: clamp(8px, 1vw, 16px);
     font-size: clamp(18px, 2.2vw, 36px);
     font-weight: 700;
     letter-spacing: -0.01em;
+  }
+
+  &__account {
+    font-size: clamp(11px, 1.1vw, 18px);
+    font-weight: 400;
+    opacity: 0.55;
+    letter-spacing: 0;
   }
 
   &__badge {
