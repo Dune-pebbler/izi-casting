@@ -32,7 +32,6 @@ import {
 } from "../../store/slices/deviceSlice";
 import { usePlaylistManager } from "./PlaylistManager";
 import { useTenantModules } from "../../hooks/useTenantModules";
-import DisclaimerModal, { hasAcceptedDisclaimer } from "./DisclaimerModal";
 import PlaylistList from "./PlaylistList";
 import EditModal from "./slide-edit/EditModal";
 import MoveSlideModal from "./MoveSlideModal";
@@ -118,14 +117,18 @@ function AdminView() {
   const [modalEmailTextColor, setModalEmailTextColor] = useState("#ffffff");
   const [modalEmailAccentColor, setModalEmailAccentColor] = useState("#4f87ff");
   const [modalSportlinkApiKey, setModalSportlinkApiKey] = useState("");
-  const [modalSportlinkDataType, setModalSportlinkDataType] = useState("programma");
+  const [modalSportlinkDataType, setModalSportlinkDataType] =
+    useState("programma");
   const [modalSportlinkTeams, setModalSportlinkTeams] = useState([]);
   const [modalSportlinkTitle, setModalSportlinkTitle] = useState("");
-  const [modalSportlinkAantalDagen, setModalSportlinkAantalDagen] = useState(14);
+  const [modalSportlinkAantalDagen, setModalSportlinkAantalDagen] =
+    useState(14);
   const [modalSportlinkMaxItems, setModalSportlinkMaxItems] = useState(10);
   const [modalSportlinkBgColor, setModalSportlinkBgColor] = useState("#0f172a");
-  const [modalSportlinkTextColor, setModalSportlinkTextColor] = useState("#ffffff");
-  const [modalSportlinkAccentColor, setModalSportlinkAccentColor] = useState("#ff6600");
+  const [modalSportlinkTextColor, setModalSportlinkTextColor] =
+    useState("#ffffff");
+  const [modalSportlinkAccentColor, setModalSportlinkAccentColor] =
+    useState("#ff6600");
   const [modalSportlinkDate, setModalSportlinkDate] = useState("");
   const [imageLibraryTarget, setImageLibraryTarget] = useState("main");
   const [modalTimeRestriction, setModalTimeRestriction] = useState({
@@ -134,7 +137,15 @@ function AdminView() {
     endTime: "17:00",
     startDate: "",
     endDate: "",
-    days: { mon: true, tue: true, wed: true, thu: true, fri: true, sat: true, sun: true },
+    days: {
+      mon: true,
+      tue: true,
+      wed: true,
+      thu: true,
+      fri: true,
+      sat: true,
+      sun: true,
+    },
   });
   const [currentEditingPlaylistId, setCurrentEditingPlaylistId] =
     useState(null);
@@ -177,11 +188,6 @@ function AdminView() {
   // Trash modal state
   const [trashModalOpen, setTrashModalOpen] = useState(false);
   const [trashedSlides, setTrashedSlides] = useState([]);
-
-  // Disclaimer state
-  const [disclaimerAccepted, setDisclaimerAccepted] = useState(
-    hasAcceptedDisclaimer
-  );
 
   // Redux hooks
   const dispatch = useAppDispatch();
@@ -660,7 +666,15 @@ function AdminView() {
         endTime: "17:00",
         startDate: "",
         endDate: "",
-        days: { mon: true, tue: true, wed: true, thu: true, fri: true, sat: true, sun: true },
+        days: {
+          mon: true,
+          tue: true,
+          wed: true,
+          thu: true,
+          fri: true,
+          sat: true,
+          sun: true,
+        },
       },
     );
   };
@@ -709,7 +723,15 @@ function AdminView() {
       endTime: "17:00",
       startDate: "",
       endDate: "",
-      days: { mon: true, tue: true, wed: true, thu: true, fri: true, sat: true, sun: true },
+      days: {
+        mon: true,
+        tue: true,
+        wed: true,
+        thu: true,
+        fri: true,
+        sat: true,
+        sun: true,
+      },
     });
   };
 
@@ -1025,33 +1047,37 @@ function AdminView() {
                             sportlinkAccentColor: modalSportlinkAccentColor,
                             sportlinkDate: modalSportlinkDate,
                             duration:
-                              modalSlideDuration === "" ? 30 : modalSlideDuration,
+                              modalSlideDuration === ""
+                                ? 30
+                                : modalSlideDuration,
                           }
                         : {
-                          text: sanitizeHTMLContent(modalTinyMCEContent),
-                          tinyMCEContent: modalTinyMCEContent,
-                          imageUrl: modalImageUrl,
-                          videoUrl: modalVideoUrl,
-                          teletekstChannel: modalTeletekstChannel,
-                          teletekstTheme: modalTeletekstTheme,
-                          teletekstPageCount: modalTeletekstPageCount,
-                          teletekstSkipLines: modalTeletekstSkipLines,
-                          iframeUrl: modalIframeUrl,
-                          type:
-                            slideLayout === "iframe"
-                              ? "iframe"
-                              : slideLayout === "teletekst"
-                                ? "teletekst"
-                                : modalVideoUrl
-                                  ? "video"
-                                  : modalImageUrl
-                                    ? "image"
-                                    : "text",
-                          imagePosition: imagePosition,
-                          imageSide: modalImageSide,
-                          duration:
-                            modalSlideDuration === "" ? 5 : modalSlideDuration,
-                        }),
+                            text: sanitizeHTMLContent(modalTinyMCEContent),
+                            tinyMCEContent: modalTinyMCEContent,
+                            imageUrl: modalImageUrl,
+                            videoUrl: modalVideoUrl,
+                            teletekstChannel: modalTeletekstChannel,
+                            teletekstTheme: modalTeletekstTheme,
+                            teletekstPageCount: modalTeletekstPageCount,
+                            teletekstSkipLines: modalTeletekstSkipLines,
+                            iframeUrl: modalIframeUrl,
+                            type:
+                              slideLayout === "iframe"
+                                ? "iframe"
+                                : slideLayout === "teletekst"
+                                  ? "teletekst"
+                                  : modalVideoUrl
+                                    ? "video"
+                                    : modalImageUrl
+                                      ? "image"
+                                      : "text",
+                            imagePosition: imagePosition,
+                            imageSide: modalImageSide,
+                            duration:
+                              modalSlideDuration === ""
+                                ? 5
+                                : modalSlideDuration,
+                          }),
             };
 
             return updatedSlide;
@@ -1489,10 +1515,6 @@ function AdminView() {
     <div
       className={`admin-layout ${isSidebarCollapsed ? "sidebar-collapsed" : ""}`}
     >
-      {!disclaimerAccepted && (
-        <DisclaimerModal onAccept={() => setDisclaimerAccepted(true)} />
-      )}
-
       {/* Fixed Left Sidebar */}
       <Sidebar
         setDeviceToDelete={(device) => dispatch(setDeviceToDelete(device))}
