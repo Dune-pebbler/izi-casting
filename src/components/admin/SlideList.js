@@ -617,6 +617,14 @@ function SlideList({
           return "Website";
         case "countdown":
           return "Afteltimer";
+        case "sportlink":
+          return "sportlink";
+        case "email":
+          return "email inbox";
+        case "agenda":
+          return "agenda";
+        case "gallery":
+          return "Fotogallerij";
         case "side-by-side":
         default:
           return "Side by Side";
