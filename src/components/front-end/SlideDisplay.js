@@ -1404,7 +1404,8 @@ function SlideDisplay({
                 theme={slide.teletekstTheme || "classic"}
                 pageCount={slide.teletekstPageCount || 1}
                 duration={slide.duration || 10}
-                skipLines={slide.teletekstSkipLines || 0}
+                skipTopLines={slide.teletekstSkipTopLines || 0}
+                skipBottomLines={slide.teletekstSkipBottomLines || 0}
               />
             ) : (
               <div className="display-teletekst-placeholder">

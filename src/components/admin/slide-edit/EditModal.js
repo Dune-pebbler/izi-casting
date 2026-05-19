@@ -44,7 +44,8 @@ function EditModal({
   teletekstChannel,
   teletekstTheme,
   teletekstPageCount,
-  teletekstSkipLines,
+  teletekstSkipTopLines,
+  teletekstSkipBottomLines,
   iframeUrl,
   onClose,
   onSave,
@@ -62,7 +63,8 @@ function EditModal({
   onTeletekstChannelChange,
   onTeletekstThemeChange,
   onTeletekstPageCountChange,
-  onTeletekstSkipLinesChange,
+  onTeletekstSkipTopLinesChange,
+  onTeletekstSkipBottomLinesChange,
   onIframeUrlChange,
   onToggleSlideVisibility,
   onOpenLibrary,
@@ -271,11 +273,13 @@ function EditModal({
                 channel={teletekstChannel}
                 theme={teletekstTheme}
                 pageCount={teletekstPageCount}
-                skipLines={teletekstSkipLines}
+                skipTopLines={teletekstSkipTopLines}
+                skipBottomLines={teletekstSkipBottomLines}
                 onChannelChange={onTeletekstChannelChange}
                 onThemeChange={onTeletekstThemeChange}
                 onPageCountChange={onTeletekstPageCountChange}
-                onSkipLinesChange={onTeletekstSkipLinesChange}
+                onSkipTopLinesChange={onTeletekstSkipTopLinesChange}
+                onSkipBottomLinesChange={onTeletekstSkipBottomLinesChange}
               />
             </div>
           </div>
