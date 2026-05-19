@@ -521,11 +521,72 @@ function Feed({ feeds, settings }) {
     rotateFeeds();
   }, [rssFeed]);
 
+  const currentItem = rssFeed[currentFeedIndex] ?? null;
+  const descriptionRef = useRef(null);
+
+  useEffect(() => {
+    const el = descriptionRef.current;
+    if (!el || !currentItem?.description) return;
+
+    // Cancel any running animation from the previous item
+    el.getAnimations().forEach(anim => anim.cancel());
+    el.classList.remove('scrolling-text');
+
+    // Double rAF: first frame lets React flush DOM, second lets browser compute layout
+    let raf1, raf2;
+    raf1 = requestAnimationFrame(() => {
+      raf2 = requestAnimationFrame(() => {
+        // Temporarily force single-line to measure true text width
+        el.style.webkitLineClamp = 'unset';
+        el.style.display = 'block';
+        el.style.whiteSpace = 'nowrap';
+        el.style.overflow = 'visible';
+
+        const containerWidth = el.parentElement?.clientWidth || 0;
+        const textWidth = el.scrollWidth;
+
+        // Restore element to default state
+        el.style.cssText = '';
+
+        if (containerWidth === 0 || textWidth <= containerWidth) {
+          return;
+        }
+
+        el.classList.add('scrolling-text');
+
+        const scrollDistance = textWidth - containerWidth;
+        const consistentScrollSpeed = 150;
+        const scrollTime = (scrollDistance / consistentScrollSpeed) * 1000;
+        const pauseTime = 1000;
+        const totalAnimationDuration = scrollTime + pauseTime * 2;
+
+        if (currentItem) {
+          currentItem.dynamicDuration = Math.max(totalAnimationDuration / 1000, 5);
+        }
+
+        const startPauseRatio = pauseTime / totalAnimationDuration;
+        const endPauseRatio = (totalAnimationDuration - pauseTime) / totalAnimationDuration;
+
+        const keyframes = [
+          { transform: 'translateX(0)', offset: 0 },
+          { transform: 'translateX(0)', offset: startPauseRatio },
+          { transform: `translateX(-${scrollDistance}px)`, offset: endPauseRatio },
+          { transform: `translateX(-${scrollDistance}px)`, offset: 1 },
+        ];
+
+        el.animate(keyframes, { duration: totalAnimationDuration, easing: 'linear', fill: 'forwards' });
+      });
+    });
+
+    return () => {
+      cancelAnimationFrame(raf1);
+      cancelAnimationFrame(raf2);
+    };
+  }, [currentItem]);
+
   if (rssFeed.length === 0) {
     return null;
   }
-
-  const currentItem = rssFeed[currentFeedIndex];
 
   return (
     <div className="feed-container">
@@ -534,110 +595,7 @@ function Feed({ feeds, settings }) {
           {currentItem?.title || "No title"}
         </div>
         <div className="rss-description-container">
-          <div 
-            className="rss-description"
-            ref={(el) => {
-              if (el && currentItem?.description) {
-                // Use requestAnimationFrame to defer the measurement to avoid render loops
-                requestAnimationFrame(() => {
-                  // Temporarily remove line clamp to measure full text width
-                  const originalStyle = el.style.cssText;
-                  el.style.webkitLineClamp = 'unset';
-                  el.style.display = 'block';
-                  el.style.whiteSpace = 'nowrap';
-                  el.style.overflow = 'visible';
-                  
-                  // Check if text overflows the container
-                  const containerWidth = el.parentElement.clientWidth;
-                  const textWidth = el.scrollWidth;
-                  const isOverflowing = textWidth > containerWidth;
-                  
-                  if (isOverflowing) {
-                    el.classList.add('scrolling-text');
-                    
-                    // Calculate scroll distance to show the full text
-                    const scrollDistance = textWidth - containerWidth;
-                    
-                    // Use a consistent scroll speed for all content
-                    const consistentScrollSpeed = 150; // pixels per second - consistent for all content
-                    
-                    // Calculate the time needed to scroll the full distance at consistent speed
-                    const scrollTime = (scrollDistance / consistentScrollSpeed) * 1000; // convert to milliseconds
-                    
-                    // Add pause time at start and end (2 seconds total: 1s start + 1s end)
-                    const pauseTime = 1000; // 1 second pause at start and end
-                    const totalAnimationDuration = scrollTime + (pauseTime * 2);
-                    
-                    // Update the feed item's duration to match the calculated time
-                    if (currentItem) {
-                      currentItem.dynamicDuration = Math.max(totalAnimationDuration / 1000, 5); // minimum 5 seconds
-                    }
-                    
-                    // Create and apply the animation with consistent timing
-                    const startPauseRatio = pauseTime / totalAnimationDuration;
-                    const endPauseRatio = (totalAnimationDuration - pauseTime) / totalAnimationDuration;
-                    
-                    // Create keyframes with consistent timing
-                    const keyframes = [
-                      { transform: 'translateX(0)', offset: 0 },
-                      { transform: 'translateX(0)', offset: startPauseRatio },
-                      { transform: `translateX(-${scrollDistance}px)`, offset: endPauseRatio },
-                      { transform: `translateX(-${scrollDistance}px)`, offset: 1 }
-                    ];
-                    
-                    const animationOptions = {
-                      duration: totalAnimationDuration,
-                      easing: 'linear',
-                      fill: 'forwards'
-                    };
-                    
-                    // Check if animation is already running for this feed item
-                    const existingAnimations = el.getAnimations();
-                    const isAlreadyAnimating = existingAnimations.some(anim => 
-                      anim.playState === 'running' && 
-                      anim.effect && 
-                      anim.effect.getKeyframes().some(kf => 
-                        kf.transform && kf.transform.includes(`translateX(-${scrollDistance}px)`)
-                      )
-                    );
-                    
-                    // Also check if we've already set up animation for this specific item
-                    const animationKey = `${currentItem?.title}-${scrollDistance}-${totalAnimationDuration}`;
-                    const hasAnimated = el.dataset.animationKey === animationKey;
-                    
-                    if (!isAlreadyAnimating && !hasAnimated) {
-                      // Stop any existing animation
-                      el.getAnimations().forEach(anim => anim.cancel());
-                      
-                      // Mark this element as having been animated
-                      el.dataset.animationKey = animationKey;
-                      
-                      // Add a small delay to prevent jump on re-render
-                      setTimeout(() => {
-                        // Start the new animation
-                        el.animate(keyframes, animationOptions);
-                      }, 100);
-                    }
-                    
-                    // console.log(`🎬 Scrolling animation started:`, {
-                    //   scrollDistance: `${scrollDistance}px`,
-                    //   duration: `${totalAnimationDuration}ms`,
-                    //   feedDuration: `${currentItem?.dynamicDuration || 10}s`,
-                    //   scrollSpeed: `${consistentScrollSpeed}px/s`,
-                    //   pauseTime: `${pauseTime}ms`
-                    // });
-                  } else {
-                    el.classList.remove('scrolling-text');
-                    // Stop any existing animation
-                    el.getAnimations().forEach(anim => anim.cancel());
-                  }
-                  
-                  // Restore original style
-                  el.style.cssText = originalStyle;
-                });
-              }
-            }}
-          >
+          <div className="rss-description" ref={descriptionRef}>
             {currentItem?.description || "No description"}
           </div>
         </div>
