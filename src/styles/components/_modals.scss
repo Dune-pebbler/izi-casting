@@ -37,7 +37,8 @@
     border-bottom: 1px solid var(--border);
     background-color: var(--surface);
 
-    h2, h3 {
+    h2,
+    h3 {
       margin: 0;
       font-size: $font-size-lg;
       font-weight: $font-weight-semibold;
@@ -347,5 +348,69 @@
 
   .feed-edit-modal .popular-feeds {
     grid-template-columns: 1fr;
+  }
+}
+
+// Disclaimer Modal
+.disclaimer-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999;
+  padding: $spacing-lg;
+}
+
+.disclaimer-modal {
+  background-color: var(--surface);
+  border-radius: $border-radius-lg;
+  box-shadow: $shadow-lg;
+  width: 100%;
+  max-width: 540px;
+  animation: modalSlideIn 0.2s ease-out;
+
+  .disclaimer-modal-header {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    padding: $spacing-lg;
+
+    h2 {
+      margin: 0;
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+  }
+
+  .disclaimer-modal-body {
+    padding: 24px;
+    max-height: 50vh;
+    overflow-y: scroll;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+
+    p {
+      margin: 0 0 $spacing-md;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+
+    ul {
+      margin: 0 0 $spacing-md;
+      padding-left: 1.25rem;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      line-height: 1.8;
+    }
+  }
+
+  .disclaimer-modal-footer {
+    padding: $spacing-md $spacing-lg $spacing-lg;
+    display: flex;
+    justify-content: flex-end;
   }
 }

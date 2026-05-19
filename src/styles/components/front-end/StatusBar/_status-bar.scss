@@ -1,6 +1,6 @@
 // Bottom Bar Styles
 .display-bottom-bar {
-  position: fixed;
+  position: absolute;
   margin: $spacing-md;
   width: calc(100% - $spacing-md * 2);
   bottom: 0;

@@ -28,7 +28,9 @@
       "Bash(cd \"/Users/ruben/Documents/Dune pebbler/izi-casting\" && node -e \"require\\('firebase/app'\\)\" 2>&1 | head -3)",
       "Bash(cd \"/Users/ruben/Documents/Dune pebbler/izi-casting\" && node cleanup-firestore.mjs)",
       "Bash(kill 9116 2>/dev/null; echo \"killed\")",
-      "Bash(python3 -m json.tool)"
+      "Bash(python3 -m json.tool)",
+      "WebFetch(domain:dexels.github.io)",
+      "WebFetch(domain:sportlinkservices.github.io)"
     ],
     "deny": [],
     "ask": []

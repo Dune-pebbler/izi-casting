@@ -667,7 +667,9 @@ function FeedList() {
         >
           <div className="settings-toggle-left">
             <MessageSquareText size={16} />
-            <span>Feed configuratie ({enabledFeedsCount}/{feeds.length})</span>
+            <span>
+              Feed configuratie ({enabledFeedsCount}/{feeds.length})
+            </span>
           </div>
           {isFeedSettingsExpanded ? (
             <ChevronUp size={16} />
@@ -681,6 +683,10 @@ function FeedList() {
       <div
         className={`collapsible-wrapper${isFeedSettingsExpanded ? " expanded" : ""}`}
       >
+        <div className="feed-list__warning">
+          <strong>Let op:</strong> U bent verantwoordelijk voor de inhoud van
+          externe feeds. Controleer altijd de bron
+        </div>
         <div className="feed-collapse-inner">
           <DndContext
             sensors={sensors}
@@ -709,44 +715,52 @@ function FeedList() {
       </div>
 
       {/* Feed Deletion Confirmation Modal */}
-      {feedToDelete && createPortal(
-        <div className="slide-delete-modal-wrapper">
-          <div className="modal-overlay" onClick={() => setFeedToDelete(null)}>
-            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-              <div className="modal-header">
-                <h3>Feed verwijderen</h3>
-                <button
-                  onClick={() => setFeedToDelete(null)}
-                  className="modal-close-btn"
-                  title="Sluiten"
-                >
-                  <X size={20} />
-                </button>
-              </div>
-              <div className="modal-body">
-                <p className="modal-description">
-                  Weet je zeker dat je <strong>{feedToDelete.name}</strong> wilt verwijderen?
-                </p>
-                <p className="delete-warning">
-                  Deze actie kan niet ongedaan worden gemaakt.
-                </p>
-              </div>
-              <div className="modal-footer">
-                <button
-                  onClick={() => setFeedToDelete(null)}
-                  className="btn btn-secondary"
-                >
-                  Annuleren
-                </button>
-                <button onClick={handleDeleteFeed} className="btn btn-danger">
-                  Verwijderen
-                </button>
+      {feedToDelete &&
+        createPortal(
+          <div className="slide-delete-modal-wrapper">
+            <div
+              className="modal-overlay"
+              onClick={() => setFeedToDelete(null)}
+            >
+              <div
+                className="modal-content"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="modal-header">
+                  <h3>Feed verwijderen</h3>
+                  <button
+                    onClick={() => setFeedToDelete(null)}
+                    className="modal-close-btn"
+                    title="Sluiten"
+                  >
+                    <X size={20} />
+                  </button>
+                </div>
+                <div className="modal-body">
+                  <p className="modal-description">
+                    Weet je zeker dat je <strong>{feedToDelete.name}</strong>{" "}
+                    wilt verwijderen?
+                  </p>
+                  <p className="delete-warning">
+                    Deze actie kan niet ongedaan worden gemaakt.
+                  </p>
+                </div>
+                <div className="modal-footer">
+                  <button
+                    onClick={() => setFeedToDelete(null)}
+                    className="btn btn-secondary"
+                  >
+                    Annuleren
+                  </button>
+                  <button onClick={handleDeleteFeed} className="btn btn-danger">
+                    Verwijderen
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        </div>,
-        document.body
-      )}
+          </div>,
+          document.body,
+        )}
     </div>
   );
 }

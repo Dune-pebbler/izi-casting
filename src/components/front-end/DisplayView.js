@@ -822,6 +822,34 @@ function DisplayView() {
         const isTimeActive = (slide) => {
           const tr = slide.timeRestriction;
           if (!tr?.enabled) return true;
+
+          // Date range check (optional — empty string means no restriction)
+          if (tr.startDate || tr.endDate) {
+            const pad = (n) => String(n).padStart(2, "0");
+            const todayStr = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+
+            // Normalize to YYYY-MM-DD string — handles plain strings, Date objects,
+            // and Firestore Timestamps (which have a .toDate() method)
+            const toDateStr = (val) => {
+              if (!val) return null;
+              if (typeof val === "string") return val.slice(0, 10);
+              if (typeof val.toDate === "function") return val.toDate().toISOString().slice(0, 10);
+              if (val instanceof Date) return val.toISOString().slice(0, 10);
+              return null;
+            };
+
+            const startStr = toDateStr(tr.startDate);
+            const endStr = toDateStr(tr.endDate);
+            if (startStr && todayStr < startStr) return false;
+            if (endStr && todayStr > endStr) return false;
+          }
+
+          if (tr.days) {
+            const dayKeys = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
+            const key = dayKeys[now.getDay()];
+            if (tr.days[key] === false) return false;
+          }
+
           const [sh, sm] = tr.startTime.split(":").map(Number);
           const [eh, em] = tr.endTime.split(":").map(Number);
           const start = sh * 60 + sm;
@@ -857,6 +885,7 @@ function DisplayView() {
               (slide.layout === "countdown" && slide.countdownTargetDate) ||
               (slide.layout === "agenda" && slide.agendaCalendars && slide.agendaCalendars.length > 0) ||
               (slide.layout === "email" && slide.emailProvider) ||
+              (slide.layout === "sportlink" && slide.sportlinkApiKey && slide.sportlinkTeams && slide.sportlinkTeams.length > 0) ||
               (!slide.type && slide.text && slide.text.trim())),
         );
 

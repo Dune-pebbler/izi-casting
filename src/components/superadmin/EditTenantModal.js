@@ -22,6 +22,7 @@ import {
   CalendarDays,
   Sparkles,
   Mail,
+  Trophy,
 } from "lucide-react";
 import { doc, setDoc } from "firebase/firestore";
 import { db } from "../../firebase";
@@ -103,6 +104,13 @@ const SLIDETYPES = [
     description:
       "Laat een overzicht zien van de meest recente ongelezen emails.",
     icon: Mail,
+  },
+  {
+    key: "sportlink",
+    label: "Sportlink",
+    description:
+      "Toon wedstrijdprogramma, uitslagen of poulestand via Sportlink Club.Dataservice.",
+    icon: Trophy,
   },
 ];
 

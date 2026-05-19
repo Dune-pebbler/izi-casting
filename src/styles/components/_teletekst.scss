@@ -266,15 +266,19 @@
 @keyframes teletekst-scroll {
   0% {
     transform: translateY(0);
+    animation-timing-function: linear;
   }
-  15% {
+  25% {
     transform: translateY(0);
+    animation-timing-function: ease-in-out;
   }
   50% {
     transform: translateY(var(--scroll-distance, -200px));
+    animation-timing-function: linear;
   }
-  65% {
+  75% {
     transform: translateY(var(--scroll-distance, -200px));
+    animation-timing-function: ease-in-out;
   }
   100% {
     transform: translateY(0);
@@ -298,6 +302,7 @@
     line-height: 1.4;
     white-space: pre;
     width: fit-content;
+    margin: 0 auto;
 
     &.auto-scroll {
       animation: teletekst-scroll var(--scroll-duration, 20s) linear infinite;

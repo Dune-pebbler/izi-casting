@@ -460,3 +460,662 @@
     }
   }
 }
+
+// =============================================================================
+// SPORTLINK SLIDE - Admin Input
+// =============================================================================
+
+.modal-sportlink {
+  display: flex;
+  flex: 1;
+  height: 100%;
+  overflow: auto;
+}
+
+.sportlink-input {
+  display: flex;
+  gap: 24px;
+  width: 100%;
+  padding: 24px;
+  flex-wrap: wrap;
+
+  &__left {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    flex: 1;
+    min-width: 240px;
+    max-width: 340px;
+  }
+
+  &__right {
+    flex: 2;
+    min-width: 320px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  &__section {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  &__section-title {
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted-foreground);
+    margin: 0 0 4px;
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    label {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--foreground);
+    }
+  }
+
+  &__row {
+    display: flex;
+    gap: 12px;
+
+    .sportlink-input__field {
+      flex: 1;
+    }
+  }
+
+  &__hint {
+    font-size: 12px;
+    color: var(--muted-foreground);
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  &__error {
+    font-size: 12px;
+    color: #ff6b6b;
+    padding: 8px 12px;
+    background: rgba(255, 107, 107, 0.1);
+    border-radius: 6px;
+  }
+
+  &__data-types {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  &__type-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--background);
+    color: var(--foreground);
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.15s;
+
+    &.active {
+      border-color: var(--primary);
+      background: color-mix(in srgb, var(--primary) 12%, transparent);
+    }
+
+    &:hover:not(.active) {
+      border-color: var(--primary);
+      background: color-mix(in srgb, var(--primary) 6%, transparent);
+    }
+  }
+
+  &__type-label {
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  &__type-desc {
+    font-size: 11px;
+    color: var(--muted-foreground);
+  }
+
+  &__api-row {
+    display: flex;
+    gap: 8px;
+  }
+
+  &__api-key-wrapper {
+    position: relative;
+    flex: 1;
+    display: flex;
+    align-items: center;
+  }
+
+  &__api-key {
+    flex: 1;
+    padding-right: 36px !important;
+  }
+
+  &__api-key-toggle {
+    position: absolute;
+    right: 8px;
+    background: none;
+    border: none;
+    padding: 4px;
+    cursor: pointer;
+    color: var(--foreground-secondary);
+    display: flex;
+    align-items: center;
+    border-radius: 4px;
+
+    &:hover {
+      color: var(--foreground);
+      background-color: var(--muted);
+    }
+  }
+
+  &__fetch-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  &__team-search-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+
+    .form-input {
+      flex: 1;
+    }
+  }
+
+  &__select-all-btn {
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  &__team-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-height: 280px;
+    overflow-y: auto;
+  }
+
+  &__team-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--background);
+    color: var(--foreground);
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.15s;
+
+    &.active {
+      border-color: var(--primary);
+      background: color-mix(in srgb, var(--primary) 12%, transparent);
+    }
+
+    &:hover:not(.active) {
+      border-color: var(--primary);
+      background: color-mix(in srgb, var(--primary) 6%, transparent);
+    }
+  }
+
+  &__team-check {
+    color: var(--primary);
+    flex-shrink: 0;
+  }
+
+  &__team-name {
+    flex: 1;
+    font-size: 13px;
+    font-weight: 500;
+  }
+
+  &__team-meta {
+    font-size: 11px;
+    color: var(--muted-foreground);
+  }
+
+  &__selected-count {
+    margin-left: 8px;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--primary);
+    background: color-mix(in srgb, var(--primary) 12%, transparent);
+    border: 1px solid color-mix(in srgb, var(--primary) 30%, transparent);
+    border-radius: 100px;
+    padding: 1px 7px;
+  }
+
+  &__chips-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+
+    label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--foreground);
+      margin: 0;
+    }
+  }
+
+  &__chips-clear {
+    background: none;
+    border: none;
+    font-size: 11px;
+    color: var(--muted-foreground);
+    cursor: pointer;
+    padding: 0;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    transition: color 0.15s;
+
+    &:hover {
+      color: var(--primary);
+    }
+  }
+
+  &__team-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+
+  &__team-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 6px 3px 9px;
+    background: color-mix(in srgb, var(--primary) 12%, transparent);
+    border: 1px solid color-mix(in srgb, var(--primary) 30%, transparent);
+    border-radius: 100px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--foreground);
+    line-height: 1.4;
+  }
+
+  &__chip-remove {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    padding: 0;
+    background: none;
+    border: none;
+    border-radius: 50%;
+    color: var(--muted-foreground);
+    cursor: pointer;
+    transition:
+      background 0.12s,
+      color 0.12s;
+    flex-shrink: 0;
+
+    &:hover {
+      background: color-mix(in srgb, var(--primary) 18%, transparent);
+      color: var(--primary);
+    }
+  }
+
+  &__poule-order {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  &__order-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 10px;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    background: var(--background);
+
+    &.is-dragging {
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+      border-color: var(--primary);
+    }
+  }
+
+  &__drag-handle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    background: none;
+    border: none;
+    color: var(--muted-foreground);
+    cursor: grab;
+    flex-shrink: 0;
+    touch-action: none;
+
+    &:active {
+      cursor: grabbing;
+    }
+
+    &:hover {
+      color: var(--foreground);
+    }
+  }
+
+  &__order-index {
+    width: 18px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--muted-foreground);
+    text-align: center;
+    flex-shrink: 0;
+  }
+
+  &__order-name {
+    flex: 1;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--foreground);
+  }
+
+  &__order-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    background: none;
+    border: none;
+    border-radius: 5px;
+    color: var(--muted-foreground);
+    cursor: pointer;
+    flex-shrink: 0;
+    transition:
+      background 0.12s,
+      color 0.12s;
+
+    &--remove {
+      &:hover {
+        background: rgba(255, 100, 100, 0.1);
+        color: #ff6464;
+      }
+    }
+  }
+}
+
+.spinning {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// =============================================================================
+// SPORTLINK SLIDE - Display (Front-end)
+// =============================================================================
+
+.display-sportlink {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24px 32px 16px;
+    border-bottom: 1px solid;
+    flex-shrink: 0;
+  }
+
+  &__title {
+    font-size: clamp(2rem, 3vw, 3rem);
+    font-weight: 700;
+    margin: 0;
+  }
+
+  &__badge {
+    font-size: 0.7em;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 4px 12px;
+    border-radius: 20px;
+    color: white;
+    flex-shrink: 0;
+  }
+
+  &__body {
+    flex: 1;
+    overflow: hidden;
+    padding: 0 32px 24px;
+  }
+
+  &__loading,
+  &__empty,
+  &__error {
+    padding: 40px 0;
+    font-size: 1rem;
+    text-align: center;
+  }
+
+  // Multiple poule groups
+  &__poule-group {
+    & + & {
+      margin-top: 24px;
+      padding-top: 8px;
+    }
+  }
+
+  &__poule-header {
+    font-size: clamp(1.8rem, 2.5vw, 2.5rem);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-top: 16px;
+    margin-bottom: 4px;
+    padding-bottom: 6px;
+    border-bottom: 2px solid currentColor;
+    opacity: 0.9;
+  }
+
+  // Standings table
+  &__table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 16px;
+
+    th {
+      padding: 12px 12px;
+      font-size: clamp(1.8rem, 2vw, 2.5rem);
+      font-weight: 600;
+      text-align: center;
+      border-bottom: 1px solid;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+
+      &.team {
+        text-align: left;
+      }
+
+      &:first-child {
+        width: 40px;
+      }
+      &:last-child {
+        text-align: right;
+      }
+    }
+
+    td {
+      padding: 12px 12px;
+
+      font-size: clamp(1.8rem, 2vw, 2.5rem);
+      font-weight: 600;
+      text-align: center;
+      letter-spacing: 0.06em;
+
+      &.team {
+        text-align: left;
+      }
+
+      &:last-child {
+        text-align: right;
+      }
+    }
+  }
+
+  &__row {
+    td {
+      padding: 10px 12px;
+      font-size: clamp(1.4rem, 2vw, 2rem);
+      border-bottom: 1px solid;
+      vertical-align: middle;
+
+      &:first-child {
+        font-size: 0.9em;
+        width: 40px;
+      }
+      &:last-child {
+        text-align: right;
+      }
+    }
+  }
+
+  // Program/results list
+  &__matches {
+    margin-top: 12px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__match {
+    display: flex;
+    align-items: stretch;
+    border-bottom: 1px solid;
+    padding: 14px 0;
+  }
+
+  &__match-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  &__match-date {
+    font-size: clamp(1.4rem, 1.8vw, 2rem);
+    font-weight: 500;
+  }
+
+  &__match-teams {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: clamp(1.8rem, 2.5vw, 2.5rem);
+    font-weight: 600;
+  }
+
+  &__match-team {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    &--away {
+      justify-content: flex-end;
+      flex-direction: row;
+    }
+  }
+
+  &__match-home,
+  &__match-away {
+    flex: 1;
+  }
+
+  &__match-away {
+    text-align: right;
+  }
+
+  &__match-vs {
+    font-size: 0.85em;
+    font-weight: 400;
+    flex-shrink: 0;
+  }
+
+  &__match-score {
+    font-size: 1em;
+    font-weight: 800;
+    flex-shrink: 0;
+    letter-spacing: 0.05em;
+    padding: 4px 12px;
+    border-radius: 6px;
+  }
+
+  &__match-location {
+    font-size: clamp(1.4rem, 1.8vw, 2rem);
+  }
+
+  &__team-logo {
+    width: clamp(24px, 3.5vw, 44px);
+    height: clamp(24px, 3.5vw, 44px);
+    object-fit: contain;
+    flex-shrink: 0;
+  }
+
+  &__standing-team {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-transform: uppercase;
+  }
+}
+
+@keyframes sportlinkScroll {
+  0% {
+    transform: translateY(0);
+  }
+  10% {
+    transform: translateY(0);
+  }
+  45% {
+    transform: translateY(var(--sportlink-scroll-dist));
+  }
+  55% {
+    transform: translateY(var(--sportlink-scroll-dist));
+  }
+  90% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}

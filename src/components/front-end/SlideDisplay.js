@@ -245,7 +245,9 @@ function AgendaDisplay({ slide }) {
                     allEvents.push({
                       ...ev,
                       start: occ,
-                      end: ev.end ? new Date(year, ev.end.getMonth(), ev.end.getDate()) : null,
+                      end: ev.end
+                        ? new Date(year, ev.end.getMonth(), ev.end.getDate())
+                        : null,
                       calName: cal.name,
                       calColor: cal.color || "#4f87ff",
                     });
@@ -465,8 +467,14 @@ function EmailSlideDisplay({ slide }) {
       if (contentHeight > containerHeight) {
         const scrollDistance = contentHeight - containerHeight;
         const duration = scrollDistance / 30;
-        contentRef.current.style.setProperty("--email-scroll-dist", `-${scrollDistance}px`);
-        contentRef.current.style.setProperty("--email-scroll-duration", `${duration}s`);
+        contentRef.current.style.setProperty(
+          "--email-scroll-dist",
+          `-${scrollDistance}px`,
+        );
+        contentRef.current.style.setProperty(
+          "--email-scroll-duration",
+          `${duration}s`,
+        );
         setShouldScroll(true);
       } else {
         setShouldScroll(false);
@@ -504,19 +512,27 @@ function EmailSlideDisplay({ slide }) {
       className="email-slide"
       style={{ backgroundColor: bgColor, color: textColor }}
     >
-      <div className="email-slide__header" style={{ borderBottomColor: accentColor }}>
+      <div
+        className="email-slide__header"
+        style={{ borderBottomColor: accentColor }}
+      >
         <span className="email-slide__title">Inbox</span>
         {unreadOnly && (
-          <span className="email-slide__badge" style={{ backgroundColor: accentColor }}>
+          <span
+            className="email-slide__badge"
+            style={{ backgroundColor: accentColor }}
+          >
             Ongelezen
           </span>
+        )}
+
+        {credentials.email && (
+          <span className="email-slide__account">{credentials.email}</span>
         )}
       </div>
 
       <div className="email-slide__body" ref={bodyRef}>
-        {loading && (
-          <div className="email-slide__state">Emails ophalen...</div>
-        )}
+        {loading && <div className="email-slide__state">Emails ophalen...</div>}
         {!loading && error && (
           <div className="email-slide__state email-slide__state--error">
             {error}
@@ -537,15 +553,479 @@ function EmailSlideDisplay({ slide }) {
               <div
                 key={email.id || i}
                 className={`email-slide__item${!email.isRead ? " email-slide__item--unread" : ""}`}
-                style={{ borderLeftColor: !email.isRead ? accentColor : "transparent" }}
+                style={{
+                  borderLeftColor: !email.isRead ? accentColor : "transparent",
+                }}
               >
                 <div className="email-slide__item-subject">{email.subject}</div>
-                <div className="email-slide__item-meta" style={{ color: `${textColor}99` }}>
-                  <span className="email-slide__item-from">{formatFrom(email.from)}</span>
-                  <span className="email-slide__item-date">{formatDate(email.receivedAt)}</span>
+                <div
+                  className="email-slide__item-meta"
+                  style={{ color: `${textColor}99` }}
+                >
+                  <span className="email-slide__item-from">
+                    {formatFrom(email.from)}
+                  </span>
+                  <span className="email-slide__item-date">
+                    {formatDate(email.receivedAt)}
+                  </span>
                 </div>
               </div>
             ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function SportlinkDisplay({ slide }) {
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const bodyRef = useRef(null);
+  const contentRef = useRef(null);
+
+  const apiKey = slide.sportlinkApiKey || "";
+  const dataType = slide.sportlinkDataType || "programma";
+  const teams = slide.sportlinkTeams || [];
+  const aantalDagen = slide.sportlinkAantalDagen || 14;
+  const maxItems = slide.sportlinkMaxItems || 10;
+  const bgColor = slide.sportlinkBgColor || "#0f172a";
+  const textColor = slide.sportlinkTextColor || "#ffffff";
+  const accentColor = slide.sportlinkAccentColor || "#ff6600";
+  const targetDate =
+    slide.sportlinkDate || new Date().toISOString().slice(0, 10);
+
+  useEffect(() => {
+    if (!apiKey || !teams.length) {
+      setLoading(false);
+      return;
+    }
+
+    // Sportlink returns dates as DD-MM-YYYY; normalize to YYYY-MM-DD for comparison
+    const normalizeSportlinkDate = (dateStr) => {
+      if (!dateStr) return null;
+      const m = dateStr.match(/^(\d{2})-(\d{2})-(\d{4})/);
+      if (m) return `${m[3]}-${m[2]}-${m[1]}`;
+      return dateStr.slice(0, 10);
+    };
+
+    const fetchData = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const settled = await Promise.allSettled(
+          teams.map(async (team) => {
+            const params = new URLSearchParams({ client_id: apiKey });
+            if (dataType === "poulestand") {
+              if (!team.poulecode) return [];
+              params.set("poulecode", team.poulecode);
+              const res = await fetch(
+                `https://data.sportlink.com/${dataType}?${params}`,
+              );
+              if (!res.ok) throw new Error(`HTTP ${res.status}`);
+              const json = await res.json();
+              return Array.isArray(json)
+                ? json.map((row) => ({ ...row, _teamNaam: team.teamnaam }))
+                : [];
+            } else {
+              const msPerWeek = 7 * 24 * 60 * 60 * 1000;
+              // Sportlink week runs Tuesday–Monday (not Monday–Sunday)
+              const getTuesdayOfWeek = (dateStr) => {
+                const d = new Date(dateStr + "T00:00:00Z");
+                const day = d.getUTCDay(); // 0=Sun,1=Mon,2=Tue,...
+                const offset = day >= 2 ? 2 - day : -(day + 5);
+                d.setUTCDate(d.getUTCDate() + offset);
+                return d;
+              };
+              const todayStr = new Date().toISOString().slice(0, 10);
+              const weekOffset = Math.round(
+                (getTuesdayOfWeek(targetDate) - getTuesdayOfWeek(todayStr)) /
+                  msPerWeek,
+              );
+
+              params.set("teamcode", team.teamcode);
+              params.set("aantaldagen", 7);
+              params.set("weekoffset", weekOffset);
+              const url = `https://data.sportlink.com/${dataType}?${params}`;
+
+              const res = await fetch(url);
+              if (!res.ok) throw new Error(`HTTP ${res.status}`);
+              const json = await res.json();
+
+              return json
+                .filter(
+                  (row) =>
+                    row.wedstrijddatum &&
+                    normalizeSportlinkDate(row.wedstrijddatum) === targetDate,
+                )
+                .map((row) => ({ ...row, _teamNaam: team.teamnaam }));
+            }
+          }),
+        );
+
+        if (dataType === "poulestand") {
+          // Group by unique poulecode — teams in the same poule share one table
+          const pouleMap = new Map();
+          teams.forEach((team, i) => {
+            const result = settled[i];
+            if (result.status === "rejected") {
+              console.warn("[Sportlink] team fout:", result.reason);
+              return;
+            }
+            if (!result.value.length) return;
+            if (!pouleMap.has(team.poulecode)) {
+              const seen = new Set();
+              const deduped = result.value.filter((row) => {
+                const key = row.teamnaam;
+                if (seen.has(key)) return false;
+                seen.add(key);
+                return true;
+              });
+              pouleMap.set(team.poulecode, {
+                teamNaam: team.teamnaam,
+                rows: deduped.slice(0, maxItems),
+              });
+            }
+          });
+          setData([...pouleMap.values()]);
+          return;
+        }
+
+        const results = settled
+          .filter((r) => {
+            if (r.status === "rejected") {
+              console.warn("[Sportlink] team fout:", r.reason);
+            }
+            return r.status === "fulfilled";
+          })
+          .map((r) => r.value);
+
+        const merged = results.flat();
+
+        {
+          const seen = new Set();
+          const deduped = merged.filter((row) => {
+            const key = `${row.wedstrijddatum}|${row.thuisteam}|${row.uitteam}`;
+            if (seen.has(key)) return false;
+            seen.add(key);
+            return true;
+          });
+          // sort by date (ISO 8601 strings sort lexicographically)
+          const sorted = deduped.sort((a, b) => {
+            if (!a.wedstrijddatum) return 1;
+            if (!b.wedstrijddatum) return -1;
+            return a.wedstrijddatum.localeCompare(b.wedstrijddatum);
+          });
+          setData(sorted.slice(0, maxItems));
+        }
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+    const interval = setInterval(fetchData, 5 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, [
+    slide.sportlinkApiKey,
+    slide.sportlinkTeams,
+    slide.sportlinkDataType,
+    slide.sportlinkAantalDagen,
+    slide.sportlinkMaxItems,
+    slide.sportlinkDate,
+  ]); // eslint-disable-line
+
+  useEffect(() => {
+    if (loading || !data.length) return;
+    const timeoutId = setTimeout(() => {
+      const body = bodyRef.current;
+      const content = contentRef.current;
+      if (!body || !content) return;
+      const scrollDistance = content.scrollHeight - body.clientHeight;
+      if (scrollDistance <= 0) return;
+      const scrollDuration = scrollDistance / 50 / 0.6;
+      const totalDuration = scrollDuration * 2;
+      content.style.setProperty(
+        "--sportlink-scroll-dist",
+        `-${scrollDistance}px`,
+      );
+      content.style.animation = `sportlinkScroll ${totalDuration}s linear infinite`;
+    }, 400);
+    return () => {
+      clearTimeout(timeoutId);
+      if (contentRef.current) {
+        contentRef.current.style.animation = "";
+        contentRef.current.style.removeProperty("--sportlink-scroll-dist");
+      }
+    };
+  }, [loading, data]);
+
+  const formatDate = (dateStr) => {
+    if (!dateStr) return "";
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return dateStr;
+    return d.toLocaleDateString("nl-NL", {
+      weekday: "short",
+      day: "numeric",
+      month: "short",
+    });
+  };
+
+  const dataTypeLabel =
+    {
+      programma: "Programma",
+      uitslagen: "Uitslagen",
+      poulestand: "Poulestand",
+    }[dataType] || dataType;
+  const title = slide.sportlinkTitle || dataTypeLabel;
+
+  return (
+    <div
+      className="display-sportlink"
+      style={{ backgroundColor: bgColor, color: textColor }}
+    >
+      <div
+        className="display-sportlink__header"
+        style={{ borderBottomColor: `${accentColor}40` }}
+      >
+        <h2 className="display-sportlink__title" style={{ color: textColor }}>
+          {title}
+        </h2>
+        <span
+          className="display-sportlink__badge"
+          style={{ backgroundColor: accentColor }}
+        >
+          {dataTypeLabel}
+        </span>
+      </div>
+
+      <div className="display-sportlink__body" ref={bodyRef}>
+        {loading && (
+          <div
+            className="display-sportlink__loading"
+            style={{ color: `${textColor}88` }}
+          >
+            Gegevens laden…
+          </div>
+        )}
+        {!loading && error && (
+          <div
+            className="display-sportlink__error"
+            style={{ color: "#ff6b6b" }}
+          >
+            Fout bij laden: {error}
+          </div>
+        )}
+        {!loading && !error && data.length === 0 && (
+          <div
+            className="display-sportlink__empty"
+            style={{ color: `${textColor}88` }}
+          >
+            {!apiKey || !teams.length
+              ? "Geen koppeling geconfigureerd"
+              : "Geen gegevens beschikbaar"}
+          </div>
+        )}
+
+        {!loading && !error && data.length > 0 && (
+          <div ref={contentRef}>
+            {dataType === "poulestand" ? (
+              data.map((group, gi) => (
+                <div key={gi} className="display-sportlink__poule-group">
+                  {data.length > 1 && (
+                    <div
+                      className="display-sportlink__poule-header"
+                      style={{ color: accentColor }}
+                    >
+                      {group.teamNaam}
+                    </div>
+                  )}
+                  <table className="display-sportlink__table">
+                    <thead>
+                      <tr
+                        style={{
+                          color: `${textColor}99`,
+                          borderBottomColor: `${textColor}20`,
+                        }}
+                      >
+                        <th>#</th>
+                        <th className="team">Team</th>
+                        <th>Gespeeld</th>
+                        <th>Gewonnen</th>
+                        <th>Gelijk</th>
+                        <th>Verloren</th>
+                        <th>Punten</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {group.rows.map((row, i) => {
+                        const isOwn =
+                          row.eigenteam === "true" ||
+                          teams.some((t) => t.teamnaam === row.teamnaam);
+                        return (
+                          <tr
+                            key={i}
+                            style={{
+                              borderBottomColor: `${textColor}20`,
+                              backgroundColor: isOwn
+                                ? `${accentColor}20`
+                                : "transparent",
+                            }}
+                          >
+                            <td
+                              style={{
+                                color: `${textColor}99`,
+                                borderBottom: `1px solid ${textColor}20`,
+                              }}
+                            >
+                              {row.positie || i + 1}
+                            </td>
+                            <td
+                              style={{
+                                fontWeight: isOwn ? 700 : 400,
+                                borderBottom: `1px solid ${textColor}20`,
+                              }}
+                            >
+                              <div className="display-sportlink__standing-team">
+                                {row.clublogo && (
+                                  <img
+                                    src={row.clublogo}
+                                    alt=""
+                                    className="display-sportlink__team-logo"
+                                  />
+                                )}
+                                {row.teamnaam}
+                              </div>
+                            </td>
+                            <td
+                              style={{
+                                borderBottom: `1px solid ${textColor}20`,
+                              }}
+                            >
+                              {row.gespeeldewedstrijden ?? "—"}
+                            </td>
+                            <td
+                              style={{
+                                borderBottom: `1px solid ${textColor}20`,
+                              }}
+                            >
+                              {row.gewonnen ?? "—"}
+                            </td>
+                            <td
+                              style={{
+                                borderBottom: `1px solid ${textColor}20`,
+                              }}
+                            >
+                              {row.gelijk ?? "—"}
+                            </td>
+                            <td
+                              style={{
+                                borderBottom: `1px solid ${textColor}20`,
+                              }}
+                            >
+                              {row.verloren ?? "—"}
+                            </td>
+                            <td
+                              style={{
+                                fontWeight: 700,
+                                color: accentColor,
+                                borderBottom: `1px solid ${textColor}20`,
+                              }}
+                            >
+                              {row.punten ?? "—"}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              ))
+            ) : (
+              <div className="display-sportlink__matches">
+                {data.map((row, i) => (
+                  <div
+                    key={i}
+                    className="display-sportlink__match"
+                    style={{ borderBottomColor: `${textColor}10` }}
+                  >
+                    <div className="display-sportlink__match-info">
+                      <div className="display-sportlink__match-teams">
+                        <div
+                          className="display-sportlink__match-date display-sportlink__match-team"
+                          style={{ color: `${textColor}88` }}
+                        >
+                          {formatDate(row.wedstrijddatum)}
+                          {row.aanvangstijd && (
+                            <span> · {row.aanvangstijd}</span>
+                          )}
+                        </div>
+                        {row.accommodatie && (
+                          <div
+                            className="display-sportlink__match-location"
+                            style={{ color: `${textColor}55` }}
+                          >
+                            {row.accommodatie}
+                          </div>
+                        )}
+                        <div className="display-sportlink__match-team"></div>
+                      </div>
+
+                      <div
+                        className="display-sportlink__match-teams"
+                        style={{ color: textColor }}
+                      >
+                        <div className="display-sportlink__match-team">
+                          {row.thuisteamlogo && (
+                            <img
+                              src={row.thuisteamlogo}
+                              alt=""
+                              className="display-sportlink__team-logo"
+                            />
+                          )}
+                          <span className="display-sportlink__match-home">
+                            {row.thuisteam}
+                          </span>
+                        </div>
+                        {dataType === "uitslagen" && row.uitslag ? (
+                          <span
+                            className="display-sportlink__match-score"
+                            style={{
+                              backgroundColor: `${accentColor}22`,
+                              color: accentColor,
+                            }}
+                          >
+                            {row.uitslag}
+                          </span>
+                        ) : (
+                          <span
+                            className="display-sportlink__match-vs"
+                            style={{ color: `${textColor}44` }}
+                          >
+                            vs
+                          </span>
+                        )}
+                        <div className="display-sportlink__match-team display-sportlink__match-team--away">
+                          <span className="display-sportlink__match-away">
+                            {row.uitteam}
+                          </span>
+                          {row.uitteamlogo && (
+                            <img
+                              src={row.uitteamlogo}
+                              alt=""
+                              className="display-sportlink__team-logo"
+                            />
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -638,7 +1118,7 @@ function SlideDisplay({
         const ms = ((e.delay || 0) + e.exitAfter) * 1000;
         return setTimeout(
           () => setExitedEffects((prev) => new Set([...prev, e.id])),
-          ms
+          ms,
         );
       });
 
@@ -924,7 +1404,8 @@ function SlideDisplay({
                 theme={slide.teletekstTheme || "classic"}
                 pageCount={slide.teletekstPageCount || 1}
                 duration={slide.duration || 10}
-                skipLines={slide.teletekstSkipLines || 0}
+                skipTopLines={slide.teletekstSkipTopLines || 0}
+                skipBottomLines={slide.teletekstSkipBottomLines || 0}
               />
             ) : (
               <div className="display-teletekst-placeholder">
@@ -962,6 +1443,8 @@ function SlideDisplay({
         {layout === "agenda" && <AgendaDisplay slide={slide} />}
 
         {layout === "email" && <EmailSlideDisplay slide={slide} />}
+
+        {layout === "sportlink" && <SportlinkDisplay slide={slide} />}
       </>
     );
   };
@@ -1023,7 +1506,7 @@ function SlideDisplay({
                 ...(effect.background && {
                   background: hexToRgba(
                     effect.backgroundColor || "#000000",
-                    (effect.backgroundOpacity ?? 45) / 100
+                    (effect.backgroundOpacity ?? 45) / 100,
                   ),
                   padding: "0.15em 0.4em",
                   borderRadius: "6px",

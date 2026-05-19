@@ -1,16 +1,26 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Tv, RefreshCw, AlertCircle } from 'lucide-react';
-import { TELETEKST_THEMES } from '../admin/slide-edit/TeletekstInput';
+import React, { useState, useEffect, useRef } from "react";
+import { Tv, RefreshCw, AlertCircle } from "lucide-react";
+import { TELETEKST_THEMES } from "../admin/slide-edit/TeletekstInput";
 
-function TeletekstDisplay({ channel = '101', theme = 'classic', pageCount = 1, duration = 10, skipLines = 0 }) {
-  const [content, setContent] = useState('');
+function TeletekstDisplay({
+  channel = "101",
+  theme = "classic",
+  pageCount = 1,
+  duration = 10,
+  skipTopLines = 0,
+  skipBottomLines = 0,
+}) {
+  const [content, setContent] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [shouldScroll, setShouldScroll] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [wrapperHeight, setWrapperHeight] = useState(null);
   const contentRef = useRef(null);
+  const wrapperRef = useRef(null);
 
-  const selectedTheme = TELETEKST_THEMES.find(t => t.id === theme) || TELETEKST_THEMES[0];
+  const selectedTheme =
+    TELETEKST_THEMES.find((t) => t.id === theme) || TELETEKST_THEMES[0];
   const totalPages = Math.max(1, pageCount);
 
   const fetchTeletekst = async (page) => {
@@ -25,8 +35,8 @@ function TeletekstDisplay({ channel = '101', theme = 'classic', pageCount = 1, d
         throw new Error(`Failed to load page ${channel}`);
       }
 
-      const contentType = response.headers.get('content-type') || '';
-      if (!contentType.includes('application/json')) {
+      const contentType = response.headers.get("content-type") || "";
+      if (!contentType.includes("application/json")) {
         throw new Error(`Pagina ${channel} niet beschikbaar`);
       }
 
@@ -36,13 +46,13 @@ function TeletekstDisplay({ channel = '101', theme = 'classic', pageCount = 1, d
       if (data && data.content) {
         // NOS teletekst uses Private Use Area chars (&#xF0xx;) for mosaic graphics.
         // These only render with a dedicated teletext font — replace with spaces.
-        const cleaned = data.content.replace(/&#xF[0-9A-Fa-f]{3};/g, ' ');
+        const cleaned = data.content.replace(/&#xF[0-9A-Fa-f]{3};/g, " ");
         setContent(cleaned);
       } else {
-        throw new Error('No content available');
+        throw new Error("No content available");
       }
     } catch (err) {
-      console.error('Error fetching teletekst:', err);
+      console.error("Error fetching teletekst:", err);
       setError(err.message);
     } finally {
       setLoading(false);
@@ -58,7 +68,10 @@ function TeletekstDisplay({ channel = '101', theme = 'classic', pageCount = 1, d
       setCurrentPage(1);
       fetchTeletekstRef.current(1);
 
-      const interval = setInterval(() => fetchTeletekstRef.current(currentPageRef.current), 60000);
+      const interval = setInterval(
+        () => fetchTeletekstRef.current(currentPageRef.current),
+        60000,
+      );
       return () => clearInterval(interval);
     }
   }, [channel]);
@@ -80,43 +93,61 @@ function TeletekstDisplay({ channel = '101', theme = 'classic', pageCount = 1, d
     return () => clearTimeout(timer);
   }, [currentPage, totalPages, duration]);
 
-  // Check if content overflows and should scroll
+  // Check if content overflows and should scroll; calculate wrapper height for bottom clipping
   useEffect(() => {
     if (contentRef.current && content) {
       const checkOverflow = () => {
-        const container = contentRef.current.parentElement;
+        const outerContainer = wrapperRef.current?.parentElement;
         const contentHeight = contentRef.current.scrollHeight;
-        const containerHeight = container?.clientHeight || 0;
+        const containerHeight = outerContainer?.clientHeight || 0;
 
-        console.log('Teletekst heights:', { contentHeight, containerHeight });
+        const rootFontSize = parseFloat(
+          getComputedStyle(document.documentElement).fontSize,
+        );
+        const lineHeightPx = 2.8 * rootFontSize;
+        const skippedTopPx = skipTopLines * lineHeightPx;
+        const skippedBottomPx = skipBottomLines * lineHeightPx;
 
-        if (contentHeight > containerHeight) {
+        // Clip the bottom by constraining wrapper height
+        const clippedHeight = Math.max(0, containerHeight - skippedBottomPx);
+        setWrapperHeight(clippedHeight);
+
+        const effectiveContentHeight =
+          contentHeight - skippedTopPx - skippedBottomPx;
+
+        if (effectiveContentHeight > clippedHeight) {
           setShouldScroll(true);
-          // Calculate scroll distance and duration based on content height
-          // Add extra 200px to scroll further so the end appears higher on screen
-          const scrollDistance = contentHeight - containerHeight + 200;
-          const duration = scrollDistance / 30; // 30px per second max scroll speed
+          const scrollDistance = effectiveContentHeight - clippedHeight;
+          const duration = Math.max(20, scrollDistance / 20);
 
           if (contentRef.current) {
-            contentRef.current.style.setProperty('--scroll-distance', `-${scrollDistance}px`);
-            contentRef.current.style.setProperty('--scroll-duration', `${duration}s`);
+            contentRef.current.style.setProperty(
+              "--scroll-distance",
+              `-${scrollDistance}px`,
+            );
+            contentRef.current.style.setProperty(
+              "--scroll-duration",
+              `${duration}s`,
+            );
           }
         } else {
           setShouldScroll(false);
         }
       };
 
-      // Check after a short delay to ensure content is rendered
       const timer = setTimeout(checkOverflow, 100);
       return () => clearTimeout(timer);
     }
-  }, [content]);
+  }, [content, skipTopLines, skipBottomLines]);
 
   if (loading && !content) {
     return (
       <div
         className="teletekst-display teletekst-loading"
-        style={{ backgroundColor: selectedTheme.bg, color: selectedTheme.colors.green }}
+        style={{
+          backgroundColor: selectedTheme.bg,
+          color: selectedTheme.colors.green,
+        }}
       >
         <Tv size={48} />
         <p>Teletekst pagina {channel} laden...</p>
@@ -128,7 +159,10 @@ function TeletekstDisplay({ channel = '101', theme = 'classic', pageCount = 1, d
     return (
       <div
         className="teletekst-display teletekst-error"
-        style={{ backgroundColor: selectedTheme.bg, color: selectedTheme.colors.red }}
+        style={{
+          backgroundColor: selectedTheme.bg,
+          color: selectedTheme.colors.red,
+        }}
       >
         <AlertCircle size={48} />
         <h3>Kan Teletekst niet laden</h3>
@@ -136,7 +170,10 @@ function TeletekstDisplay({ channel = '101', theme = 'classic', pageCount = 1, d
         <button
           onClick={fetchTeletekst}
           className="retry-btn"
-          style={{ borderColor: selectedTheme.colors.green, color: selectedTheme.colors.green }}
+          style={{
+            borderColor: selectedTheme.colors.green,
+            color: selectedTheme.colors.green,
+          }}
         >
           <RefreshCw size={16} />
           Opnieuw proberen
@@ -151,25 +188,39 @@ function TeletekstDisplay({ channel = '101', theme = 'classic', pageCount = 1, d
       style={{
         backgroundColor: selectedTheme.bg,
         color: selectedTheme.text,
-        '--theme-bg': selectedTheme.bg,
-        '--theme-text': selectedTheme.text,
-        '--color-red': selectedTheme.colors.red,
-        '--color-green': selectedTheme.colors.green,
-        '--color-yellow': selectedTheme.colors.yellow,
-        '--color-blue': selectedTheme.colors.blue,
-        '--color-cyan': selectedTheme.colors.cyan,
-        '--color-magenta': selectedTheme.colors.magenta,
-        '--color-white': selectedTheme.colors.white,
-        '--color-black': selectedTheme.colors.black
+        "--theme-bg": selectedTheme.bg,
+        "--theme-text": selectedTheme.text,
+        "--color-red": selectedTheme.colors.red,
+        "--color-green": selectedTheme.colors.green,
+        "--color-yellow": selectedTheme.colors.yellow,
+        "--color-blue": selectedTheme.colors.blue,
+        "--color-cyan": selectedTheme.colors.cyan,
+        "--color-magenta": selectedTheme.colors.magenta,
+        "--color-white": selectedTheme.colors.white,
+        "--color-black": selectedTheme.colors.black,
       }}
     >
       <div
-        key={currentPage}
-        ref={contentRef}
-        className={`teletekst-content ${shouldScroll ? 'auto-scroll' : ''}`}
-        style={skipLines > 0 ? { marginTop: `${skipLines * -2.8}rem` } : undefined}
-        dangerouslySetInnerHTML={{ __html: content }}
-      />
+        ref={wrapperRef}
+        style={{
+          overflow: "hidden",
+          height: wrapperHeight != null ? `${wrapperHeight}px` : "100%",
+          width: "100%",
+          flexShrink: 0,
+        }}
+      >
+        <div
+          key={currentPage}
+          ref={contentRef}
+          className={`teletekst-content ${shouldScroll ? "auto-scroll" : ""}`}
+          style={
+            skipTopLines > 0
+              ? { marginTop: `${skipTopLines * -2.8}rem` }
+              : undefined
+          }
+          dangerouslySetInnerHTML={{ __html: content }}
+        />
+      </div>
     </div>
   );
 }

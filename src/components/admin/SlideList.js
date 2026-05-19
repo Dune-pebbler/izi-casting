@@ -20,11 +20,9 @@ import {
   Timer,
   CalendarDays,
   Mail,
-  Sparkles,
   MonitorPlay,
+  Trophy,
 } from "lucide-react";
-import SlideEffectsModal from "./SlideEffectsModal";
-import SlidePreviewModal from "./slide-edit/SlidePreviewModal";
 
 const iconMap = {
   video: <Play />,
@@ -37,7 +35,9 @@ const iconMap = {
   countdown: <Timer />,
   agenda: <CalendarDays />,
   email: <Mail />,
+  sportlink: <Trophy />,
 };
+import { useTenant } from "../../context/TenantContext";
 import { sanitizeHTMLContent } from "../../utils/sanitize";
 import { extractVideoInfo } from "../../utils/videoMetadata";
 import {
@@ -75,6 +75,7 @@ function SlideList({
   modules = {},
   slideTypes = {},
   onSaveSlideEffects,
+  onToggleSlideTimeRestriction,
   playlistCount = 1,
 }) {
   const hasSlideTypeConfig = Object.keys(slideTypes).length > 0;
@@ -83,8 +84,11 @@ function SlideList({
     const layout = slide.layout || "side-by-side";
     return slideTypes[layout] === false;
   };
-  const [effectsSlide, setEffectsSlide] = useState(null);
-  const [previewSlide, setPreviewSlide] = useState(null);
+  const { tenantId } = useTenant();
+
+  const openSlidePreview = (slide) => {
+    window.open(`/preview/${tenantId}/slide/${slide.id}`, "_blank");
+  };
   // Function to strip HTML tags and get clean text
   const stripHtml = (html) => {
     if (!html) return "";
@@ -510,7 +514,7 @@ function SlideList({
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                setPreviewSlide(slide);
+                openSlidePreview(slide);
               }}
               className="btn-icon"
               title="Voorbeeld bekijken"
@@ -539,25 +543,20 @@ function SlideList({
               <Trash2 size={16} />
             </button>
 
-            {modules.slideEffects && (
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setEffectsSlide(slide);
-                }}
-                className={`btn-icon ${slide.effects?.length > 0 ? "btn-icon--effects-active" : ""}`}
-                title="Slide effecten"
-              >
-                <Sparkles size={16} />
-              </button>
-            )}
-
-            <span
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onToggleSlideTimeRestriction(slide.id);
+              }}
               className={`btn-icon btn-icon--time ${slide.timeRestriction?.enabled ? "btn-icon--success" : ""}`}
-              title={`Tijdvenster: ${slide.timeRestriction?.startTime} – ${slide.timeRestriction?.endTime}`}
+              title={
+                slide.timeRestriction?.enabled
+                  ? `Tijdvenster aan: ${slide.timeRestriction?.startTime} – ${slide.timeRestriction?.endTime}`
+                  : "Tijdvenster uitgeschakeld"
+              }
             >
               <Clock size={16} />
-            </span>
+            </button>
 
             <button
               onClick={(e) => {
@@ -618,6 +617,14 @@ function SlideList({
           return "Website";
         case "countdown":
           return "Afteltimer";
+        case "sportlink":
+          return "sportlink";
+        case "email":
+          return "email inbox";
+        case "agenda":
+          return "agenda";
+        case "gallery":
+          return "Fotogallerij";
         case "side-by-side":
         default:
           return "Side by Side";
@@ -688,7 +695,7 @@ function SlideList({
           <button
             onClick={(e) => {
               e.stopPropagation();
-              setPreviewSlide(slide);
+              openSlidePreview(slide);
             }}
             className="btn-icon"
             title="Voorbeeld bekijken"
@@ -716,25 +723,20 @@ function SlideList({
             <Trash2 size={16} />
           </button>
 
-          {modules.slideEffects && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setEffectsSlide(slide);
-              }}
-              className={`btn-icon ${slide.effects?.length > 0 ? "btn-icon--effects-active" : ""}`}
-              title="Slide effecten"
-            >
-              <Sparkles size={16} />
-            </button>
-          )}
-
-          <span
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onToggleSlideTimeRestriction(slide.id);
+            }}
             className={`btn-icon btn-icon--time ${slide.timeRestriction?.enabled ? "btn-icon--success" : ""}`}
-            title={`Tijdvenster: ${slide.timeRestriction?.startTime} – ${slide.timeRestriction?.endTime}`}
+            title={
+              slide.timeRestriction?.enabled
+                ? `Tijdvenster aan: ${slide.timeRestriction?.startTime} – ${slide.timeRestriction?.endTime}`
+                : "Tijdvenster uitgeschakeld"
+            }
           >
             <Clock size={16} />
-          </span>
+          </button>
 
           <button
             onClick={(e) => {
@@ -802,13 +804,15 @@ function SlideList({
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                onEditSlide(slide);
+                onToggleSlideTimeRestriction(slide.id);
                 setActionsOpen(false);
               }}
               className={`btn-icon slide-row__actions-panel-btn${slide.timeRestriction?.enabled ? " btn-icon--success" : ""}`}
             >
               <Clock size={16} />
-              <span>Tijdvenster</span>
+              <span>
+                Tijdvenster {slide.timeRestriction?.enabled ? "uit" : "aan"}
+              </span>
             </button>
             <button
               onClick={(e) => {
@@ -912,29 +916,6 @@ function SlideList({
           )}
         </SortableContext>
       </DndContext>
-
-      {effectsSlide &&
-        ReactDOM.createPortal(
-          <SlideEffectsModal
-            slide={effectsSlide}
-            onClose={() => setEffectsSlide(null)}
-            onSave={(effects) => {
-              if (onSaveSlideEffects) {
-                onSaveSlideEffects(effectsSlide.id, effects);
-              }
-            }}
-          />,
-          document.body,
-        )}
-
-      {previewSlide &&
-        ReactDOM.createPortal(
-          <SlidePreviewModal
-            slide={previewSlide}
-            onClose={() => setPreviewSlide(null)}
-          />,
-          document.body,
-        )}
     </>
   );
 }

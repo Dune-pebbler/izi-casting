@@ -10,6 +10,7 @@ function ProtectedRoute({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [authorized, setAuthorized] = useState(false);
+  const [tenantExists, setTenantExists] = useState(true);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
@@ -22,14 +23,45 @@ function ProtectedRoute({ children }) {
 
       const email = firebaseUser.email || '';
 
-      // Dunepebbler staff always have full access
+      // Always verify the tenant exists when in tenant mode
+      if (tenantId) {
+        try {
+          const tenantDoc = await getDoc(doc(db, 'tenants', tenantId));
+          if (!tenantDoc.exists()) {
+            setTenantExists(false);
+            setLoading(false);
+            return;
+          }
+
+          // Dunepebbler staff get access to any existing tenant
+          if (email.endsWith('@dunepebbler.nl')) {
+            setAuthorized(true);
+            setLoading(false);
+            return;
+          }
+
+          const data = tenantDoc.data();
+          const authorizedUsers = data.authorizedUsers || [];
+          const isAuthorized = authorizedUsers.some((u) =>
+            typeof u === 'string' ? u === email : u.email === email
+          );
+          setAuthorized(isAuthorized);
+        } catch (error) {
+          console.error('Error checking tenant authorization:', error);
+          setAuthorized(false);
+        }
+        setLoading(false);
+        return;
+      }
+
+      // Dunepebbler staff always have full access outside tenant mode
       if (email.endsWith('@dunepebbler.nl')) {
         setAuthorized(true);
         setLoading(false);
         return;
       }
 
-      // /my/admin: any logged-in user can access — tenant filtering happens inside MyAdminView
+      // /my-izi: any logged-in user can access — tenant filtering happens inside MyAdminView
       if (isMyAdmin) {
         setAuthorized(true);
         setLoading(false);
@@ -50,28 +82,7 @@ function ProtectedRoute({ children }) {
         return;
       }
 
-      // Tenant mode: check authorizedUsers on the tenant document
-      if (tenantId) {
-        try {
-          const tenantDoc = await getDoc(doc(db, 'tenants', tenantId));
-          if (tenantDoc.exists()) {
-            const data = tenantDoc.data();
-            const authorizedUsers = data.authorizedUsers || [];
-            const isAuthorized = authorizedUsers.some((u) =>
-              typeof u === 'string' ? u === email : u.email === email
-            );
-            setAuthorized(isAuthorized);
-          } else {
-            setAuthorized(false);
-          }
-        } catch (error) {
-          console.error('Error checking tenant authorization:', error);
-          setAuthorized(false);
-        }
-      } else {
-        setAuthorized(false);
-      }
-
+      setAuthorized(false);
       setLoading(false);
     });
 
@@ -84,6 +95,19 @@ function ProtectedRoute({ children }) {
 
   if (!user) {
     return <Navigate to={`/login?next=${encodeURIComponent(window.location.pathname)}`} replace />;
+  }
+
+  if (!tenantExists) {
+    return (
+      <div className="access-denied">
+        <h2>Tenant niet gevonden</h2>
+        <p>De omgeving <strong>{tenantId}</strong> bestaat niet.</p>
+        <p>Controleer de URL of neem contact op met <a href="mailto:info@dunepebbler.nl">info@dunepebbler.nl</a>.</p>
+        <button onClick={() => window.history.back()} className="btn btn-secondary" style={{ marginTop: '1rem' }}>
+          ← Terug
+        </button>
+      </div>
+    );
   }
 
   if (!authorized) {

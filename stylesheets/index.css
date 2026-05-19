@@ -1276,7 +1276,7 @@
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
   padding: 16px;
-  width: 220px;
+  width: 300px;
   z-index: 100;
   display: flex;
   flex-direction: column;
@@ -1327,19 +1327,27 @@
   flex-direction: column;
   gap: 8px;
 }
-.slide-modal__time-popup-wrapper .slide-modal__time-popup .time-popup__field {
+.slide-modal__time-popup-wrapper .slide-modal__time-popup .time-popup__row {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
   gap: 8px;
 }
+.slide-modal__time-popup-wrapper .slide-modal__time-popup .time-popup__row .time-popup__field {
+  flex: 1;
+}
+.slide-modal__time-popup-wrapper .slide-modal__time-popup .time-popup__field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
 .slide-modal__time-popup-wrapper .slide-modal__time-popup .time-popup__field label {
-  font-size: 12px;
+  font-size: 10px;
+  font-weight: 500;
   color: var(--foreground-secondary);
-  min-width: 28px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 .slide-modal__time-popup-wrapper .slide-modal__time-popup .time-popup__field .time-popup__time-input {
-  flex: 1;
+  width: 100%;
   padding: 4px 8px;
   border: 1px solid var(--border);
   border-radius: 4px;
@@ -1352,10 +1360,67 @@
   outline: none;
   border-color: var(--primary);
 }
+.slide-modal__time-popup-wrapper .slide-modal__time-popup .time-popup__date-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+}
+.slide-modal__time-popup-wrapper .slide-modal__time-popup .time-popup__date-section small {
+  font-size: 10px;
+  color: var(--foreground-secondary);
+}
+.slide-modal__time-popup-wrapper .slide-modal__time-popup .time-popup__date-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
 .slide-modal__time-popup-wrapper .slide-modal__time-popup .time-popup__midnight-note {
   font-size: 10px;
   color: var(--primary);
   margin: 0;
+}
+.slide-modal__time-popup-wrapper .slide-modal__time-popup .time-popup__days {
+  display: flex;
+  gap: 3px;
+}
+.slide-modal__time-popup-wrapper .slide-modal__time-popup .time-popup__day-label {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 26px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--foreground-muted);
+  background: var(--muted);
+  border: 1px solid transparent;
+  cursor: pointer;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
+  transition: all 0.1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  letter-spacing: 0.01em;
+}
+.slide-modal__time-popup-wrapper .slide-modal__time-popup .time-popup__day-label input[type=checkbox] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+.slide-modal__time-popup-wrapper .slide-modal__time-popup .time-popup__day-label:has(input:checked) {
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border-color: var(--primary);
+}
+.slide-modal__time-popup-wrapper .slide-modal__time-popup .time-popup__day-label:hover:not(:has(input:checked)) {
+  background: var(--muted-hover);
+  color: var(--foreground);
+  border-color: var(--border);
 }
 
 .modal-textarea-overlay {
@@ -1728,7 +1793,8 @@
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
   display: flex;
   flex-direction: column;
-  width: min(90vw, 160vh + 48px);
+  width: min(90vw, (90vh - 48px - 2 * 16px) * 16 / 9 + 2 * 16px);
+  max-height: 90vh;
   overflow: hidden;
 }
 .slide-preview-modal__header {
