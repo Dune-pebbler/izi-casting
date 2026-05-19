@@ -702,7 +702,13 @@ function DisplayView() {
         if (data.playlists) {
           setPlaylists(data.playlists);
         } else if (data.slides) {
-          setPlaylists([{ id: "default", name: "Default Playlist", slides: data.slides || [] }]);
+          setPlaylists([
+            {
+              id: "default",
+              name: "Default Playlist",
+              slides: data.slides || [],
+            },
+          ]);
         } else {
           setPlaylists([]);
         }
@@ -833,7 +839,8 @@ function DisplayView() {
             const toDateStr = (val) => {
               if (!val) return null;
               if (typeof val === "string") return val.slice(0, 10);
-              if (typeof val.toDate === "function") return val.toDate().toISOString().slice(0, 10);
+              if (typeof val.toDate === "function")
+                return val.toDate().toISOString().slice(0, 10);
               if (val instanceof Date) return val.toISOString().slice(0, 10);
               return null;
             };
@@ -883,9 +890,14 @@ function DisplayView() {
                 slide.images &&
                 slide.images.length > 0) ||
               (slide.layout === "countdown" && slide.countdownTargetDate) ||
-              (slide.layout === "agenda" && slide.agendaCalendars && slide.agendaCalendars.length > 0) ||
+              (slide.layout === "agenda" &&
+                slide.agendaCalendars &&
+                slide.agendaCalendars.length > 0) ||
               (slide.layout === "email" && slide.emailProvider) ||
-              (slide.layout === "sportlink" && slide.sportlinkApiKey && slide.sportlinkTeams && slide.sportlinkTeams.length > 0) ||
+              (slide.layout === "sportlink" &&
+                slide.sportlinkApiKey &&
+                slide.sportlinkTeams &&
+                slide.sportlinkTeams.length > 0) ||
               (!slide.type && slide.text && slide.text.trim())),
         );
 
@@ -1211,6 +1223,18 @@ function DisplayView() {
     }
   }, [isPaired, displayPairingCode, isGeneratingCode, codeTimeRemaining]);
 
+  // Force the application to refresh at 06:00
+  useEffect(() => {
+    const checkDailyReset = () => {
+      const now = new Date();
+      if (now.getHours() === 6 && now.getMinutes() === 0) {
+        window.location.reload();
+      }
+    };
+    const resetInterval = setInterval(checkDailyReset, 60000);
+    return () => clearInterval(resetInterval);
+  }, []);
+
   useEffect(() => {
     console.log(
       "🚀 Initialization useEffect triggered, hasInitialized:",
@@ -1350,7 +1374,9 @@ function DisplayView() {
                 <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
               </svg>
             </div>
-            <span className="audio-unlock-text">Klik of druk op een toets om muziek te starten</span>
+            <span className="audio-unlock-text">
+              Klik of druk op een toets om muziek te starten
+            </span>
           </div>
         </div>
       )}
