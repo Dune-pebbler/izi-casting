@@ -4,6 +4,7 @@ import { Provider } from "react-redux";
 import { Toaster } from "sonner";
 import { store } from "./store/store";
 import { TenantProvider, useTenant } from "./context/TenantContext";
+import { ConfirmProvider } from "./context/ConfirmContext";
 import LoginView from "./components/LoginView";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminView from "./components/admin/AdminView";
@@ -54,6 +55,7 @@ function MyAdminRoute() {
 function App() {
   return (
     <Provider store={store}>
+      <ConfirmProvider>
       <TenantProvider>
         <Router
           future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
@@ -85,6 +87,7 @@ function App() {
           </div>
         </Router>
       </TenantProvider>
+      </ConfirmProvider>
     </Provider>
   );
 }

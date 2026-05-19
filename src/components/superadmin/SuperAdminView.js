@@ -26,11 +26,11 @@ import {
   ChevronUp,
   Trash2,
   RotateCcw,
-  AlertTriangle,
 } from "lucide-react";
 import CreateTenantModal from "./CreateTenantModal";
 import EditTenantModal from "./EditTenantModal";
 import { toast } from "sonner";
+import { useConfirm } from "../../context/ConfirmContext";
 
 function normaliseUser(u) {
   if (typeof u === "string") return { email: u, role: "admin" };
@@ -45,7 +45,9 @@ async function permanentDeleteTenant(tenantId) {
     await Promise.all(snap.docs.map((d) => deleteDoc(d.ref)));
   }
   for (const displayDoc of ["settings", "content"]) {
-    await deleteDoc(doc(db, "tenants", tenantId, "display", displayDoc)).catch(() => {});
+    await deleteDoc(doc(db, "tenants", tenantId, "display", displayDoc)).catch(
+      () => {},
+    );
   }
 
   // Delete global devices linked to this tenant + their command queues
@@ -91,7 +93,7 @@ function TenantCard({ tenant, onEdit }) {
   const [isSaving, setIsSaving] = useState(false);
   const [isUsersExpanded, setIsUsersExpanded] = useState(false);
   const [logoUrl, setLogoUrl] = useState("");
-  const [confirmDelete, setConfirmDelete] = useState(false);
+  const confirm = useConfirm();
 
   useEffect(() => {
     getDoc(doc(db, "tenants", tenant.id, "display", "settings")).then(
@@ -153,6 +155,13 @@ function TenantCard({ tenant, onEdit }) {
   };
 
   const handleSoftDelete = async () => {
+    const ok = await confirm({
+      title: "Omgeving verwijderen",
+      message: `Weet je zeker dat je "${tenant.name}" wilt verwijderen?`,
+      confirmLabel: "Verwijderen",
+      danger: true,
+    });
+    if (!ok) return;
     try {
       await updateDoc(doc(db, "tenants", tenant.id), {
         deletedAt: new Date().toISOString(),
@@ -164,6 +173,12 @@ function TenantCard({ tenant, onEdit }) {
   };
 
   const handleRestore = async () => {
+    const ok = await confirm({
+      title: "Omgeving herstellen",
+      message: `Weet je zeker dat je "${tenant.name}" wilt herstellen?`,
+      confirmLabel: "Herstellen",
+    });
+    if (!ok) return;
     try {
       await updateDoc(doc(db, "tenants", tenant.id), { deletedAt: null });
       toast.success(`${tenant.name} hersteld`);
@@ -173,6 +188,13 @@ function TenantCard({ tenant, onEdit }) {
   };
 
   const handlePermanentDelete = async () => {
+    const ok = await confirm({
+      title: "Permanent verwijderen",
+      message: `Weet je zeker dat je "${tenant.name}" permanent wilt verwijderen? Alle data en bestanden worden verwijderd.`,
+      confirmLabel: "Permanent verwijderen",
+      danger: true,
+    });
+    if (!ok) return;
     setIsSaving(true);
     try {
       await permanentDeleteTenant(tenant.id);
@@ -207,35 +229,15 @@ function TenantCard({ tenant, onEdit }) {
                 <RotateCcw size={14} />
                 <span>Herstellen</span>
               </button>
-              {confirmDelete ? (
-                <>
-                  <button
-                    className="btn btn-sm btn-danger"
-                    onClick={handlePermanentDelete}
-                    disabled={isSaving}
-                  >
-                    <AlertTriangle size={14} />
-                    <span>Bevestig</span>
-                  </button>
-                  <button
-                    className="btn btn-sm btn-outline"
-                    onClick={() => setConfirmDelete(false)}
-                    disabled={isSaving}
-                  >
-                    Annuleer
-                  </button>
-                </>
-              ) : (
-                <button
-                  className="btn btn-sm btn-danger"
-                  title="Permanent verwijderen"
-                  onClick={() => setConfirmDelete(true)}
-                  disabled={isSaving}
-                >
-                  <Trash2 size={14} />
-                  <span>Permanent</span>
-                </button>
-              )}
+              <button
+                className="btn btn-sm btn-danger"
+                title="Permanent verwijderen"
+                onClick={handlePermanentDelete}
+                disabled={isSaving}
+              >
+                <Trash2 size={14} />
+                <span>Permanent</span>
+              </button>
             </>
           ) : (
             <>
