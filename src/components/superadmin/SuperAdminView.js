@@ -459,12 +459,18 @@ function SuperAdminUsersPanel() {
   );
 }
 
+const STATUS_FILTERS = [
+  { key: "active", label: "Actief" },
+  { key: "deleted", label: "Verwijderd" },
+];
+
 function SuperAdminView() {
   const [tenants, setTenants] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editingTenantSettings, setEditingTenantSettings] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("active");
 
   useEffect(() => {
     const unsubscribe = onSnapshot(collection(db, "tenants"), (snapshot) => {
@@ -511,11 +517,17 @@ function SuperAdminView() {
               <Monitor size={20} />
               Omgevingen (
               {
-                tenants.filter((tenant) =>
-                  tenant.name
+                tenants.filter((tenant) => {
+                  const matchesSearch = tenant.name
                     ?.toLowerCase()
-                    .includes(searchQuery.toLowerCase()),
-                ).length
+                    .includes(searchQuery.toLowerCase());
+                  const isDeleted = !!tenant.deletedAt;
+                  const matchesStatus =
+                    statusFilter === "all" ||
+                    (statusFilter === "active" && !isDeleted) ||
+                    (statusFilter === "deleted" && isDeleted);
+                  return matchesSearch && matchesStatus;
+                }).length
               }
               )
             </h2>
@@ -534,6 +546,27 @@ function SuperAdminView() {
                 <Plus size={16} />
                 Nieuwe omgeving
               </button>
+            </div>
+          </div>
+
+          <div className="superadmin-filters">
+            <div className="filter-group">
+              {STATUS_FILTERS.map((f) => (
+                <button
+                  key={f.key}
+                  className={`filter-pill${statusFilter === f.key ? " filter-pill--active" : ""}`}
+                  onClick={() => setStatusFilter(f.key)}
+                >
+                  {f.label}
+                  <span className="filter-pill-count">
+                    {f.key === "all"
+                      ? tenants.length
+                      : tenants.filter((t) =>
+                          f.key === "active" ? !t.deletedAt : !!t.deletedAt,
+                        ).length}
+                  </span>
+                </button>
+              ))}
             </div>
           </div>
 
@@ -560,12 +593,24 @@ function SuperAdminView() {
             </div>
           ) : (
             (() => {
-              const filtered = tenants.filter((tenant) =>
-                tenant.name?.toLowerCase().includes(searchQuery.toLowerCase()),
-              );
+              const filtered = tenants.filter((tenant) => {
+                const matchesSearch = tenant.name
+                  ?.toLowerCase()
+                  .includes(searchQuery.toLowerCase());
+                const isDeleted = !!tenant.deletedAt;
+                const matchesStatus =
+                  statusFilter === "all" ||
+                  (statusFilter === "active" && !isDeleted) ||
+                  (statusFilter === "deleted" && isDeleted);
+                return matchesSearch && matchesStatus;
+              });
               return filtered.length === 0 ? (
                 <div className="superadmin-empty">
-                  <p>Geen omgevingen gevonden voor "{searchQuery}".</p>
+                  <p>
+                    {searchQuery
+                      ? `Geen omgevingen gevonden voor "${searchQuery}".`
+                      : "Geen omgevingen in deze categorie."}
+                  </p>
                 </div>
               ) : (
                 <div className="tenant-grid">
