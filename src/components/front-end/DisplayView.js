@@ -96,8 +96,6 @@ function DisplayView() {
     return false;
   }, []);
 
-  console.log("DisplayView component rendered");
-
   const generatePairingCode = useCallback(() => {
     const code = Math.floor(10000 + Math.random() * 90000).toString();
     console.log("Generated pairing code:", code);
@@ -384,6 +382,42 @@ function DisplayView() {
     }
   }, [isPaired, deviceId]);
 
+  const showToast = useCallback((message, duration = 3000) => {
+    if (!document.getElementById("izi-toast-style")) {
+      const style = document.createElement("style");
+      style.id = "izi-toast-style";
+      style.textContent = `
+        @keyframes fadeInOut {
+          0% { opacity: 0; transform: translateY(-20px); }
+          20% { opacity: 1; transform: translateY(0); }
+          80% { opacity: 1; transform: translateY(0); }
+          100% { opacity: 0; transform: translateY(-20px); }
+        }
+      `;
+      document.head.appendChild(style);
+    }
+
+    const toast = document.createElement("div");
+    toast.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: rgba(0, 123, 255, 0.9);
+      color: white;
+      padding: 10px 15px;
+      border-radius: 5px;
+      font-size: 14px;
+      z-index: 9999;
+      animation: fadeInOut ${duration / 1000}s ease-in-out;
+    `;
+    toast.textContent = message;
+    document.body.appendChild(toast);
+
+    setTimeout(() => {
+      toast.parentNode?.removeChild(toast);
+    }, duration);
+  }, []);
+
   const handleChangeSlide = useCallback((action) => {
     const total = slidesRef.current.length;
     if (total === 0) return;
@@ -397,123 +431,23 @@ function DisplayView() {
     }
     setSlideProgress(0);
 
-    const PingIndicator = document.createElement("div");
-    PingIndicator.style.cssText = `
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      background: rgba(0, 123, 255, 0.9);
-      color: white;
-      padding: 10px 15px;
-      border-radius: 5px;
-      font-size: 14px;
-      z-index: 9999;
-      animation: fadeInOut 3s ease-in-out;
-    `;
-
     const message = action === "next" ? "Volgende slide" : "Vorige slide";
-    PingIndicator.textContent = message;
-
-    const style = document.createElement("style");
-    style.textContent = `
-      @keyframes fadeInOut {
-        0% { opacity: 0; transform: translateY(-20px); }
-        20% { opacity: 1; transform: translateY(0); }
-        80% { opacity: 1; transform: translateY(0); }
-        100% { opacity: 0; transform: translateY(-20px); }
-      }
-    `;
-    document.head.appendChild(style);
-
-    document.body.appendChild(PingIndicator);
-
-    setTimeout(() => {
-      if (PingIndicator.parentNode) {
-        PingIndicator.parentNode.removeChild(PingIndicator);
-      }
-    }, 3000);
-  }, []);
+    showToast(message, 3000);
+  }, [showToast]);
 
   const handleDevicePing = useCallback(() => {
-    console.log("Restarting slides from beginning");
-
-    const PingIndicator = document.createElement("div");
-    PingIndicator.style.cssText = `
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      background: rgba(0, 123, 255, 0.9);
-      color: white;
-      padding: 10px 15px;
-      border-radius: 5px;
-      font-size: 14px;
-      z-index: 9999;
-      animation: fadeInOut 3s ease-in-out;
-    `;
-    PingIndicator.textContent = "Pong";
-
-    const style = document.createElement("style");
-    style.textContent = `
-      @keyframes fadeInOut {
-        0% { opacity: 0; transform: translateY(-20px); }
-        20% { opacity: 1; transform: translateY(0); }
-        80% { opacity: 1; transform: translateY(0); }
-        100% { opacity: 0; transform: translateY(-20px); }
-      }
-    `;
-    document.head.appendChild(style);
-
-    document.body.appendChild(PingIndicator);
-
-    setTimeout(() => {
-      if (PingIndicator.parentNode) {
-        PingIndicator.parentNode.removeChild(PingIndicator);
-      }
-    }, 3000);
-  }, []);
+    showToast("Pong", 3000);
+  }, [showToast]);
 
   const handleRefreshSlides = useCallback(() => {
-    console.log("Restarting slides from beginning");
     setCurrentSlideIndex(0);
     setSlideProgress(0);
-
-    const refreshIndicator = document.createElement("div");
-    refreshIndicator.style.cssText = `
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      background: rgba(0, 123, 255, 0.9);
-      color: white;
-      padding: 10px 15px;
-      border-radius: 5px;
-      font-size: 14px;
-      z-index: 9999;
-      animation: fadeInOut 2s ease-in-out;
-    `;
-    refreshIndicator.textContent = "Slides opnieuw gestart";
-
-    const style = document.createElement("style");
-    style.textContent = `
-      @keyframes fadeInOut {
-        0% { opacity: 0; transform: translateY(-20px); }
-        20% { opacity: 1; transform: translateY(0); }
-        80% { opacity: 1; transform: translateY(0); }
-        100% { opacity: 0; transform: translateY(-20px); }
-      }
-    `;
-    document.head.appendChild(style);
-
-    document.body.appendChild(refreshIndicator);
+    showToast("Slides opnieuw gestart", 2000);
 
     setTimeout(() => {
-      if (refreshIndicator.parentNode) {
-        refreshIndicator.parentNode.removeChild(refreshIndicator);
-      }
-
-      console.log("Force reloading browser...");
       window.location.reload();
     }, 2000);
-  }, []);
+  }, [showToast]);
 
   useEffect(() => {
     console.log("🎧 Device pairing listener useEffect triggered");
@@ -735,9 +669,6 @@ function DisplayView() {
 
       unsubscribeContent = onSnapshot(displayDocRef, (snap) => {
         if (tenantDeletedRef.current) return;
-        if (Date.now() % 10000 < 100) {
-          console.log("Raw Firebase data:", snap.data());
-        }
         applyContentDoc(snap);
       });
 
@@ -917,80 +848,11 @@ function DisplayView() {
       return acc;
     }, []);
 
-    console.log("🎬 Slide processing debug:");
-    console.log("📊 Total playlists:", playlists.length);
-    playlists.forEach((playlist, index) => {
-      console.log(`📁 Playlist ${index + 1}:`, {
-        id: playlist.id,
-        name: playlist.name,
-        isEnabled: playlist.isEnabled,
-        slidesCount: playlist.slides?.length || 0,
-      });
-
-      if (playlist.slides) {
-        playlist.slides.forEach((slide, slideIndex) => {
-          console.log(`  📄 Slide ${slideIndex + 1}:`, {
-            id: slide.id,
-            name: slide.name,
-            type: slide.type,
-            isVisible: slide.isVisible,
-            hasText: !!slide.text,
-            hasImageUrl: !!slide.imageUrl,
-            hasVideoUrl: !!slide.videoUrl,
-            hasTeletekstChannel: !!slide.teletekstChannel,
-            teletekstChannel: slide.teletekstChannel,
-            layout: slide.layout,
-            duration: slide.duration,
-          });
-
-          if (slide.imageUrl) {
-            console.log(
-              `🖼️ Slide ${slideIndex + 1} Image URL:`,
-              slide.imageUrl,
-            );
-            console.log(
-              `📐 Slide ${slideIndex + 1} Layout:`,
-              slide.layout || "default",
-            );
-          }
-        });
-      }
-    });
-
-    console.log("🎬 All flattened slides with image URLs and layouts:");
-    allSlides.forEach((slide, index) => {
-      console.log(`📄 Flattened Slide ${index + 1}:`, {
-        id: slide.id,
-        name: slide.name,
-        layout: slide.layout || "default",
-        imageUrl: slide.imageUrl || "No image",
-        videoUrl: slide.videoUrl || "No video",
-        duration: slide.duration,
-      });
-    });
-
-    if (Date.now() % 10000 < 100) {
-      console.log(
-        "All flattened slides with positions:",
-        allSlides.map((s) => ({
-          id: s.id,
-          type: s.type,
-          imagePosition: s.imagePosition,
-          duration: s.duration,
-          hasVideoUrl: !!s.videoUrl,
-        })),
-      );
-    }
-    console.log("🎬 Setting slides:", allSlides.length, "slides");
     setSlides(allSlides);
     setCurrentSlideIndex(0);
   }, [playlists, tenantSlideTypes]);
 
   useEffect(() => {
-    console.log(
-      "🎠 Slide rotation useEffect triggered, slides:",
-      slides.length,
-    );
     if (slides.length === 0) return;
 
     slidesRef.current = slides;
@@ -1001,28 +863,6 @@ function DisplayView() {
       const currentSlide = slides[currentIndex];
       const slideDuration = (currentSlide?.duration || 5) * 1000;
 
-      console.log("🎠 Current slide details:", {
-        index: currentIndex,
-        name: currentSlide?.name,
-        layout: currentSlide?.layout || "default",
-        imageUrl: currentSlide?.imageUrl || "No image",
-        videoUrl: currentSlide?.videoUrl || "No video",
-        duration: currentSlide?.duration,
-        calculatedDurationMs: slideDuration,
-      });
-
-      if (Date.now() % 5000 < 100) {
-        console.log(
-          "Slide timing - Current slide:",
-          currentSlide?.name,
-          "Duration:",
-          currentSlide?.duration,
-          "Calculated duration (ms):",
-          slideDuration,
-        );
-      }
-
-      console.log("🎠 Setting current slide index:", currentIndex);
       setCurrentSlideIndex(currentIndex);
       currentSlideRef.current = currentIndex;
 
