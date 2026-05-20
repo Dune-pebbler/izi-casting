@@ -2272,7 +2272,7 @@ a:hover {
   margin-top: 48px;
 }
 .display-weather__grid .display-weather__desc {
-  font-size: 24px;
+  font-size: 2rem;
   opacity: 0.7;
   margin-top: 48px;
 }
@@ -2284,7 +2284,7 @@ a:hover {
 }
 
 .display-weather__city {
-  font-size: 24px;
+  font-size: 1.5rem;
   text-align: center;
 }
 
@@ -2319,7 +2319,7 @@ a:hover {
 .display-weather__stat-value {
   display: block;
   color: white;
-  font-size: 32px;
+  font-size: 2.5rem;
 }
 
 .display-weather__stat-label {
@@ -2327,6 +2327,7 @@ a:hover {
   margin-top: 8px;
   opacity: 0.5;
   text-transform: uppercase;
+  font-size: 1.5rem;
 }
 
 .display-weather__right {
@@ -2345,6 +2346,7 @@ a:hover {
   font-weight: 600;
 }
 .display-weather__forecast-header h2 {
+  font-size: 2rem;
   color: #a3a3a3;
 }
 

@@ -13,30 +13,34 @@ import {
 } from "lucide-react";
 
 const WMO = {
-  0:  { label: "Heldere hemel",           Icon: Sun,           color: "#FFD700" },
-  1:  { label: "Overwegend helder",        Icon: CloudSun,      color: "#FFA500" },
-  2:  { label: "Gedeeltelijk bewolkt",     Icon: CloudSun,      color: "#FFA500" },
-  3:  { label: "Bewolkt",                  Icon: Cloud,         color: "#9CA3AF" },
-  45: { label: "Mist",                     Icon: CloudFog,      color: "#D1D5DB" },
-  48: { label: "IJsmist",                  Icon: CloudFog,      color: "#D1D5DB" },
-  51: { label: "Lichte motregen",          Icon: CloudDrizzle,  color: "#60A5FA" },
-  53: { label: "Motregen",                 Icon: CloudDrizzle,  color: "#60A5FA" },
-  55: { label: "Dichte motregen",          Icon: CloudDrizzle,  color: "#3B82F6" },
-  61: { label: "Lichte regen",             Icon: CloudRain,     color: "#60A5FA" },
-  63: { label: "Regen",                    Icon: CloudRain,     color: "#3B82F6" },
-  65: { label: "Zware regen",              Icon: CloudRain,     color: "#1D4ED8" },
-  71: { label: "Lichte sneeuw",            Icon: CloudSnow,     color: "#BAE6FD" },
-  73: { label: "Sneeuw",                   Icon: CloudSnow,     color: "#BAE6FD" },
-  75: { label: "Zware sneeuw",             Icon: CloudSnow,     color: "#93C5FD" },
-  77: { label: "Sneeuwkorrels",            Icon: Snowflake,     color: "#BAE6FD" },
-  80: { label: "Lichte buien",             Icon: CloudRain,     color: "#60A5FA" },
-  81: { label: "Buien",                    Icon: CloudRain,     color: "#3B82F6" },
-  82: { label: "Zware buien",              Icon: CloudLightning, color: "#818CF8" },
-  85: { label: "Lichte sneeuwbuien",       Icon: CloudSnow,     color: "#BAE6FD" },
-  86: { label: "Zware sneeuwbuien",        Icon: CloudSnow,     color: "#93C5FD" },
-  95: { label: "Onweer",                   Icon: CloudLightning, color: "#FBBF24" },
-  96: { label: "Onweer met hagel",         Icon: CloudLightning, color: "#FBBF24" },
-  99: { label: "Zwaar onweer met hagel",   Icon: CloudLightning, color: "#FBBF24" },
+  0: { label: "Heldere hemel", Icon: Sun, color: "#FFD700" },
+  1: { label: "Overwegend helder", Icon: CloudSun, color: "#FFA500" },
+  2: { label: "Gedeeltelijk bewolkt", Icon: CloudSun, color: "#FFA500" },
+  3: { label: "Bewolkt", Icon: Cloud, color: "#9CA3AF" },
+  45: { label: "Mist", Icon: CloudFog, color: "#D1D5DB" },
+  48: { label: "IJsmist", Icon: CloudFog, color: "#D1D5DB" },
+  51: { label: "Lichte motregen", Icon: CloudDrizzle, color: "#60A5FA" },
+  53: { label: "Motregen", Icon: CloudDrizzle, color: "#60A5FA" },
+  55: { label: "Dichte motregen", Icon: CloudDrizzle, color: "#3B82F6" },
+  61: { label: "Lichte regen", Icon: CloudRain, color: "#60A5FA" },
+  63: { label: "Regen", Icon: CloudRain, color: "#3B82F6" },
+  65: { label: "Zware regen", Icon: CloudRain, color: "#1D4ED8" },
+  71: { label: "Lichte sneeuw", Icon: CloudSnow, color: "#BAE6FD" },
+  73: { label: "Sneeuw", Icon: CloudSnow, color: "#BAE6FD" },
+  75: { label: "Zware sneeuw", Icon: CloudSnow, color: "#93C5FD" },
+  77: { label: "Sneeuwkorrels", Icon: Snowflake, color: "#BAE6FD" },
+  80: { label: "Lichte buien", Icon: CloudRain, color: "#60A5FA" },
+  81: { label: "Buien", Icon: CloudRain, color: "#3B82F6" },
+  82: { label: "Zware buien", Icon: CloudLightning, color: "#818CF8" },
+  85: { label: "Lichte sneeuwbuien", Icon: CloudSnow, color: "#BAE6FD" },
+  86: { label: "Zware sneeuwbuien", Icon: CloudSnow, color: "#93C5FD" },
+  95: { label: "Onweer", Icon: CloudLightning, color: "#FBBF24" },
+  96: { label: "Onweer met hagel", Icon: CloudLightning, color: "#FBBF24" },
+  99: {
+    label: "Zwaar onweer met hagel",
+    Icon: CloudLightning,
+    color: "#FBBF24",
+  },
 };
 
 const DAYS_NL = ["zo", "ma", "di", "wo", "do", "vr", "za"];
@@ -142,7 +146,10 @@ function WeatherDisplay({
 
   if (!lat || !long) {
     return (
-      <div className="display-weather__empty" style={{ color: accentColor, fontFamily: "Poppins, sans-serif" }}>
+      <div
+        className="display-weather__empty"
+        style={{ color: accentColor, fontFamily: "Poppins, sans-serif" }}
+      >
         Geen locatie ingesteld
       </div>
     );
@@ -150,7 +157,10 @@ function WeatherDisplay({
 
   if (error) {
     return (
-      <div className="display-weather__empty" style={{ color: accentColor, fontFamily: "Poppins, sans-serif" }}>
+      <div
+        className="display-weather__empty"
+        style={{ color: accentColor, fontFamily: "Poppins, sans-serif" }}
+      >
         Kon weer niet laden
       </div>
     );
@@ -158,7 +168,10 @@ function WeatherDisplay({
 
   if (!weather) {
     return (
-      <div className="display-weather__loading" style={{ color: accentColor, fontFamily: "Poppins, sans-serif" }}>
+      <div
+        className="display-weather__loading"
+        style={{ color: accentColor, fontFamily: "Poppins, sans-serif" }}
+      >
         <span>⛅</span>
         <p>Weer laden…</p>
       </div>
@@ -182,7 +195,10 @@ function WeatherDisplay({
     hourlyIdx >= 0 ? weather.hourly.precipitation_probability[hourlyIdx] : null;
 
   return (
-    <div className="display-weather__grid" style={{ fontFamily: "Poppins, sans-serif" }}>
+    <div
+      className="display-weather__grid"
+      style={{ fontFamily: "Poppins, sans-serif" }}
+    >
       <div
         className="display-weather__left"
         style={{
@@ -203,7 +219,6 @@ function WeatherDisplay({
         </div>
         <div className="display-weather__center">
           <div className="display-weather__current">
-            <currentWmo.Icon className="display-weather__main-icon" strokeWidth={1} color={currentWmo.color} />
             <div className="display-weather__main">
               <span className="display-weather__temp">{temp}°C</span>
               <span className="display-weather__desc">{currentWmo.label}</span>
@@ -266,7 +281,11 @@ function WeatherDisplay({
                   <div key={dateStr} className="display-weather__forecast-row">
                     <div className="display-weather__row-day">{dayLabel}</div>
                     <div className="display-weather__row-emoji">
-                      <wmo.Icon size="1em" strokeWidth={1.5} color={wmo.color} />
+                      <wmo.Icon
+                        size="1em"
+                        strokeWidth={1.5}
+                        color={wmo.color}
+                      />
                     </div>
                     <div className="display-weather__row-label">
                       {wmo.label}
