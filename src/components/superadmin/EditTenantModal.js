@@ -23,6 +23,7 @@ import {
   Sparkles,
   Mail,
   Trophy,
+  CloudIcon,
 } from "lucide-react";
 import { doc, setDoc } from "firebase/firestore";
 import { db } from "../../firebase";
@@ -111,6 +112,12 @@ const SLIDETYPES = [
     description:
       "Toon wedstrijdprogramma, uitslagen of poulestand via Sportlink Club.Dataservice.",
     icon: Trophy,
+  },
+  {
+    key: "weather",
+    label: "Weer",
+    description: "Toon de weersvoorspelling in een bepaalde regio",
+    icon: CloudIcon,
   },
 ];
 

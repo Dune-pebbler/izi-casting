@@ -22,6 +22,7 @@ import {
   Mail,
   MonitorPlay,
   Trophy,
+  CloudIcon,
 } from "lucide-react";
 
 const iconMap = {
@@ -36,6 +37,7 @@ const iconMap = {
   agenda: <CalendarDays />,
   email: <Mail />,
   sportlink: <Trophy />,
+  weather: <CloudIcon />,
 };
 import { useTenant } from "../../context/TenantContext";
 import { sanitizeHTMLContent } from "../../utils/sanitize";
@@ -625,6 +627,8 @@ function SlideList({
           return "agenda";
         case "gallery":
           return "Fotogallerij";
+        case "weather":
+          return "Weerbericht";
         case "side-by-side":
         default:
           return "Side by Side";

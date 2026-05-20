@@ -23,6 +23,7 @@ import CountdownInput from "./CountdownInput";
 import AgendaInput from "./AgendaInput";
 import EmailInput from "./EmailInput";
 import SportlinkInput from "./SportlinkInput";
+import WeatherInput from "./WeatherInput";
 import SlideEffectsModal from "../SlideEffectsModal";
 
 function EditModal({
@@ -140,6 +141,21 @@ function EditModal({
   onSportlinkAccentColorChange,
   sportlinkDate,
   onSportlinkDateChange,
+  weatherLat,
+  onWeatherLatChange,
+  weatherLong,
+  onWeatherLongChange,
+  weatherCity,
+  onWeatherCityChange,
+  weatherAccentColor,
+  onWeatherAccentColorChange,
+  weatherForecastDays,
+  onWeatherForecastDaysChange,
+  weatherLeftBgImage,
+  onWeatherLeftBgImageUpload,
+  weatherLeftBgImagePosition,
+  onWeatherLeftBgImagePositionChange,
+  onOpenWeatherLeftLibrary,
   modules = {},
   onSaveSlideEffects,
 }) {
@@ -405,6 +421,30 @@ function EditModal({
               onAccentColorChange={onSportlinkAccentColorChange}
               sportlinkDate={sportlinkDate}
               onDateChange={onSportlinkDateChange}
+            />
+          </div>
+        );
+
+      case "weather":
+        return (
+          <div className="modal-weather">
+            <WeatherInput
+              weatherLat={weatherLat}
+              weatherLong={weatherLong}
+              weatherCity={weatherCity}
+              weatherAccentColor={weatherAccentColor}
+              onLatChange={onWeatherLatChange}
+              onLongChange={onWeatherLongChange}
+              onCityChange={onWeatherCityChange}
+              onAccentColorChange={onWeatherAccentColorChange}
+              weatherForecastDays={weatherForecastDays}
+              onForecastDaysChange={onWeatherForecastDaysChange}
+              weatherLeftBgImage={weatherLeftBgImage}
+              weatherLeftBgImagePosition={weatherLeftBgImagePosition}
+              onWeatherLeftBgImageUpload={onWeatherLeftBgImageUpload}
+              onWeatherLeftBgImagePositionChange={onWeatherLeftBgImagePositionChange}
+              uploadingImage={uploadingImage}
+              onOpenWeatherLeftLibrary={onOpenWeatherLeftLibrary}
             />
           </div>
         );

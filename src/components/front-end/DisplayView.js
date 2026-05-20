@@ -884,6 +884,7 @@ function DisplayView() {
               (slide.type === "video" && slide.videoUrl) ||
               (slide.type === "teletekst" && slide.teletekstChannel) ||
               (slide.layout === "teletekst" && slide.teletekstChannel) ||
+              (slide.layout === "weather" && slide.weatherLat) ||
               (slide.type === "iframe" && slide.iframeUrl) ||
               (slide.layout === "iframe" && slide.iframeUrl) ||
               (slide.layout === "gallery" &&

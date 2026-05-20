@@ -3,6 +3,7 @@ import { sanitizeHTMLContent } from "../../utils/sanitize";
 import TextPagination from "./TextPagination";
 import VideoPlayer from "./VideoPlayer";
 import TeletekstDisplay from "./TeletekstDisplay";
+import WeatherDisplay from "./WeatherDisplay";
 import { getTextPaginationConfig } from "../../config/textPagination";
 
 function CountdownDisplay({ slide }) {
@@ -1396,6 +1397,27 @@ function SlideDisplay({
           </div>
         )}
 
+        {layout === "weather" && (
+          <div className="display-weather-wrapper">
+            {slide.weatherLat && slide.weatherLong ? (
+              <WeatherDisplay
+                lat={slide.weatherLat}
+                long={slide.weatherLong}
+                cityName={slide.weatherCity || ""}
+                accentColor={slide.weatherAccentColor || "#4f87ff"}
+                forecastDays={slide.weatherForecastDays ?? 7}
+                leftBgImage={slide.weatherLeftBgImage || ""}
+                leftBgImagePosition={slide.weatherLeftBgImagePosition || "center"}
+              />
+            ) : (
+              <div className="display-weather-placeholder">
+                <div className="placeholder-text">
+                  Geen locatie ingesteld
+                </div>
+              </div>
+            )}
+          </div>
+        )}
         {layout === "teletekst" && (
           <div className="display-teletekst">
             {slide.teletekstChannel ? (

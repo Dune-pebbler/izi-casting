@@ -1336,11 +1336,24 @@
 // =============================================================================
 
 @keyframes agendaScroll {
-  0%        { transform: translateY(0); animation-timing-function: linear; }
-  60%       { transform: translateY(var(--agenda-scroll-dist, 0px)); animation-timing-function: steps(1, end); }
-  75%       { transform: translateY(var(--agenda-scroll-dist, 0px)); }
-  75.001%   { transform: translateY(0); animation-timing-function: linear; }
-  100%      { transform: translateY(0); }
+  0% {
+    transform: translateY(0);
+    animation-timing-function: linear;
+  }
+  60% {
+    transform: translateY(var(--agenda-scroll-dist, 0px));
+    animation-timing-function: steps(1, end);
+  }
+  75% {
+    transform: translateY(var(--agenda-scroll-dist, 0px));
+  }
+  75.001% {
+    transform: translateY(0);
+    animation-timing-function: linear;
+  }
+  100% {
+    transform: translateY(0);
+  }
 }
 
 .display-agenda {
@@ -1456,11 +1469,21 @@
 // =============================================================================
 
 @keyframes emailScroll {
-  0%      { transform: translateY(0); }
-  15%     { transform: translateY(0); }
-  50%     { transform: translateY(var(--email-scroll-dist, -200px)); }
-  65%     { transform: translateY(var(--email-scroll-dist, -200px)); }
-  100%    { transform: translateY(0); }
+  0% {
+    transform: translateY(0);
+  }
+  15% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(var(--email-scroll-dist, -200px));
+  }
+  65% {
+    transform: translateY(var(--email-scroll-dist, -200px));
+  }
+  100% {
+    transform: translateY(0);
+  }
 }
 
 .email-slide {
@@ -1578,5 +1601,149 @@
   &__item-date {
     white-space: nowrap;
     flex-shrink: 0;
+  }
+}
+
+.display-weather-wrapper {
+  width: 100%;
+  height: 100%;
+  display: flex;
+}
+
+.display-weather-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.display-weather {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: clamp(16px, 3vw, 48px);
+  box-sizing: border-box;
+  gap: clamp(12px, 2vw, 28px);
+
+  &__loading,
+  &__empty {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    font-size: clamp(16px, 2vw, 28px);
+    opacity: 0.6;
+
+    span {
+      font-size: clamp(32px, 4vw, 64px);
+    }
+  }
+
+  &__top {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(8px, 1.2vw, 20px);
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__location {
+    font-size: clamp(13px, 1.4vw, 22px);
+    font-weight: 500;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+  }
+
+  &__current {
+    display: flex;
+    align-items: center;
+    gap: clamp(12px, 2vw, 32px);
+  }
+
+  &__emoji {
+    font-size: clamp(48px, 7vw, 120px);
+    line-height: 1;
+    filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
+  }
+
+  &__main {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  &__temp {
+    font-size: clamp(48px, 8vw, 140px);
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+
+  &__desc {
+    font-size: clamp(16px, 2vw, 32px);
+    font-weight: 400;
+    opacity: 0.9;
+  }
+
+  &__details {
+    display: flex;
+    gap: clamp(16px, 2.5vw, 40px);
+  }
+
+  &__detail {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: clamp(14px, 1.6vw, 26px);
+    font-weight: 500;
+  }
+
+  &__forecast {
+    display: flex;
+    gap: clamp(8px, 1.5vw, 24px);
+    padding-top: clamp(12px, 1.5vw, 24px);
+    border-top: 1px solid;
+    flex-shrink: 0;
+  }
+
+  &__day {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+
+  &__day-name {
+    font-size: clamp(11px, 1.1vw, 18px);
+    font-weight: 600;
+    text-transform: capitalize;
+    letter-spacing: 0.04em;
+  }
+
+  &__day-emoji {
+    font-size: clamp(20px, 2.5vw, 40px);
+    line-height: 1.2;
+  }
+
+  &__day-max {
+    font-size: clamp(14px, 1.6vw, 26px);
+    font-weight: 700;
+  }
+
+  &__day-min {
+    font-size: clamp(12px, 1.3vw, 20px);
+    font-weight: 400;
+  }
+
+  &__day-rain {
+    font-size: clamp(10px, 1vw, 16px);
+    font-weight: 400;
   }
 }

@@ -131,6 +131,13 @@ function AdminView() {
   const [modalSportlinkAccentColor, setModalSportlinkAccentColor] =
     useState("#ff6600");
   const [modalSportlinkDate, setModalSportlinkDate] = useState("");
+  const [modalWeatherLat, setModalWeatherLat] = useState("");
+  const [modalWeatherLong, setModalWeatherLong] = useState("");
+  const [modalWeatherCity, setModalWeatherCity] = useState("");
+  const [modalWeatherAccentColor, setModalWeatherAccentColor] = useState("#4f87ff");
+  const [modalWeatherForecastDays, setModalWeatherForecastDays] = useState(7);
+  const [modalWeatherLeftBgImage, setModalWeatherLeftBgImage] = useState("");
+  const [modalWeatherLeftBgImagePosition, setModalWeatherLeftBgImagePosition] = useState("center");
   const [imageLibraryTarget, setImageLibraryTarget] = useState("main");
   const [modalTimeRestriction, setModalTimeRestriction] = useState({
     enabled: false,
@@ -442,6 +449,7 @@ function AdminView() {
       agenda: "agenda",
       email: "email",
       sportlink: "sportlink",
+      weather: "weather",
     };
     const newSlide = {
       id: Date.now(),
@@ -492,6 +500,16 @@ function AdminView() {
         sportlinkTextColor: "#ffffff",
         sportlinkAccentColor: "#ff6600",
         sportlinkDate: "",
+        duration: 30,
+      }),
+      ...(slideLayout === "weather" && {
+        weatherLat: "",
+        weatherLong: "",
+        weatherCity: "",
+        weatherAccentColor: "#4f87ff",
+        weatherForecastDays: 7,
+        weatherLeftBgImage: "",
+        weatherLeftBgImagePosition: "center",
         duration: 30,
       }),
       imagePosition: "center",
@@ -661,6 +679,13 @@ function AdminView() {
     setModalSportlinkTextColor(slide.sportlinkTextColor || "#ffffff");
     setModalSportlinkAccentColor(slide.sportlinkAccentColor || "#ff6600");
     setModalSportlinkDate(slide.sportlinkDate || "");
+    setModalWeatherLat(slide.weatherLat || "");
+    setModalWeatherLong(slide.weatherLong || "");
+    setModalWeatherCity(slide.weatherCity || "");
+    setModalWeatherAccentColor(slide.weatherAccentColor || "#4f87ff");
+    setModalWeatherForecastDays(slide.weatherForecastDays ?? 7);
+    setModalWeatherLeftBgImage(slide.weatherLeftBgImage || "");
+    setModalWeatherLeftBgImagePosition(slide.weatherLeftBgImagePosition || "center");
     setModalTimeRestriction(
       slide.timeRestriction || {
         enabled: false,
@@ -881,6 +906,8 @@ function AdminView() {
   const handleSelectImageFromLibrary = (image) => {
     if (imageLibraryTarget === "countdown") {
       setModalCountdownBgImage(image.url);
+    } else if (imageLibraryTarget === "weatherLeft") {
+      setModalWeatherLeftBgImage(image.url);
     } else {
       setModalImageUrl(image.url);
     }
@@ -895,6 +922,63 @@ function AdminView() {
   const handleOpenCountdownBgLibrary = () => {
     setImageLibraryTarget("countdown");
     setImageLibraryModalOpen(true);
+  };
+
+  const handleOpenWeatherLeftBgLibrary = () => {
+    setImageLibraryTarget("weatherLeft");
+    setImageLibraryModalOpen(true);
+  };
+
+  const handleModalWeatherLeftBgImageUpload = async (file) => {
+    if (!file) {
+      setModalWeatherLeftBgImage("");
+      return;
+    }
+
+    if (!file.type.startsWith("image/")) {
+      toast.error("Selecteer een geldig afbeeldingsbestand.");
+      return;
+    }
+
+    const maxSize = 5 * 1024 * 1024;
+    if (file.size > maxSize) {
+      toast.error("Afbeelding moet kleiner zijn dan 5MB.");
+      return;
+    }
+
+    setUploadingImage(true);
+    const loadingToast = toast.loading("Afbeelding uploaden...");
+
+    try {
+      const timestamp = Date.now();
+      const fileName = `${timestamp}_${file.name}`;
+      const storageRef = tenantStorageRef(
+        storage,
+        tenantId,
+        `slides/${fileName}`,
+      );
+      const snapshot = await uploadBytes(storageRef, file);
+      const downloadURL = await getDownloadURL(snapshot.ref);
+
+      await addDoc(tenantCollection(db, tenantId, "mediaLibrary"), {
+        name: file.name,
+        url: downloadURL,
+        storagePath: `tenants/${tenantId}/slides/${fileName}`,
+        size: file.size,
+        type: file.type,
+        uploadedAt: new Date(),
+      });
+
+      setModalWeatherLeftBgImage(downloadURL);
+      toast.dismiss(loadingToast);
+      toast.success("Afbeelding succesvol geüpload!");
+    } catch (error) {
+      console.error("Error uploading weather left background:", error);
+      toast.dismiss(loadingToast);
+      toast.error("Fout bij uploaden: " + error.message);
+    } finally {
+      setUploadingImage(false);
+    }
   };
 
   const handleModalCountdownBgImageUpload = async (file) => {
@@ -977,6 +1061,7 @@ function AdminView() {
             const isAgenda = slideLayout === "agenda";
             const isEmail = slideLayout === "email";
             const isSportlink = slideLayout === "sportlink";
+            const isWeather = slideLayout === "weather";
             const galleryDuration = isGallery
               ? modalGalleryImages.reduce(
                   (sum, img) => sum + (img.duration || 3),
@@ -1054,7 +1139,22 @@ function AdminView() {
                                 ? 30
                                 : modalSlideDuration,
                           }
-                        : {
+                        : isWeather
+                          ? {
+                              type: "weather",
+                              weatherLat: modalWeatherLat,
+                              weatherLong: modalWeatherLong,
+                              weatherCity: modalWeatherCity,
+                              weatherAccentColor: modalWeatherAccentColor,
+                              weatherForecastDays: modalWeatherForecastDays,
+                              weatherLeftBgImage: modalWeatherLeftBgImage,
+                              weatherLeftBgImagePosition: modalWeatherLeftBgImagePosition,
+                              duration:
+                                modalSlideDuration === ""
+                                  ? 30
+                                  : modalSlideDuration,
+                            }
+                          : {
                             text: sanitizeHTMLContent(modalTinyMCEContent),
                             tinyMCEContent: modalTinyMCEContent,
                             imageUrl: modalImageUrl,
@@ -1782,6 +1882,21 @@ function AdminView() {
           onSportlinkAccentColorChange={setModalSportlinkAccentColor}
           sportlinkDate={modalSportlinkDate}
           onSportlinkDateChange={setModalSportlinkDate}
+          weatherLat={modalWeatherLat}
+          onWeatherLatChange={setModalWeatherLat}
+          weatherLong={modalWeatherLong}
+          onWeatherLongChange={setModalWeatherLong}
+          weatherCity={modalWeatherCity}
+          onWeatherCityChange={setModalWeatherCity}
+          weatherAccentColor={modalWeatherAccentColor}
+          onWeatherAccentColorChange={setModalWeatherAccentColor}
+          weatherForecastDays={modalWeatherForecastDays}
+          onWeatherForecastDaysChange={setModalWeatherForecastDays}
+          weatherLeftBgImage={modalWeatherLeftBgImage}
+          onWeatherLeftBgImageUpload={handleModalWeatherLeftBgImageUpload}
+          weatherLeftBgImagePosition={modalWeatherLeftBgImagePosition}
+          onWeatherLeftBgImagePositionChange={setModalWeatherLeftBgImagePosition}
+          onOpenWeatherLeftLibrary={handleOpenWeatherLeftBgLibrary}
           modules={modules}
           onSaveSlideEffects={(effects) => {
             saveSlideEffects(

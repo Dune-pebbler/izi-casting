@@ -1,5 +1,19 @@
 import React, { useState, useEffect, useRef } from "react";
-import { X, LayoutGrid, Image, FileText, Play, Tv, Globe, Images, Timer, CalendarDays, Mail, Trophy } from "lucide-react";
+import {
+  X,
+  LayoutGrid,
+  Image,
+  FileText,
+  Play,
+  Tv,
+  Globe,
+  Images,
+  Timer,
+  CalendarDays,
+  Mail,
+  Trophy,
+  CloudIcon,
+} from "lucide-react";
 
 const SLIDE_TYPES = [
   { id: "side-by-side", label: "Afbeelding + Tekst", icon: LayoutGrid },
@@ -13,6 +27,7 @@ const SLIDE_TYPES = [
   { id: "agenda", label: "Agenda", icon: CalendarDays },
   { id: "email", label: "E-mail inbox", icon: Mail },
   { id: "sportlink", label: "Sportlink", icon: Trophy },
+  { id: "weather", label: "Weer", icon: CloudIcon },
 ];
 
 const AddSlideModal = ({ isOpen, onClose, onConfirm, slideTypes = {} }) => {
