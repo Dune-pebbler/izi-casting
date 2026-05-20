@@ -230,7 +230,7 @@ function WeatherDisplay({
             className="display-weather__stat"
             style={{
               borderColor: accentColor,
-              backgroundColor: `${accentColor}33`,
+              backgroundColor: `${accentColor}34`,
             }}
           >
             <span className="display-weather__stat-value">{feelsLike}°C</span>
