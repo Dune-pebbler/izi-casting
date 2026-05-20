@@ -2257,6 +2257,135 @@ a:hover {
   font-weight: 400;
 }
 
+.display-weather__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  width: 100%;
+  height: 100%;
+  font-family: Poppins, sans-serif;
+}
+.display-weather__grid .display-weather__temp {
+  color: white;
+  margin-top: 48px;
+}
+.display-weather__grid .display-weather__desc {
+  font-size: 24px;
+  opacity: 0.7;
+  margin-top: 48px;
+}
+
+.display-weather__left {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+}
+
+.display-weather__city {
+  font-size: 24px;
+  opacity: 0.5;
+  text-align: center;
+}
+
+.display-weather__center {
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.display-weather__stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px;
+}
+
+.display-weather__stat {
+  background-color: rgba(0, 0, 0, 0.4);
+  border-radius: 16px;
+  padding: 16px;
+  border: 1px solid grey;
+  text-align: center;
+}
+
+.display-weather__stat-value {
+  display: block;
+  color: white;
+  font-size: 32px;
+}
+
+.display-weather__stat-label {
+  display: block;
+  margin-top: 8px;
+  opacity: 0.5;
+  text-transform: uppercase;
+}
+
+.display-weather__right {
+  background-color: #fafafa;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.display-weather__forecast-header {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid grey;
+  margin-bottom: 16px;
+  font-weight: 600;
+}
+.display-weather__forecast-header h2 {
+  color: #a3a3a3;
+}
+
+.display-weather__forecast-body {
+  overflow: hidden;
+  flex: 1;
+}
+
+.display-weather__forecast-row {
+  border-radius: 16px;
+  padding: 16px;
+  background-color: #f0f0f0;
+  margin-bottom: 16px;
+  font-size: 2.5rem;
+  display: grid;
+  grid-template-columns: auto auto 1fr auto auto;
+  gap: 8px;
+}
+
+.display-weather__row-day {
+  width: 80px;
+  border-right: 1px solid grey;
+  padding-right: 16px;
+  color: #a3a3a3;
+  text-align: right;
+}
+
+.display-weather__row-emoji {
+  width: 60px;
+  text-align: center;
+}
+
+.display-weather__row-label {
+  color: #a3a3a3;
+}
+
+.display-weather__row-max {
+  color: black;
+  width: 80px;
+  text-align: center;
+}
+
+.display-weather__row-min {
+  color: #a3a3a3;
+  margin-left: 16px;
+  width: 60px;
+  text-align: center;
+}
+
 .display-content {
   position: relative;
 }

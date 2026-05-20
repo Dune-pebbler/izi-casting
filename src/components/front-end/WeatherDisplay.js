@@ -33,11 +33,6 @@ function getWmo(code) {
   return WMO[code] || { label: "Onbekend", emoji: "🌡️" };
 }
 
-const tempColors = {
-  lightbg: "#fafafa",
-  lightgrey: "#f0f0f0",
-  grey: "#a3a3a3",
-};
 
 function WeatherDisplay({
   lat,
@@ -176,189 +171,49 @@ function WeatherDisplay({
     hourlyIdx >= 0 ? weather.hourly.precipitation_probability[hourlyIdx] : null;
 
   return (
-    <div
-      style={{
-        flexDirection: "row",
-        display: "grid",
-        width: "100%",
-        height: "100%",
-        gridTemplateColumns: "1fr 1fr",
-        position: "relative",
-        fontFamily: "Poppins",
-      }}
-    >
+    <div className="display-weather__grid">
       <div
+        className="display-weather__left"
         style={{
           background: leftBgImage
             ? `url(${leftBgImage}) ${leftBgImagePosition} / cover no-repeat`
             : "linear-gradient(140deg,rgba(0, 0, 0, 1) 0%, rgba(8, 8, 8, 1) 50%, rgba(99, 99, 99, 1) 100%)",
-          padding: "24px",
-          display: "flex",
-          flexDirection: "column",
         }}
       >
-        <div
-          style={{
-            fontSize: "24px",
-            opacity: "0.5",
-            textAlign: "center",
-            fontFamily: "Poppins",
-          }}
-        >
-          {cityName}
-        </div>
-        <div
-          style={{
-            flexGrow: "1",
-            display: "flex",
-            verticalAlign: "middle",
-            textAlign: "center",
-            margin: "0 auto",
-          }}
-        >
+        <div className="display-weather__city">{cityName}</div>
+        <div className="display-weather__center">
           <div className="display-weather__current">
             <div className="display-weather__main">
-              <span
-                className="display-weather__temp"
-                style={{
-                  color: "white",
-                  marginTop: "48px",
-                  fontFamily: "Poppins",
-                }}
-              >
-                {temp}°C
-              </span>
-              <span
-                style={{
-                  fontSize: "24px",
-                  opacity: "0.7",
-                  marginTop: "48px",
-                  fontFamily: "Poppins",
-                }}
-                className="display-weather__desc"
-              >
-                {currentWmo.label}
-              </span>
+              <span className="display-weather__temp">{temp}°C</span>
+              <span className="display-weather__desc">{currentWmo.label}</span>
             </div>
           </div>
         </div>
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr 1fr",
-            gap: "16px",
-          }}
-        >
-          <div
-            style={{
-              backgroundColor: "rgba(0,0,0,0.4)",
-              borderRadius: "16px",
-              padding: "16px",
-              border: "1px solid grey",
-              textAlign: "center",
-              fontFamily: "Poppins",
-            }}
-          >
-            <span
-              style={{ display: "block", color: "white", fontSize: "32px" }}
-            >
-              {feelsLike}°C
-            </span>
-            <span
-              style={{
-                opacity: "0.5",
-                textTransform: "uppercase",
-                display: "block",
-                marginTop: "8px",
-              }}
-            >
-              gevoel
-            </span>
+        <div className="display-weather__stats">
+          <div className="display-weather__stat">
+            <span className="display-weather__stat-value">{feelsLike}°C</span>
+            <span className="display-weather__stat-label">gevoel</span>
           </div>
-          <div
-            style={{
-              backgroundColor: "rgba(0,0,0,0.4)",
-              borderRadius: "16px",
-              padding: "16px",
-              border: "1px solid grey",
-              textAlign: "center",
-              fontFamily: "Poppins",
-            }}
-          >
-            <span
-              style={{ display: "block", color: "white", fontSize: "32px" }}
-            >
-              {wind}
-            </span>
-            <span
-              style={{
-                opacity: "0.5",
-                textTransform: "uppercase",
-                display: "block",
-                marginTop: "8px",
-              }}
-            >
-              km/u
-            </span>
+          <div className="display-weather__stat">
+            <span className="display-weather__stat-value">{wind}</span>
+            <span className="display-weather__stat-label">km/u</span>
           </div>
-          <div
-            style={{
-              backgroundColor: "rgba(0,0,0,0.4)",
-              borderRadius: "16px",
-              padding: "16px",
-              border: "1px solid grey",
-              textAlign: "center",
-              fontFamily: "Poppins",
-            }}
-          >
-            <span
-              style={{ display: "block", color: "white", fontSize: "32px" }}
-            >
-              {precipProb}%
-            </span>
-            <span
-              style={{
-                opacity: "0.5",
-                textTransform: "uppercase",
-                display: "block",
-                marginTop: "8px",
-              }}
-            >
-              Regen
-            </span>
+          <div className="display-weather__stat">
+            <span className="display-weather__stat-value">{precipProb}%</span>
+            <span className="display-weather__stat-label">Regen</span>
           </div>
         </div>
       </div>
 
-      <div
-        style={{
-          backgroundColor: tempColors.lightbg,
-          padding: "24px",
-          display: "flex",
-          flexDirection: "column",
-          overflow: "hidden",
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            borderBottom: "1px solid grey",
-            marginBottom: "16px",
-          }}
-        >
-          <h2 style={{ color: tempColors.grey, fontFamily: "Poppins" }}>
-            VERWACHTING
-          </h2>
-          <h2 style={{ color: tempColors.grey, fontFamily: "Poppins" }}>
+      <div className="display-weather__right">
+        <div className="display-weather__forecast-header">
+          <h2>VERWACHTING</h2>
+          <h2>
             {formatDateTime.dateString} {formatDateTime.timeString}
           </h2>
         </div>
 
-        <div
-          ref={forecastBodyRef}
-          style={{ overflow: "hidden", flex: 1, fontFamily: "Poppins" }}
-        >
+        <div ref={forecastBodyRef} className="display-weather__forecast-body">
           {daily && (
             <div ref={forecastContentRef}>
               {daily.time.map((dateStr, i) => {
@@ -366,53 +221,14 @@ function WeatherDisplay({
                 const dayLabel = DAYS_NL[d.getDay()];
                 const wmo = getWmo(daily.weathercode[i]);
                 return (
-                  <div
-                    key={dateStr}
-                    style={{
-                      borderRadius: "16px",
-                      padding: "16px",
-                      backgroundColor: tempColors.lightgrey,
-                      marginBottom: "16px",
-                      fontSize: "2.5rem",
-                      display: "grid",
-                      gridTemplateColumns: "auto auto 1fr auto auto",
-                      gap: "8px",
-                    }}
-                  >
-                    <div
-                      style={{
-                        width: "80px",
-                        borderRight: "1px solid grey",
-                        paddingRight: "16px",
-                        color: tempColors.grey,
-                        textAlign: "right",
-                      }}
-                    >
-                      {dayLabel}
-                    </div>
-                    <div style={{ width: "60px", textAlign: "center" }}>
-                      {wmo.emoji}
-                    </div>
-                    <div style={{ color: tempColors.grey }}>{wmo.label}</div>
-
-                    <div
-                      style={{
-                        color: "black",
-                        width: "80px",
-                        textAlign: "center",
-                      }}
-                    >
+                  <div key={dateStr} className="display-weather__forecast-row">
+                    <div className="display-weather__row-day">{dayLabel}</div>
+                    <div className="display-weather__row-emoji">{wmo.emoji}</div>
+                    <div className="display-weather__row-label">{wmo.label}</div>
+                    <div className="display-weather__row-max">
                       {Math.round(daily.temperature_2m_max[i])}°
                     </div>
-
-                    <div
-                      style={{
-                        color: tempColors.grey,
-                        marginLeft: "16px",
-                        width: "60px",
-                        textAlign: "center",
-                      }}
-                    >
+                    <div className="display-weather__row-min">
                       {Math.round(daily.temperature_2m_min[i])}°
                     </div>
                   </div>
