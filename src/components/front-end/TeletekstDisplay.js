@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import { Tv, RefreshCw, AlertCircle } from "lucide-react";
 import { TELETEKST_THEMES } from "../admin/slide-edit/TeletekstInput";
 
@@ -15,7 +15,6 @@ function TeletekstDisplay({
   const [error, setError] = useState(null);
   const [shouldScroll, setShouldScroll] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [wrapperHeight, setWrapperHeight] = useState(null);
   const contentRef = useRef(null);
   const wrapperRef = useRef(null);
 
@@ -42,7 +41,6 @@ function TeletekstDisplay({
 
       const data = await response.json();
 
-      // Extract text content from the JSON response
       if (data && data.content) {
         // NOS teletekst uses Private Use Area chars (&#xF0xx;) for mosaic graphics.
         // These only render with a dedicated teletext font — replace with spaces.
@@ -93,32 +91,27 @@ function TeletekstDisplay({
     return () => clearTimeout(timer);
   }, [currentPage, totalPages, duration]);
 
-  // Check if content overflows and should scroll; calculate wrapper height for bottom clipping
+  // Strip top and bottom lines directly from the HTML content
+  const processedContent = useMemo(() => {
+    if (!content) return content;
+    if (!skipTopLines && !skipBottomLines) return content;
+    const lines = content.split("\n");
+    const end = skipBottomLines > 0 ? lines.length - skipBottomLines : lines.length;
+    return lines.slice(skipTopLines, end).join("\n");
+  }, [content, skipTopLines, skipBottomLines]);
+
+  // Check if content overflows and should scroll
   useEffect(() => {
-    if (contentRef.current && content) {
+    if (contentRef.current && processedContent) {
       const checkOverflow = () => {
         const outerContainer = wrapperRef.current?.parentElement;
         const contentHeight = contentRef.current.scrollHeight;
         const containerHeight = outerContainer?.clientHeight || 0;
 
-        const rootFontSize = parseFloat(
-          getComputedStyle(document.documentElement).fontSize,
-        );
-        const lineHeightPx = 2.8 * rootFontSize;
-        const skippedTopPx = skipTopLines * lineHeightPx;
-        const skippedBottomPx = skipBottomLines * lineHeightPx;
-
-        // Clip the bottom by constraining wrapper height
-        const clippedHeight = Math.max(0, containerHeight - skippedBottomPx);
-        setWrapperHeight(clippedHeight);
-
-        const effectiveContentHeight =
-          contentHeight - skippedTopPx - skippedBottomPx;
-
-        if (effectiveContentHeight > clippedHeight) {
+        if (contentHeight > containerHeight) {
           setShouldScroll(true);
-          const scrollDistance = effectiveContentHeight - clippedHeight;
-          const duration = Math.max(20, scrollDistance / 20);
+          const scrollDistance = contentHeight - containerHeight;
+          const dur = Math.max(20, scrollDistance / 20);
 
           if (contentRef.current) {
             contentRef.current.style.setProperty(
@@ -127,7 +120,7 @@ function TeletekstDisplay({
             );
             contentRef.current.style.setProperty(
               "--scroll-duration",
-              `${duration}s`,
+              `${dur}s`,
             );
           }
         } else {
@@ -138,7 +131,7 @@ function TeletekstDisplay({
       const timer = setTimeout(checkOverflow, 100);
       return () => clearTimeout(timer);
     }
-  }, [content, skipTopLines, skipBottomLines]);
+  }, [processedContent]);
 
   if (loading && !content) {
     return (
@@ -202,23 +195,13 @@ function TeletekstDisplay({
     >
       <div
         ref={wrapperRef}
-        style={{
-          overflow: "hidden",
-          height: wrapperHeight != null ? `${wrapperHeight}px` : "100%",
-          width: "100%",
-          flexShrink: 0,
-        }}
+        style={{ overflow: "hidden", height: "100%", width: "100%" }}
       >
         <div
           key={currentPage}
           ref={contentRef}
           className={`teletekst-content ${shouldScroll ? "auto-scroll" : ""}`}
-          style={
-            skipTopLines > 0
-              ? { marginTop: `${skipTopLines * -2.8}rem` }
-              : undefined
-          }
-          dangerouslySetInnerHTML={{ __html: content }}
+          dangerouslySetInnerHTML={{ __html: processedContent }}
         />
       </div>
     </div>
