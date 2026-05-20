@@ -33,7 +33,6 @@ function getWmo(code) {
   return WMO[code] || { label: "Onbekend", emoji: "🌡️" };
 }
 
-
 function WeatherDisplay({
   lat,
   long,
@@ -190,15 +189,33 @@ function WeatherDisplay({
           </div>
         </div>
         <div className="display-weather__stats">
-          <div className="display-weather__stat">
+          <div
+            className="display-weather__stat"
+            style={{
+              borderColor: accentColor,
+              backgroundColor: `${accentColor}33`,
+            }}
+          >
             <span className="display-weather__stat-value">{feelsLike}°C</span>
             <span className="display-weather__stat-label">gevoel</span>
           </div>
-          <div className="display-weather__stat">
+          <div
+            className="display-weather__stat"
+            style={{
+              borderColor: accentColor,
+              backgroundColor: `${accentColor}33`,
+            }}
+          >
             <span className="display-weather__stat-value">{wind}</span>
             <span className="display-weather__stat-label">km/u</span>
           </div>
-          <div className="display-weather__stat">
+          <div
+            className="display-weather__stat"
+            style={{
+              borderColor: accentColor,
+              backgroundColor: `${accentColor}33`,
+            }}
+          >
             <span className="display-weather__stat-value">{precipProb}%</span>
             <span className="display-weather__stat-label">Regen</span>
           </div>
@@ -206,8 +223,11 @@ function WeatherDisplay({
       </div>
 
       <div className="display-weather__right">
-        <div className="display-weather__forecast-header">
-          <h2>VERWACHTING</h2>
+        <div
+          className="display-weather__forecast-header"
+          style={{ borderBottomColor: accentColor }}
+        >
+          <h2 style={{ color: accentColor }}>VERWACHTING</h2>
           <h2>
             {formatDateTime.dateString} {formatDateTime.timeString}
           </h2>
@@ -223,9 +243,16 @@ function WeatherDisplay({
                 return (
                   <div key={dateStr} className="display-weather__forecast-row">
                     <div className="display-weather__row-day">{dayLabel}</div>
-                    <div className="display-weather__row-emoji">{wmo.emoji}</div>
-                    <div className="display-weather__row-label">{wmo.label}</div>
-                    <div className="display-weather__row-max">
+                    <div className="display-weather__row-emoji">
+                      {wmo.emoji}
+                    </div>
+                    <div className="display-weather__row-label">
+                      {wmo.label}
+                    </div>
+                    <div
+                      className="display-weather__row-max"
+                      style={{ color: accentColor }}
+                    >
                       {Math.round(daily.temperature_2m_max[i])}°
                     </div>
                     <div className="display-weather__row-min">

@@ -12,7 +12,11 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 function PlaylistPreviewView() {
   const { tenantId } = useParams();
 
-  const [authState, setAuthState] = useState({ loading: true, user: null, authorized: false });
+  const [authState, setAuthState] = useState({
+    loading: true,
+    user: null,
+    authorized: false,
+  });
   const [redirectToLogin, setRedirectToLogin] = useState(false);
 
   const [playlists, setPlaylists] = useState([]);
@@ -63,11 +67,19 @@ function PlaylistPreviewView() {
           const data = tenantSnap.data();
           const authorizedUsers = data.authorizedUsers || [];
           const isAuthorized = authorizedUsers.some((u) =>
-            typeof u === "string" ? u === email : u.email === email
+            typeof u === "string" ? u === email : u.email === email,
           );
-          setAuthState({ loading: false, user: firebaseUser, authorized: isAuthorized });
+          setAuthState({
+            loading: false,
+            user: firebaseUser,
+            authorized: isAuthorized,
+          });
         } else {
-          setAuthState({ loading: false, user: firebaseUser, authorized: false });
+          setAuthState({
+            loading: false,
+            user: firebaseUser,
+            authorized: false,
+          });
         }
       } catch {
         setAuthState({ loading: false, user: firebaseUser, authorized: false });
@@ -84,11 +96,14 @@ function PlaylistPreviewView() {
     const displayDocRef = tenantDoc(db, tenantId, "display", "content");
     const settingsDocRef = tenantDoc(db, tenantId, "display", "settings");
 
-    const unsubscribeTenant = onSnapshot(doc(db, "tenants", tenantId), (snap) => {
-      const tenantData = snap.exists() ? snap.data() : {};
-      setTenantModules(tenantData.modules || {});
-      setTenantSlideTypes(tenantData.slideTypes || {});
-    });
+    const unsubscribeTenant = onSnapshot(
+      doc(db, "tenants", tenantId),
+      (snap) => {
+        const tenantData = snap.exists() ? snap.data() : {};
+        setTenantModules(tenantData.modules || {});
+        setTenantSlideTypes(tenantData.slideTypes || {});
+      },
+    );
 
     const unsubscribeContent = onSnapshot(displayDocRef, (snap) => {
       if (snap.exists()) {
@@ -96,7 +111,13 @@ function PlaylistPreviewView() {
         if (data.playlists) {
           setPlaylists(data.playlists);
         } else if (data.slides) {
-          setPlaylists([{ id: "default", name: "Default Playlist", slides: data.slides || [] }]);
+          setPlaylists([
+            {
+              id: "default",
+              name: "Default Playlist",
+              slides: data.slides || [],
+            },
+          ]);
         } else {
           setPlaylists([]);
         }
@@ -126,14 +147,33 @@ function PlaylistPreviewView() {
         };
         ["p", "h1", "h2", "h3"].forEach((tag) => {
           const t = typo[tag] || defaults[tag];
-          document.documentElement.style.setProperty(`--typo-${tag}-size`, `${t.fontSize}px`);
-          document.documentElement.style.setProperty(`--typo-${tag}-family`, t.fontFamily);
+          document.documentElement.style.setProperty(
+            `--typo-${tag}-size`,
+            `${t.fontSize}px`,
+          );
+          document.documentElement.style.setProperty(
+            `--typo-${tag}-family`,
+            t.fontFamily,
+          );
         });
 
         if (data.feeds && Array.isArray(data.feeds)) {
-          setFeeds(data.feeds.filter((f) => f.isEnabled !== false && f.isVisible !== false));
+          setFeeds(
+            data.feeds.filter(
+              (f) => f.isEnabled !== false && f.isVisible !== false,
+            ),
+          );
         } else if (data.feedUrl) {
-          setFeeds([{ id: "legacy", name: "Legacy Feed", url: data.feedUrl, isEnabled: true, duration: 10, isVisible: true }]);
+          setFeeds([
+            {
+              id: "legacy",
+              name: "Legacy Feed",
+              url: data.feedUrl,
+              isEnabled: true,
+              duration: 10,
+              isVisible: true,
+            },
+          ]);
         } else {
           setFeeds([]);
         }
@@ -171,7 +211,8 @@ function PlaylistPreviewView() {
           const toDateStr = (val) => {
             if (!val) return null;
             if (typeof val === "string") return val.slice(0, 10);
-            if (typeof val.toDate === "function") return val.toDate().toISOString().slice(0, 10);
+            if (typeof val.toDate === "function")
+              return val.toDate().toISOString().slice(0, 10);
             if (val instanceof Date) return val.toISOString().slice(0, 10);
             return null;
           };
@@ -215,12 +256,20 @@ function PlaylistPreviewView() {
             (slide.layout === "teletekst" && slide.teletekstChannel) ||
             (slide.type === "iframe" && slide.iframeUrl) ||
             (slide.layout === "iframe" && slide.iframeUrl) ||
-            (slide.layout === "gallery" && slide.images && slide.images.length > 0) ||
+            (slide.layout === "gallery" &&
+              slide.images &&
+              slide.images.length > 0) ||
             (slide.layout === "countdown" && slide.countdownTargetDate) ||
-            (slide.layout === "agenda" && slide.agendaCalendars && slide.agendaCalendars.length > 0) ||
+            (slide.layout === "agenda" &&
+              slide.agendaCalendars &&
+              slide.agendaCalendars.length > 0) ||
             (slide.layout === "email" && slide.emailProvider) ||
-            (slide.layout === "sportlink" && slide.sportlinkApiKey && slide.sportlinkTeams && slide.sportlinkTeams.length > 0) ||
-            (!slide.type && slide.text && slide.text.trim()))
+            (slide.layout === "weather" && slide.weatherLat) ||
+            (slide.layout === "sportlink" &&
+              slide.sportlinkApiKey &&
+              slide.sportlinkTeams &&
+              slide.sportlinkTeams.length > 0) ||
+            (!slide.type && slide.text && slide.text.trim())),
       );
 
       const repeatCount = playlist.repeatCount || 1;
@@ -307,18 +356,28 @@ function PlaylistPreviewView() {
 
   const handleMouseMove = useCallback(() => {
     setShowControls(true);
-    if (hideControlsTimerRef.current) clearTimeout(hideControlsTimerRef.current);
-    hideControlsTimerRef.current = setTimeout(() => setShowControls(false), 3000);
+    if (hideControlsTimerRef.current)
+      clearTimeout(hideControlsTimerRef.current);
+    hideControlsTimerRef.current = setTimeout(
+      () => setShowControls(false),
+      3000,
+    );
   }, []);
 
   useEffect(() => {
     return () => {
-      if (hideControlsTimerRef.current) clearTimeout(hideControlsTimerRef.current);
+      if (hideControlsTimerRef.current)
+        clearTimeout(hideControlsTimerRef.current);
     };
   }, []);
 
   if (redirectToLogin) {
-    return <Navigate to={`/login?next=${encodeURIComponent(window.location.pathname)}`} replace />;
+    return (
+      <Navigate
+        to={`/login?next=${encodeURIComponent(window.location.pathname)}`}
+        replace
+      />
+    );
   }
 
   if (authState.loading) {
@@ -329,10 +388,14 @@ function PlaylistPreviewView() {
     return (
       <div className="access-denied">
         <h2>Geen toegang</h2>
-        <p>Je account ({authState.user?.email}) heeft geen toegang tot deze omgeving.</p>
+        <p>
+          Je account ({authState.user?.email}) heeft geen toegang tot deze
+          omgeving.
+        </p>
         <p>
           Neem contact op met{" "}
-          <a href="mailto:info@dunepebbler.nl">info@dunepebbler.nl</a> om toegang te krijgen.
+          <a href="mailto:info@dunepebbler.nl">info@dunepebbler.nl</a> om
+          toegang te krijgen.
         </p>
       </div>
     );
@@ -375,9 +438,15 @@ function PlaylistPreviewView() {
         color={settings.progressBarColor}
       />
 
-      <StatusBar currentSlide={currentSlide} settings={settings} feeds={feeds} />
+      <StatusBar
+        currentSlide={currentSlide}
+        settings={settings}
+        feeds={feeds}
+      />
 
-      <div className={`preview-controls-overlay ${showControls ? "visible" : ""}`}>
+      <div
+        className={`preview-controls-overlay ${showControls ? "visible" : ""}`}
+      >
         <button
           className="preview-nav-btn"
           onClick={() => handleChangeSlide("prev")}
