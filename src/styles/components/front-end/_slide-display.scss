@@ -1755,6 +1755,10 @@
   height: 100%;
   font-family: Poppins, sans-serif;
 
+  * {
+    font-family: Poppins, sans-serif;
+  }
+
   .display-weather__temp {
     color: white;
     margin-top: 48px;
@@ -1775,7 +1779,6 @@
 
 .display-weather__city {
   font-size: 24px;
-  opacity: 0.5;
   text-align: center;
 }
 
@@ -1785,6 +1788,12 @@
   align-items: center;
   justify-content: center;
   text-align: center;
+}
+
+.display-weather__main-icon {
+  width: clamp(80px, 10vw, 160px);
+  height: clamp(80px, 10vw, 160px);
+  flex-shrink: 0;
 }
 
 .display-weather__stats {
@@ -1859,8 +1868,9 @@
 }
 
 .display-weather__row-emoji {
-  width: 60px;
-  text-align: center;
+  padding: 0 8px;
+  display: flex;
+  align-items: center;
 }
 
 .display-weather__row-label {
