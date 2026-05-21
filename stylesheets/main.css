@@ -5160,6 +5160,7 @@ a:hover {
   padding: 4px 8px;
   border-radius: 4px;
   transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  width: 150px;
 }
 .playlist-title:hover {
   background-color: var(--muted);
@@ -5209,6 +5210,7 @@ a:hover {
   display: flex;
   align-items: center;
   gap: 4px;
+  width: 60px;
 }
 .playlist-duration .duration-label {
   font-size: 12px;
@@ -5227,6 +5229,7 @@ a:hover {
   display: flex;
   align-items: center;
   gap: 4px;
+  width: 60px;
 }
 .playlist-slide-count .slide-count-value {
   display: flex;
@@ -5240,6 +5243,7 @@ a:hover {
   display: flex;
   align-items: center;
   gap: 4px;
+  width: 60px;
 }
 .playlist-repeat-count .repeat-label {
   font-size: 12px;
@@ -9497,11 +9501,12 @@ a:hover {
   gap: 10px;
 }
 .display-sportlink__match-team--away {
-  justify-content: flex-end;
+  justify-content: flex-start;
   flex-direction: row;
 }
 .display-sportlink__match-home, .display-sportlink__match-away {
   flex: 1;
+  margin: 0 1.5rem;
 }
 .display-sportlink__match-vs {
   font-size: 0.85em;
@@ -9515,6 +9520,7 @@ a:hover {
   letter-spacing: 0.05em;
   padding: 4px 12px;
   border-radius: 6px;
+  margin: 0 24px;
 }
 .display-sportlink__match-location {
   font-size: clamp(1.4rem, 1.8vw, 2rem);
@@ -9525,6 +9531,7 @@ a:hover {
   -o-object-fit: contain;
      object-fit: contain;
   flex-shrink: 0;
+  vertical-align: middle;
 }
 .display-sportlink__standing-team {
   display: flex;

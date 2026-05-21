@@ -78,6 +78,7 @@
   padding: $spacing-xs $spacing-sm;
   border-radius: $border-radius-sm;
   transition: $transition-base;
+  width: 150px;
 
   &:hover {
     background-color: var(--muted);
@@ -126,6 +127,7 @@
   display: flex;
   align-items: center;
   gap: $spacing-xs;
+  width: 60px;
 
   .duration-label {
     font-size: $font-size-sm;
@@ -146,6 +148,7 @@
   display: flex;
   align-items: center;
   gap: $spacing-xs;
+  width: 60px;
 
   .slide-count-value {
     display: flex;
@@ -160,6 +163,7 @@
   display: flex;
   align-items: center;
   gap: $spacing-xs;
+  width: 60px;
 
   .repeat-label {
     font-size: $font-size-sm;
