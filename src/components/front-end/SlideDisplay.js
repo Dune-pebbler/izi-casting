@@ -966,6 +966,9 @@ function SportlinkDisplay({ slide }) {
                           className="display-sportlink__match-date display-sportlink__match-team"
                           style={{ color: `${textColor}88` }}
                         >
+                          {slide.sportlinkDataType === "programma" && (
+                            <span>{formatDate(row.wedstrijddatum)}</span>
+                          )}
                           {row.aanvangstijd && <span>{row.aanvangstijd}</span>}
                         </div>
                         {row.accommodatie && (
