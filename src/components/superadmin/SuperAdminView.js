@@ -26,6 +26,7 @@ import {
   ChevronUp,
   Trash2,
   RotateCcw,
+  Clock,
 } from "lucide-react";
 import CreateTenantModal from "./CreateTenantModal";
 import EditTenantModal from "./EditTenantModal";
@@ -269,6 +270,40 @@ function TenantCard({ tenant, onEdit }) {
               </button>
             </>
           )}
+        </div>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: "8px",
+          }}
+        >
+          <div
+            style={{
+              border: "1px solid grey",
+              textAlign: "center",
+              padding: "8px",
+              borderRadius: "8px",
+            }}
+          >
+            <div>
+              <Monitor size={18} />
+            </div>
+            <span>{tenant.deviceCount ?? 0} scherm{(tenant.deviceCount ?? 0) !== 1 ? "en" : ""}</span>
+          </div>
+          <div
+            style={{
+              border: "1px solid grey",
+              textAlign: "center",
+              padding: "8px",
+              borderRadius: "8px",
+            }}
+          >
+            <div>
+              <Clock size={18} />
+            </div>
+            <span>{tenant.totalSeconds ?? 0}s</span>
+          </div>
         </div>
       </div>
 

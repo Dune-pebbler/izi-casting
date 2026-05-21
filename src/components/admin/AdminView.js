@@ -5,9 +5,11 @@ import {
   setDoc,
   getDoc,
   addDoc,
+  updateDoc,
   collection,
   getDocs,
   deleteDoc,
+  increment,
 } from "firebase/firestore";
 import {
   ref,
@@ -1432,6 +1434,9 @@ function AdminView() {
   const deleteDevice = async (deviceId) => {
     try {
       await deleteDoc(doc(db, "devices", deviceId));
+      await updateDoc(doc(db, "tenants", tenantId), {
+        deviceCount: increment(-1),
+      });
       dispatch(clearDeviceToDelete());
       toast.success("Apparaat succesvol ontkoppeld");
     } catch (error) {

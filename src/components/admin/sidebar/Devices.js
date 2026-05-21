@@ -19,6 +19,7 @@ import {
   setDoc,
   deleteDoc,
   updateDoc,
+  increment,
   collection,
   query,
   where,
@@ -181,6 +182,10 @@ function Devices({ setDeviceToDelete, deleteDevice, isAdmin }) {
 
       // Delete pairing code — it's been used, no need to keep it
       await deleteDoc(doc(db, "pairing_codes", enteredPairingCode));
+
+      await updateDoc(doc(db, "tenants", tenantId), {
+        deviceCount: increment(1),
+      });
 
       setEnteredPairingCode("");
       dispatch(setShowPairingForm(false));
