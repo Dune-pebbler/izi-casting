@@ -1026,7 +1026,7 @@ function SportlinkDisplay({ slide }) {
                         ) : (
                           <span
                             className="display-sportlink__match-vs"
-                            style={{ color: `${textColor}44` }}
+                            style={{ color: `${accentColor}` }}
                           >
                             vs
                           </span>
@@ -1059,7 +1059,7 @@ function SportlinkDisplay({ slide }) {
                                 className="display-sportlink__match-team"
                                 style={{ justifyContent: "flex-end" }}
                               >
-                                <span>
+                                <span style={{ color: `${textColor}55` }}>
                                   Kleedkamer :&nbsp;
                                   {row.kleedkamerthuisteam
                                     ? row.kleedkamerthuisteam
@@ -1073,7 +1073,10 @@ function SportlinkDisplay({ slide }) {
 
                               <div
                                 className="display-sportlink__match-team display-sportlink__match-team--away"
-                                style={{ justifyContent: "flex-start" }}
+                                style={{
+                                  justifyContent: "flex-start",
+                                  color: `${textColor}55`,
+                                }}
                               >
                                 <span>
                                   Kleedkamer :&nbsp;
