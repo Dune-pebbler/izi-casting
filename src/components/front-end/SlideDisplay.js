@@ -795,6 +795,13 @@ function SportlinkDisplay({ slide }) {
         <h2 className="display-sportlink__title" style={{ color: textColor }}>
           {title}
         </h2>
+
+        {slide.sportlinkDate && (
+          <div className="display-sportlink__title">
+            {formatDate(slide.sportlinkDate)}
+          </div>
+        )}
+
         <span
           className="display-sportlink__badge"
           style={{ backgroundColor: accentColor }}
@@ -959,10 +966,7 @@ function SportlinkDisplay({ slide }) {
                           className="display-sportlink__match-date display-sportlink__match-team"
                           style={{ color: `${textColor}88` }}
                         >
-                          {formatDate(row.wedstrijddatum)}
-                          {row.aanvangstijd && (
-                            <span> · {row.aanvangstijd}</span>
-                          )}
+                          {row.aanvangstijd && <span>{row.aanvangstijd}</span>}
                         </div>
                         {row.accommodatie && (
                           <div
