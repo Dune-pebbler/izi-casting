@@ -539,6 +539,21 @@
     line-height: 1.5;
   }
 
+  &__checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    cursor: pointer;
+
+    input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+      accent-color: var(--primary);
+    }
+  }
+
   &__error {
     font-size: 12px;
     color: #ff6b6b;
@@ -1084,6 +1099,13 @@
 
   &__match-location {
     font-size: clamp(1.4rem, 1.8vw, 2rem);
+  }
+
+  &__match-veld {
+    font-size: clamp(1.2rem, 1.5vw, 1.7rem);
+    display: flex;
+    align-items: center;
+    gap: 2px;
   }
 
   &__team-logo {

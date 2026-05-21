@@ -131,6 +131,10 @@ function AdminView() {
   const [modalSportlinkAccentColor, setModalSportlinkAccentColor] =
     useState("#ff6600");
   const [modalSportlinkDate, setModalSportlinkDate] = useState("");
+  const [modalSportlinkShowVeldInfo, setModalSportlinkShowVeldInfo] =
+    useState(false);
+  const [modalSportlinkOnlyThuis, setModalSportlinkOnlyThuis] =
+    useState(false);
   const [modalWeatherLat, setModalWeatherLat] = useState("");
   const [modalWeatherLong, setModalWeatherLong] = useState("");
   const [modalWeatherCity, setModalWeatherCity] = useState("");
@@ -500,6 +504,8 @@ function AdminView() {
         sportlinkTextColor: "#ffffff",
         sportlinkAccentColor: "#ff6600",
         sportlinkDate: "",
+        sportlinkShowVeldInfo: false,
+        sportlinkOnlyThuis: false,
         duration: 30,
       }),
       ...(slideLayout === "weather" && {
@@ -679,6 +685,8 @@ function AdminView() {
     setModalSportlinkTextColor(slide.sportlinkTextColor || "#ffffff");
     setModalSportlinkAccentColor(slide.sportlinkAccentColor || "#ff6600");
     setModalSportlinkDate(slide.sportlinkDate || "");
+    setModalSportlinkShowVeldInfo(slide.sportlinkShowVeldInfo || false);
+    setModalSportlinkOnlyThuis(slide.sportlinkOnlyThuis || false);
     setModalWeatherLat(slide.weatherLat || "");
     setModalWeatherLong(slide.weatherLong || "");
     setModalWeatherCity(slide.weatherCity || "");
@@ -745,6 +753,8 @@ function AdminView() {
     setModalSportlinkTextColor("#ffffff");
     setModalSportlinkAccentColor("#ff6600");
     setModalSportlinkDate("");
+    setModalSportlinkShowVeldInfo(false);
+    setModalSportlinkOnlyThuis(false);
     setModalTimeRestriction({
       enabled: false,
       startTime: "08:00",
@@ -1134,6 +1144,8 @@ function AdminView() {
                             sportlinkTextColor: modalSportlinkTextColor,
                             sportlinkAccentColor: modalSportlinkAccentColor,
                             sportlinkDate: modalSportlinkDate,
+                            sportlinkShowVeldInfo: modalSportlinkShowVeldInfo,
+                            sportlinkOnlyThuis: modalSportlinkOnlyThuis,
                             duration:
                               modalSlideDuration === ""
                                 ? 30
@@ -1882,6 +1894,10 @@ function AdminView() {
           onSportlinkAccentColorChange={setModalSportlinkAccentColor}
           sportlinkDate={modalSportlinkDate}
           onSportlinkDateChange={setModalSportlinkDate}
+          sportlinkShowVeldInfo={modalSportlinkShowVeldInfo}
+          onSportlinkShowVeldInfoChange={setModalSportlinkShowVeldInfo}
+          sportlinkOnlyThuis={modalSportlinkOnlyThuis}
+          onSportlinkOnlyThuisChange={setModalSportlinkOnlyThuis}
           weatherLat={modalWeatherLat}
           onWeatherLatChange={setModalWeatherLat}
           weatherLong={modalWeatherLong}

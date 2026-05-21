@@ -141,6 +141,10 @@ function EditModal({
   onSportlinkAccentColorChange,
   sportlinkDate,
   onSportlinkDateChange,
+  sportlinkShowVeldInfo,
+  onSportlinkShowVeldInfoChange,
+  sportlinkOnlyThuis,
+  onSportlinkOnlyThuisChange,
   weatherLat,
   onWeatherLatChange,
   weatherLong,
@@ -421,6 +425,10 @@ function EditModal({
               onAccentColorChange={onSportlinkAccentColorChange}
               sportlinkDate={sportlinkDate}
               onDateChange={onSportlinkDateChange}
+              sportlinkShowVeldInfo={sportlinkShowVeldInfo}
+              onShowVeldInfoChange={onSportlinkShowVeldInfoChange}
+              sportlinkOnlyThuis={sportlinkOnlyThuis}
+              onOnlyThuisChange={onSportlinkOnlyThuisChange}
             />
           </div>
         );
