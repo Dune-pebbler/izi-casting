@@ -971,62 +971,24 @@ function SportlinkDisplay({ slide }) {
                           className="display-sportlink__match-date display-sportlink__match-team"
                           style={{ color: `${textColor}88` }}
                         >
-                          {slide.sportlinkDataType === "programma" && (
-                            <span>{formatDate(row.wedstrijddatum)}</span>
+                          {row.aanvangstijd && !slide.sportlinkOnlyThuis && (
+                            <span>{row.aanvangstijd}</span>
                           )}
-                          {row.aanvangstijd && <span>{row.aanvangstijd}</span>}
                         </div>
                         {row.accommodatie && (
                           <div
                             className="display-sportlink__match-location"
                             style={{ color: `${textColor}55` }}
                           >
-                            {row.accommodatie}
+                            {slide.sportlinkOnlyThuis
+                              ? row.aanvangstijd
+                              : row.accommodatie}
+
+                            {slide.sportlinkShowVeldInfo && (
+                              <span> - {row.veld}</span>
+                            )}
                           </div>
                         )}
-                        {/* {slide.sportlinkShowVeldInfo ? "yes" : "no"}
-                        {row.kleedkamerthuisteam ? "thuis yes" : "thuis no"}
-                        {row.kleedkameruitteam ? "uit yes" : "uit no"}
-                        {row.veldnummer ? "veld yes" : "veld no"} */}
-                        {/* {slide.sportlinkShowVeldInfo &&
-                          (row.veld ||
-                            row.kleedkamerthuisteam ||
-                            row.kleedkameruitteam) && (
-                            <div
-                              className="display-sportlink__match-veld"
-                              style={{ color: `${textColor}77` }}
-                            >
-                              {row.veld && <span>{row.veld}</span>}
-                              {row.veld &&
-                                (row.kleedkamerthuisteam ||
-                                  row.kleedkameruitteam) && (
-                                  <span
-                                    style={{ margin: "0 6px", opacity: 0.4 }}
-                                  >
-                                    ·
-                                  </span>
-                                )}
-                              {row.kleedkamerthuisteam && (
-                                <span>
-                                  Kleedkamer thuis:{" "}
-                                  <strong>{row.kleedkamerthuisteam}</strong>
-                                </span>
-                              )}
-                              {row.kleedkamerthuisteam &&
-                                row.kleedkameruitteam && (
-                                  <span
-                                    style={{ margin: "0 6px", opacity: 0.4 }}
-                                  >
-                                    ·
-                                  </span>
-                                )}
-                              {row.kleedkameruitteam && (
-                                <span>
-                                  Uit: <strong>{row.kleedkameruitteam}</strong>
-                                </span>
-                              )}
-                            </div>
-                          )} */}
                         <div className="display-sportlink__match-team"></div>
                       </div>
 
@@ -1092,14 +1054,13 @@ function SportlinkDisplay({ slide }) {
                           (row.veld ||
                             row.kleedkamerthuisteam ||
                             row.kleedkameruitteam) && (
-                            // <div
-                            //   className="display-sportlink__match-veld"
-                            //   style={{ color: `${textColor}77` }}
-                            // >
                             <>
-                              <div className="display-sportlink__match-team">
+                              <div
+                                className="display-sportlink__match-team"
+                                style={{ justifyContent: "flex-end" }}
+                              >
                                 <span>
-                                  Kleedkamer thuis:&nbsp;
+                                  Kleedkamer :&nbsp;
                                   {row.kleedkamerthuisteam
                                     ? row.kleedkamerthuisteam
                                     : " niet bekend"}
@@ -1107,17 +1068,15 @@ function SportlinkDisplay({ slide }) {
                               </div>
 
                               <div className="display-sportlink__match-vs">
-                                <span>
-                                  {row.veld ? row.veld : " niet bekend"}
-                                </span>
+                                <span>&nbsp;</span>
                               </div>
 
                               <div
                                 className="display-sportlink__match-team display-sportlink__match-team--away"
-                                style={{ justifyContent: "flex-end" }}
+                                style={{ justifyContent: "flex-start" }}
                               >
                                 <span>
-                                  Kleedkamer Uit:&nbsp;
+                                  Kleedkamer :&nbsp;
                                   {row.kleedkameruitteam
                                     ? row.kleedkameruitteam
                                     : " niet bekend"}
