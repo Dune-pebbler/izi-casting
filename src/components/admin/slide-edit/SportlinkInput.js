@@ -95,6 +95,10 @@ function SportlinkInput({
   onAccentColorChange,
   sportlinkDate,
   onDateChange,
+  sportlinkShowVeldInfo,
+  onShowVeldInfoChange,
+  sportlinkOnlyThuis,
+  onOnlyThuisChange,
 }) {
   const [availableTeams, setAvailableTeams] = useState([]);
   const [loadingTeams, setLoadingTeams] = useState(false);
@@ -236,6 +240,40 @@ function SportlinkInput({
                 max="50"
                 onChange={(e) => onMaxItemsChange(Number(e.target.value))}
               />
+            </div>
+          )}
+
+          {sportlinkDataType !== "poulestand" && (
+            <div className="sportlink-input__field">
+              <label className="sportlink-input__checkbox-label">
+                <input
+                  type="checkbox"
+                  checked={sportlinkOnlyThuis || false}
+                  onChange={(e) => onOnlyThuisChange(e.target.checked)}
+                />
+                Alleen thuiswedstrijden
+              </label>
+              <p className="sportlink-input__hint">
+                Toont alleen wedstrijden waarbij het geselecteerde team thuis
+                speelt.
+              </p>
+            </div>
+          )}
+
+          {sportlinkDataType === "programma" && (
+            <div className="sportlink-input__field">
+              <label className="sportlink-input__checkbox-label">
+                <input
+                  type="checkbox"
+                  checked={sportlinkShowVeldInfo || false}
+                  onChange={(e) => onShowVeldInfoChange(e.target.checked)}
+                />
+                Toon veld &amp; kleedkamer
+              </label>
+              <p className="sportlink-input__hint">
+                Toont het veldnummer en kleedkamernummer per wedstrijd (indien
+                beschikbaar).
+              </p>
             </div>
           )}
 

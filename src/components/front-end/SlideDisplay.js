@@ -705,6 +705,7 @@ function SportlinkDisplay({ slide }) {
         const merged = results.flat();
 
         {
+          const teamNamen = new Set(teams.map((t) => t.teamnaam));
           const seen = new Set();
           const deduped = merged.filter((row) => {
             const key = `${row.wedstrijddatum}|${row.thuisteam}|${row.uitteam}`;
@@ -712,8 +713,11 @@ function SportlinkDisplay({ slide }) {
             seen.add(key);
             return true;
           });
+          const filtered = slide.sportlinkOnlyThuis
+            ? deduped.filter((row) => teamNamen.has(row.thuisteam))
+            : deduped;
           // sort by date (ISO 8601 strings sort lexicographically)
-          const sorted = deduped.sort((a, b) => {
+          const sorted = filtered.sort((a, b) => {
             if (!a.wedstrijddatum) return 1;
             if (!b.wedstrijddatum) return -1;
             return a.wedstrijddatum.localeCompare(b.wedstrijddatum);
@@ -737,6 +741,7 @@ function SportlinkDisplay({ slide }) {
     slide.sportlinkAantalDagen,
     slide.sportlinkMaxItems,
     slide.sportlinkDate,
+    slide.sportlinkOnlyThuis,
   ]); // eslint-disable-line
 
   useEffect(() => {
@@ -976,6 +981,49 @@ function SportlinkDisplay({ slide }) {
                             {row.accommodatie}
                           </div>
                         )}
+                        {/* {slide.sportlinkShowVeldInfo ? "yes" : "no"}
+                        {row.kleedkamerthuisteam ? "thuis yes" : "thuis no"}
+                        {row.kleedkameruitteam ? "uit yes" : "uit no"}
+                        {row.veldnummer ? "veld yes" : "veld no"} */}
+                        {/* {slide.sportlinkShowVeldInfo &&
+                          (row.veld ||
+                            row.kleedkamerthuisteam ||
+                            row.kleedkameruitteam) && (
+                            <div
+                              className="display-sportlink__match-veld"
+                              style={{ color: `${textColor}77` }}
+                            >
+                              {row.veld && <span>{row.veld}</span>}
+                              {row.veld &&
+                                (row.kleedkamerthuisteam ||
+                                  row.kleedkameruitteam) && (
+                                  <span
+                                    style={{ margin: "0 6px", opacity: 0.4 }}
+                                  >
+                                    ·
+                                  </span>
+                                )}
+                              {row.kleedkamerthuisteam && (
+                                <span>
+                                  Kleedkamer thuis:{" "}
+                                  <strong>{row.kleedkamerthuisteam}</strong>
+                                </span>
+                              )}
+                              {row.kleedkamerthuisteam &&
+                                row.kleedkameruitteam && (
+                                  <span
+                                    style={{ margin: "0 6px", opacity: 0.4 }}
+                                  >
+                                    ·
+                                  </span>
+                                )}
+                              {row.kleedkameruitteam && (
+                                <span>
+                                  Uit: <strong>{row.kleedkameruitteam}</strong>
+                                </span>
+                              )}
+                            </div>
+                          )} */}
                         <div className="display-sportlink__match-team"></div>
                       </div>
 
@@ -1030,15 +1078,50 @@ function SportlinkDisplay({ slide }) {
                             <span className="display-sportlink__match-away">
                               {row.uitteam}
                             </span>
-                            {/* {row.uitteamlogo && (
-                              <img
-                                src={row.uitteamlogo}
-                                alt=""
-                                className="display-sportlink__team-logo"
-                              />
-                            )} */}
                           </div>
                         </div>
+                      </div>
+                      <div
+                        className="display-sportlink__match-teams"
+                        style={{ color: textColor }}
+                      >
+                        {slide.sportlinkShowVeldInfo &&
+                          (row.veld ||
+                            row.kleedkamerthuisteam ||
+                            row.kleedkameruitteam) && (
+                            // <div
+                            //   className="display-sportlink__match-veld"
+                            //   style={{ color: `${textColor}77` }}
+                            // >
+                            <>
+                              <div className="display-sportlink__match-team">
+                                <span>
+                                  Kleedkamer thuis:&nbsp;
+                                  {row.kleedkamerthuisteam
+                                    ? row.kleedkamerthuisteam
+                                    : " niet bekend"}
+                                </span>
+                              </div>
+
+                              <div className="display-sportlink__match-vs">
+                                <span>
+                                  {row.veld ? row.veld : " niet bekend"}
+                                </span>
+                              </div>
+
+                              <div
+                                className="display-sportlink__match-team display-sportlink__match-team--away"
+                                style={{ justifyContent: "flex-end" }}
+                              >
+                                <span>
+                                  Kleedkamer Uit:&nbsp;
+                                  {row.kleedkameruitteam
+                                    ? row.kleedkameruitteam
+                                    : " niet bekend"}
+                                </span>
+                              </div>
+                            </>
+                          )}
                       </div>
                     </div>
                   </div>
