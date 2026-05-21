@@ -658,13 +658,14 @@ function FeedList() {
     console.log("Feed drag start:", event);
   }, []);
 
+  function handleFeedlistExpand() {
+    setIsFeedSettingsExpanded((oldState) => !oldState);
+  }
+
   return (
     <div className="feed-list">
       <div className="settings-header">
-        <button
-          className="settings-toggle-btn"
-          onClick={() => setIsFeedSettingsExpanded(!isFeedSettingsExpanded)}
-        >
+        <button className="settings-toggle-btn" onClick={handleFeedlistExpand}>
           <div className="settings-toggle-left">
             <MessageSquareText size={16} />
             <span>
@@ -683,11 +684,11 @@ function FeedList() {
       <div
         className={`collapsible-wrapper${isFeedSettingsExpanded ? " expanded" : ""}`}
       >
-        <div className="feed-list__warning">
-          <strong>Let op:</strong> U bent verantwoordelijk voor de inhoud van
-          externe feeds. Controleer altijd de bron
-        </div>
         <div className="feed-collapse-inner">
+          <div className="feed-list__warning">
+            <strong>Let op:</strong> U bent verantwoordelijk voor de inhoud van
+            externe feeds. Controleer altijd de bron
+          </div>
           <DndContext
             sensors={sensors}
             collisionDetection={closestCenter}

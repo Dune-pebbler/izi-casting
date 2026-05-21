@@ -43,7 +43,7 @@ const WMO = {
   },
 };
 
-const DAYS_NL = ["zo", "ma", "di", "wo", "do", "vr", "za"];
+const DAYS_NL = ["Zo", "Ma", "Di", "Wo", "Do", "Vr", "Za"];
 
 function getWmo(code) {
   return WMO[code] || { label: "Onbekend", Icon: Thermometer };
@@ -85,7 +85,9 @@ function WeatherDisplay({
       minute: "2-digit",
     };
 
-    const dateString = currentDateTime.toLocaleDateString("nl-NL", dateOptions);
+    const dateString = currentDateTime
+      .toLocaleDateString("nl-NL", dateOptions)
+      .replace(/\b\w/g, (c) => c.toUpperCase());
     const timeString = currentDateTime.toLocaleTimeString("nl-NL", timeOptions);
 
     return { dateString, timeString };
@@ -277,9 +279,19 @@ function WeatherDisplay({
                 const d = new Date(dateStr + "T12:00:00");
                 const dayLabel = DAYS_NL[d.getDay()];
                 const wmo = getWmo(daily.weathercode[i]);
+
+                const dateString = d
+                  .toLocaleDateString("nl-NL", {
+                    weekday: "short",
+                    month: "short",
+                    day: "numeric",
+                  })
+                  .replace(/\b\w/g, (c) => c.toUpperCase());
                 return (
                   <div key={dateStr} className="display-weather__forecast-row">
-                    <div className="display-weather__row-day">{dayLabel}</div>
+                    <div className="display-weather__row-day">
+                      <span>{dateString}</span>
+                    </div>
                     <div className="display-weather__row-emoji">
                       <wmo.Icon
                         size="1em"
