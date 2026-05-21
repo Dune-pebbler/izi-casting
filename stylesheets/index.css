@@ -3029,6 +3029,19 @@
   margin: 0;
   line-height: 1.5;
 }
+.sportlink-input__checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  cursor: pointer;
+}
+.sportlink-input__checkbox-label input[type=checkbox] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: var(--primary);
+}
 .sportlink-input__error {
   font-size: 12px;
   color: #ff6b6b;
@@ -3431,7 +3444,7 @@
   display: flex;
   align-items: stretch;
   border-bottom: 1px solid;
-  padding: 14px 0;
+  padding: 28px 0;
 }
 .display-sportlink__match-info {
   flex: 1;
@@ -3480,6 +3493,12 @@
 }
 .display-sportlink__match-location {
   font-size: clamp(1.4rem, 1.8vw, 2rem);
+}
+.display-sportlink__match-veld {
+  font-size: clamp(1.2rem, 1.5vw, 1.7rem);
+  display: flex;
+  align-items: center;
+  gap: 2px;
 }
 .display-sportlink__team-logo {
   width: clamp(24px, 3.5vw, 44px);
