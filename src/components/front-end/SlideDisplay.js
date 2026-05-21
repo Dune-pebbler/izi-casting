@@ -1146,6 +1146,11 @@ function SlideDisplay({
 
   // Handle slide changes and transitions
   useEffect(() => {
+    if (currentSlide && currentSlide.id === displaySlide?.id) {
+      // Same slide, data might have changed — update in place without transition
+      setDisplaySlide(currentSlide);
+      return;
+    }
     if (currentSlide && currentSlide.id !== displaySlide?.id) {
       const transition = currentSlide.transition || "slide-left";
 
@@ -1419,6 +1424,7 @@ function SlideDisplay({
           <div className="display-weather-wrapper">
             {slide.weatherLat && slide.weatherLong ? (
               <WeatherDisplay
+                key={`${slide.weatherLat}-${slide.weatherLong}-${slide.weatherForecastDays}-${slide.weatherAccentColor}-${slide.weatherLeftBgImage}-${slide.weatherCity}`}
                 lat={slide.weatherLat}
                 long={slide.weatherLong}
                 cityName={slide.weatherCity || ""}

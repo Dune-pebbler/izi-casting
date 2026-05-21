@@ -117,7 +117,7 @@ function WeatherDisplay({
     fetchWeather();
     const interval = setInterval(fetchWeather, 30 * 60 * 1000);
     return () => clearInterval(interval);
-  }, [lat, long]);
+  }, [lat, long, forecastDays]);
 
   useEffect(() => {
     if (!weather) return;

@@ -991,7 +991,6 @@ function DisplayView() {
     }
     console.log("🎬 Setting slides:", allSlides.length, "slides");
     setSlides(allSlides);
-    setCurrentSlideIndex(0);
   }, [playlists, tenantSlideTypes]);
 
   useEffect(() => {
@@ -1002,7 +1001,9 @@ function DisplayView() {
     if (slides.length === 0) return;
 
     slidesRef.current = slides;
-    let currentIndex = 0;
+    const savedId = currentSlideIdRef.current;
+    const savedIndex = savedId ? slides.findIndex((s) => s.id === savedId) : -1;
+    let currentIndex = savedIndex !== -1 ? savedIndex : 0;
     let timeoutId = null;
 
     const rotateSlides = () => {
@@ -1033,6 +1034,7 @@ function DisplayView() {
       console.log("🎠 Setting current slide index:", currentIndex);
       setCurrentSlideIndex(currentIndex);
       currentSlideRef.current = currentIndex;
+      currentSlideIdRef.current = currentSlide?.id ?? null;
 
       timeoutId = setTimeout(() => {
         currentIndex = (currentIndex + 1) % slides.length;
@@ -1058,6 +1060,7 @@ function DisplayView() {
   }, [slides]);
 
   const currentSlideRef = useRef(0);
+  const currentSlideIdRef = useRef(null);
   const slidesRef = useRef([]);
   const rotationRestartRef = useRef(null);
   const progressRef = useRef(0);
