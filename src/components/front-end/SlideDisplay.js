@@ -978,7 +978,7 @@ function SportlinkDisplay({ slide }) {
                         {row.accommodatie && (
                           <div
                             className="display-sportlink__match-location"
-                            style={{ color: `${textColor}55` }}
+                            style={{ color: `${accentColor}` }}
                           >
                             {slide.sportlinkOnlyThuis
                               ? row.aanvangstijd
@@ -1026,7 +1026,7 @@ function SportlinkDisplay({ slide }) {
                         ) : (
                           <span
                             className="display-sportlink__match-vs"
-                            style={{ color: `${accentColor}` }}
+                            style={{ color: `${textColor}` }}
                           >
                             vs
                           </span>
@@ -1059,7 +1059,12 @@ function SportlinkDisplay({ slide }) {
                                 className="display-sportlink__match-team"
                                 style={{ justifyContent: "flex-end" }}
                               >
-                                <span style={{ color: `${textColor}55` }}>
+                                <span
+                                  style={{
+                                    color: `${textColor}`,
+                                    fontSize: "1.5rem",
+                                  }}
+                                >
                                   Kleedkamer :&nbsp;
                                   {row.kleedkamerthuisteam
                                     ? row.kleedkamerthuisteam
@@ -1075,7 +1080,8 @@ function SportlinkDisplay({ slide }) {
                                 className="display-sportlink__match-team display-sportlink__match-team--away"
                                 style={{
                                   justifyContent: "flex-start",
-                                  color: `${textColor}55`,
+                                  color: `${textColor}`,
+                                  fontSize: "1.5rem",
                                 }}
                               >
                                 <span>
