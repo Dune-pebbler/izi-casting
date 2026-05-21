@@ -1051,7 +1051,7 @@
     gap: 10px;
 
     &--away {
-      justify-content: flex-end;
+      justify-content: flex-start;
       flex-direction: row;
     }
   }
@@ -1059,10 +1059,11 @@
   &__match-home,
   &__match-away {
     flex: 1;
+    margin: 0 1.5rem;
   }
 
   &__match-away {
-    text-align: right;
+    // text-align: right;
   }
 
   &__match-vs {
@@ -1078,6 +1079,7 @@
     letter-spacing: 0.05em;
     padding: 4px 12px;
     border-radius: 6px;
+    margin: 0 24px;
   }
 
   &__match-location {
@@ -1089,6 +1091,7 @@
     height: clamp(24px, 3.5vw, 44px);
     object-fit: contain;
     flex-shrink: 0;
+    vertical-align: middle;
   }
 
   &__standing-team {

@@ -174,6 +174,16 @@ function DisplayView() {
     [dispatch],
   );
 
+  const fetchExternalIp = useCallback(async () => {
+    try {
+      const res = await fetch("https://api4.ipify.org?format=json");
+      const data = await res.json();
+      return data.ip || null;
+    } catch {
+      return null;
+    }
+  }, []);
+
   const generateDisplayPairingCode = useCallback(async () => {
     if (isGeneratingCodeInternalRef.current) {
       console.log("Already generating code internally, skipping...");
@@ -366,13 +376,10 @@ function DisplayView() {
     if (isPaired && deviceId && deviceId.trim() !== "") {
       const updateLastSeen = async () => {
         try {
-          await setDoc(
-            doc(db, "devices", deviceId),
-            {
-              lastSeen: new Date().toISOString(),
-            },
-            { merge: true },
-          );
+          const update = { lastSeen: new Date().toISOString() };
+          const ip = await fetchExternalIp();
+          if (ip) update.externalIp = ip;
+          await setDoc(doc(db, "devices", deviceId), update, { merge: true });
         } catch (error) {
           console.error("Error updating last seen:", error);
         }
@@ -382,7 +389,7 @@ function DisplayView() {
       const interval = setInterval(updateLastSeen, 60000);
       return () => clearInterval(interval);
     }
-  }, [isPaired, deviceId]);
+  }, [isPaired, deviceId, fetchExternalIp]);
 
   const handleChangeSlide = useCallback((action) => {
     const total = slidesRef.current.length;

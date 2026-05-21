@@ -208,6 +208,12 @@
         color: var(--success);
         transition: $transition-base;
 
+        &.device-item--offline {
+          border-color: var(--border);
+          background-color: transparent;
+          color: var(--foreground-secondary);
+        }
+
         &:has(.device-delete-btn:hover) {
           border-color: var(--destructive);
           background-color: var(--destructive-light);
@@ -242,12 +248,17 @@
             flex-direction: column;
             gap: 4px;
 
+            .device-name-row {
+              display: flex;
+              align-items: center;
+              gap: $spacing-sm;
+            }
+
             .device-name-title {
               color: var(--foreground);
               font-size: 0.875rem;
               font-weight: $font-weight-semibold;
               cursor: pointer;
-              // padding: $spacing-sm;
               border-radius: 200px;
               transition: $transition-base;
               align-self: flex-start;
@@ -257,11 +268,33 @@
               }
             }
 
+            .device-status-badge {
+              font-size: 0.65rem;
+              font-weight: $font-weight-semibold;
+              padding: 2px 6px;
+              border-radius: 100px;
+              text-transform: uppercase;
+              letter-spacing: 0.04em;
+
+              &--online {
+                background-color: rgba(80, 184, 60, 0.15);
+                color: #50b83c;
+              }
+
+              &--offline {
+                background-color: var(--muted);
+                color: var(--foreground-secondary);
+              }
+            }
+
             .device-last-seen {
               font-size: 0.75rem;
               color: var(--foreground-secondary);
-              // padding-left: $spacing-sm;
               font-weight: $font-weight-normal;
+
+              .device-ip {
+                font-family: monospace;
+              }
             }
           }
 

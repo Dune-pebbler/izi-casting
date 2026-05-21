@@ -3457,14 +3457,12 @@
   gap: 10px;
 }
 .display-sportlink__match-team--away {
-  justify-content: flex-end;
+  justify-content: flex-start;
   flex-direction: row;
 }
 .display-sportlink__match-home, .display-sportlink__match-away {
   flex: 1;
-}
-.display-sportlink__match-away {
-  text-align: right;
+  margin: 0 1.5rem;
 }
 .display-sportlink__match-vs {
   font-size: 0.85em;
@@ -3478,6 +3476,7 @@
   letter-spacing: 0.05em;
   padding: 4px 12px;
   border-radius: 6px;
+  margin: 0 24px;
 }
 .display-sportlink__match-location {
   font-size: clamp(1.4rem, 1.8vw, 2rem);
@@ -3488,6 +3487,7 @@
   -o-object-fit: contain;
      object-fit: contain;
   flex-shrink: 0;
+  vertical-align: middle;
 }
 .display-sportlink__standing-team {
   display: flex;

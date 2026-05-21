@@ -979,17 +979,22 @@ function SportlinkDisplay({ slide }) {
                         className="display-sportlink__match-teams"
                         style={{ color: textColor }}
                       >
-                        <div className="display-sportlink__match-team">
-                          {row.thuisteamlogo && (
-                            <img
-                              src={row.thuisteamlogo}
-                              alt=""
-                              className="display-sportlink__team-logo"
-                            />
-                          )}
-                          <span className="display-sportlink__match-home">
-                            {row.thuisteam}
-                          </span>
+                        <div
+                          className="display-sportlink__match-team"
+                          style={{ justifyContent: "flex-end" }}
+                        >
+                          <div>
+                            <span className="display-sportlink__match-home">
+                              {row.thuisteam}
+                            </span>
+                            {row.thuisteamlogo && (
+                              <img
+                                src={row.thuisteamlogo}
+                                alt=""
+                                className="display-sportlink__team-logo"
+                              />
+                            )}
+                          </div>
                         </div>
                         {dataType === "uitslagen" && row.uitslag ? (
                           <span
@@ -1010,16 +1015,25 @@ function SportlinkDisplay({ slide }) {
                           </span>
                         )}
                         <div className="display-sportlink__match-team display-sportlink__match-team--away">
-                          <span className="display-sportlink__match-away">
-                            {row.uitteam}
-                          </span>
-                          {row.uitteamlogo && (
-                            <img
-                              src={row.uitteamlogo}
-                              alt=""
-                              className="display-sportlink__team-logo"
-                            />
-                          )}
+                          <div>
+                            {row.uitteamlogo && (
+                              <img
+                                src={row.uitteamlogo}
+                                alt=""
+                                className="display-sportlink__team-logo"
+                              />
+                            )}
+                            <span className="display-sportlink__match-away">
+                              {row.uitteam}
+                            </span>
+                            {/* {row.uitteamlogo && (
+                              <img
+                                src={row.uitteamlogo}
+                                alt=""
+                                className="display-sportlink__team-logo"
+                              />
+                            )} */}
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -1407,13 +1421,13 @@ function SlideDisplay({
                 accentColor={slide.weatherAccentColor || "#4f87ff"}
                 forecastDays={slide.weatherForecastDays ?? 7}
                 leftBgImage={slide.weatherLeftBgImage || ""}
-                leftBgImagePosition={slide.weatherLeftBgImagePosition || "center"}
+                leftBgImagePosition={
+                  slide.weatherLeftBgImagePosition || "center"
+                }
               />
             ) : (
               <div className="display-weather-placeholder">
-                <div className="placeholder-text">
-                  Geen locatie ingesteld
-                </div>
+                <div className="placeholder-text">Geen locatie ingesteld</div>
               </div>
             )}
           </div>

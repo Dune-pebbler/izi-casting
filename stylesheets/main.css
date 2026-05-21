@@ -4459,6 +4459,11 @@ a:hover {
   color: var(--success);
   transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
+.sidebar-devices .devices-content .devices-list .device-item.device-item--offline {
+  border-color: var(--border);
+  background-color: transparent;
+  color: var(--foreground-secondary);
+}
 .sidebar-devices .devices-content .devices-list .device-item:has(.device-delete-btn:hover) {
   border-color: var(--destructive);
   background-color: var(--destructive-light);
@@ -4490,6 +4495,11 @@ a:hover {
   flex-direction: column;
   gap: 4px;
 }
+.sidebar-devices .devices-content .devices-list .device-item .device-header .device-name-display .device-name-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
 .sidebar-devices .devices-content .devices-list .device-item .device-header .device-name-display .device-name-title {
   color: var(--foreground);
   font-size: 0.875rem;
@@ -4502,10 +4512,29 @@ a:hover {
 .sidebar-devices .devices-content .devices-list .device-item .device-header .device-name-display .device-name-title:hover {
   background-color: var(--muted);
 }
+.sidebar-devices .devices-content .devices-list .device-item .device-header .device-name-display .device-status-badge {
+  font-size: 0.65rem;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 100px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.sidebar-devices .devices-content .devices-list .device-item .device-header .device-name-display .device-status-badge--online {
+  background-color: rgba(80, 184, 60, 0.15);
+  color: #50b83c;
+}
+.sidebar-devices .devices-content .devices-list .device-item .device-header .device-name-display .device-status-badge--offline {
+  background-color: var(--muted);
+  color: var(--foreground-secondary);
+}
 .sidebar-devices .devices-content .devices-list .device-item .device-header .device-name-display .device-last-seen {
   font-size: 0.75rem;
   color: var(--foreground-secondary);
   font-weight: 400;
+}
+.sidebar-devices .devices-content .devices-list .device-item .device-header .device-name-display .device-last-seen .device-ip {
+  font-family: monospace;
 }
 .sidebar-devices .devices-content .devices-list .device-item .device-header .device-name-input {
   width: 100%;
@@ -9473,9 +9502,6 @@ a:hover {
 }
 .display-sportlink__match-home, .display-sportlink__match-away {
   flex: 1;
-}
-.display-sportlink__match-away {
-  text-align: right;
 }
 .display-sportlink__match-vs {
   font-size: 0.85em;

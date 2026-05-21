@@ -309,7 +309,7 @@ function Devices({ setDeviceToDelete, deleteDevice, isAdmin }) {
       : new Date(lastSeen);
     const now = new Date();
     const diffInMinutes = (now - lastSeenDate) / (1000 * 60);
-    return diffInMinutes < 5; // Consider device online if seen in last 5 minutes
+    return diffInMinutes < 15; // Consider device online if seen in last 15 minutes
   };
 
   const formatLastSeen = (lastSeen) => {
@@ -337,9 +337,9 @@ function Devices({ setDeviceToDelete, deleteDevice, isAdmin }) {
     return `${diffInDays} ${diffInDays === 1 ? "dag" : "dagen"} geleden`;
   };
 
-  // Count online devices
-  const onlineDevices = linkedDevices.filter(
-    (device) => device.isPaired && isDeviceOnline(device.lastSeen),
+  const pairedDevices = linkedDevices.filter((device) => device.isPaired);
+  const onlineDevices = pairedDevices.filter((device) =>
+    isDeviceOnline(device.lastSeen),
   );
 
   const [isDeviceSettingsExpanded, setIsDeviceSettingsExpanded] =
@@ -353,7 +353,12 @@ function Devices({ setDeviceToDelete, deleteDevice, isAdmin }) {
       >
         <div className="settings-toggle-left">
           <Monitor size={16} />
-          <span>Schermen ({onlineDevices.length})</span>
+          <span>
+            Schermen ({onlineDevices.length}
+            {pairedDevices.length > onlineDevices.length &&
+              `/${pairedDevices.length}`}
+            )
+          </span>
         </div>
         {isDeviceSettingsExpanded ? (
           <ChevronUp size={16} />
@@ -368,15 +373,18 @@ function Devices({ setDeviceToDelete, deleteDevice, isAdmin }) {
           {/* Pairing Section */}
 
           {/* Devices List */}
-          {linkedDevices.length > 0 && (
+          {pairedDevices.length > 0 && (
             <div className="devices-list">
-              {linkedDevices
-                .filter(
-                  (device) =>
-                    device.isPaired && isDeviceOnline(device.lastSeen),
-                ) // Only show paired and online devices
-                .map((device) => (
-                  <div key={device.id} className="device-item">
+              {pairedDevices.map((device) => {
+                const online = isDeviceOnline(device.lastSeen);
+                if (!isAdmin && !online) {
+                  return;
+                }
+                return (
+                  <div
+                    key={device.id}
+                    className={`device-item${online ? "" : " device-item--offline"}`}
+                  >
                     <div className="device-header">
                       <div className="device-header-left">
                         {editingDeviceId === device.id ? (
@@ -402,14 +410,29 @@ function Devices({ setDeviceToDelete, deleteDevice, isAdmin }) {
                           />
                         ) : (
                           <div className="device-name-display">
-                            <strong
-                              className="device-name-title"
-                              onClick={() => handleEditName(device)}
-                            >
-                              {getDisplayName(device)}
-                            </strong>
+                            <div className="device-name-row">
+                              <strong
+                                className="device-name-title"
+                                onClick={() => handleEditName(device)}
+                              >
+                                {getDisplayName(device)}
+                              </strong>
+                              <span
+                                className={`device-status-badge${online ? " device-status-badge--online" : " device-status-badge--offline"}`}
+                              >
+                                {online ? "Online" : "Offline"}
+                              </span>
+                            </div>
                             <div className="device-last-seen">
                               Laatst gezien: {formatLastSeen(device.lastSeen)}
+                              {device.externalIp && (
+                                <span
+                                  className="device-ip"
+                                  style={{ display: "block", marginTop: "4px" }}
+                                >
+                                  {device.externalIp}
+                                </span>
+                              )}
                             </div>
                           </div>
                         )}
@@ -485,12 +508,13 @@ function Devices({ setDeviceToDelete, deleteDevice, isAdmin }) {
                       </div>
                     </div>
                   </div>
-                ))}
+                );
+              })}
             </div>
           )}
 
           {/* Extra Screen Button - only show when devices are connected and not showing pairing form */}
-          {onlineDevices.length > 0 && !showPairingForm && isAdmin && (
+          {pairedDevices.length > 0 && !showPairingForm && isAdmin && (
             <div
               className="extra-screen-button"
               onClick={() => dispatch(setShowPairingForm(true))}
@@ -503,11 +527,11 @@ function Devices({ setDeviceToDelete, deleteDevice, isAdmin }) {
           )}
 
           <div className="pairing-section">
-            {(onlineDevices.length === 0 || showPairingForm) && (
+            {(pairedDevices.length === 0 || showPairingForm) && (
               <div className="pairing-form-display">
                 <div className="pairing-form-header">
                   <h2>Apparaat koppelen</h2>
-                  {onlineDevices.length > 0 && (
+                  {pairedDevices.length > 0 && (
                     <button
                       onClick={() => {
                         dispatch(setShowPairingForm(false));
