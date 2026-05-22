@@ -152,6 +152,8 @@ function AdminView() {
   const [modalQrPanelTextColor, setModalQrPanelTextColor] = useState("#ffffff");
   const [modalQrTextSlides, setModalQrTextSlides] = useState([]);
   const [modalQrTextInterval, setModalQrTextInterval] = useState(5);
+  const [uploadingQrSlideId, setUploadingQrSlideId] = useState(null);
+  const [qrSlideLibraryTargetId, setQrSlideLibraryTargetId] = useState(null);
   const [imageLibraryTarget, setImageLibraryTarget] = useState("main");
   const [modalTimeRestriction, setModalTimeRestriction] = useState({
     enabled: false,
@@ -956,6 +958,11 @@ function AdminView() {
       setModalCountdownBgImage(image.url);
     } else if (imageLibraryTarget === "weatherLeft") {
       setModalWeatherLeftBgImage(image.url);
+    } else if (imageLibraryTarget === "qrSlide" && qrSlideLibraryTargetId !== null) {
+      setModalQrTextSlides((prev) =>
+        prev.map((s) => (s.id === qrSlideLibraryTargetId ? { ...s, bgImage: image.url } : s)),
+      );
+      setQrSlideLibraryTargetId(null);
     } else {
       setModalImageUrl(image.url);
     }
@@ -1079,6 +1086,44 @@ function AdminView() {
     } finally {
       setUploadingImage(false);
     }
+  };
+
+  const handleQrSlideImageUpload = async (slideId, file) => {
+    if (!file.type.startsWith("image/")) { toast.error("Selecteer een geldig afbeeldingsbestand."); return; }
+    if (file.size > 5 * 1024 * 1024) { toast.error("Afbeelding moet kleiner zijn dan 5MB."); return; }
+
+    setUploadingQrSlideId(slideId);
+    const loadingToast = toast.loading(`${file.name} uploaden…`);
+    try {
+      const timestamp = Date.now();
+      const fileName = `${timestamp}_${file.name}`;
+      const storageRef = tenantStorageRef(storage, tenantId, `slides/${fileName}`);
+      const snapshot = await uploadBytes(storageRef, file);
+      const downloadURL = await getDownloadURL(snapshot.ref);
+
+      await addDoc(tenantCollection(db, tenantId, "mediaLibrary"), {
+        name: file.name, url: downloadURL,
+        storagePath: `tenants/${tenantId}/slides/${fileName}`,
+        size: file.size, type: file.type, uploadedAt: new Date(),
+      });
+
+      setModalQrTextSlides((prev) =>
+        prev.map((s) => (s.id === slideId ? { ...s, bgImage: downloadURL } : s)),
+      );
+      toast.dismiss(loadingToast);
+      toast.success(`${file.name} toegevoegd!`);
+    } catch (error) {
+      toast.dismiss(loadingToast);
+      toast.error("Fout bij uploaden: " + error.message);
+    } finally {
+      setUploadingQrSlideId(null);
+    }
+  };
+
+  const handleOpenQrSlideLibrary = (slideId) => {
+    setQrSlideLibraryTargetId(slideId);
+    setImageLibraryTarget("qrSlide");
+    setImageLibraryModalOpen(true);
   };
 
   const handleSelectGalleryImageFromLibrary = (image) => {
@@ -1987,6 +2032,9 @@ function AdminView() {
           onQrTextSlidesChange={setModalQrTextSlides}
           qrTextInterval={modalQrTextInterval}
           onQrTextIntervalChange={setModalQrTextInterval}
+          onQrSlideImageUpload={handleQrSlideImageUpload}
+          onOpenQrSlideLibrary={handleOpenQrSlideLibrary}
+          uploadingQrSlideId={uploadingQrSlideId}
           modules={modules}
           onSaveSlideEffects={(effects) => {
             saveSlideEffects(

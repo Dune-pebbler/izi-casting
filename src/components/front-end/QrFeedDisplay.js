@@ -34,21 +34,30 @@ function QrFeedDisplay({ slide }) {
   }, [textSlides.length]);
 
   const currentSlide = textSlides[currentIndex];
+  const slideBgColor = currentSlide?.bgColor || leftBgColor;
+  const slideBgImage = currentSlide?.bgImage || null;
 
   return (
     <div className="qr-feed">
       <div
         className="qr-feed__left"
-        style={{ backgroundColor: leftBgColor, color: leftTextColor }}
+        style={{ color: leftTextColor, backgroundColor: leftBgColor }}
       >
+        {/* Background layer fades with the slide */}
+        <div
+          className={`qr-feed__slide-bg${animating ? " qr-feed__slide-bg--exit" : ""}`}
+          style={{
+            backgroundColor: slideBgColor,
+            backgroundImage: slideBgImage ? `url(${slideBgImage})` : "none",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
+        >
+          {slideBgImage && <div className="qr-feed__bg-overlay" />}
+        </div>
+
         {textSlides.length > 0 ? (
           <>
-            <div className={`qr-feed__text-slide${animating ? " qr-feed__text-slide--exit" : ""}`}>
-              <div
-                className="qr-feed__text-content"
-                dangerouslySetInnerHTML={{ __html: currentSlide?.text || "" }}
-              />
-            </div>
             {textSlides.length > 1 && (
               <div className="qr-feed__dots">
                 {textSlides.map((_, i) => (
@@ -60,10 +69,20 @@ function QrFeedDisplay({ slide }) {
                 ))}
               </div>
             )}
+            <div
+              className={`qr-feed__text-slide${animating ? " qr-feed__text-slide--exit" : ""}`}
+            >
+              {currentSlide?.text && (
+                <div
+                  className="qr-feed__text-content"
+                  dangerouslySetInnerHTML={{ __html: currentSlide.text }}
+                />
+              )}
+            </div>
           </>
         ) : (
           <div className="qr-feed__empty-left">
-            <span>Geen tekst-slides toegevoegd</span>
+            <span>Geen slides toegevoegd</span>
           </div>
         )}
       </div>
@@ -79,7 +98,10 @@ function QrFeedDisplay({ slide }) {
               style={{ width: "100%", height: "auto", maxWidth: 280 }}
             />
           ) : (
-            <div className="qr-feed__qr-placeholder" style={{ borderColor: panelTextColor, color: panelTextColor }}>
+            <div
+              className="qr-feed__qr-placeholder"
+              style={{ borderColor: panelTextColor, color: panelTextColor }}
+            >
               Geen URL ingesteld
             </div>
           )}

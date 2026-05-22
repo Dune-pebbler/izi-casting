@@ -179,6 +179,9 @@ function EditModal({
   onQrTextSlidesChange,
   qrTextInterval,
   onQrTextIntervalChange,
+  onQrSlideImageUpload,
+  onOpenQrSlideLibrary,
+  uploadingQrSlideId,
   modules = {},
   onSaveSlideEffects,
 }) {
@@ -474,6 +477,9 @@ function EditModal({
               onQrTextSlidesChange={onQrTextSlidesChange}
               qrTextInterval={qrTextInterval}
               onQrTextIntervalChange={onQrTextIntervalChange}
+              onQrSlideImageUpload={onQrSlideImageUpload}
+              onOpenQrSlideLibrary={onOpenQrSlideLibrary}
+              uploadingQrSlideId={uploadingQrSlideId}
             />
           </div>
         );

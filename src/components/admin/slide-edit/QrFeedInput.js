@@ -1,5 +1,5 @@
-import React from "react";
-import { Plus, Trash2, GripVertical, QrCode, PanelLeft } from "lucide-react";
+import React, { useRef } from "react";
+import { Plus, Trash2, GripVertical, QrCode, PanelLeft, Image, BookImage, X } from "lucide-react";
 import {
   DndContext,
   closestCenter,
@@ -32,7 +32,17 @@ function ColorField({ label, value, onChange }) {
   );
 }
 
-function SortableTextSlide({ item, onRemove, onTextChange }) {
+function SortableTextSlide({
+  item,
+  onRemove,
+  onTextChange,
+  onBgColorChange,
+  onBgImageUpload,
+  onBgImageRemove,
+  onOpenLibrary,
+  uploadingId,
+}) {
+  const fileInputRef = useRef(null);
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
     useSortable({ id: item.id });
 
@@ -42,31 +52,101 @@ function SortableTextSlide({ item, onRemove, onTextChange }) {
     opacity: isDragging ? 0.4 : 1,
   };
 
+  const isUploading = uploadingId === item.id;
+
   return (
     <div
       ref={setNodeRef}
       style={style}
       className={`qr-feed-input__item${isDragging ? " dragging" : ""}`}
     >
-      <div
-        className="qr-feed-input__drag-handle"
-        {...attributes}
-        {...listeners}
-      >
+      <div className="qr-feed-input__drag-handle" {...attributes} {...listeners}>
         <GripVertical size={16} />
       </div>
-      <textarea
-        className="qr-feed-input__textarea"
-        value={item.text}
-        onChange={(e) => onTextChange(item.id, e.target.value)}
-        placeholder="Typ hier je tekst…"
-        rows={3}
-      />
+
+      <div className="qr-feed-input__item-body">
+        {/* Per-slide background row */}
+        <div className="qr-feed-input__item-bg-row">
+          <div className="slide-color-input qr-feed-input__item-bg-color">
+            <label>Achtergrond</label>
+            <div className="slide-color-input__wrapper">
+              <input
+                type="color"
+                value={item.bgColor || "#0f172a"}
+                onChange={(e) => onBgColorChange(item.id, e.target.value)}
+                className="slide-color-input__picker"
+              />
+              <span className="slide-color-input__hex">{item.bgColor || "#0f172a"}</span>
+            </div>
+          </div>
+
+          <div className="qr-feed-input__item-bg-image">
+            <label>Afbeelding (optioneel)</label>
+            {item.bgImage ? (
+              <div className="qr-feed-input__item-thumb-row">
+                <img
+                  src={item.bgImage}
+                  alt=""
+                  className="qr-feed-input__item-thumb"
+                />
+                <button
+                  type="button"
+                  className="btn-icon btn-icon--danger"
+                  onClick={() => onBgImageRemove(item.id)}
+                  title="Verwijder afbeelding"
+                >
+                  <X size={12} />
+                </button>
+              </div>
+            ) : (
+              <div className="qr-feed-input__item-upload-row">
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  style={{ display: "none" }}
+                  onChange={(e) => {
+                    if (e.target.files?.[0]) onBgImageUpload(item.id, e.target.files[0]);
+                    e.target.value = "";
+                  }}
+                />
+                <button
+                  type="button"
+                  className="btn btn-secondary btn-sm"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isUploading}
+                >
+                  <Image size={13} />
+                  {isUploading ? "Uploaden…" : "Upload"}
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-secondary btn-sm"
+                  onClick={() => onOpenLibrary(item.id)}
+                  title="Kies uit bibliotheek"
+                >
+                  <BookImage size={13} />
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Text */}
+        <textarea
+          className="qr-feed-input__textarea"
+          value={item.text || ""}
+          onChange={(e) => onTextChange(item.id, e.target.value)}
+          placeholder="Tekst (optioneel — laat leeg voor alleen achtergrond)"
+          rows={2}
+        />
+      </div>
+
       <button
         type="button"
         className="btn-icon btn-icon--danger"
         onClick={() => onRemove(item.id)}
-        title="Verwijder"
+        title="Verwijder slide"
       >
         <Trash2 size={14} />
       </button>
@@ -91,23 +171,24 @@ function QrFeedInput({
   onQrTextSlidesChange,
   qrTextInterval,
   onQrTextIntervalChange,
+  onQrSlideImageUpload,
+  onOpenQrSlideLibrary,
+  uploadingQrSlideId,
 }) {
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
   );
 
   const addSlide = () => {
-    onQrTextSlidesChange([...qrTextSlides, { id: Date.now(), text: "" }]);
+    onQrTextSlidesChange([...qrTextSlides, { id: Date.now(), text: "", bgColor: "", bgImage: "" }]);
   };
 
   const removeSlide = (id) => {
     onQrTextSlidesChange(qrTextSlides.filter((s) => s.id !== id));
   };
 
-  const updateText = (id, text) => {
-    onQrTextSlidesChange(
-      qrTextSlides.map((s) => (s.id === id ? { ...s, text } : s)),
-    );
+  const updateField = (id, field, value) => {
+    onQrTextSlidesChange(qrTextSlides.map((s) => (s.id === id ? { ...s, [field]: value } : s)));
   };
 
   const handleDragEnd = ({ active, over }) => {
@@ -120,11 +201,11 @@ function QrFeedInput({
   return (
     <div className="qr-feed-input">
 
-      {/* LEFT — tekst-slides */}
+      {/* LEFT — slides */}
       <div className="qr-feed-input__section">
         <div className="qr-feed-input__section-header">
           <h4 className="qr-feed-input__section-title">
-            <PanelLeft size={15} /> Tekst-slides (links)
+            <PanelLeft size={15} /> Slides (links)
           </h4>
           <div className="qr-feed-input__interval">
             <label>Interval</label>
@@ -144,7 +225,7 @@ function QrFeedInput({
 
         <div className="qr-feed-input__colors">
           <ColorField
-            label="Achtergrond tekst-kant"
+            label="Standaard achtergrond"
             value={qrLeftBgColor}
             onChange={onQrLeftBgColorChange}
           />
@@ -155,32 +236,26 @@ function QrFeedInput({
           />
         </div>
 
-        <DndContext
-          sensors={sensors}
-          collisionDetection={closestCenter}
-          onDragEnd={handleDragEnd}
-        >
-          <SortableContext
-            items={qrTextSlides.map((s) => s.id)}
-            strategy={verticalListSortingStrategy}
-          >
+        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+          <SortableContext items={qrTextSlides.map((s) => s.id)} strategy={verticalListSortingStrategy}>
             {qrTextSlides.map((item) => (
               <SortableTextSlide
                 key={item.id}
                 item={item}
                 onRemove={removeSlide}
-                onTextChange={updateText}
+                onTextChange={(id, val) => updateField(id, "text", val)}
+                onBgColorChange={(id, val) => updateField(id, "bgColor", val)}
+                onBgImageUpload={onQrSlideImageUpload}
+                onBgImageRemove={(id) => updateField(id, "bgImage", "")}
+                onOpenLibrary={onOpenQrSlideLibrary}
+                uploadingId={uploadingQrSlideId}
               />
             ))}
           </SortableContext>
         </DndContext>
 
-        <button
-          type="button"
-          className="btn btn-secondary qr-feed-input__add-btn"
-          onClick={addSlide}
-        >
-          <Plus size={16} /> Tekst-slide toevoegen
+        <button type="button" className="btn btn-secondary qr-feed-input__add-btn" onClick={addSlide}>
+          <Plus size={16} /> Slide toevoegen
         </button>
       </div>
 
