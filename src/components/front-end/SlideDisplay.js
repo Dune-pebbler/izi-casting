@@ -988,7 +988,7 @@ function SportlinkDisplay({ slide }) {
                     })}
                   </span>
                   <span style={{ color: headerTextColor, textAlign: "right" }}>
-                    Uitteam
+                    Bezoekers
                   </span>
                   {slide.sportlinkShowVeldInfo && (
                     <span
