@@ -93,6 +93,8 @@ function SportlinkInput({
   onTextColorChange,
   sportlinkAccentColor,
   onAccentColorChange,
+  sportlinkHeaderTextColor,
+  onHeaderTextColorChange,
   sportlinkDate,
   onDateChange,
   sportlinkShowVeldInfo,
@@ -308,19 +310,37 @@ function SportlinkInput({
             </div>
           </div>
 
-          <div className="sportlink-input__field">
-            <label>Accentkleur (clubkleur)</label>
-            <div className="countdown-input__color-wrapper">
-              <input
-                type="color"
-                value={sportlinkAccentColor}
-                onChange={(e) => onAccentColorChange(e.target.value)}
-                className="countdown-input__color-picker"
-              />
-              <span className="countdown-input__color-hex">
-                {sportlinkAccentColor}
-              </span>
+          <div className="sportlink-input__row">
+            <div className="sportlink-input__field">
+              <label>Accentkleur (clubkleur)</label>
+              <div className="countdown-input__color-wrapper">
+                <input
+                  type="color"
+                  value={sportlinkAccentColor}
+                  onChange={(e) => onAccentColorChange(e.target.value)}
+                  className="countdown-input__color-picker"
+                />
+                <span className="countdown-input__color-hex">
+                  {sportlinkAccentColor}
+                </span>
+              </div>
             </div>
+            {sportlinkDataType === "programma" && (
+              <div className="sportlink-input__field">
+                <label>Header text kleur</label>
+                <div className="countdown-input__color-wrapper">
+                  <input
+                    type="color"
+                    value={sportlinkHeaderTextColor}
+                    onChange={(e) => onHeaderTextColorChange(e.target.value)}
+                    className="countdown-input__color-picker"
+                  />
+                  <span className="countdown-input__color-hex">
+                    {sportlinkHeaderTextColor}
+                  </span>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

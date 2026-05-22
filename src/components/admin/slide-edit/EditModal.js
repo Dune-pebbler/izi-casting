@@ -139,6 +139,8 @@ function EditModal({
   onSportlinkTextColorChange,
   sportlinkAccentColor,
   onSportlinkAccentColorChange,
+  sportlinkHeaderTextColor,
+  onSportlinkHeaderTextColorChange,
   sportlinkDate,
   onSportlinkDateChange,
   sportlinkShowVeldInfo,
@@ -423,6 +425,8 @@ function EditModal({
               onTextColorChange={onSportlinkTextColorChange}
               sportlinkAccentColor={sportlinkAccentColor}
               onAccentColorChange={onSportlinkAccentColorChange}
+              sportlinkHeaderTextColor={sportlinkHeaderTextColor}
+              onHeaderTextColorChange={onSportlinkHeaderTextColorChange}
               sportlinkDate={sportlinkDate}
               onDateChange={onSportlinkDateChange}
               sportlinkShowVeldInfo={sportlinkShowVeldInfo}

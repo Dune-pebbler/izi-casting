@@ -130,6 +130,8 @@ function AdminView() {
     useState("#ffffff");
   const [modalSportlinkAccentColor, setModalSportlinkAccentColor] =
     useState("#ff6600");
+  const [modalSportlinkHeaderTextColor, setModalSportlinkHeaderTextColor] =
+    useState("#ffffff");
   const [modalSportlinkDate, setModalSportlinkDate] = useState("");
   const [modalSportlinkShowVeldInfo, setModalSportlinkShowVeldInfo] =
     useState(false);
@@ -503,6 +505,7 @@ function AdminView() {
         sportlinkBgColor: "#0f172a",
         sportlinkTextColor: "#ffffff",
         sportlinkAccentColor: "#ff6600",
+        sportlinkHeaderTextColor: "#ffffff",
         sportlinkDate: "",
         sportlinkShowVeldInfo: false,
         sportlinkOnlyThuis: false,
@@ -684,6 +687,7 @@ function AdminView() {
     setModalSportlinkBgColor(slide.sportlinkBgColor || "#0f172a");
     setModalSportlinkTextColor(slide.sportlinkTextColor || "#ffffff");
     setModalSportlinkAccentColor(slide.sportlinkAccentColor || "#ff6600");
+    setModalSportlinkHeaderTextColor(slide.sportlinkHeaderTextColor || "#ffffff");
     setModalSportlinkDate(slide.sportlinkDate || "");
     setModalSportlinkShowVeldInfo(slide.sportlinkShowVeldInfo || false);
     setModalSportlinkOnlyThuis(slide.sportlinkOnlyThuis || false);
@@ -1143,6 +1147,7 @@ function AdminView() {
                             sportlinkBgColor: modalSportlinkBgColor,
                             sportlinkTextColor: modalSportlinkTextColor,
                             sportlinkAccentColor: modalSportlinkAccentColor,
+                            sportlinkHeaderTextColor: modalSportlinkHeaderTextColor,
                             sportlinkDate: modalSportlinkDate,
                             sportlinkShowVeldInfo: modalSportlinkShowVeldInfo,
                             sportlinkOnlyThuis: modalSportlinkOnlyThuis,
@@ -1892,6 +1897,8 @@ function AdminView() {
           onSportlinkTextColorChange={setModalSportlinkTextColor}
           sportlinkAccentColor={modalSportlinkAccentColor}
           onSportlinkAccentColorChange={setModalSportlinkAccentColor}
+          sportlinkHeaderTextColor={modalSportlinkHeaderTextColor}
+          onSportlinkHeaderTextColorChange={setModalSportlinkHeaderTextColor}
           sportlinkDate={modalSportlinkDate}
           onSportlinkDateChange={setModalSportlinkDate}
           sportlinkShowVeldInfo={modalSportlinkShowVeldInfo}

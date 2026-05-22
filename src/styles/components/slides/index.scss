@@ -893,7 +893,7 @@
 }
 
 // =============================================================================
-// SPORTLINK SLIDE - Display (Front-end)
+// SPORTLINK SLIDE - Display (Front-end) — container + layout
 // =============================================================================
 
 .display-sportlink {
@@ -902,6 +902,10 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
+
+  * {
+    font-family: "Poppins";
+  }
 
   &__header {
     display: flex;
@@ -932,7 +936,8 @@
   &__body {
     flex: 1;
     overflow: hidden;
-    padding: 0 32px 24px;
+    display: flex;
+    flex-direction: column;
   }
 
   &__loading,
@@ -943,7 +948,20 @@
     text-align: center;
   }
 
-  // Multiple poule groups
+  // Programma/uitslagen: scoreboard-header + scrollende rijen
+  &__matches {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  // Scrollbare rijcontainer — clipped zodat rijen achter de header verdwijnen
+  &__rows-scroll {
+    flex: 1;
+    overflow: hidden;
+  }
+
+  // Poulestand
   &__poule-group {
     & + & {
       margin-top: 24px;
@@ -956,21 +974,19 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    margin-top: 16px;
     margin-bottom: 4px;
     padding-bottom: 6px;
     border-bottom: 2px solid currentColor;
     opacity: 0.9;
   }
 
-  // Standings table
   &__table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 16px;
 
     th {
-      padding: 12px 12px;
+      padding: 12px;
       font-size: clamp(1.8rem, 2vw, 2.5rem);
       font-weight: 600;
       text-align: center;
@@ -981,7 +997,6 @@
       &.team {
         text-align: left;
       }
-
       &:first-child {
         width: 40px;
       }
@@ -991,121 +1006,23 @@
     }
 
     td {
-      padding: 12px 12px;
-
+      padding: 12px;
       font-size: clamp(1.8rem, 2vw, 2.5rem);
       font-weight: 600;
       text-align: center;
       letter-spacing: 0.06em;
 
-      &.team {
-        text-align: left;
-      }
-
       &:last-child {
         text-align: right;
       }
     }
   }
 
-  &__row {
-    td {
-      padding: 10px 12px;
-      font-size: clamp(1.4rem, 2vw, 2rem);
-      border-bottom: 1px solid;
-      vertical-align: middle;
-
-      &:first-child {
-        font-size: 0.9em;
-        width: 40px;
-      }
-      &:last-child {
-        text-align: right;
-      }
-    }
-  }
-
-  // Program/results list
-  &__matches {
-    margin-top: 12px;
-    display: flex;
-    flex-direction: column;
-  }
-
-  &__match {
-    display: flex;
-    align-items: stretch;
-    border-bottom: 1px solid;
-    padding: 28px 0;
-  }
-
-  &__match-info {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
-
-  &__match-date {
-    font-size: clamp(1.4rem, 1.8vw, 2rem);
-    font-weight: 500;
-  }
-
-  &__match-teams {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    font-size: clamp(1.8rem, 2.5vw, 2.5rem);
-    font-weight: 600;
-  }
-
-  &__match-team {
-    flex: 1;
+  &__standing-team {
     display: flex;
     align-items: center;
     gap: 10px;
-
-    &--away {
-      justify-content: flex-start;
-      flex-direction: row;
-    }
-  }
-
-  &__match-home,
-  &__match-away {
-    flex: 1;
-    margin: 0 1.5rem;
-  }
-
-  &__match-away {
-    // text-align: right;
-  }
-
-  &__match-vs {
-    font-size: 0.85em;
-    font-weight: 400;
-    flex-shrink: 0;
-  }
-
-  &__match-score {
-    font-size: 1em;
-    font-weight: 800;
-    flex-shrink: 0;
-    letter-spacing: 0.05em;
-    padding: 4px 12px;
-    border-radius: 6px;
-    margin: 0 24px;
-  }
-
-  &__match-location {
-    font-size: clamp(1.4rem, 1.8vw, 2rem);
-  }
-
-  &__match-veld {
-    font-size: clamp(1.2rem, 1.5vw, 1.7rem);
-    display: flex;
-    align-items: center;
-    gap: 2px;
+    text-transform: uppercase;
   }
 
   &__team-logo {
@@ -1115,13 +1032,109 @@
     flex-shrink: 0;
     vertical-align: middle;
   }
+}
 
-  &__standing-team {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    text-transform: uppercase;
-  }
+/* Scorebord grid - 5 kolommen: tijd | thuisteam | vs | uitteam | veld */
+.display-sportlink__scoreboard-header,
+.display-sportlink__scoreboard-row {
+  display: grid;
+  align-items: center;
+  gap: 0 20px;
+  padding: 28px 36px;
+}
+
+.display-sportlink__scoreboard-header {
+  font-size: 2rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 16px 36px;
+  font-weight: 600;
+}
+
+.display-sportlink__scoreboard-row {
+  border-bottom: 1px solid;
+}
+
+.display-sportlink__scoreboard-row:last-child {
+  border-bottom: none;
+}
+
+/* Tijd */
+.display-sportlink__scoreboard-time {
+  font-size: 2.8rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* Team blok (naam + kleedkamer onder elkaar) */
+.display-sportlink__scoreboard-team {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0; /* zorgt dat ellipsis werkt */
+}
+
+.display-sportlink__scoreboard-team div {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 2.3rem;
+  font-weight: 500;
+  min-width: 0;
+}
+
+/* Uitteam: logo rechts, naam links — zo knipt ellipsis rechts af */
+.display-sportlink__scoreboard-team--away div {
+  flex-direction: row-reverse;
+}
+
+/* Team namen: ellipsis altijd aan het einde (rechts) */
+.display-sportlink__match-home,
+.display-sportlink__match-away {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.display-sportlink__match-away {
+  text-align: right;
+}
+
+/* Kleedkamer subtekst */
+.display-sportlink__scoreboard-room {
+  font-size: 1.4rem;
+  white-space: nowrap;
+}
+
+.display-sportlink__scoreboard-team--away .display-sportlink__scoreboard-room {
+  text-align: right;
+}
+
+/* VS badge */
+.display-sportlink__match-vs {
+  text-align: center;
+  font-size: 1.4rem;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 999px;
+  padding: 8px 0;
+  font-weight: 500;
+}
+
+/* Uitslag badge */
+.display-sportlink__match-score {
+  text-align: center;
+  font-size: 2rem;
+  font-weight: 500;
+  border-radius: 6px;
+  padding: 6px 0;
+}
+
+/* Veld rechts */
+.display-sportlink__scoreboard-veld {
+  font-size: 1.6rem;
+  text-align: right;
 }
 
 @keyframes sportlinkScroll {

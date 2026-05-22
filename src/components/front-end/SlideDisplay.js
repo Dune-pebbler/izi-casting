@@ -594,6 +594,7 @@ function SportlinkDisplay({ slide }) {
   const bgColor = slide.sportlinkBgColor || "#0f172a";
   const textColor = slide.sportlinkTextColor || "#ffffff";
   const accentColor = slide.sportlinkAccentColor || "#ff6600";
+  const headerTextColor = slide.sportlinkHeaderTextColor || textColor;
   const targetDate =
     slide.sportlinkDate || new Date().toISOString().slice(0, 10);
 
@@ -791,31 +792,33 @@ function SportlinkDisplay({ slide }) {
   return (
     <div
       className="display-sportlink"
-      style={{ backgroundColor: bgColor, color: textColor }}
+      style={{ color: textColor, width: "100%" }}
     >
-      <div
-        className="display-sportlink__header"
-        style={{ borderBottomColor: `${accentColor}40` }}
-      >
-        <h2 className="display-sportlink__title" style={{ color: textColor }}>
-          {title}
-        </h2>
-
-        {slide.sportlinkDate && (
-          <div className="display-sportlink__title">
-            {formatDate(slide.sportlinkDate)}
-          </div>
-        )}
-
-        <span
-          className="display-sportlink__badge"
-          style={{ backgroundColor: accentColor }}
+      {dataTypeLabel !== "Programma" && (
+        <div
+          className="display-sportlink__header"
+          style={{ borderBottomColor: `${accentColor}40` }}
         >
-          {dataTypeLabel}
-        </span>
-      </div>
+          <h2 className="display-sportlink__title" style={{ color: textColor }}>
+            {title}
+          </h2>
 
-      <div className="display-sportlink__body" ref={bodyRef}>
+          {slide.sportlinkDate && (
+            <div className="display-sportlink__title">
+              {formatDate(slide.sportlinkDate)}
+            </div>
+          )}
+
+          <span
+            className="display-sportlink__badge"
+            style={{ backgroundColor: accentColor }}
+          >
+            {dataTypeLabel}
+          </span>
+        </div>
+      )}
+
+      <div className="display-sportlink__body">
         {loading && (
           <div
             className="display-sportlink__loading"
@@ -843,264 +846,275 @@ function SportlinkDisplay({ slide }) {
           </div>
         )}
 
-        {!loading && !error && data.length > 0 && (
-          <div ref={contentRef}>
-            {dataType === "poulestand" ? (
-              data.map((group, gi) => (
-                <div key={gi} className="display-sportlink__poule-group">
-                  {data.length > 1 && (
-                    <div
-                      className="display-sportlink__poule-header"
-                      style={{ color: accentColor }}
-                    >
-                      {group.teamNaam}
-                    </div>
-                  )}
-                  <table className="display-sportlink__table">
-                    <thead>
-                      <tr
-                        style={{
-                          color: `${textColor}99`,
-                          borderBottomColor: `${textColor}20`,
-                        }}
-                      >
-                        <th>#</th>
-                        <th className="team">Team</th>
-                        <th>Gespeeld</th>
-                        <th>Gewonnen</th>
-                        <th>Gelijk</th>
-                        <th>Verloren</th>
-                        <th>Punten</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {group.rows.map((row, i) => {
-                        const isOwn =
-                          row.eigenteam === "true" ||
-                          teams.some((t) => t.teamnaam === row.teamnaam);
-                        return (
-                          <tr
-                            key={i}
-                            style={{
-                              borderBottomColor: `${textColor}20`,
-                              backgroundColor: isOwn
-                                ? `${accentColor}20`
-                                : "transparent",
-                            }}
-                          >
-                            <td
-                              style={{
-                                color: `${textColor}99`,
-                                borderBottom: `1px solid ${textColor}20`,
-                              }}
-                            >
-                              {row.positie || i + 1}
-                            </td>
-                            <td
-                              style={{
-                                fontWeight: isOwn ? 700 : 400,
-                                borderBottom: `1px solid ${textColor}20`,
-                              }}
-                            >
-                              <div className="display-sportlink__standing-team">
-                                {row.clublogo && (
-                                  <img
-                                    src={row.clublogo}
-                                    alt=""
-                                    className="display-sportlink__team-logo"
-                                  />
-                                )}
-                                {row.teamnaam}
-                              </div>
-                            </td>
-                            <td
-                              style={{
-                                borderBottom: `1px solid ${textColor}20`,
-                              }}
-                            >
-                              {row.gespeeldewedstrijden ?? "—"}
-                            </td>
-                            <td
-                              style={{
-                                borderBottom: `1px solid ${textColor}20`,
-                              }}
-                            >
-                              {row.gewonnen ?? "—"}
-                            </td>
-                            <td
-                              style={{
-                                borderBottom: `1px solid ${textColor}20`,
-                              }}
-                            >
-                              {row.gelijk ?? "—"}
-                            </td>
-                            <td
-                              style={{
-                                borderBottom: `1px solid ${textColor}20`,
-                              }}
-                            >
-                              {row.verloren ?? "—"}
-                            </td>
-                            <td
-                              style={{
-                                fontWeight: 700,
-                                color: accentColor,
-                                borderBottom: `1px solid ${textColor}20`,
-                              }}
-                            >
-                              {row.punten ?? "—"}
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-              ))
-            ) : (
-              <div className="display-sportlink__matches">
-                {data.map((row, i) => (
-                  <div
-                    key={i}
-                    className="display-sportlink__match"
-                    style={{ borderBottomColor: `${textColor}10` }}
-                  >
-                    <div className="display-sportlink__match-info">
-                      <div className="display-sportlink__match-teams">
-                        <div
-                          className="display-sportlink__match-date display-sportlink__match-team"
-                          style={{ color: `${textColor}88` }}
-                        >
-                          {row.aanvangstijd && !slide.sportlinkOnlyThuis && (
-                            <span>{row.aanvangstijd}</span>
-                          )}
-                        </div>
-                        {row.accommodatie && (
-                          <div
-                            className="display-sportlink__match-location"
-                            style={{ color: `${accentColor}` }}
-                          >
-                            {slide.sportlinkOnlyThuis
-                              ? row.aanvangstijd
-                              : row.accommodatie}
-
-                            {slide.sportlinkShowVeldInfo && (
-                              <span> - {row.veld}</span>
-                            )}
-                          </div>
-                        )}
-                        <div className="display-sportlink__match-team"></div>
-                      </div>
-
+        {!loading &&
+          !error &&
+          data.length > 0 &&
+          (dataType === "poulestand" ? (
+            <div className="display-sportlink__rows-scroll" ref={bodyRef}>
+              <div ref={contentRef}>
+                {data.map((group, gi) => (
+                  <div key={gi} className="display-sportlink__poule-group">
+                    {data.length > 1 && (
                       <div
-                        className="display-sportlink__match-teams"
-                        style={{ color: textColor }}
+                        className="display-sportlink__poule-header"
+                        style={{ color: accentColor }}
                       >
-                        <div
-                          className="display-sportlink__match-team"
-                          style={{ justifyContent: "flex-end" }}
-                        >
-                          <div>
-                            <span className="display-sportlink__match-home">
-                              {row.thuisteam}
-                            </span>
-                            {row.thuisteamlogo && (
-                              <img
-                                src={row.thuisteamlogo}
-                                alt=""
-                                className="display-sportlink__team-logo"
-                              />
-                            )}
-                          </div>
-                        </div>
-                        {dataType === "uitslagen" && row.uitslag ? (
-                          <span
-                            className="display-sportlink__match-score"
-                            style={{
-                              backgroundColor: `${accentColor}22`,
-                              color: accentColor,
-                            }}
-                          >
-                            {row.uitslag}
-                          </span>
-                        ) : (
-                          <span
-                            className="display-sportlink__match-vs"
-                            style={{ color: `${textColor}` }}
-                          >
-                            vs
-                          </span>
-                        )}
-                        <div className="display-sportlink__match-team display-sportlink__match-team--away">
-                          <div>
-                            {row.uitteamlogo && (
-                              <img
-                                src={row.uitteamlogo}
-                                alt=""
-                                className="display-sportlink__team-logo"
-                              />
-                            )}
-                            <span className="display-sportlink__match-away">
-                              {row.uitteam}
-                            </span>
-                          </div>
-                        </div>
+                        {group.teamNaam}
                       </div>
-                      <div
-                        className="display-sportlink__match-teams"
-                        style={{ color: textColor }}
-                      >
-                        {slide.sportlinkShowVeldInfo &&
-                          (row.veld ||
-                            row.kleedkamerthuisteam ||
-                            row.kleedkameruitteam) && (
-                            <>
-                              <div
-                                className="display-sportlink__match-team"
-                                style={{ justifyContent: "flex-end" }}
-                              >
-                                <span
-                                  style={{
-                                    color: `${textColor}`,
-                                    fontSize: "1.5rem",
-                                  }}
-                                >
-                                  Kleedkamer :&nbsp;
-                                  {row.kleedkamerthuisteam
-                                    ? row.kleedkamerthuisteam
-                                    : " niet bekend"}
-                                </span>
-                              </div>
-
-                              <div className="display-sportlink__match-vs">
-                                <span>&nbsp;</span>
-                              </div>
-
-                              <div
-                                className="display-sportlink__match-team display-sportlink__match-team--away"
+                    )}
+                    <table className="display-sportlink__table">
+                      <thead>
+                        <tr
+                          style={{
+                            color: `${textColor}99`,
+                            borderBottomColor: `${textColor}20`,
+                          }}
+                        >
+                          <th>#</th>
+                          <th className="team">Team</th>
+                          <th>Gespeeld</th>
+                          <th>Gewonnen</th>
+                          <th>Gelijk</th>
+                          <th>Verloren</th>
+                          <th>Punten</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {group.rows.map((row, i) => {
+                          const isOwn =
+                            row.eigenteam === "true" ||
+                            teams.some((t) => t.teamnaam === row.teamnaam);
+                          return (
+                            <tr
+                              key={i}
+                              style={{
+                                borderBottomColor: `${textColor}20`,
+                                backgroundColor: isOwn
+                                  ? `${accentColor}20`
+                                  : "transparent",
+                              }}
+                            >
+                              <td
                                 style={{
-                                  justifyContent: "flex-start",
-                                  color: `${textColor}`,
-                                  fontSize: "1.5rem",
+                                  color: `${textColor}99`,
+                                  borderBottom: `1px solid ${textColor}20`,
                                 }}
                               >
-                                <span>
-                                  Kleedkamer :&nbsp;
-                                  {row.kleedkameruitteam
-                                    ? row.kleedkameruitteam
-                                    : " niet bekend"}
-                                </span>
-                              </div>
-                            </>
-                          )}
-                      </div>
-                    </div>
+                                {row.positie || i + 1}
+                              </td>
+                              <td
+                                style={{
+                                  fontWeight: isOwn ? 700 : 400,
+                                  borderBottom: `1px solid ${textColor}20`,
+                                }}
+                              >
+                                <div className="display-sportlink__standing-team">
+                                  {row.clublogo && (
+                                    <img
+                                      src={row.clublogo}
+                                      alt=""
+                                      className="display-sportlink__team-logo"
+                                    />
+                                  )}
+                                  {row.teamnaam}
+                                </div>
+                              </td>
+                              <td
+                                style={{
+                                  borderBottom: `1px solid ${textColor}20`,
+                                }}
+                              >
+                                {row.gespeeldewedstrijden ?? "—"}
+                              </td>
+                              <td
+                                style={{
+                                  borderBottom: `1px solid ${textColor}20`,
+                                }}
+                              >
+                                {row.gewonnen ?? "—"}
+                              </td>
+                              <td
+                                style={{
+                                  borderBottom: `1px solid ${textColor}20`,
+                                }}
+                              >
+                                {row.gelijk ?? "—"}
+                              </td>
+                              <td
+                                style={{
+                                  borderBottom: `1px solid ${textColor}20`,
+                                }}
+                              >
+                                {row.verloren ?? "—"}
+                              </td>
+                              <td
+                                style={{
+                                  fontWeight: 700,
+                                  color: accentColor,
+                                  borderBottom: `1px solid ${textColor}20`,
+                                }}
+                              >
+                                {row.punten ?? "—"}
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
                   </div>
                 ))}
               </div>
-            )}
-          </div>
-        )}
+            </div>
+          ) : (
+            <div className="display-sportlink__matches">
+              {/* Kolomheader — blijft vast, rijen animeren eronder */}
+              {dataTypeLabel === "Programma" && (
+                <div
+                  className="display-sportlink__scoreboard-header"
+                  style={{
+                    backgroundColor: `${accentColor}`,
+                    gridTemplateColumns: slide.sportlinkShowVeldInfo
+                      ? "140px 1fr 200px 1fr 90px"
+                      : "140px 1fr 200px 1fr",
+                  }}
+                >
+                  <span style={{ color: headerTextColor }}>Tijd</span>
+                  <span style={{ color: headerTextColor }}>Thuisteam</span>
+                  <span style={{ textAlign: "center", color: headerTextColor }}>
+                    {new Date(slide.sportlinkDate).toLocaleDateString("nl-NL", {
+                      weekday: "long",
+                      day: "numeric",
+                      month: "short",
+                    })}
+                  </span>
+                  <span style={{ color: headerTextColor, textAlign: "right" }}>
+                    Uitteam
+                  </span>
+                  {slide.sportlinkShowVeldInfo && (
+                    <span
+                      style={{ color: headerTextColor, textAlign: "right" }}
+                    >
+                      Veld
+                    </span>
+                  )}
+                </div>
+              )}
+
+              {/* Scrollbare rijen */}
+              <div className="display-sportlink__rows-scroll" ref={bodyRef}>
+                <div ref={contentRef}>
+                  {data.map((row, i) => (
+                    <div
+                      key={i}
+                      className="display-sportlink__scoreboard-row"
+                      style={{
+                        borderBottomColor: `${textColor}10`,
+                        backgroundColor:
+                          i % 2 === 0 ? `${bgColor}99` : `${bgColor}75`,
+                        gridTemplateColumns: slide.sportlinkShowVeldInfo
+                          ? "140px 1fr 200px 1fr 90px"
+                          : "140px 1fr 200px 1fr",
+                      }}
+                    >
+                      {/* Tijd */}
+                      <span
+                        className="display-sportlink__scoreboard-time"
+                        style={{ color: accentColor }}
+                      >
+                        {row.aanvangstijd}
+                      </span>
+
+                      {/* Thuisteam + kleedkamer */}
+                      <div className="display-sportlink__scoreboard-team">
+                        <div style={{ color: textColor }}>
+                          {row.thuisteamlogo && (
+                            <img
+                              src={row.thuisteamlogo}
+                              width={40}
+                              alt=""
+                              className="display-sportlink__team-logo"
+                            />
+                          )}
+                          <span className="display-sportlink__match-home">
+                            {row.thuisteam}
+                          </span>
+                        </div>
+                        {slide.sportlinkShowVeldInfo && (
+                          <span
+                            className="display-sportlink__scoreboard-room"
+                            style={{ color: `${textColor}` }}
+                          >
+                            Kleedkamer:{" "}
+                            {row.kleedkamerthuisteam
+                              ? row.kleedkamerthuisteam
+                              : "niet bekend"}
+                          </span>
+                        )}
+                      </div>
+
+                      {/* VS of uitslag */}
+                      {dataType === "uitslagen" && row.uitslag ? (
+                        <span
+                          className="display-sportlink__match-score"
+                          style={{
+                            backgroundColor: `${accentColor}22`,
+                            color: accentColor,
+                          }}
+                        >
+                          {row.uitslag}
+                        </span>
+                      ) : (
+                        <span
+                          className="display-sportlink__match-vs"
+                          style={{ color: `${textColor}55` }}
+                        >
+                          vs
+                        </span>
+                      )}
+
+                      {/* Uitteam + kleedkamer */}
+                      <div className="display-sportlink__scoreboard-team display-sportlink__scoreboard-team--away">
+                        <div style={{ color: textColor }}>
+                          <span className="display-sportlink__match-away">
+                            {row.uitteam}
+                          </span>
+                          {row.uitteamlogo && (
+                            <img
+                              src={row.uitteamlogo}
+                              width={40}
+                              alt=""
+                              className="display-sportlink__team-logo"
+                            />
+                          )}
+                        </div>
+                        {slide.sportlinkShowVeldInfo && (
+                          <span
+                            className="display-sportlink__scoreboard-room"
+                            style={{ color: `${textColor}` }}
+                          >
+                            Kleedkamer:{" "}
+                            {row.kleedkameruitteam
+                              ? row.kleedkameruitteam
+                              : "niet bekend"}
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Veld */}
+                      {row.accommodatie && slide.sportlinkShowVeldInfo && (
+                        <span
+                          className="display-sportlink__scoreboard-veld"
+                          style={{ color: accentColor }}
+                        >
+                          {slide.sportlinkShowVeldInfo && `${row.veld}`}
+                        </span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          ))}
       </div>
     </div>
   );
