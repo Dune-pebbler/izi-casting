@@ -1891,3 +1891,52 @@
   width: 60px;
   text-align: center;
 }
+
+.display--portrait {
+  .display-weather__grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: 2fr 3fr;
+  }
+
+  .display-weather__left {
+    flex-direction: column;
+    padding: 24px;
+  }
+
+  .display-weather__temp {
+    margin-top: 16px !important;
+    font-size: clamp(3rem, 6vw, 5rem) !important;
+  }
+
+  .display-weather__desc {
+    margin-top: 8px !important;
+    font-size: 1.5rem !important;
+  }
+
+  .display-weather__stat-value {
+    font-size: 2rem;
+  }
+
+  .display-weather__stat-label {
+    font-size: 1.25rem;
+  }
+
+  .display-weather__forecast-row {
+    font-size: 1.5rem;
+    padding: 12px 16px;
+    grid-template-columns: 1.5fr auto 2fr auto auto;
+
+    .display-weather__row-max {
+      width: 60px;
+    }
+
+    .display-weather__row-min {
+      width: 50px;
+      margin-left: 8px;
+    }
+  }
+
+  .display-weather__forecast-header h2 {
+    font-size: 1.5rem;
+  }
+}

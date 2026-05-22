@@ -11,6 +11,7 @@ import {
   SatelliteDish,
   ArrowBigLeftDash,
   ArrowBigRightDash,
+  RotateCw,
 } from "lucide-react";
 
 import {
@@ -36,7 +37,7 @@ import {
   clearPairingError,
 } from "../../../store/slices/deviceSlice";
 
-function Devices({ setDeviceToDelete, deleteDevice, isAdmin }) {
+function Devices({ setDeviceToDelete, deleteDevice, isAdmin, canRotate }) {
   const { tenantId } = useTenant();
   // Redux state
   const dispatch = useAppDispatch();
@@ -297,6 +298,17 @@ function Devices({ setDeviceToDelete, deleteDevice, isAdmin }) {
     }
   };
 
+  const handleRotationChange = async (deviceId, rotation) => {
+    try {
+      await updateDoc(doc(db, "devices", deviceId), {
+        screenRotation: rotation,
+      });
+    } catch (error) {
+      console.error("Error updating screen rotation:", error);
+      toast.error("Fout bij opslaan van rotatie");
+    }
+  };
+
   // Utility functions
   const getDisplayName = (device) => {
     return device.customName || device.id;
@@ -496,6 +508,33 @@ function Devices({ setDeviceToDelete, deleteDevice, isAdmin }) {
                             <span>Volgende</span>
                           </button>
                         </div>
+
+                        {canRotate && (
+                          <div className="device-rotation-selector">
+                            <span className="device-rotation-label">
+                              Rotatie
+                            </span>
+                            <div className="device-rotation-options">
+                              {[
+                                { value: 0, label: "0°" },
+                                { value: 90, label: "90°" },
+                                { value: 180, label: "180°" },
+                                { value: -90, label: "270°" },
+                              ].map(({ value, label }) => (
+                                <button
+                                  key={value}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleRotationChange(device.id, value);
+                                  }}
+                                  className={`device-rotation-btn${(device.screenRotation || 0) === value ? " active" : ""}`}
+                                >
+                                  {label}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        )}
                       </div>
                       <div className="device-header-right">
                         <button

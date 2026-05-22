@@ -389,6 +389,53 @@
             }
           }
 
+          .device-rotation-selector {
+            align-items: center;
+            gap: $spacing-sm;
+            margin-top: $spacing-xs;
+
+            .device-rotation-label {
+              font-size: 0.75rem;
+              font-weight: 700;
+              margin-bottom: 4px;
+              display: block;
+              color: var(--foreground-secondary);
+              white-space: nowrap;
+            }
+
+            .device-rotation-options {
+              display: grid;
+              gap: 8px;
+              grid-template-columns: auto auto auto auto;
+
+              .device-rotation-btn {
+                background-color: white;
+                border: 1px solid var(--border);
+                color: var(--foreground);
+                cursor: pointer;
+                padding: 4px 8px;
+                border-radius: 0.5em;
+                font-size: 0.75rem;
+                font-weight: $font-weight-medium;
+                transition: all 0.2s ease;
+
+                [data-theme="dark"] & {
+                  background-color: black;
+                }
+
+                &:hover {
+                  background-color: var(--muted);
+                }
+
+                &.active {
+                  background-color: var(--primary);
+                  border-color: var(--primary);
+                  color: var(--surface);
+                }
+              }
+            }
+          }
+
           .device-delete-btn {
             background: none;
             border: none;

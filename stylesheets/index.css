@@ -3847,28 +3847,14 @@
 .qr-feed-input__drag-handle:hover {
   color: var(--foreground);
 }
-.qr-feed-input__textarea {
-  flex: 1;
-  resize: vertical;
-  min-height: 72px;
-  border: 1px solid var(--border);
+.qr-feed-input__editor-wrap {
   border-radius: 6px;
-  padding: 8px 10px;
-  font-size: 13px;
-  font-family: inherit;
-  color: var(--foreground);
-  background: var(--input-background, var(--background));
-  outline: none;
-  transition: border-color 0.15s;
+  overflow: hidden;
+  border: 1px solid var(--border);
 }
-.qr-feed-input__textarea:focus {
-  border-color: var(--primary);
-}
-.qr-feed-input__textarea::-moz-placeholder {
-  color: var(--muted-foreground);
-}
-.qr-feed-input__textarea::placeholder {
-  color: var(--muted-foreground);
+.qr-feed-input__editor-wrap .tox-tinymce {
+  border: none !important;
+  border-radius: 0 !important;
 }
 .qr-feed-input__add-btn {
   display: flex;

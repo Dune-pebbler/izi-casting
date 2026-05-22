@@ -2397,6 +2397,44 @@ a:hover {
   text-align: center;
 }
 
+.display--portrait .display-weather__grid {
+  grid-template-columns: 1fr;
+  grid-template-rows: 2fr 3fr;
+}
+.display--portrait .display-weather__left {
+  flex-direction: column;
+  padding: 24px;
+}
+.display--portrait .display-weather__temp {
+  margin-top: 16px !important;
+  font-size: clamp(3rem, 6vw, 5rem) !important;
+}
+.display--portrait .display-weather__desc {
+  margin-top: 8px !important;
+  font-size: 1.5rem !important;
+}
+.display--portrait .display-weather__stat-value {
+  font-size: 2rem;
+}
+.display--portrait .display-weather__stat-label {
+  font-size: 1.25rem;
+}
+.display--portrait .display-weather__forecast-row {
+  font-size: 1.5rem;
+  padding: 12px 16px;
+  grid-template-columns: 1.5fr auto 2fr auto auto;
+}
+.display--portrait .display-weather__forecast-row .display-weather__row-max {
+  width: 60px;
+}
+.display--portrait .display-weather__forecast-row .display-weather__row-min {
+  width: 50px;
+  margin-left: 8px;
+}
+.display--portrait .display-weather__forecast-header h2 {
+  font-size: 1.5rem;
+}
+
 .display-content {
   position: relative;
 }
@@ -4624,6 +4662,46 @@ a:hover {
   display: block;
   width: 100%;
   font-size: 11px;
+}
+.sidebar-devices .devices-content .devices-list .device-item .device-header .device-rotation-selector {
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+.sidebar-devices .devices-content .devices-list .device-item .device-header .device-rotation-selector .device-rotation-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+  display: block;
+  color: var(--foreground-secondary);
+  white-space: nowrap;
+}
+.sidebar-devices .devices-content .devices-list .device-item .device-header .device-rotation-selector .device-rotation-options {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: auto auto auto auto;
+}
+.sidebar-devices .devices-content .devices-list .device-item .device-header .device-rotation-selector .device-rotation-options .device-rotation-btn {
+  background-color: white;
+  border: 1px solid var(--border);
+  color: var(--foreground);
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 0.5em;
+  font-size: 0.75rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+[data-theme=dark] .sidebar-devices .devices-content .devices-list .device-item .device-header .device-rotation-selector .device-rotation-options .device-rotation-btn {
+  background-color: black;
+}
+.sidebar-devices .devices-content .devices-list .device-item .device-header .device-rotation-selector .device-rotation-options .device-rotation-btn:hover {
+  background-color: var(--muted);
+}
+.sidebar-devices .devices-content .devices-list .device-item .device-header .device-rotation-selector .device-rotation-options .device-rotation-btn.active {
+  background-color: var(--primary);
+  border-color: var(--primary);
+  color: var(--surface);
 }
 .sidebar-devices .devices-content .devices-list .device-item .device-header .device-delete-btn {
   background: none;
@@ -8680,17 +8758,18 @@ a:hover {
   grid-template-columns: 1fr 1fr;
   gap: 12px;
 }
-.countdown-input__color-field {
+
+.slide-color-input {
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
-.countdown-input__color-field label {
+.slide-color-input label {
   font-size: 12px;
   font-weight: 500;
   color: var(--foreground);
 }
-.countdown-input__color-wrapper {
+.slide-color-input__wrapper {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -8699,7 +8778,7 @@ a:hover {
   border-radius: 8px;
   background: var(--background);
 }
-.countdown-input__color-picker {
+.slide-color-input__picker {
   width: 28px;
   height: 28px;
   border: none;
@@ -8708,7 +8787,7 @@ a:hover {
   cursor: pointer;
   background: none;
 }
-.countdown-input__color-hex {
+.slide-color-input__hex {
   font-size: 12px;
   font-family: monospace;
   color: var(--muted-foreground);
@@ -9073,6 +9152,19 @@ a:hover {
   margin: 0;
   line-height: 1.5;
 }
+.sportlink-input__checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  cursor: pointer;
+}
+.sportlink-input__checkbox-label input[type=checkbox] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: var(--primary);
+}
 .sportlink-input__error {
   font-size: 12px;
   color: #ff6b6b;
@@ -9369,6 +9461,9 @@ a:hover {
   flex-direction: column;
   overflow: hidden;
 }
+.display-sportlink * {
+  font-family: "Poppins";
+}
 .display-sportlink__header {
   display: flex;
   align-items: center;
@@ -9395,12 +9490,22 @@ a:hover {
 .display-sportlink__body {
   flex: 1;
   overflow: hidden;
-  padding: 0 32px 24px;
+  display: flex;
+  flex-direction: column;
 }
 .display-sportlink__loading, .display-sportlink__empty, .display-sportlink__error {
   padding: 40px 0;
   font-size: 1rem;
   text-align: center;
+}
+.display-sportlink__matches {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.display-sportlink__rows-scroll {
+  flex: 1;
+  overflow: hidden;
 }
 .display-sportlink__poule-group + .display-sportlink__poule-group {
   margin-top: 24px;
@@ -9411,7 +9516,6 @@ a:hover {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  margin-top: 16px;
   margin-bottom: 4px;
   padding-bottom: 6px;
   border-bottom: 2px solid currentColor;
@@ -9423,7 +9527,7 @@ a:hover {
   margin-top: 16px;
 }
 .display-sportlink__table th {
-  padding: 12px 12px;
+  padding: 12px;
   font-size: clamp(1.8rem, 2vw, 2.5rem);
   font-weight: 600;
   text-align: center;
@@ -9441,89 +9545,20 @@ a:hover {
   text-align: right;
 }
 .display-sportlink__table td {
-  padding: 12px 12px;
+  padding: 12px;
   font-size: clamp(1.8rem, 2vw, 2.5rem);
   font-weight: 600;
   text-align: center;
   letter-spacing: 0.06em;
 }
-.display-sportlink__table td.team {
-  text-align: left;
-}
 .display-sportlink__table td:last-child {
   text-align: right;
 }
-.display-sportlink__row td {
-  padding: 10px 12px;
-  font-size: clamp(1.4rem, 2vw, 2rem);
-  border-bottom: 1px solid;
-  vertical-align: middle;
-}
-.display-sportlink__row td:first-child {
-  font-size: 0.9em;
-  width: 40px;
-}
-.display-sportlink__row td:last-child {
-  text-align: right;
-}
-.display-sportlink__matches {
-  margin-top: 12px;
-  display: flex;
-  flex-direction: column;
-}
-.display-sportlink__match {
-  display: flex;
-  align-items: stretch;
-  border-bottom: 1px solid;
-  padding: 14px 0;
-}
-.display-sportlink__match-info {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-.display-sportlink__match-date {
-  font-size: clamp(1.4rem, 1.8vw, 2rem);
-  font-weight: 500;
-}
-.display-sportlink__match-teams {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-size: clamp(1.8rem, 2.5vw, 2.5rem);
-  font-weight: 600;
-}
-.display-sportlink__match-team {
-  flex: 1;
+.display-sportlink__standing-team {
   display: flex;
   align-items: center;
   gap: 10px;
-}
-.display-sportlink__match-team--away {
-  justify-content: flex-start;
-  flex-direction: row;
-}
-.display-sportlink__match-home, .display-sportlink__match-away {
-  flex: 1;
-  margin: 0 1.5rem;
-}
-.display-sportlink__match-vs {
-  font-size: 0.85em;
-  font-weight: 400;
-  flex-shrink: 0;
-}
-.display-sportlink__match-score {
-  font-size: 1em;
-  font-weight: 800;
-  flex-shrink: 0;
-  letter-spacing: 0.05em;
-  padding: 4px 12px;
-  border-radius: 6px;
-  margin: 0 24px;
-}
-.display-sportlink__match-location {
-  font-size: clamp(1.4rem, 1.8vw, 2rem);
+  text-transform: uppercase;
 }
 .display-sportlink__team-logo {
   width: clamp(24px, 3.5vw, 44px);
@@ -9533,11 +9568,108 @@ a:hover {
   flex-shrink: 0;
   vertical-align: middle;
 }
-.display-sportlink__standing-team {
+
+/* Scorebord grid - 5 kolommen: tijd | thuisteam | vs | uitteam | veld */
+.display-sportlink__scoreboard-header,
+.display-sportlink__scoreboard-row {
+  display: grid;
+  align-items: center;
+  gap: 0 20px;
+  padding: 28px 36px;
+}
+
+.display-sportlink__scoreboard-header {
+  font-size: 2rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 16px 36px;
+  font-weight: 600;
+}
+
+.display-sportlink__scoreboard-row {
+  border-bottom: 1px solid;
+}
+
+.display-sportlink__scoreboard-row:last-child {
+  border-bottom: none;
+}
+
+/* Tijd */
+.display-sportlink__scoreboard-time {
+  font-size: 2.8rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* Team blok (naam + kleedkamer onder elkaar) */
+.display-sportlink__scoreboard-team {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0; /* zorgt dat ellipsis werkt */
+}
+
+.display-sportlink__scoreboard-team div {
   display: flex;
   align-items: center;
   gap: 10px;
-  text-transform: uppercase;
+  font-size: 2.3rem;
+  font-weight: 500;
+  min-width: 0;
+}
+
+/* Uitteam: logo rechts, naam links — zo knipt ellipsis rechts af */
+.display-sportlink__scoreboard-team--away div {
+  flex-direction: row-reverse;
+}
+
+/* Team namen: ellipsis altijd aan het einde (rechts) */
+.display-sportlink__match-home,
+.display-sportlink__match-away {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.display-sportlink__match-away {
+  text-align: right;
+}
+
+/* Kleedkamer subtekst */
+.display-sportlink__scoreboard-room {
+  font-size: 1.4rem;
+  white-space: nowrap;
+}
+
+.display-sportlink__scoreboard-team--away .display-sportlink__scoreboard-room {
+  text-align: right;
+}
+
+/* VS badge */
+.display-sportlink__match-vs {
+  text-align: center;
+  font-size: 1.4rem;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 999px;
+  padding: 8px 0;
+  font-weight: 500;
+}
+
+/* Uitslag badge */
+.display-sportlink__match-score {
+  text-align: center;
+  font-size: 2rem;
+  font-weight: 500;
+  border-radius: 6px;
+  padding: 6px 0;
+}
+
+/* Veld rechts */
+.display-sportlink__scoreboard-veld {
+  font-size: 1.6rem;
+  text-align: right;
 }
 
 @keyframes sportlinkScroll {
@@ -9560,6 +9692,299 @@ a:hover {
     transform: translateY(0);
   }
 }
+.qr-feed {
+  width: 100%;
+  height: 100%;
+  display: flex;
+}
+.qr-feed__left {
+  flex: 1;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.qr-feed__slide-bg {
+  position: absolute;
+  inset: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+}
+.qr-feed__slide-bg--exit {
+  opacity: 0;
+}
+.qr-feed__bg-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  pointer-events: none;
+}
+.qr-feed__text-slide {
+  flex: 1;
+  display: flex;
+  padding: 8% 10%;
+  position: relative;
+  transition: opacity 0.4s ease;
+}
+.qr-feed__text-slide--exit {
+  opacity: 0;
+}
+.qr-feed__text-content {
+  font-size: clamp(1.8rem, 3vw, 3.2rem);
+  line-height: 1.5;
+  color: inherit;
+  width: 100%;
+}
+.qr-feed__text-content h1,
+.qr-feed__text-content h2,
+.qr-feed__text-content h3,
+.qr-feed__text-content h4,
+.qr-feed__text-content h5,
+.qr-feed__text-content h6,
+.qr-feed__text-content p,
+.qr-feed__text-content ul,
+.qr-feed__text-content ol,
+.qr-feed__text-content li {
+  margin: 0 0 0.4em;
+}
+.qr-feed__text-content h1:last-child,
+.qr-feed__text-content h2:last-child,
+.qr-feed__text-content h3:last-child,
+.qr-feed__text-content h4:last-child,
+.qr-feed__text-content h5:last-child,
+.qr-feed__text-content h6:last-child,
+.qr-feed__text-content p:last-child,
+.qr-feed__text-content ul:last-child,
+.qr-feed__text-content ol:last-child,
+.qr-feed__text-content li:last-child {
+  margin-bottom: 0;
+}
+.qr-feed__text-content h1 {
+  font-size: 1.4em;
+  font-weight: 700;
+}
+.qr-feed__text-content h2 {
+  font-size: 1.2em;
+  font-weight: 700;
+}
+.qr-feed__text-content h3 {
+  font-size: 1.05em;
+  font-weight: 600;
+}
+.qr-feed__text-content strong {
+  font-weight: 700;
+}
+.qr-feed__empty-left {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.4;
+  font-size: 1.4rem;
+}
+.qr-feed__dots {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  padding: 20px 0 28px;
+  flex-shrink: 0;
+  position: relative;
+}
+.qr-feed__dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  opacity: 0.25;
+  transition: opacity 0.3s;
+}
+.qr-feed__dot--active {
+  opacity: 1;
+}
+.qr-feed__right {
+  width: 36%;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.qr-feed__qr-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  padding: 10%;
+  width: 100%;
+}
+.qr-feed__qr-placeholder {
+  width: 200px;
+  height: 200px;
+  border: 3px dashed;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.5;
+  font-size: 1.2rem;
+  text-align: center;
+  padding: 16px;
+}
+.qr-feed__label {
+  font-size: clamp(1.4rem, 2vw, 2rem);
+  font-weight: 600;
+  text-align: center;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.modal-qr-feed {
+  display: flex;
+  flex: 1;
+  height: 100%;
+  overflow: auto;
+}
+
+.qr-feed-input {
+  display: flex;
+  gap: 32px;
+  width: 100%;
+  padding: 24px;
+  flex-wrap: wrap;
+}
+.qr-feed-input__section {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  flex: 1;
+  min-width: 260px;
+}
+.qr-feed-input__section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.qr-feed-input__section-title {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted-foreground);
+  margin: 0;
+}
+.qr-feed-input__colors {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.qr-feed-input__interval {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.qr-feed-input__interval label {
+  font-size: 12px;
+  color: var(--muted-foreground);
+  white-space: nowrap;
+}
+.qr-feed-input__interval span {
+  font-size: 12px;
+  color: var(--muted-foreground);
+}
+.qr-feed-input__item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--background);
+}
+.qr-feed-input__item.dragging {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  border-color: var(--primary);
+}
+.qr-feed-input__item-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+.qr-feed-input__item-bg-row {
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+.qr-feed-input__item-bg-color {
+  flex-shrink: 0;
+}
+.qr-feed-input__item-bg-image {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 120px;
+}
+.qr-feed-input__item-bg-image label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--foreground);
+}
+.qr-feed-input__item-thumb-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.qr-feed-input__item-thumb {
+  width: 40px;
+  height: 40px;
+  -o-object-fit: cover;
+     object-fit: cover;
+  border-radius: 5px;
+  border: 1px solid var(--border);
+}
+.qr-feed-input__item-upload-row {
+  display: flex;
+  gap: 6px;
+}
+.qr-feed-input__drag-handle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 2px;
+  color: var(--muted-foreground);
+  cursor: grab;
+  flex-shrink: 0;
+  margin-top: 2px;
+  touch-action: none;
+}
+.qr-feed-input__drag-handle:active {
+  cursor: grabbing;
+}
+.qr-feed-input__drag-handle:hover {
+  color: var(--foreground);
+}
+.qr-feed-input__editor-wrap {
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+.qr-feed-input__editor-wrap .tox-tinymce {
+  border: none !important;
+  border-radius: 0 !important;
+}
+.qr-feed-input__add-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  align-self: flex-start;
+}
+
 @keyframes weatherForecastScroll {
   0% {
     transform: translateY(0);

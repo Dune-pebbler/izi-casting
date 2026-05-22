@@ -68,6 +68,8 @@ function DisplayView() {
   });
   const [feeds, setFeeds] = useState([]);
 
+  const [screenRotation, setScreenRotation] = useState(0);
+
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [fullscreenSupported, setFullscreenSupported] = useState(false);
 
@@ -548,6 +550,8 @@ function DisplayView() {
             setDisplayTenantId(deviceData.tenantId);
             localStorage.setItem("izi_tenant_id", deviceData.tenantId);
           }
+
+          setScreenRotation(deviceData.screenRotation || 0);
 
           console.log("Device pairing status changed:", newPairedStatus);
 
@@ -1337,8 +1341,30 @@ function DisplayView() {
   const nextSlide = slides[nextSlideIndex];
   const nextSlideLayout = nextSlide?.layout || "side-by-side";
 
+  const rotationStyle = (() => {
+    if (screenRotation === 90 || screenRotation === -90) {
+      return {
+        transform: `rotate(${screenRotation}deg)`,
+        width: "100vh",
+        height: "100vw",
+        position: "fixed",
+        top: "calc(50vh - 50vw)",
+        left: "calc(50vw - 50vh)",
+      };
+    }
+    if (screenRotation === 180) {
+      return { transform: "rotate(180deg)" };
+    }
+    return {};
+  })();
+
+  const isPortrait = screenRotation === 90 || screenRotation === -90;
+
   return (
-    <div className="display-container">
+    <div
+      className={`display-container${isPortrait ? " display--portrait" : ""}`}
+      style={rotationStyle}
+    >
       <SlideDisplay
         currentSlide={currentSlide}
         slideLayout={slideLayout}

@@ -25,6 +25,7 @@ import {
   Trophy,
   CloudIcon,
   ScanQrCode,
+  Rotate3dIcon,
 } from "lucide-react";
 import { doc, setDoc } from "firebase/firestore";
 import { db } from "../../firebase";
@@ -43,6 +44,12 @@ const MODULES = [
     label: "Slide effects",
     description: "Voeg effecten toe op de slide!",
     icon: Sparkles,
+  },
+  {
+    key: "rotateDevice",
+    label: "Scherm draaien",
+    description: "Draai een scherm 90, 180 or 270 om",
+    icon: Rotate3dIcon,
   },
 ];
 

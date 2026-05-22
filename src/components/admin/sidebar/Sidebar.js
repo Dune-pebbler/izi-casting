@@ -235,6 +235,7 @@ function Sidebar({
           setDeviceToDelete={setDeviceToDelete}
           deleteDevice={deleteDevice}
           isAdmin={isAdmin}
+          canRotate={modules.rotateDevice}
         />
         <FeedList />
         {tenantId && isAdmin && <UsersPanel tenantId={tenantId} />}
