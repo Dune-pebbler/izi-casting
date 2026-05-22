@@ -12156,7 +12156,6 @@ a:hover {
   padding: 24px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
   transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
@@ -12248,6 +12247,19 @@ a:hover {
   gap: 4px;
   font-size: 12px;
   color: var(--foreground-muted);
+}
+
+.tenant-card-stats {
+  margin-top: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0;
+  border-top: 1px solid var(--border);
+  font-size: 0.75rem;
+  justify-content: space-between;
+  color: var(--text-muted);
+  vertical-align: middle;
 }
 
 .tenant-card-users {

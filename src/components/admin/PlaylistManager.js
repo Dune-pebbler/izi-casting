@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { doc, setDoc, onSnapshot } from "firebase/firestore";
+import { doc, setDoc, onSnapshot, updateDoc } from "firebase/firestore";
 import { ref, deleteObject } from "firebase/storage";
 import { db, storage } from "../../firebase";
 import { toast } from "sonner";
@@ -76,16 +76,28 @@ export const usePlaylistManager = () => {
   const savePlaylistsToFirebase = async (playlistsToSave) => {
     try {
       const displayDocRef = tenantDoc(db, tenantId, "display", "content");
-      console.log(
-        "Saving playlists to Firebase:",
-        playlistsToSave.map((p) => ({ id: p.id, slideCount: p.slides.length })),
-      );
       await setDoc(
         displayDocRef,
         { playlists: playlistsToSave },
         { merge: true },
       );
-      console.log("Playlists saved to Firebase successfully");
+
+      const enabledPlaylists = playlistsToSave.filter((p) => p.isEnabled !== false);
+      let slides = 0;
+      let duration = 0;
+      enabledPlaylists.forEach((p) => {
+        (p.slides || []).forEach((slide) => {
+          if (slide.isVisible !== false) {
+            slides++;
+            duration += slide.duration || 5;
+          }
+        });
+      });
+      await setDoc(
+        doc(db, "tenants", tenantId),
+        { stats: { playlists: enabledPlaylists.length, slides, duration } },
+        { merge: true },
+      );
     } catch (error) {
       console.error("Error saving playlists to Firebase:", error);
       toast.error("Error saving changes: " + error.message);

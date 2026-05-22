@@ -113,8 +113,8 @@ function Devices({ setDeviceToDelete, deleteDevice, isAdmin, canRotate }) {
             ...serializedData,
           };
         });
-        console.log("Devices loaded:", devices); // Debug log
         dispatch(setLinkedDevices(devices));
+        updateDoc(doc(db, "tenants", tenantId), { "stats.devices": devices.length }).catch(() => {});
       },
     );
 

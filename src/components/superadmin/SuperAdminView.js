@@ -26,6 +26,9 @@ import {
   ChevronUp,
   Trash2,
   RotateCcw,
+  Clock,
+  ListMusic,
+  File,
 } from "lucide-react";
 import CreateTenantModal from "./CreateTenantModal";
 import EditTenantModal from "./EditTenantModal";
@@ -79,6 +82,15 @@ async function permanentDeleteTenant(tenantId) {
   }
 
   await deleteDoc(doc(db, "tenants", tenantId));
+}
+
+function formatDuration(seconds) {
+  if (seconds >= 60) {
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return `${m}m ${String(s).padStart(2, "0")}s`;
+  }
+  return `${seconds}s`;
 }
 
 function TenantCard({ tenant, onEdit }) {
@@ -271,6 +283,30 @@ function TenantCard({ tenant, onEdit }) {
           )}
         </div>
       </div>
+
+      {tenant.stats ? (
+        <div className="tenant-card-stats">
+          <span title="Aantal gekoppelde schermen">
+            <Monitor size={16} />
+            {tenant.stats.devices ?? 0}
+          </span>
+          <span title="De tijdsduur van alle slides">
+            <Clock size={16} />
+            {formatDuration(tenant.stats.duration ?? 0)}
+          </span>
+
+          <span title="Aantal active slides">
+            <File size={16} />
+            {tenant.stats.slides ?? 0}
+          </span>
+
+          <span title="Aantal active playlists">
+            <ListMusic size={16} /> {tenant.stats.playlists ?? 0}
+          </span>
+        </div>
+      ) : (
+        <div className="tenant-card-stats">Geen gegevens gevonden</div>
+      )}
 
       <div className="tenant-card-users">
         <button

@@ -281,7 +281,6 @@
   padding: $spacing-lg;
   display: flex;
   flex-direction: column;
-  gap: $spacing-md;
   box-shadow: $shadow-sm;
   transition: $transition-base;
 
@@ -365,16 +364,21 @@
 }
 
 .tenant-card-stats {
-  display: flex;
-  gap: $spacing-md;
-}
-
-.tenant-stat {
+  margin-top: 16px;
   display: flex;
   align-items: center;
-  gap: $spacing-xs;
-  font-size: $font-size-sm;
+  gap: $spacing-sm;
+  padding: $spacing-sm 0;
+  border-top: 1px solid var(--border);
+  font-size: 0.75rem;
+  justify-content: space-between;
   color: var(--foreground-muted);
+
+  span {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
 }
 
 .tenant-card-users {
