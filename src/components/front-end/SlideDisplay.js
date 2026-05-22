@@ -4,6 +4,7 @@ import TextPagination from "./TextPagination";
 import VideoPlayer from "./VideoPlayer";
 import TeletekstDisplay from "./TeletekstDisplay";
 import WeatherDisplay from "./WeatherDisplay";
+import QrFeedDisplay from "./QrFeedDisplay";
 import { getTextPaginationConfig } from "../../config/textPagination";
 
 function CountdownDisplay({ slide }) {
@@ -1559,6 +1560,8 @@ function SlideDisplay({
         {layout === "email" && <EmailSlideDisplay slide={slide} />}
 
         {layout === "sportlink" && <SportlinkDisplay slide={slide} />}
+
+        {layout === "qr-feed" && <QrFeedDisplay slide={slide} />}
       </>
     );
   };

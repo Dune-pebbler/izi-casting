@@ -13,6 +13,7 @@ import {
   Mail,
   Trophy,
   CloudIcon,
+  QrCode,
 } from "lucide-react";
 
 const SLIDE_TYPES = [
@@ -28,6 +29,7 @@ const SLIDE_TYPES = [
   { id: "email", label: "E-mail inbox", icon: Mail },
   { id: "sportlink", label: "Sportlink", icon: Trophy },
   { id: "weather", label: "Weer", icon: CloudIcon },
+  { id: "qr-feed", label: "QR + Tekst", icon: QrCode },
 ];
 
 const AddSlideModal = ({ isOpen, onClose, onConfirm, slideTypes = {} }) => {

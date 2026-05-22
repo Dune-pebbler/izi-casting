@@ -13,6 +13,7 @@ import {
   Trophy,
   ChevronDown,
   CloudIcon,
+  QrCode,
 } from "lucide-react";
 
 function LayoutSelector({ currentLayout, onLayoutChange, slideTypes = {} }) {
@@ -67,6 +68,7 @@ function LayoutSelector({ currentLayout, onLayoutChange, slideTypes = {} }) {
       title: "Sportlink Club.Dataservice",
     },
     { id: "weather", label: "Weer", icon: CloudIcon, title: "Weer bericht" },
+    { id: "qr-feed", label: "QR + Tekst", icon: QrCode, title: "QR code met tekst-slides" },
   ];
 
   const hasSlideTypeConfig = Object.keys(slideTypes).length > 0;

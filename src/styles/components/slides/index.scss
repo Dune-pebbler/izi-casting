@@ -80,19 +80,24 @@
     gap: 12px;
   }
 
-  &__color-field {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
+}
 
-    label {
-      font-size: 12px;
-      font-weight: 500;
-      color: var(--foreground);
-    }
+// =============================================================================
+// GENERIC SLIDE COLOR INPUT
+// =============================================================================
+
+.slide-color-input {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--foreground);
   }
 
-  &__color-wrapper {
+  &__wrapper {
     display: flex;
     align-items: center;
     gap: 8px;
@@ -102,7 +107,7 @@
     background: var(--background);
   }
 
-  &__color-picker {
+  &__picker {
     width: 28px;
     height: 28px;
     border: none;
@@ -112,7 +117,7 @@
     background: none;
   }
 
-  &__color-hex {
+  &__hex {
     font-size: 12px;
     font-family: monospace;
     color: var(--muted-foreground);
@@ -1155,6 +1160,251 @@
   }
   100% {
     transform: translateY(0);
+  }
+}
+
+// =============================================================================
+// QR FEED SLIDE - Display (Front-end)
+// =============================================================================
+
+.qr-feed {
+  width: 100%;
+  height: 100%;
+  display: flex;
+
+  &__left {
+    flex: 1;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  &__text-slide {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    padding: 8% 10%;
+    transition: opacity 0.4s ease;
+
+    &--exit {
+      opacity: 0;
+    }
+  }
+
+  &__text-content {
+    font-size: clamp(1.8rem, 3vw, 3.2rem);
+    line-height: 1.5;
+    color: inherit;
+    width: 100%;
+
+    h1, h2, h3, h4, h5, h6, p, ul, ol, li {
+      margin: 0 0 0.4em;
+      &:last-child { margin-bottom: 0; }
+    }
+
+    h1 { font-size: 1.4em; font-weight: 700; }
+    h2 { font-size: 1.2em; font-weight: 700; }
+    h3 { font-size: 1.05em; font-weight: 600; }
+    strong { font-weight: 700; }
+  }
+
+  &__empty-left {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.4;
+    font-size: 1.4rem;
+  }
+
+  &__dots {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    padding: 20px 0 28px;
+    flex-shrink: 0;
+  }
+
+  &__dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    opacity: 0.25;
+    transition: opacity 0.3s;
+
+    &--active {
+      opacity: 1;
+    }
+  }
+
+  &__right {
+    width: 36%;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__qr-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+    padding: 10%;
+    width: 100%;
+  }
+
+  &__qr-placeholder {
+    width: 200px;
+    height: 200px;
+    border: 3px dashed;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.5;
+    font-size: 1.2rem;
+    text-align: center;
+    padding: 16px;
+  }
+
+  &__label {
+    font-size: clamp(1.4rem, 2vw, 2rem);
+    font-weight: 600;
+    text-align: center;
+    margin: 0;
+    line-height: 1.4;
+  }
+}
+
+// =============================================================================
+// QR FEED SLIDE - Admin Input
+// =============================================================================
+
+.modal-qr-feed {
+  display: flex;
+  flex: 1;
+  height: 100%;
+  overflow: auto;
+}
+
+.qr-feed-input {
+  display: flex;
+  gap: 32px;
+  width: 100%;
+  padding: 24px;
+  flex-wrap: wrap;
+
+  &__section {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    flex: 1;
+    min-width: 260px;
+  }
+
+  &__section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  &__section-title {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted-foreground);
+    margin: 0;
+  }
+
+  &__colors {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  &__interval {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+
+    label {
+      font-size: 12px;
+      color: var(--muted-foreground);
+      white-space: nowrap;
+    }
+
+    span {
+      font-size: 12px;
+      color: var(--muted-foreground);
+    }
+  }
+
+  &__item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 10px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--background);
+
+    &.dragging {
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+      border-color: var(--primary);
+    }
+  }
+
+  &__drag-handle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 2px;
+    color: var(--muted-foreground);
+    cursor: grab;
+    flex-shrink: 0;
+    margin-top: 2px;
+    touch-action: none;
+
+    &:active { cursor: grabbing; }
+    &:hover { color: var(--foreground); }
+  }
+
+  &__textarea {
+    flex: 1;
+    resize: vertical;
+    min-height: 72px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 10px;
+    font-size: 13px;
+    font-family: inherit;
+    color: var(--foreground);
+    background: var(--input-background, var(--background));
+    outline: none;
+    transition: border-color 0.15s;
+
+    &:focus {
+      border-color: var(--primary);
+    }
+
+    &::placeholder {
+      color: var(--muted-foreground);
+    }
+  }
+
+  &__add-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    align-self: flex-start;
   }
 }
 

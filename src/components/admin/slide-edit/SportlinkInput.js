@@ -282,28 +282,28 @@ function SportlinkInput({
           <div className="sportlink-input__row">
             <div className="sportlink-input__field">
               <label>Achtergrondkleur</label>
-              <div className="countdown-input__color-wrapper">
+              <div className="slide-color-input__wrapper">
                 <input
                   type="color"
                   value={sportlinkBgColor}
                   onChange={(e) => onBgColorChange(e.target.value)}
-                  className="countdown-input__color-picker"
+                  className="slide-color-input__picker"
                 />
-                <span className="countdown-input__color-hex">
+                <span className="slide-color-input__hex">
                   {sportlinkBgColor}
                 </span>
               </div>
             </div>
             <div className="sportlink-input__field">
               <label>Tekstkleur</label>
-              <div className="countdown-input__color-wrapper">
+              <div className="slide-color-input__wrapper">
                 <input
                   type="color"
                   value={sportlinkTextColor}
                   onChange={(e) => onTextColorChange(e.target.value)}
-                  className="countdown-input__color-picker"
+                  className="slide-color-input__picker"
                 />
-                <span className="countdown-input__color-hex">
+                <span className="slide-color-input__hex">
                   {sportlinkTextColor}
                 </span>
               </div>
@@ -313,14 +313,14 @@ function SportlinkInput({
           <div className="sportlink-input__row">
             <div className="sportlink-input__field">
               <label>Accentkleur (clubkleur)</label>
-              <div className="countdown-input__color-wrapper">
+              <div className="slide-color-input__wrapper">
                 <input
                   type="color"
                   value={sportlinkAccentColor}
                   onChange={(e) => onAccentColorChange(e.target.value)}
-                  className="countdown-input__color-picker"
+                  className="slide-color-input__picker"
                 />
-                <span className="countdown-input__color-hex">
+                <span className="slide-color-input__hex">
                   {sportlinkAccentColor}
                 </span>
               </div>
@@ -328,14 +328,14 @@ function SportlinkInput({
             {sportlinkDataType === "programma" && (
               <div className="sportlink-input__field">
                 <label>Header text kleur</label>
-                <div className="countdown-input__color-wrapper">
+                <div className="slide-color-input__wrapper">
                   <input
                     type="color"
                     value={sportlinkHeaderTextColor}
                     onChange={(e) => onHeaderTextColorChange(e.target.value)}
-                    className="countdown-input__color-picker"
+                    className="slide-color-input__picker"
                   />
-                  <span className="countdown-input__color-hex">
+                  <span className="slide-color-input__hex">
                     {sportlinkHeaderTextColor}
                   </span>
                 </div>

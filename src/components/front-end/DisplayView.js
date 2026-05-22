@@ -906,6 +906,7 @@ function DisplayView() {
                 slide.sportlinkApiKey &&
                 slide.sportlinkTeams &&
                 slide.sportlinkTeams.length > 0) ||
+              (slide.layout === "qr-feed" && slide.qrUrl) ||
               (!slide.type && slide.text && slide.text.trim())),
         );
 

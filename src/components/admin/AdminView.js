@@ -144,6 +144,14 @@ function AdminView() {
   const [modalWeatherForecastDays, setModalWeatherForecastDays] = useState(7);
   const [modalWeatherLeftBgImage, setModalWeatherLeftBgImage] = useState("");
   const [modalWeatherLeftBgImagePosition, setModalWeatherLeftBgImagePosition] = useState("center");
+  const [modalQrUrl, setModalQrUrl] = useState("");
+  const [modalQrLabel, setModalQrLabel] = useState("");
+  const [modalQrLeftBgColor, setModalQrLeftBgColor] = useState("#0f172a");
+  const [modalQrLeftTextColor, setModalQrLeftTextColor] = useState("#ffffff");
+  const [modalQrPanelColor, setModalQrPanelColor] = useState("#1d4ed8");
+  const [modalQrPanelTextColor, setModalQrPanelTextColor] = useState("#ffffff");
+  const [modalQrTextSlides, setModalQrTextSlides] = useState([]);
+  const [modalQrTextInterval, setModalQrTextInterval] = useState(5);
   const [imageLibraryTarget, setImageLibraryTarget] = useState("main");
   const [modalTimeRestriction, setModalTimeRestriction] = useState({
     enabled: false,
@@ -519,6 +527,16 @@ function AdminView() {
         weatherForecastDays: 7,
         weatherLeftBgImage: "",
         weatherLeftBgImagePosition: "center",
+      }),
+      ...(slideLayout === "qr-feed" && {
+        qrUrl: "",
+        qrLabel: "",
+        qrLeftBgColor: "#0f172a",
+        qrLeftTextColor: "#ffffff",
+        qrPanelColor: "#1d4ed8",
+        qrPanelTextColor: "#ffffff",
+        qrTextSlides: [],
+        qrTextInterval: 5,
         duration: 30,
       }),
       imagePosition: "center",
@@ -698,6 +716,14 @@ function AdminView() {
     setModalWeatherForecastDays(slide.weatherForecastDays ?? 7);
     setModalWeatherLeftBgImage(slide.weatherLeftBgImage || "");
     setModalWeatherLeftBgImagePosition(slide.weatherLeftBgImagePosition || "center");
+    setModalQrUrl(slide.qrUrl || "");
+    setModalQrLabel(slide.qrLabel || "");
+    setModalQrLeftBgColor(slide.qrLeftBgColor || "#0f172a");
+    setModalQrLeftTextColor(slide.qrLeftTextColor || "#ffffff");
+    setModalQrPanelColor(slide.qrPanelColor || "#1d4ed8");
+    setModalQrPanelTextColor(slide.qrPanelTextColor || "#ffffff");
+    setModalQrTextSlides(slide.qrTextSlides || []);
+    setModalQrTextInterval(slide.qrTextInterval || 5);
     setModalTimeRestriction(
       slide.timeRestriction || {
         enabled: false,
@@ -759,6 +785,14 @@ function AdminView() {
     setModalSportlinkDate("");
     setModalSportlinkShowVeldInfo(false);
     setModalSportlinkOnlyThuis(false);
+    setModalQrUrl("");
+    setModalQrLabel("");
+    setModalQrLeftBgColor("#0f172a");
+    setModalQrLeftTextColor("#ffffff");
+    setModalQrPanelColor("#1d4ed8");
+    setModalQrPanelTextColor("#ffffff");
+    setModalQrTextSlides([]);
+    setModalQrTextInterval(5);
     setModalTimeRestriction({
       enabled: false,
       startTime: "08:00",
@@ -1076,6 +1110,7 @@ function AdminView() {
             const isEmail = slideLayout === "email";
             const isSportlink = slideLayout === "sportlink";
             const isWeather = slideLayout === "weather";
+            const isQrFeed = slideLayout === "qr-feed";
             const galleryDuration = isGallery
               ? modalGalleryImages.reduce(
                   (sum, img) => sum + (img.duration || 3),
@@ -1171,6 +1206,22 @@ function AdminView() {
                                   ? 30
                                   : modalSlideDuration,
                             }
+                          : isQrFeed
+                            ? {
+                                type: "qr-feed",
+                                qrUrl: modalQrUrl,
+                                qrLabel: modalQrLabel,
+                                qrLeftBgColor: modalQrLeftBgColor,
+                                qrLeftTextColor: modalQrLeftTextColor,
+                                qrPanelColor: modalQrPanelColor,
+                                qrPanelTextColor: modalQrPanelTextColor,
+                                qrTextSlides: modalQrTextSlides,
+                                qrTextInterval: modalQrTextInterval,
+                                duration:
+                                  modalSlideDuration === ""
+                                    ? 30
+                                    : modalSlideDuration,
+                              }
                           : {
                             text: sanitizeHTMLContent(modalTinyMCEContent),
                             tinyMCEContent: modalTinyMCEContent,
@@ -1920,6 +1971,22 @@ function AdminView() {
           weatherLeftBgImagePosition={modalWeatherLeftBgImagePosition}
           onWeatherLeftBgImagePositionChange={setModalWeatherLeftBgImagePosition}
           onOpenWeatherLeftLibrary={handleOpenWeatherLeftBgLibrary}
+          qrUrl={modalQrUrl}
+          onQrUrlChange={setModalQrUrl}
+          qrLabel={modalQrLabel}
+          onQrLabelChange={setModalQrLabel}
+          qrLeftBgColor={modalQrLeftBgColor}
+          onQrLeftBgColorChange={setModalQrLeftBgColor}
+          qrLeftTextColor={modalQrLeftTextColor}
+          onQrLeftTextColorChange={setModalQrLeftTextColor}
+          qrPanelColor={modalQrPanelColor}
+          onQrPanelColorChange={setModalQrPanelColor}
+          qrPanelTextColor={modalQrPanelTextColor}
+          onQrPanelTextColorChange={setModalQrPanelTextColor}
+          qrTextSlides={modalQrTextSlides}
+          onQrTextSlidesChange={setModalQrTextSlides}
+          qrTextInterval={modalQrTextInterval}
+          onQrTextIntervalChange={setModalQrTextInterval}
           modules={modules}
           onSaveSlideEffects={(effects) => {
             saveSlideEffects(

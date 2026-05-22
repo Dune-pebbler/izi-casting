@@ -23,6 +23,7 @@ import {
   MonitorPlay,
   Trophy,
   CloudIcon,
+  ScanQrCode,
 } from "lucide-react";
 
 const iconMap = {
@@ -38,6 +39,7 @@ const iconMap = {
   email: <Mail />,
   sportlink: <Trophy />,
   weather: <CloudIcon />,
+  "qr-feed": <ScanQrCode />,
 };
 import { useTenant } from "../../context/TenantContext";
 import { sanitizeHTMLContent } from "../../utils/sanitize";
@@ -629,6 +631,8 @@ function SlideList({
           return "Fotogallerij";
         case "weather":
           return "Weerbericht";
+        case "qr-feed":
+          return "QR + tekst";
         case "side-by-side":
         default:
           return "Side by Side";

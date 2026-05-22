@@ -24,10 +24,12 @@ import {
   Mail,
   Trophy,
   CloudIcon,
+  ScanQrCode,
 } from "lucide-react";
 import { doc, setDoc } from "firebase/firestore";
 import { db } from "../../firebase";
 import { toast } from "sonner";
+import QRCode from "react-qr-code";
 
 const MODULES = [
   {
@@ -118,6 +120,12 @@ const SLIDETYPES = [
     label: "Weer",
     description: "Toon de weersvoorspelling in een bepaalde regio",
     icon: CloudIcon,
+  },
+  {
+    key: "qr-feed",
+    label: "QR + Tekst",
+    description: "Toon inhoud met een QR code om te scannen voor jou content!",
+    icon: ScanQrCode,
   },
 ];
 

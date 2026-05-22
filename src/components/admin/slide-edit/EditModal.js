@@ -24,6 +24,7 @@ import AgendaInput from "./AgendaInput";
 import EmailInput from "./EmailInput";
 import SportlinkInput from "./SportlinkInput";
 import WeatherInput from "./WeatherInput";
+import QrFeedInput from "./QrFeedInput";
 import SlideEffectsModal from "../SlideEffectsModal";
 
 function EditModal({
@@ -162,6 +163,22 @@ function EditModal({
   weatherLeftBgImagePosition,
   onWeatherLeftBgImagePositionChange,
   onOpenWeatherLeftLibrary,
+  qrUrl,
+  onQrUrlChange,
+  qrLabel,
+  onQrLabelChange,
+  qrLeftBgColor,
+  onQrLeftBgColorChange,
+  qrLeftTextColor,
+  onQrLeftTextColorChange,
+  qrPanelColor,
+  onQrPanelColorChange,
+  qrPanelTextColor,
+  onQrPanelTextColorChange,
+  qrTextSlides,
+  onQrTextSlidesChange,
+  qrTextInterval,
+  onQrTextIntervalChange,
   modules = {},
   onSaveSlideEffects,
 }) {
@@ -433,6 +450,30 @@ function EditModal({
               onShowVeldInfoChange={onSportlinkShowVeldInfoChange}
               sportlinkOnlyThuis={sportlinkOnlyThuis}
               onOnlyThuisChange={onSportlinkOnlyThuisChange}
+            />
+          </div>
+        );
+
+      case "qr-feed":
+        return (
+          <div className="modal-qr-feed">
+            <QrFeedInput
+              qrUrl={qrUrl}
+              onQrUrlChange={onQrUrlChange}
+              qrLabel={qrLabel}
+              onQrLabelChange={onQrLabelChange}
+              qrLeftBgColor={qrLeftBgColor}
+              onQrLeftBgColorChange={onQrLeftBgColorChange}
+              qrLeftTextColor={qrLeftTextColor}
+              onQrLeftTextColorChange={onQrLeftTextColorChange}
+              qrPanelColor={qrPanelColor}
+              onQrPanelColorChange={onQrPanelColorChange}
+              qrPanelTextColor={qrPanelTextColor}
+              onQrPanelTextColorChange={onQrPanelTextColorChange}
+              qrTextSlides={qrTextSlides}
+              onQrTextSlidesChange={onQrTextSlidesChange}
+              qrTextInterval={qrTextInterval}
+              onQrTextIntervalChange={onQrTextIntervalChange}
             />
           </div>
         );

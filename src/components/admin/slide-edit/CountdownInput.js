@@ -3,16 +3,16 @@ import ImageUpload from './ImageUpload';
 
 function ColorField({ label, value, onChange }) {
   return (
-    <div className="countdown-input__color-field">
+    <div className="slide-color-input">
       <label>{label}</label>
-      <div className="countdown-input__color-wrapper">
+      <div className="slide-color-input__wrapper">
         <input
           type="color"
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="countdown-input__color-picker"
+          className="slide-color-input__picker"
         />
-        <span className="countdown-input__color-hex">{value}</span>
+        <span className="slide-color-input__hex">{value}</span>
       </div>
     </div>
   );

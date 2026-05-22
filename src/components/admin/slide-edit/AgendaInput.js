@@ -82,28 +82,28 @@ function AgendaInput({
           <div className="agenda-input__row">
             <div className="agenda-input__field">
               <label>Achtergrondkleur</label>
-              <div className="countdown-input__color-wrapper">
+              <div className="slide-color-input__wrapper">
                 <input
                   type="color"
                   value={agendaBgColor}
                   onChange={(e) => onAgendaBgColorChange(e.target.value)}
-                  className="countdown-input__color-picker"
+                  className="slide-color-input__picker"
                 />
-                <span className="countdown-input__color-hex">
+                <span className="slide-color-input__hex">
                   {agendaBgColor}
                 </span>
               </div>
             </div>
             <div className="agenda-input__field">
               <label>Tekstkleur</label>
-              <div className="countdown-input__color-wrapper">
+              <div className="slide-color-input__wrapper">
                 <input
                   type="color"
                   value={agendaTextColor}
                   onChange={(e) => onAgendaTextColorChange(e.target.value)}
-                  className="countdown-input__color-picker"
+                  className="slide-color-input__picker"
                 />
-                <span className="countdown-input__color-hex">
+                <span className="slide-color-input__hex">
                   {agendaTextColor}
                 </span>
               </div>

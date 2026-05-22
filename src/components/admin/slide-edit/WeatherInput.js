@@ -70,14 +70,14 @@ function WeatherInput({
 
           <div className="sportlink-input__field">
             <label>Accentkleur</label>
-            <div className="countdown-input__color-wrapper">
+            <div className="slide-color-input__wrapper">
               <input
                 type="color"
                 value={weatherAccentColor}
                 onChange={(e) => onAccentColorChange(e.target.value)}
-                className="countdown-input__color-picker"
+                className="slide-color-input__picker"
               />
-              <span className="countdown-input__color-hex">
+              <span className="slide-color-input__hex">
                 {weatherAccentColor}
               </span>
             </div>
