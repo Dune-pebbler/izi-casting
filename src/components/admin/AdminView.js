@@ -66,6 +66,7 @@ function AdminView() {
     copyPlaylist,
     reorderPlaylists,
     calculatePlaylistDuration,
+    formatDuration,
     savePlaylistsToFirebase,
     updatePlaylistMusic,
   } = usePlaylistManager();
@@ -86,8 +87,10 @@ function AdminView() {
   const [modalTeletekstChannel, setModalTeletekstChannel] = useState("101");
   const [modalTeletekstTheme, setModalTeletekstTheme] = useState("classic");
   const [modalTeletekstPageCount, setModalTeletekstPageCount] = useState(1);
-  const [modalTeletekstSkipTopLines, setModalTeletekstSkipTopLines] = useState(0);
-  const [modalTeletekstSkipBottomLines, setModalTeletekstSkipBottomLines] = useState(0);
+  const [modalTeletekstSkipTopLines, setModalTeletekstSkipTopLines] =
+    useState(0);
+  const [modalTeletekstSkipBottomLines, setModalTeletekstSkipBottomLines] =
+    useState(0);
   const [modalIframeUrl, setModalIframeUrl] = useState("");
   const [modalGalleryImages, setModalGalleryImages] = useState([]);
   const [uploadingGalleryImage, setUploadingGalleryImage] = useState(false);
@@ -135,15 +138,16 @@ function AdminView() {
   const [modalSportlinkDate, setModalSportlinkDate] = useState("");
   const [modalSportlinkShowVeldInfo, setModalSportlinkShowVeldInfo] =
     useState(false);
-  const [modalSportlinkOnlyThuis, setModalSportlinkOnlyThuis] =
-    useState(false);
+  const [modalSportlinkOnlyThuis, setModalSportlinkOnlyThuis] = useState(false);
   const [modalWeatherLat, setModalWeatherLat] = useState("");
   const [modalWeatherLong, setModalWeatherLong] = useState("");
   const [modalWeatherCity, setModalWeatherCity] = useState("");
-  const [modalWeatherAccentColor, setModalWeatherAccentColor] = useState("#4f87ff");
+  const [modalWeatherAccentColor, setModalWeatherAccentColor] =
+    useState("#4f87ff");
   const [modalWeatherForecastDays, setModalWeatherForecastDays] = useState(7);
   const [modalWeatherLeftBgImage, setModalWeatherLeftBgImage] = useState("");
-  const [modalWeatherLeftBgImagePosition, setModalWeatherLeftBgImagePosition] = useState("center");
+  const [modalWeatherLeftBgImagePosition, setModalWeatherLeftBgImagePosition] =
+    useState("center");
   const [modalQrUrl, setModalQrUrl] = useState("");
   const [modalQrLabel, setModalQrLabel] = useState("");
   const [modalQrLeftBgColor, setModalQrLeftBgColor] = useState("#0f172a");
@@ -707,7 +711,9 @@ function AdminView() {
     setModalSportlinkBgColor(slide.sportlinkBgColor || "#0f172a");
     setModalSportlinkTextColor(slide.sportlinkTextColor || "#ffffff");
     setModalSportlinkAccentColor(slide.sportlinkAccentColor || "#ff6600");
-    setModalSportlinkHeaderTextColor(slide.sportlinkHeaderTextColor || "#ffffff");
+    setModalSportlinkHeaderTextColor(
+      slide.sportlinkHeaderTextColor || "#ffffff",
+    );
     setModalSportlinkDate(slide.sportlinkDate || "");
     setModalSportlinkShowVeldInfo(slide.sportlinkShowVeldInfo || false);
     setModalSportlinkOnlyThuis(slide.sportlinkOnlyThuis || false);
@@ -717,7 +723,9 @@ function AdminView() {
     setModalWeatherAccentColor(slide.weatherAccentColor || "#4f87ff");
     setModalWeatherForecastDays(slide.weatherForecastDays ?? 7);
     setModalWeatherLeftBgImage(slide.weatherLeftBgImage || "");
-    setModalWeatherLeftBgImagePosition(slide.weatherLeftBgImagePosition || "center");
+    setModalWeatherLeftBgImagePosition(
+      slide.weatherLeftBgImagePosition || "center",
+    );
     setModalQrUrl(slide.qrUrl || "");
     setModalQrLabel(slide.qrLabel || "");
     setModalQrLeftBgColor(slide.qrLeftBgColor || "#0f172a");
@@ -958,9 +966,14 @@ function AdminView() {
       setModalCountdownBgImage(image.url);
     } else if (imageLibraryTarget === "weatherLeft") {
       setModalWeatherLeftBgImage(image.url);
-    } else if (imageLibraryTarget === "qrSlide" && qrSlideLibraryTargetId !== null) {
+    } else if (
+      imageLibraryTarget === "qrSlide" &&
+      qrSlideLibraryTargetId !== null
+    ) {
       setModalQrTextSlides((prev) =>
-        prev.map((s) => (s.id === qrSlideLibraryTargetId ? { ...s, bgImage: image.url } : s)),
+        prev.map((s) =>
+          s.id === qrSlideLibraryTargetId ? { ...s, bgImage: image.url } : s,
+        ),
       );
       setQrSlideLibraryTargetId(null);
     } else {
@@ -1089,26 +1102,41 @@ function AdminView() {
   };
 
   const handleQrSlideImageUpload = async (slideId, file) => {
-    if (!file.type.startsWith("image/")) { toast.error("Selecteer een geldig afbeeldingsbestand."); return; }
-    if (file.size > 5 * 1024 * 1024) { toast.error("Afbeelding moet kleiner zijn dan 5MB."); return; }
+    if (!file.type.startsWith("image/")) {
+      toast.error("Selecteer een geldig afbeeldingsbestand.");
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Afbeelding moet kleiner zijn dan 5MB.");
+      return;
+    }
 
     setUploadingQrSlideId(slideId);
     const loadingToast = toast.loading(`${file.name} uploaden…`);
     try {
       const timestamp = Date.now();
       const fileName = `${timestamp}_${file.name}`;
-      const storageRef = tenantStorageRef(storage, tenantId, `slides/${fileName}`);
+      const storageRef = tenantStorageRef(
+        storage,
+        tenantId,
+        `slides/${fileName}`,
+      );
       const snapshot = await uploadBytes(storageRef, file);
       const downloadURL = await getDownloadURL(snapshot.ref);
 
       await addDoc(tenantCollection(db, tenantId, "mediaLibrary"), {
-        name: file.name, url: downloadURL,
+        name: file.name,
+        url: downloadURL,
         storagePath: `tenants/${tenantId}/slides/${fileName}`,
-        size: file.size, type: file.type, uploadedAt: new Date(),
+        size: file.size,
+        type: file.type,
+        uploadedAt: new Date(),
       });
 
       setModalQrTextSlides((prev) =>
-        prev.map((s) => (s.id === slideId ? { ...s, bgImage: downloadURL } : s)),
+        prev.map((s) =>
+          s.id === slideId ? { ...s, bgImage: downloadURL } : s,
+        ),
       );
       toast.dismiss(loadingToast);
       toast.success(`${file.name} toegevoegd!`);
@@ -1227,7 +1255,8 @@ function AdminView() {
                             sportlinkBgColor: modalSportlinkBgColor,
                             sportlinkTextColor: modalSportlinkTextColor,
                             sportlinkAccentColor: modalSportlinkAccentColor,
-                            sportlinkHeaderTextColor: modalSportlinkHeaderTextColor,
+                            sportlinkHeaderTextColor:
+                              modalSportlinkHeaderTextColor,
                             sportlinkDate: modalSportlinkDate,
                             sportlinkShowVeldInfo: modalSportlinkShowVeldInfo,
                             sportlinkOnlyThuis: modalSportlinkOnlyThuis,
@@ -1245,7 +1274,8 @@ function AdminView() {
                               weatherAccentColor: modalWeatherAccentColor,
                               weatherForecastDays: modalWeatherForecastDays,
                               weatherLeftBgImage: modalWeatherLeftBgImage,
-                              weatherLeftBgImagePosition: modalWeatherLeftBgImagePosition,
+                              weatherLeftBgImagePosition:
+                                modalWeatherLeftBgImagePosition,
                               duration:
                                 modalSlideDuration === ""
                                   ? 30
@@ -1267,34 +1297,36 @@ function AdminView() {
                                     ? 30
                                     : modalSlideDuration,
                               }
-                          : {
-                            text: sanitizeHTMLContent(modalTinyMCEContent),
-                            tinyMCEContent: modalTinyMCEContent,
-                            imageUrl: modalImageUrl,
-                            videoUrl: modalVideoUrl,
-                            teletekstChannel: modalTeletekstChannel,
-                            teletekstTheme: modalTeletekstTheme,
-                            teletekstPageCount: modalTeletekstPageCount,
-                            teletekstSkipTopLines: modalTeletekstSkipTopLines,
-                            teletekstSkipBottomLines: modalTeletekstSkipBottomLines,
-                            iframeUrl: modalIframeUrl,
-                            type:
-                              slideLayout === "iframe"
-                                ? "iframe"
-                                : slideLayout === "teletekst"
-                                  ? "teletekst"
-                                  : modalVideoUrl
-                                    ? "video"
-                                    : modalImageUrl
-                                      ? "image"
-                                      : "text",
-                            imagePosition: imagePosition,
-                            imageSide: modalImageSide,
-                            duration:
-                              modalSlideDuration === ""
-                                ? 5
-                                : modalSlideDuration,
-                          }),
+                            : {
+                                text: sanitizeHTMLContent(modalTinyMCEContent),
+                                tinyMCEContent: modalTinyMCEContent,
+                                imageUrl: modalImageUrl,
+                                videoUrl: modalVideoUrl,
+                                teletekstChannel: modalTeletekstChannel,
+                                teletekstTheme: modalTeletekstTheme,
+                                teletekstPageCount: modalTeletekstPageCount,
+                                teletekstSkipTopLines:
+                                  modalTeletekstSkipTopLines,
+                                teletekstSkipBottomLines:
+                                  modalTeletekstSkipBottomLines,
+                                iframeUrl: modalIframeUrl,
+                                type:
+                                  slideLayout === "iframe"
+                                    ? "iframe"
+                                    : slideLayout === "teletekst"
+                                      ? "teletekst"
+                                      : modalVideoUrl
+                                        ? "video"
+                                        : modalImageUrl
+                                          ? "image"
+                                          : "text",
+                                imagePosition: imagePosition,
+                                imageSide: modalImageSide,
+                                duration:
+                                  modalSlideDuration === ""
+                                    ? 5
+                                    : modalSlideDuration,
+                              }),
             };
 
             return updatedSlide;
@@ -1785,7 +1817,7 @@ function AdminView() {
               <div className="admin-duration">
                 <span className="admin-stat-value">
                   <Clock size={18} />
-                  <span>{totalStats.totalDuration}s</span>
+                  <span>{formatDuration(totalStats.totalDuration)}</span>
                 </span>
               </div>
             </div>
@@ -1852,6 +1884,7 @@ function AdminView() {
           onMoveSlide={openMoveSlideModal}
           uploadingImage={uploadingImage}
           calculatePlaylistDuration={calculatePlaylistDuration}
+          formatDuration={formatDuration}
           editingPlaylistNameId={editingPlaylistNameId}
           editingPlaylistName={editingPlaylistName}
           onStartEditingPlaylistName={startEditingPlaylistName}
@@ -2014,7 +2047,9 @@ function AdminView() {
           weatherLeftBgImage={modalWeatherLeftBgImage}
           onWeatherLeftBgImageUpload={handleModalWeatherLeftBgImageUpload}
           weatherLeftBgImagePosition={modalWeatherLeftBgImagePosition}
-          onWeatherLeftBgImagePositionChange={setModalWeatherLeftBgImagePosition}
+          onWeatherLeftBgImagePositionChange={
+            setModalWeatherLeftBgImagePosition
+          }
           onOpenWeatherLeftLibrary={handleOpenWeatherLeftBgLibrary}
           qrUrl={modalQrUrl}
           onQrUrlChange={setModalQrUrl}

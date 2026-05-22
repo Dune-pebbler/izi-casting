@@ -437,7 +437,7 @@ function Devices({ setDeviceToDelete, deleteDevice, isAdmin, canRotate }) {
                             </div>
                             <div className="device-last-seen">
                               Laatst gezien: {formatLastSeen(device.lastSeen)}
-                              {device.externalIp && (
+                              {isAdmin && device.externalIp && (
                                 <span
                                   className="device-ip"
                                   style={{ display: "block", marginTop: "4px" }}

@@ -81,6 +81,7 @@ function SlideList({
   onSaveSlideEffects,
   onToggleSlideTimeRestriction,
   playlistCount = 1,
+  formatDuration,
 }) {
   const hasSlideTypeConfig = Object.keys(slideTypes).length > 0;
   const isSlideTypeDisabled = (slide) => {
@@ -684,7 +685,7 @@ function SlideList({
           </h4>
           <div className="slide-row__info">
             <span className="slide-row__type">{getSlideTypeLabel(slide)}</span>
-            <span className="slide-row__duration">{slide.duration || 5}s</span>
+            <span className="slide-row__duration">{formatDuration ? formatDuration(slide.duration || 5) : `${slide.duration || 5}s`}</span>
           </div>
         </div>
         <div className="slide-row__actions">

@@ -46,6 +46,7 @@ const PlaylistList = ({
   onMoveSlide,
   uploadingImage,
   calculatePlaylistDuration,
+  formatDuration,
   // Playlist editing state
   editingPlaylistNameId,
   editingPlaylistName,
@@ -137,6 +138,7 @@ const PlaylistList = ({
               onCopyPlaylist={onCopyPlaylist}
               onConfirmDelete={onConfirmDeletePlaylist}
               calculatePlaylistDuration={calculatePlaylistDuration}
+              formatDuration={formatDuration}
             />
 
             {/* Collapsible Slides Container */}
@@ -177,6 +179,7 @@ const PlaylistList = ({
                 onSaveSlideEffects={(slideId, effects) =>
                   onSaveSlideEffects && onSaveSlideEffects(playlist.id, slideId, effects)
                 }
+                formatDuration={formatDuration}
               />
             </div>
           </div>

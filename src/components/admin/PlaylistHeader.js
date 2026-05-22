@@ -1,5 +1,13 @@
 import React from "react";
-import { GripVertical, Copy, Trash2, Eye, EyeOff, Monitor, Clock } from "lucide-react";
+import {
+  GripVertical,
+  Copy,
+  Trash2,
+  Eye,
+  EyeOff,
+  Monitor,
+  Clock,
+} from "lucide-react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
@@ -23,6 +31,7 @@ const PlaylistHeader = ({
   onCopyPlaylist,
   onConfirmDelete,
   calculatePlaylistDuration,
+  formatDuration,
 }) => {
   // Calculate slide counts
   const totalSlides = playlist.slides ? playlist.slides.length : 0;
@@ -83,19 +92,18 @@ const PlaylistHeader = ({
             </h2>
           )}
           <div className="playlist-info" onClick={(e) => e.stopPropagation()}>
-              <div className="playlist-slide-count">
-                <span className="slide-count-value">
-                  <Monitor size={14} />
-                  <span>{activeSlides}/{totalSlides}</span>
+            <div className="playlist-slide-count">
+              <span className="slide-count-value">
+                <Monitor size={14} />
+                <span>
+                  {activeSlides}/{totalSlides}
                 </span>
-              </div>
+              </span>
+            </div>
             <div className="playlist-duration">
               <span className="duration-value">
                 <Clock size={14} />
-                <span>
-                  {calculatePlaylistDuration(playlist.slides)}
-                  s
-                </span>
+                <span>{formatDuration(calculatePlaylistDuration(playlist.slides))}</span>
               </span>
             </div>
 
@@ -110,7 +118,7 @@ const PlaylistHeader = ({
                   onChange={(e) =>
                     onStartEditingRepeatCount(
                       playlist.id,
-                      parseInt(e.target.value) || 1
+                      parseInt(e.target.value) || 1,
                     )
                   }
                   onBlur={onSaveRepeatCount}
@@ -126,7 +134,7 @@ const PlaylistHeader = ({
                     e.stopPropagation();
                     onStartEditingRepeatCount(
                       playlist.id,
-                      playlist.repeatCount || 1
+                      playlist.repeatCount || 1,
                     );
                   }}
                 >
