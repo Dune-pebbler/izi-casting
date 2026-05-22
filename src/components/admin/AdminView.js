@@ -147,7 +147,7 @@ function AdminView() {
   const [modalQrUrl, setModalQrUrl] = useState("");
   const [modalQrLabel, setModalQrLabel] = useState("");
   const [modalQrLeftBgColor, setModalQrLeftBgColor] = useState("#0f172a");
-  const [modalQrLeftTextColor, setModalQrLeftTextColor] = useState("#ffffff");
+  const [modalQrDotsColor, setModalQrDotsColor] = useState("#ffffff");
   const [modalQrPanelColor, setModalQrPanelColor] = useState("#1d4ed8");
   const [modalQrPanelTextColor, setModalQrPanelTextColor] = useState("#ffffff");
   const [modalQrTextSlides, setModalQrTextSlides] = useState([]);
@@ -534,7 +534,7 @@ function AdminView() {
         qrUrl: "",
         qrLabel: "",
         qrLeftBgColor: "#0f172a",
-        qrLeftTextColor: "#ffffff",
+        qrDotsColor: "#ffffff",
         qrPanelColor: "#1d4ed8",
         qrPanelTextColor: "#ffffff",
         qrTextSlides: [],
@@ -721,7 +721,7 @@ function AdminView() {
     setModalQrUrl(slide.qrUrl || "");
     setModalQrLabel(slide.qrLabel || "");
     setModalQrLeftBgColor(slide.qrLeftBgColor || "#0f172a");
-    setModalQrLeftTextColor(slide.qrLeftTextColor || "#ffffff");
+    setModalQrDotsColor(slide.qrDotsColor || "#ffffff");
     setModalQrPanelColor(slide.qrPanelColor || "#1d4ed8");
     setModalQrPanelTextColor(slide.qrPanelTextColor || "#ffffff");
     setModalQrTextSlides(slide.qrTextSlides || []);
@@ -790,7 +790,7 @@ function AdminView() {
     setModalQrUrl("");
     setModalQrLabel("");
     setModalQrLeftBgColor("#0f172a");
-    setModalQrLeftTextColor("#ffffff");
+    setModalQrDotsColor("#ffffff");
     setModalQrPanelColor("#1d4ed8");
     setModalQrPanelTextColor("#ffffff");
     setModalQrTextSlides([]);
@@ -1257,7 +1257,7 @@ function AdminView() {
                                 qrUrl: modalQrUrl,
                                 qrLabel: modalQrLabel,
                                 qrLeftBgColor: modalQrLeftBgColor,
-                                qrLeftTextColor: modalQrLeftTextColor,
+                                qrDotsColor: modalQrDotsColor,
                                 qrPanelColor: modalQrPanelColor,
                                 qrPanelTextColor: modalQrPanelTextColor,
                                 qrTextSlides: modalQrTextSlides,
@@ -2022,8 +2022,8 @@ function AdminView() {
           onQrLabelChange={setModalQrLabel}
           qrLeftBgColor={modalQrLeftBgColor}
           onQrLeftBgColorChange={setModalQrLeftBgColor}
-          qrLeftTextColor={modalQrLeftTextColor}
-          onQrLeftTextColorChange={setModalQrLeftTextColor}
+          qrDotsColor={modalQrDotsColor}
+          onQrDotsColorChange={setModalQrDotsColor}
           qrPanelColor={modalQrPanelColor}
           onQrPanelColorChange={setModalQrPanelColor}
           qrPanelTextColor={modalQrPanelTextColor}

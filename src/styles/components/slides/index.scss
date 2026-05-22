@@ -1473,26 +1473,14 @@
     }
   }
 
-  &__textarea {
-    flex: 1;
-    resize: vertical;
-    min-height: 72px;
-    border: 1px solid var(--border);
+  &__editor-wrap {
     border-radius: 6px;
-    padding: 8px 10px;
-    font-size: 13px;
-    font-family: inherit;
-    color: var(--foreground);
-    background: var(--input-background, var(--background));
-    outline: none;
-    transition: border-color 0.15s;
+    overflow: hidden;
+    border: 1px solid var(--border);
 
-    &:focus {
-      border-color: var(--primary);
-    }
-
-    &::placeholder {
-      color: var(--muted-foreground);
+    .tox-tinymce {
+      border: none !important;
+      border-radius: 0 !important;
     }
   }
 

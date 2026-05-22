@@ -7,7 +7,7 @@ function QrFeedDisplay({ slide }) {
   const panelColor = slide.qrPanelColor || "#1d4ed8";
   const panelTextColor = slide.qrPanelTextColor || "#ffffff";
   const leftBgColor = slide.qrLeftBgColor || "#0f172a";
-  const leftTextColor = slide.qrLeftTextColor || "#ffffff";
+  const dotsColor = slide.qrDotsColor || "#ffffff";
   const textSlides = slide.qrTextSlides || [];
   const intervalSeconds = slide.qrTextInterval || 5;
 
@@ -41,7 +41,7 @@ function QrFeedDisplay({ slide }) {
     <div className="qr-feed">
       <div
         className="qr-feed__left"
-        style={{ color: leftTextColor, backgroundColor: leftBgColor }}
+        style={{ backgroundColor: leftBgColor }}
       >
         {/* Background layer fades with the slide */}
         <div
@@ -64,7 +64,7 @@ function QrFeedDisplay({ slide }) {
                   <span
                     key={i}
                     className={`qr-feed__dot${i === currentIndex ? " qr-feed__dot--active" : ""}`}
-                    style={{ backgroundColor: leftTextColor }}
+                    style={{ backgroundColor: dotsColor }}
                   />
                 ))}
               </div>

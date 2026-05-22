@@ -1,4 +1,5 @@
 import React, { useRef } from "react";
+import { Editor } from "@tinymce/tinymce-react";
 import { Plus, Trash2, GripVertical, QrCode, PanelLeft, Image, BookImage, X } from "lucide-react";
 import {
   DndContext,
@@ -133,13 +134,34 @@ function SortableTextSlide({
         </div>
 
         {/* Text */}
-        <textarea
-          className="qr-feed-input__textarea"
-          value={item.text || ""}
-          onChange={(e) => onTextChange(item.id, e.target.value)}
-          placeholder="Tekst (optioneel — laat leeg voor alleen achtergrond)"
-          rows={2}
-        />
+        <div className="qr-feed-input__editor-wrap">
+          <Editor
+            key={item.id}
+            apiKey="l1htx10scfunizdawurrb9j2njqukthv8eb30m6rr0r64177"
+            value={item.text || ""}
+            onEditorChange={(val) => onTextChange(item.id, val)}
+            init={{
+              height: 160,
+              menubar: false,
+              statusbar: false,
+              plugins: ["lists", "autolink"],
+              toolbar:
+                "bold italic underline | forecolor | alignleft aligncenter alignright | bullist numlist | removeformat",
+              content_style: `
+                body {
+                  font-family: Roboto, Arial, sans-serif;
+                  font-size: 18px;
+                  line-height: 1.5;
+                  margin: 0;
+                  padding: 10px 14px;
+                  color: #1a1a1a;
+                }
+                p { margin: 0 0 0.5em; }
+                p:last-child { margin-bottom: 0; }
+              `,
+            }}
+          />
+        </div>
       </div>
 
       <button
@@ -161,8 +183,8 @@ function QrFeedInput({
   onQrLabelChange,
   qrLeftBgColor,
   onQrLeftBgColorChange,
-  qrLeftTextColor,
-  onQrLeftTextColorChange,
+  qrDotsColor,
+  onQrDotsColorChange,
   qrPanelColor,
   onQrPanelColorChange,
   qrPanelTextColor,
@@ -230,9 +252,9 @@ function QrFeedInput({
             onChange={onQrLeftBgColorChange}
           />
           <ColorField
-            label="Tekstkleur"
-            value={qrLeftTextColor}
-            onChange={onQrLeftTextColorChange}
+            label="Bolletjes kleur"
+            value={qrDotsColor}
+            onChange={onQrDotsColorChange}
           />
         </div>
 

@@ -169,8 +169,8 @@ function EditModal({
   onQrLabelChange,
   qrLeftBgColor,
   onQrLeftBgColorChange,
-  qrLeftTextColor,
-  onQrLeftTextColorChange,
+  qrDotsColor,
+  onQrDotsColorChange,
   qrPanelColor,
   onQrPanelColorChange,
   qrPanelTextColor,
@@ -467,8 +467,8 @@ function EditModal({
               onQrLabelChange={onQrLabelChange}
               qrLeftBgColor={qrLeftBgColor}
               onQrLeftBgColorChange={onQrLeftBgColorChange}
-              qrLeftTextColor={qrLeftTextColor}
-              onQrLeftTextColorChange={onQrLeftTextColorChange}
+              qrDotsColor={qrDotsColor}
+              onQrDotsColorChange={onQrDotsColorChange}
               qrPanelColor={qrPanelColor}
               onQrPanelColorChange={onQrPanelColorChange}
               qrPanelTextColor={qrPanelTextColor}
