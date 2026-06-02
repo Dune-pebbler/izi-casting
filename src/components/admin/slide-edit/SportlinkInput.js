@@ -83,8 +83,6 @@ function SportlinkInput({
   onTeamsChange,
   sportlinkTitle,
   onTitleChange,
-  sportlinkAantalDagen,
-  onAantalDagenChange,
   sportlinkMaxItems,
   onMaxItemsChange,
   sportlinkBgColor,

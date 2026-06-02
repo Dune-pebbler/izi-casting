@@ -130,8 +130,6 @@ function EditModal({
   onSportlinkTeamsChange,
   sportlinkTitle,
   onSportlinkTitleChange,
-  sportlinkAantalDagen,
-  onSportlinkAantalDagenChange,
   sportlinkMaxItems,
   onSportlinkMaxItemsChange,
   sportlinkBgColor,
@@ -435,8 +433,6 @@ function EditModal({
               onTeamsChange={onSportlinkTeamsChange}
               sportlinkTitle={sportlinkTitle}
               onTitleChange={onSportlinkTitleChange}
-              sportlinkAantalDagen={sportlinkAantalDagen}
-              onAantalDagenChange={onSportlinkAantalDagenChange}
               sportlinkMaxItems={sportlinkMaxItems}
               onMaxItemsChange={onSportlinkMaxItemsChange}
               sportlinkBgColor={sportlinkBgColor}

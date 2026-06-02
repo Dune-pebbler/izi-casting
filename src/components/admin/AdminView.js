@@ -125,9 +125,7 @@ function AdminView() {
     useState("programma");
   const [modalSportlinkTeams, setModalSportlinkTeams] = useState([]);
   const [modalSportlinkTitle, setModalSportlinkTitle] = useState("");
-  const [modalSportlinkAantalDagen, setModalSportlinkAantalDagen] =
-    useState(14);
-  const [modalSportlinkMaxItems, setModalSportlinkMaxItems] = useState(10);
+const [modalSportlinkMaxItems, setModalSportlinkMaxItems] = useState(10);
   const [modalSportlinkBgColor, setModalSportlinkBgColor] = useState("#0f172a");
   const [modalSportlinkTextColor, setModalSportlinkTextColor] =
     useState("#ffffff");
@@ -514,7 +512,6 @@ function AdminView() {
         sportlinkDataType: "programma",
         sportlinkTeams: [],
         sportlinkTitle: "",
-        sportlinkAantalDagen: 14,
         sportlinkMaxItems: 10,
         sportlinkBgColor: "#0f172a",
         sportlinkTextColor: "#ffffff",
@@ -706,7 +703,6 @@ function AdminView() {
     setModalSportlinkDataType(slide.sportlinkDataType || "programma");
     setModalSportlinkTeams(slide.sportlinkTeams || []);
     setModalSportlinkTitle(slide.sportlinkTitle || "");
-    setModalSportlinkAantalDagen(slide.sportlinkAantalDagen || 14);
     setModalSportlinkMaxItems(slide.sportlinkMaxItems || 10);
     setModalSportlinkBgColor(slide.sportlinkBgColor || "#0f172a");
     setModalSportlinkTextColor(slide.sportlinkTextColor || "#ffffff");
@@ -787,7 +783,6 @@ function AdminView() {
     setModalSportlinkDataType("programma");
     setModalSportlinkTeams([]);
     setModalSportlinkTitle("");
-    setModalSportlinkAantalDagen(14);
     setModalSportlinkMaxItems(10);
     setModalSportlinkBgColor("#0f172a");
     setModalSportlinkTextColor("#ffffff");
@@ -1250,7 +1245,6 @@ function AdminView() {
                             sportlinkDataType: modalSportlinkDataType,
                             sportlinkTeams: modalSportlinkTeams,
                             sportlinkTitle: modalSportlinkTitle,
-                            sportlinkAantalDagen: modalSportlinkAantalDagen,
                             sportlinkMaxItems: modalSportlinkMaxItems,
                             sportlinkBgColor: modalSportlinkBgColor,
                             sportlinkTextColor: modalSportlinkTextColor,
@@ -2016,8 +2010,6 @@ function AdminView() {
           onSportlinkTeamsChange={setModalSportlinkTeams}
           sportlinkTitle={modalSportlinkTitle}
           onSportlinkTitleChange={setModalSportlinkTitle}
-          sportlinkAantalDagen={modalSportlinkAantalDagen}
-          onSportlinkAantalDagenChange={setModalSportlinkAantalDagen}
           sportlinkMaxItems={modalSportlinkMaxItems}
           onSportlinkMaxItemsChange={setModalSportlinkMaxItems}
           sportlinkBgColor={modalSportlinkBgColor}

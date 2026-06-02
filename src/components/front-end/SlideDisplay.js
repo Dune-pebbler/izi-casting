@@ -590,7 +590,6 @@ function SportlinkDisplay({ slide }) {
   const apiKey = slide.sportlinkApiKey || "";
   const dataType = slide.sportlinkDataType || "programma";
   const teams = slide.sportlinkTeams || [];
-  const aantalDagen = slide.sportlinkAantalDagen || 14;
   const maxItems = slide.sportlinkMaxItems || 10;
   const bgColor = slide.sportlinkBgColor || "#0f172a";
   const textColor = slide.sportlinkTextColor || "#ffffff";
@@ -648,7 +647,6 @@ function SportlinkDisplay({ slide }) {
               );
 
               params.set("teamcode", team.teamcode);
-              params.set("aantaldagen", 7);
               params.set("weekoffset", weekOffset);
               const url = `https://data.sportlink.com/${dataType}?${params}`;
 
@@ -740,7 +738,6 @@ function SportlinkDisplay({ slide }) {
     slide.sportlinkApiKey,
     slide.sportlinkTeams,
     slide.sportlinkDataType,
-    slide.sportlinkAantalDagen,
     slide.sportlinkMaxItems,
     slide.sportlinkDate,
     slide.sportlinkOnlyThuis,
@@ -771,6 +768,10 @@ function SportlinkDisplay({ slide }) {
     };
   }, [loading, data]);
 
+  let sportlinkDate = slide.sportlinkDate;
+  if (!sportlinkDate) {
+    sportlinkDate = new Date();
+  }
   const formatDate = (dateStr) => {
     if (!dateStr) return "";
     const d = new Date(dateStr);
@@ -804,9 +805,9 @@ function SportlinkDisplay({ slide }) {
             {title}
           </h2>
 
-          {slide.sportlinkDate && (
+          {sportlinkDate && (
             <div className="display-sportlink__title">
-              {formatDate(slide.sportlinkDate)}
+              {formatDate(sportlinkDate)}
             </div>
           )}
 
@@ -843,7 +844,7 @@ function SportlinkDisplay({ slide }) {
           >
             {!apiKey || !teams.length
               ? "Geen koppeling geconfigureerd"
-              : "Geen gegevens beschikbaar"}
+              : `Geen gegevens beschikbaar voor ${sportlinkDate}`}
           </div>
         )}
 
@@ -990,11 +991,12 @@ function SportlinkDisplay({ slide }) {
                   <span style={{ color: headerTextColor }}>Tijd</span>
                   <span style={{ color: headerTextColor }}>Thuisteam</span>
                   <span style={{ textAlign: "center", color: headerTextColor }}>
-                    {new Date(slide.sportlinkDate).toLocaleDateString("nl-NL", {
-                      weekday: "long",
-                      day: "numeric",
-                      month: "short",
-                    })}
+                    {sportlinkDate &&
+                      new Date(sportlinkDate).toLocaleDateString("nl-NL", {
+                        weekday: "long",
+                        day: "numeric",
+                        month: "short",
+                      })}
                   </span>
                   <span style={{ color: headerTextColor, textAlign: "right" }}>
                     Bezoekers
