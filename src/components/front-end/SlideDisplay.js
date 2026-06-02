@@ -873,10 +873,11 @@ function SportlinkDisplay({ slide }) {
                         >
                           <th>#</th>
                           <th className="team">Team</th>
-                          <th>Gespeeld</th>
-                          <th>Gewonnen</th>
-                          <th>Gelijk</th>
-                          <th>Verloren</th>
+                          <th>G</th>
+                          <th>W</th>
+                          <th>D</th>
+                          <th>V</th>
+                          <th>Doelsaldo</th>
                           <th>Punten</th>
                         </tr>
                       </thead>
@@ -891,7 +892,7 @@ function SportlinkDisplay({ slide }) {
                               style={{
                                 borderBottomColor: `${textColor}20`,
                                 backgroundColor: isOwn
-                                  ? `${accentColor}20`
+                                  ? `${accentColor}30`
                                   : "transparent",
                               }}
                             >
@@ -950,8 +951,15 @@ function SportlinkDisplay({ slide }) {
                               </td>
                               <td
                                 style={{
+                                  borderBottom: `1px solid ${textColor}20`,
+                                }}
+                              >
+                                {row.doelsaldo &&
+                                  `${row.doelpuntenvoor} - ${row.doelpuntentegen} (${row.doelsaldo})`}
+                              </td>
+                              <td
+                                style={{
                                   fontWeight: 700,
-                                  color: accentColor,
                                   borderBottom: `1px solid ${textColor}20`,
                                 }}
                               >
