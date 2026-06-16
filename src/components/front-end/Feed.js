@@ -84,7 +84,8 @@ function Feed({ feeds, settings }) {
             const jsonResponse = await response.json();
             data = proxy.extractData(JSON.stringify(jsonResponse));
           } else {
-            data = await response.text();
+            const buffer = await response.arrayBuffer();
+            data = new TextDecoder('utf-8').decode(buffer);
             data = proxy.extractData(data);
           }
 
@@ -124,7 +125,8 @@ function Feed({ feeds, settings }) {
           });
 
           if (directResponse.ok) {
-            feedData = await directResponse.text();
+            const buffer = await directResponse.arrayBuffer();
+            feedData = new TextDecoder('utf-8').decode(buffer);
             successfulProxy = "direct";
             console.log("  ✅ Direct fetch succeeded!");
           } else {
