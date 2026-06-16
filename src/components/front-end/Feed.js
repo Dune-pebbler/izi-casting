@@ -18,8 +18,13 @@ function Feed({ feeds, settings }) {
 
     try {
       // Try multiple CORS proxies for better reliability
-      // Ordered by reliability based on testing
+      // Own Vercel proxy is first — no encoding issues
       const proxies = [
+        {
+          name: "Own proxy",
+          url: `/api/rss?url=${encodeURIComponent(url)}`,
+          extractData: (data) => data,
+        },
         {
           name: "CORSProxy.io",
           url: `https://corsproxy.io/?${encodeURIComponent(url)}`,
