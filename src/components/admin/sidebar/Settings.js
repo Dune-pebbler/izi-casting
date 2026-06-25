@@ -68,6 +68,7 @@ function Settings() {
     progressBarColor: "#3dbcc9",
     feedUrl: "",
     showClock: true,
+    showDate: true,
     barStyle: "onder",
     defaultSlideTransition: "fade",
     enabledFonts: AVAILABLE_FONTS.map((f) => f.name),
@@ -90,6 +91,11 @@ function Settings() {
             showClock:
               loadedSettings.showClock !== undefined
                 ? loadedSettings.showClock
+                : true,
+            // Ensure showDate is always present, default to true if missing
+            showDate:
+              loadedSettings.showDate !== undefined
+                ? loadedSettings.showDate
                 : true,
             // Ensure barStyle is always present, default to "onder" if missing
             barStyle: loadedSettings.barStyle || "onder",
@@ -473,6 +479,19 @@ function Settings() {
                       className="checkbox-input"
                     />
                     <span className="checkbox-text">Klok Tonen</span>
+                  </label>
+                </div>
+                <div className="checkbox-setting">
+                  <label className="checkbox-label">
+                    <input
+                      type="checkbox"
+                      checked={settings.showDate}
+                      onChange={(e) =>
+                        handleInputChange("showDate", e.target.checked)
+                      }
+                      className="checkbox-input"
+                    />
+                    <span className="checkbox-text">Datum Tonen</span>
                   </label>
                 </div>
               </div>

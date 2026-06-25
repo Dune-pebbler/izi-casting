@@ -98,7 +98,9 @@ function StatusBar({ currentSlide, settings, feeds }) {
     <div className="display-bottom-bar" style={barStyle}>
       <Logo logoUrl={settings.logoUrl} />
       <FeedWrapper feeds={feeds} settings={settings} />
-      {settings.showClock && <Clock settings={settings} />}
+      {(settings.showClock || settings.showDate) && (
+        <Clock settings={settings} />
+      )}
     </div>
   );
 }

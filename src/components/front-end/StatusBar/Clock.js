@@ -34,12 +34,16 @@ const Clock = memo(({ settings }) => {
   return (
     <div className="display-bottom-clock">
       <div className="date-time-display">
-        <div className="date-line" style={{ color: settings.foregroundColor }}>
-          {formatDateTime.dateString}
-        </div>
-        <div className="time-line" style={{ color: settings.foregroundColor }}>
-          {formatDateTime.timeString}
-        </div>
+        {settings.showDate && (
+          <div className="date-line" style={{ color: settings.foregroundColor }}>
+            {formatDateTime.dateString}
+          </div>
+        )}
+        {settings.showClock && (
+          <div className="time-line" style={{ color: settings.foregroundColor }}>
+            {formatDateTime.timeString}
+          </div>
+        )}
       </div>
     </div>
   );

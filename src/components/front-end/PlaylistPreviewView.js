@@ -32,6 +32,7 @@ function PlaylistPreviewView() {
     progressBarColor: "#3dbcc9",
     feedUrl: "",
     showClock: true,
+    showDate: true,
     barStyle: "onder",
     backgroundMusic: null,
   });
@@ -134,6 +135,7 @@ function PlaylistPreviewView() {
           progressBarColor: data.progressBarColor || "#3dbcc9",
           feedUrl: data.feedUrl || "",
           showClock: data.showClock !== undefined ? data.showClock : true,
+          showDate: data.showDate !== undefined ? data.showDate : true,
           barStyle: data.barStyle || "onder",
           backgroundMusic: data.backgroundMusic || null,
         });

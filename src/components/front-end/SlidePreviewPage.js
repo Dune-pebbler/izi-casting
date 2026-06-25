@@ -25,6 +25,7 @@ function SlidePreviewPage() {
     foregroundColor: "#212121",
     progressBarColor: "#3dbcc9",
     showClock: true,
+    showDate: true,
     barStyle: "onder",
   });
   const [feeds, setFeeds] = useState([]);
@@ -115,6 +116,7 @@ function SlidePreviewPage() {
           foregroundColor: data.foregroundColor || "#212121",
           progressBarColor: data.progressBarColor || "#3dbcc9",
           showClock: data.showClock !== undefined ? data.showClock : true,
+          showDate: data.showDate !== undefined ? data.showDate : true,
           barStyle: data.barStyle || "onder",
         });
 
