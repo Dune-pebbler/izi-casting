@@ -1527,7 +1527,13 @@ function SlideDisplay({
               <TeletekstDisplay
                 channel={slide.teletekstChannel}
                 theme={slide.teletekstTheme || "classic"}
-                pageCount={slide.teletekstPageCount || 1}
+                pages={
+                  slide.teletekstPages ||
+                  Array.from(
+                    { length: slide.teletekstPageCount || 1 },
+                    (_, i) => i + 1,
+                  )
+                }
                 duration={slide.duration || 10}
                 skipTopLines={slide.teletekstSkipTopLines || 0}
                 skipBottomLines={slide.teletekstSkipBottomLines || 0}

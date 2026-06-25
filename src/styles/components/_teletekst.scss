@@ -120,6 +120,40 @@
     }
   }
 
+  .page-toggle-selector {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+
+    .page-toggle-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 2.5rem;
+      height: 2.5rem;
+      border: 2px solid var(--primary);
+      border-radius: 8px;
+      background: var(--bg-primary);
+      color: var(--primary);
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background: var(--primary);
+        color: #fff;
+        opacity: 0.85;
+      }
+
+      &.active {
+        background: var(--primary);
+        color: #fff;
+      }
+    }
+  }
+
   .theme-selector {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Tv, Palette, ChevronLeft, ChevronRight } from "lucide-react";
 
 export const TELETEKST_THEMES = [
@@ -135,12 +135,12 @@ export const TELETEKST_THEMES = [
 function TeletekstInput({
   channel = "101",
   theme = "classic",
-  pageCount = 1,
+  pages = [1],
   skipTopLines = 0,
   skipBottomLines = 0,
   onChannelChange,
   onThemeChange,
-  onPageCountChange,
+  onPagesChange,
   onSkipTopLinesChange,
   onSkipBottomLinesChange,
 }) {
@@ -162,7 +162,15 @@ function TeletekstInput({
   };
 
   // Detect how many sub-pages are available for this channel
+  const prevChannelRef = useRef(channel);
   useEffect(() => {
+    // Reset the page selection whenever the channel actually changes —
+    // a previously selected subpage may not exist on the new channel.
+    if (prevChannelRef.current !== channel) {
+      prevChannelRef.current = channel;
+      onPagesChange && onPagesChange([1]);
+    }
+
     if (!channel || channel.length < 3) {
       setMaxPages(1);
       return;
@@ -185,7 +193,16 @@ function TeletekstInput({
           page += 1;
           if (page > 10) break; // safety cap
         }
-        if (!cancelled) setMaxPages(page - 1);
+        const detectedMaxPages = page - 1;
+        if (!cancelled) {
+          setMaxPages(detectedMaxPages);
+          // Drop any selected pages that don't exist on this channel
+          const validPages = pages.filter((p) => p <= detectedMaxPages);
+          if (validPages.length !== pages.length) {
+            onPagesChange &&
+              onPagesChange(validPages.length ? validPages : [1]);
+          }
+        }
       } catch {
         if (!cancelled) setMaxPages(1);
       } finally {
@@ -202,6 +219,18 @@ function TeletekstInput({
 
   const selectedTheme =
     TELETEKST_THEMES.find((t) => t.id === theme) || TELETEKST_THEMES[0];
+
+  const sortedPages = [...pages].sort((a, b) => a - b);
+
+  const togglePage = (page) => {
+    if (!onPagesChange) return;
+    if (sortedPages.includes(page)) {
+      if (sortedPages.length === 1) return; // keep at least one page selected
+      onPagesChange(sortedPages.filter((p) => p !== page));
+    } else {
+      onPagesChange([...sortedPages, page].sort((a, b) => a - b));
+    }
+  };
 
   return (
     <div className="teletekst-input">
@@ -228,7 +257,7 @@ function TeletekstInput({
         <div className="teletekst-input-section">
           <label className="input-label">
             <Tv size={16} />
-            Aantal pagina's
+            Pagina's
           </label>
           {detectingPages ? (
             <p className="input-hint">Pagina's detecteren...</p>
@@ -236,38 +265,25 @@ function TeletekstInput({
             <p className="input-hint">Deze pagina heeft geen subpagina's.</p>
           ) : (
             <>
-              <div className="page-count-selector">
-                <button
-                  type="button"
-                  className="page-count-btn"
-                  onClick={() =>
-                    onPageCountChange &&
-                    onPageCountChange(Math.max(1, pageCount - 1))
-                  }
-                  disabled={pageCount <= 1}
-                >
-                  <ChevronLeft size={16} />
-                </button>
-                <span className="page-count-value">
-                  {pageCount} / {maxPages}
-                </span>
-                <button
-                  type="button"
-                  className="page-count-btn"
-                  onClick={() =>
-                    onPageCountChange &&
-                    onPageCountChange(Math.min(maxPages, pageCount + 1))
-                  }
-                  disabled={pageCount >= maxPages}
-                >
-                  <ChevronRight size={16} />
-                </button>
+              <div className="page-toggle-selector">
+                {Array.from({ length: maxPages }, (_, i) => i + 1).map(
+                  (page) => (
+                    <button
+                      key={page}
+                      type="button"
+                      className={`page-toggle-btn ${sortedPages.includes(page) ? "active" : ""}`}
+                      onClick={() => togglePage(page)}
+                    >
+                      {page}
+                    </button>
+                  ),
+                )}
               </div>
               <p className="input-hint">
                 Toon{" "}
-                {pageCount === 1
-                  ? "alleen pagina 1"
-                  : `pagina's 1 t/m ${pageCount}`}{" "}
+                {sortedPages.length === 1
+                  ? `alleen pagina ${sortedPages[0]}`
+                  : `pagina's ${sortedPages.join(", ")}`}{" "}
                 — elke pagina wordt even lang getoond.
               </p>
             </>
@@ -382,13 +398,13 @@ function TeletekstInput({
 
       <div className="teletekst-preview">
         <p className="preview-label">API Eindpunt:</p>
-        <code>/api/teletekst/{channel || "101"}</code>
-        {pageCount > 1 && (
-          <code>
+        {sortedPages.map((page) => (
+          <code key={page}>
             {" "}
-            … /api/teletekst/{channel}-{pageCount}
+            /api/teletekst/
+            {page === 1 ? channel || "101" : `${channel}-${page}`}
           </code>
-        )}
+        ))}
       </div>
     </div>
   );

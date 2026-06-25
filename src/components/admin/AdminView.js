@@ -86,7 +86,7 @@ function AdminView() {
   const [modalSlideTransition, setModalSlideTransition] = useState("fade");
   const [modalTeletekstChannel, setModalTeletekstChannel] = useState("101");
   const [modalTeletekstTheme, setModalTeletekstTheme] = useState("classic");
-  const [modalTeletekstPageCount, setModalTeletekstPageCount] = useState(1);
+  const [modalTeletekstPages, setModalTeletekstPages] = useState([1]);
   const [modalTeletekstSkipTopLines, setModalTeletekstSkipTopLines] =
     useState(0);
   const [modalTeletekstSkipBottomLines, setModalTeletekstSkipBottomLines] =
@@ -671,7 +671,10 @@ const [modalSportlinkMaxItems, setModalSportlinkMaxItems] = useState(10);
     setModalSlideTransition(slide.transition || "fade");
     setModalTeletekstChannel(slide.teletekstChannel || "101");
     setModalTeletekstTheme(slide.teletekstTheme || "classic");
-    setModalTeletekstPageCount(slide.teletekstPageCount || 1);
+    setModalTeletekstPages(
+      slide.teletekstPages ||
+        Array.from({ length: slide.teletekstPageCount || 1 }, (_, i) => i + 1),
+    );
     setModalTeletekstSkipTopLines(slide.teletekstSkipTopLines || 0);
     setModalTeletekstSkipBottomLines(slide.teletekstSkipBottomLines || 0);
     setModalIframeUrl(slide.iframeUrl || "");
@@ -1298,7 +1301,7 @@ const [modalSportlinkMaxItems, setModalSportlinkMaxItems] = useState(10);
                                 videoUrl: modalVideoUrl,
                                 teletekstChannel: modalTeletekstChannel,
                                 teletekstTheme: modalTeletekstTheme,
-                                teletekstPageCount: modalTeletekstPageCount,
+                                teletekstPages: modalTeletekstPages,
                                 teletekstSkipTopLines:
                                   modalTeletekstSkipTopLines,
                                 teletekstSkipBottomLines:
@@ -1932,12 +1935,12 @@ const [modalSportlinkMaxItems, setModalSportlinkMaxItems] = useState(10);
           typography={typography}
           teletekstChannel={modalTeletekstChannel}
           teletekstTheme={modalTeletekstTheme}
-          teletekstPageCount={modalTeletekstPageCount}
+          teletekstPages={modalTeletekstPages}
           teletekstSkipTopLines={modalTeletekstSkipTopLines}
           teletekstSkipBottomLines={modalTeletekstSkipBottomLines}
           onTeletekstChannelChange={setModalTeletekstChannel}
           onTeletekstThemeChange={setModalTeletekstTheme}
-          onTeletekstPageCountChange={setModalTeletekstPageCount}
+          onTeletekstPagesChange={setModalTeletekstPages}
           onTeletekstSkipTopLinesChange={setModalTeletekstSkipTopLines}
           onTeletekstSkipBottomLinesChange={setModalTeletekstSkipBottomLines}
           iframeUrl={modalIframeUrl}

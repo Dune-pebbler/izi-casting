@@ -5,7 +5,7 @@ import { TELETEKST_THEMES } from "../admin/slide-edit/TeletekstInput";
 function TeletekstDisplay({
   channel = "101",
   theme = "classic",
-  pageCount = 1,
+  pages = [1],
   duration = 10,
   skipTopLines = 0,
   skipBottomLines = 0,
@@ -14,13 +14,18 @@ function TeletekstDisplay({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [shouldScroll, setShouldScroll] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [pageIndex, setPageIndex] = useState(0);
   const contentRef = useRef(null);
   const wrapperRef = useRef(null);
 
   const selectedTheme =
     TELETEKST_THEMES.find((t) => t.id === theme) || TELETEKST_THEMES[0];
-  const totalPages = Math.max(1, pageCount);
+  const sortedPages = useMemo(
+    () => (pages.length ? [...pages].sort((a, b) => a - b) : [1]),
+    [pages],
+  );
+  const totalPages = sortedPages.length;
+  const currentPage = sortedPages[pageIndex] || sortedPages[0];
 
   const fetchTeletekst = async (page) => {
     try {
@@ -63,8 +68,8 @@ function TeletekstDisplay({
 
   useEffect(() => {
     if (channel) {
-      setCurrentPage(1);
-      fetchTeletekstRef.current(1);
+      setPageIndex(0);
+      fetchTeletekstRef.current(sortedPages[0]);
 
       const interval = setInterval(
         () => fetchTeletekstRef.current(currentPageRef.current),
@@ -72,24 +77,24 @@ function TeletekstDisplay({
       );
       return () => clearInterval(interval);
     }
-  }, [channel]);
+  }, [channel, sortedPages]);
 
   const currentPageRef = useRef(currentPage);
   currentPageRef.current = currentPage;
 
-  // Cycle through sub-pages when pageCount > 1
+  // Cycle through selected sub-pages when more than one is selected
   useEffect(() => {
     if (totalPages <= 1) return;
 
     const perPage = duration / totalPages;
     const timer = setTimeout(() => {
-      const next = currentPage >= totalPages ? 1 : currentPage + 1;
-      setCurrentPage(next);
-      fetchTeletekstRef.current(next);
+      const nextIndex = pageIndex >= totalPages - 1 ? 0 : pageIndex + 1;
+      setPageIndex(nextIndex);
+      fetchTeletekstRef.current(sortedPages[nextIndex]);
     }, perPage * 1000);
 
     return () => clearTimeout(timer);
-  }, [currentPage, totalPages, duration]);
+  }, [pageIndex, totalPages, duration, sortedPages]);
 
   // Strip top and bottom lines directly from the HTML content
   const processedContent = useMemo(() => {
