@@ -57,6 +57,7 @@ function TextEditor({ content, onContentChange, enabledFonts, typography }) {
     toolbar:
       "undo redo | blocks | bold italic underline strikethrough | forecolor backcolor | table | align lineheight | numlist bullist indent outdent | emoticons charmap | removeformat",
     block_formats: "Paragraaf=p; Header 1=h1; Header 2=h2; Header 3=h3",
+    preview_styles: false,
     font_family_formats: fontFormats,
     textcolor_map: [
       "000000",
@@ -325,6 +326,18 @@ function TextEditor({ content, onContentChange, enabledFonts, typography }) {
       }
     `,
     setup: (editor) => {
+      // Strip stray contenteditable attributes (e.g. from old saved content) —
+      // nested contenteditable="true" elements create editing hosts that break
+      // block format toggling (h1/h2/h3 renaming silently fails)
+      editor.on("PreInit", () => {
+        editor.parser.addAttributeFilter("contenteditable", (nodes) => {
+          nodes.forEach((node) => node.attr("contenteditable", null));
+        });
+        editor.serializer.addAttributeFilter("contenteditable", (nodes) => {
+          nodes.forEach((node) => node.attr("contenteditable", null));
+        });
+      });
+
       // Strip inline font-size from headings so our CSS sizes take effect
       const stripHeadingFontSizes = () => {
         editor.dom.select("h1,h2,h3").forEach((el) => {
@@ -342,7 +355,7 @@ function TextEditor({ content, onContentChange, enabledFonts, typography }) {
 
       editor.on("FormatApply", ({ format }) => {
         if (["h1", "h2", "h3"].includes(format)) {
-          setTimeout(stripHeadingFontSizes, 0);
+          stripHeadingFontSizes();
         }
       });
     },
