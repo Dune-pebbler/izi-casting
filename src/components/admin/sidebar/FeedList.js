@@ -53,6 +53,8 @@ function FeedList() {
   const [tempUrl, setTempUrl] = useState("");
   const [editingMaxPosts, setEditingMaxPosts] = useState(null);
   const [tempMaxPosts, setTempMaxPosts] = useState("");
+  const [editingDuration, setEditingDuration] = useState(null);
+  const [tempDuration, setTempDuration] = useState("");
 
   // Load feeds from Firestore
   useEffect(() => {
@@ -343,6 +345,47 @@ function FeedList() {
     }
   };
 
+  // Duration editing functions
+  const startDurationEdit = (feed) => {
+    setEditingDuration(feed.id);
+    setTempDuration(feed.duration?.toString() || "10");
+  };
+
+  const cancelDurationEdit = () => {
+    setEditingDuration(null);
+    setTempDuration("");
+  };
+
+  const saveDurationEdit = async (feedId) => {
+    const durationValue = parseInt(tempDuration);
+
+    if (!tempDuration.trim() || isNaN(durationValue)) {
+      toast.error("Voer een geldig aantal seconden in");
+      return;
+    }
+
+    if (durationValue < 1 || durationValue > 300) {
+      toast.error("Duur moet tussen 1 en 300 seconden zijn");
+      return;
+    }
+
+    const updatedFeeds = feeds.map((feed) =>
+      feed.id === feedId ? { ...feed, duration: durationValue } : feed,
+    );
+    setFeeds(updatedFeeds);
+    await saveFeedsToFirebase(updatedFeeds);
+    toast.success("Duur bijgewerkt!");
+    cancelDurationEdit();
+  };
+
+  const handleDurationKeyPress = (e, feedId) => {
+    if (e.key === "Enter") {
+      saveDurationEdit(feedId);
+    } else if (e.key === "Escape") {
+      cancelDurationEdit();
+    }
+  };
+
   const popularFeeds = [
     { name: "BBC News", url: "https://feeds.bbci.co.uk/news/rss.xml" },
     { name: "CNN", url: "https://rss.cnn.com/rss/edition.rss" },
@@ -427,6 +470,30 @@ function FeedList() {
                   onClick={() => startMaxPostsEdit(feed)}
                 >
                   {feed.maxPosts}
+                </span>
+              )}
+            </div>
+            <div className="feed-max-posts">
+              <span className="max-posts-label">Seconden per bericht:</span>
+              {editingDuration === feed.id ? (
+                <input
+                  type="number"
+                  value={tempDuration}
+                  onChange={(e) => setTempDuration(e.target.value)}
+                  onKeyDown={(e) => handleDurationKeyPress(e, feed.id)}
+                  onBlur={() => saveDurationEdit(feed.id)}
+                  className="max-posts-input"
+                  min="1"
+                  max="300"
+                  autoFocus
+                />
+              ) : (
+                <span
+                  className="max-posts-value max-posts-editable"
+                  title="Klik om duur per bericht te bewerken"
+                  onClick={() => startDurationEdit(feed)}
+                >
+                  {feed.duration || 10}
                 </span>
               )}
             </div>

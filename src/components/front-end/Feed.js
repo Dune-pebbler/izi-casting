@@ -245,14 +245,16 @@ function Feed({ feeds, settings }) {
             console.log(`✅ Feed ${feed.name} returned ${items.length} items`);
 
             // Limit items to maxPosts and add feed metadata
+            const feedDuration = feed.duration || null;
             const limitedItems = (items || [])
               .slice(0, feed.maxPosts || 5)
               .map((item) => ({
                 ...item,
-                dynamicDuration: calculateReadingTime(
+                dynamicDuration: feedDuration || calculateReadingTime(
                   item.title,
                   item.description,
                 ),
+                feedDuration,
                 feedId: feed.id,
                 feedName: feed.name,
                 maxPosts: feed.maxPosts || 5,
@@ -437,10 +439,10 @@ function Feed({ feeds, settings }) {
         const totalAnimationDuration = scrollTime + pauseTime * 2;
 
         if (currentItem) {
-          currentItem.dynamicDuration = Math.max(
-            totalAnimationDuration / 1000,
-            5,
-          );
+          const scrollBasedDuration = Math.max(totalAnimationDuration / 1000, 5);
+          currentItem.dynamicDuration = currentItem.feedDuration
+            ? Math.max(currentItem.feedDuration, scrollBasedDuration)
+            : scrollBasedDuration;
         }
 
         const startPauseRatio = pauseTime / totalAnimationDuration;
