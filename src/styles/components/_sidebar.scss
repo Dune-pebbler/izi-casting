@@ -488,3 +488,100 @@
     }
   }
 }
+
+// API keys panel
+.sidebar-api-keys {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: $spacing-sm;
+
+  .settings-toggle-btn {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: $spacing-sm;
+    width: 100%;
+    border: 0;
+    border-radius: $border-radius-lg;
+    color: var(--foreground);
+    cursor: pointer;
+    transition: $transition-base;
+    font-size: $font-size-lg;
+    background: transparent;
+    margin-bottom: $spacing-sm;
+
+    &:hover {
+      color: var(--primary);
+    }
+
+    svg {
+      color: var(--foreground-secondary);
+      transition: $transition-base;
+    }
+
+    &:hover svg {
+      color: var(--primary);
+    }
+  }
+
+  .api-key-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+    overflow: hidden;
+
+    .api-key-meta {
+      font-size: $font-size-xs;
+      color: var(--foreground-muted);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+
+  .api-key-reveal {
+    background: var(--muted);
+    border: 1px solid var(--border);
+    border-radius: $border-radius-md;
+    padding: $spacing-sm $spacing-md;
+    margin-bottom: $spacing-sm;
+
+    p {
+      margin: 0 0 $spacing-xs;
+      font-size: $font-size-xs;
+      color: var(--foreground);
+    }
+
+    .api-key-reveal-row {
+      display: flex;
+      align-items: center;
+      gap: $spacing-xs;
+
+      code {
+        flex: 1;
+        min-width: 0;
+        overflow-wrap: break-word;
+        word-break: break-all;
+        font-size: $font-size-xs;
+        background: var(--background);
+        border-radius: $border-radius-sm;
+        padding: $spacing-xs $spacing-sm;
+      }
+    }
+
+    .api-key-reveal-close {
+      margin-top: $spacing-xs;
+      background: transparent;
+      border: none;
+      color: var(--foreground-muted);
+      font-size: $font-size-xs;
+      cursor: pointer;
+      padding: 0;
+
+      &:hover {
+        color: var(--primary);
+      }
+    }
+  }
+}

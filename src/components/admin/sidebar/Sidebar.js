@@ -17,6 +17,7 @@ import { useTenant } from "../../../context/TenantContext";
 import { auth } from "../../../firebase";
 import Devices from "./Devices";
 import FeedList from "./FeedList";
+import ApiKeysPanel from "./ApiKeysPanel";
 import AudioSettings from "./AudioSettings";
 import SlideArchive from "./SlideArchive";
 import Settings from "./Settings";
@@ -239,6 +240,7 @@ function Sidebar({
         />
         <FeedList />
         {tenantId && isAdmin && <UsersPanel tenantId={tenantId} />}
+        {tenantId && isAdmin && <ApiKeysPanel tenantId={tenantId} />}
         {modules.backgroundMusic && <AudioSettings />}
         {isAdmin && (
           <Settings
