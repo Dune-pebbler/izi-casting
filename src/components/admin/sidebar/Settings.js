@@ -68,8 +68,11 @@ function Settings() {
     progressBarColor: "#3dbcc9",
     feedUrl: "",
     showClock: true,
+    capitalRssTitle: false,
+    reduceRssTitleLetterSpacing: false,
     showDate: true,
     barStyle: "onder",
+    feedFontSize: "normaal",
     defaultSlideTransition: "fade",
     enabledFonts: ["Arial"],
     typography: DEFAULT_TYPOGRAPHY,
@@ -99,6 +102,8 @@ function Settings() {
                 : true,
             // Ensure barStyle is always present, default to "onder" if missing
             barStyle: loadedSettings.barStyle || "onder",
+            // Ensure feedFontSize is always present, default to "normaal" if missing
+            feedFontSize: loadedSettings.feedFontSize || "normaal",
             progressBarColor: loadedSettings.progressBarColor || "#6366f1",
             // Ensure defaultSlideTransition is always present, default to "fade" if missing
             defaultSlideTransition:
@@ -109,6 +114,16 @@ function Settings() {
               ...DEFAULT_TYPOGRAPHY,
               ...(loadedSettings.typography || {}),
             },
+            // Ensure capitalRssTitle is always present, default to false if missing
+            capitalRssTitle:
+              loadedSettings.capitalRssTitle !== undefined
+                ? loadedSettings.capitalRssTitle
+                : false,
+            // Ensure reduceRssTitleLetterSpacing is always present, default to false if missing
+            reduceRssTitleLetterSpacing:
+              loadedSettings.reduceRssTitleLetterSpacing !== undefined
+                ? loadedSettings.reduceRssTitleLetterSpacing
+                : false,
           }));
         }
       } catch (error) {
@@ -491,6 +506,60 @@ function Settings() {
                       className="checkbox-input"
                     />
                     <span className="checkbox-text">Datum Tonen</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            {/* RSS Feed Font Size */}
+            <div className="settings-section">
+              <div className="bar-style-settings">
+                <div className="bar-style-input-group">
+                  <label htmlFor="feedFontSize">
+                    Lettergrootte RSS titel &amp; beschrijving
+                  </label>
+                  <select
+                    id="feedFontSize"
+                    value={settings.feedFontSize}
+                    onChange={(e) =>
+                      handleInputChange("feedFontSize", e.target.value)
+                    }
+                    className="bar-style-select"
+                  >
+                    <option value="groot">Groot (1,5x)</option>
+                    <option value="normaal">Normaal</option>
+                    <option value="klein">Klein (0,5x)</option>
+                  </select>
+                </div>
+              </div>
+              <div className="display-section d-flex justify-between mt-2">
+                <div className="checkbox-setting">
+                  <label className="checkbox-label">
+                    <input
+                      type="checkbox"
+                      checked={settings.capitalRssTitle}
+                      onChange={(e) =>
+                        handleInputChange("capitalRssTitle", e.target.checked)
+                      }
+                      className="checkbox-input"
+                    />
+                    <span className="checkbox-text">Title in hoofdletters</span>
+                  </label>
+                </div>
+                <div className="checkbox-setting">
+                  <label className="checkbox-label">
+                    <input
+                      type="checkbox"
+                      checked={settings.reduceRssTitleLetterSpacing}
+                      onChange={(e) =>
+                        handleInputChange(
+                          "reduceRssTitleLetterSpacing",
+                          e.target.checked,
+                        )
+                      }
+                      className="checkbox-input"
+                    />
+                    <span className="checkbox-text">Kleine letterspacing</span>
                   </label>
                 </div>
               </div>

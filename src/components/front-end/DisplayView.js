@@ -64,6 +64,8 @@ function DisplayView() {
     feedUrl: "",
     showClock: true,
     showDate: true,
+    capitalRssTitle: false,
+    reduceRssTitleLetterSpacing: false,
     barStyle: "onder",
     backgroundMusic: null,
   });
@@ -81,6 +83,7 @@ function DisplayView() {
   const generateDisplayPairingCodeRef = useRef();
   const isPairedRef = useRef(isPaired);
   const tenantDeletedRef = useRef(false);
+  const lastFeedsSignatureRef = useRef(null);
   const isGeneratingCodeRef = useRef(isGeneratingCode);
   const displayPairingCodeRef = useRef(displayPairingCode);
   const isGeneratingCodeInternalRef = useRef(false);
@@ -766,6 +769,9 @@ function DisplayView() {
             showDate: data.showDate !== undefined ? data.showDate : true,
             barStyle: data.barStyle || "onder",
             backgroundMusic: data.backgroundMusic || null,
+            capitalRssTitle: data.capitalRssTitle || false,
+            reduceRssTitleLetterSpacing:
+              data.reduceRssTitleLetterSpacing || false,
           });
 
           // Apply typography as CSS custom properties
@@ -792,23 +798,43 @@ function DisplayView() {
             );
           });
 
+          // Apply feed font size scale as a CSS custom property
+          const feedFontScales = { groot: 1.5, normaal: 1, klein: 0.5 };
+          const feedFontScale = feedFontScales[data.feedFontSize] ?? 1;
+          document.documentElement.style.setProperty(
+            "--feed-font-scale",
+            feedFontScale,
+          );
+
+          let nextFeeds;
           if (data.feeds && Array.isArray(data.feeds)) {
-            const enabledFeeds = data.feeds.filter(
+            nextFeeds = data.feeds.filter(
               (feed) => feed.isEnabled !== false && feed.isVisible !== false,
             );
-            setFeeds(enabledFeeds);
           } else if (data.feedUrl) {
-            const migratedFeed = {
-              id: "legacy",
-              name: "Legacy Feed",
-              url: data.feedUrl,
-              isEnabled: true,
-              duration: 10,
-              isVisible: true,
-            };
-            setFeeds([migratedFeed]);
+            nextFeeds = [
+              {
+                id: "legacy",
+                name: "Legacy Feed",
+                url: data.feedUrl,
+                isEnabled: true,
+                duration: 10,
+                isVisible: true,
+              },
+            ];
           } else {
-            setFeeds([]);
+            nextFeeds = [];
+          }
+
+          // Only produce a new `feeds` array reference when the feed content
+          // actually changed. Otherwise every unrelated settings update (a
+          // color, the clock toggle, etc.) recreates the array, which
+          // Feed.js's fetch/rotation effects treat as "feeds changed" and
+          // restart the RSS ticker from scratch.
+          const nextFeedsSignature = JSON.stringify(nextFeeds);
+          if (nextFeedsSignature !== lastFeedsSignatureRef.current) {
+            lastFeedsSignatureRef.current = nextFeedsSignature;
+            setFeeds(nextFeeds);
           }
         }
       });

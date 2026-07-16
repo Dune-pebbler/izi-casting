@@ -5,6 +5,7 @@ import { parseFeed, validateFeedItems } from "../../utils/rssParser";
 function Feed({ feeds, settings }) {
   const [rssFeed, setRssFeed] = useState([]);
   const [currentFeedIndex, setCurrentFeedIndex] = useState(0);
+  const [measuredDuration, setMeasuredDuration] = useState(null);
   const descriptionRef = useRef(null);
 
   // Fetch RSS feed and return items (for multiple feeds support)
@@ -370,33 +371,34 @@ function Feed({ feeds, settings }) {
     }
   }, [feeds, fetchRssFeedItems, calculateReadingTime]);
 
-  // Rotate through RSS feed items with dynamic duration
+  // Reset the measured (scroll-based) duration whenever the displayed item changes,
+  // so a stale measurement from the previous item can't leak into this one.
+  useEffect(() => {
+    setMeasuredDuration(null);
+  }, [currentFeedIndex, rssFeed]);
+
+  // Rotate through RSS feed items with dynamic duration.
+  // Schedules exactly one timeout per render of this effect and always clears it
+  // on cleanup, so changes to rssFeed/currentFeedIndex/measuredDuration can never
+  // leave a stale timer running alongside a new one (which was causing items to
+  // flash by, as multiple overlapping rotation loops fought over currentFeedIndex).
   useEffect(() => {
     if (rssFeed.length === 0) return;
 
-    let currentIndex = 0;
+    const currentItem = rssFeed[currentFeedIndex];
+    const duration =
+      (measuredDuration ?? currentItem?.dynamicDuration ?? 10) * 1000;
 
-    const rotateFeeds = () => {
-      const currentItem = rssFeed[currentIndex];
-      const duration = (currentItem.dynamicDuration || 10) * 1000;
+    console.log(
+      `Feed item "${currentItem?.title || "No title"}" will display for ${duration / 1000} seconds`,
+    );
 
-      console.log(
-        `Feed item "${currentItem?.title || "No title"}" will display for ${duration / 1000} seconds`,
-      );
+    const timeoutId = setTimeout(() => {
+      setCurrentFeedIndex((prev) => (prev + 1) % rssFeed.length);
+    }, duration);
 
-      // Update the current feed index for display
-      setCurrentFeedIndex(currentIndex);
-
-      // Set up next rotation
-      setTimeout(() => {
-        currentIndex = (currentIndex + 1) % rssFeed.length;
-        rotateFeeds();
-      }, duration);
-    };
-
-    // Start the rotation
-    rotateFeeds();
-  }, [rssFeed]);
+    return () => clearTimeout(timeoutId);
+  }, [rssFeed, currentFeedIndex, measuredDuration]);
 
   // Measure overflow and set up scroll animation whenever the displayed item changes.
   // Uses a stable ref + useEffect instead of an inline ref callback to avoid
@@ -496,7 +498,16 @@ function Feed({ feeds, settings }) {
   return (
     <div className="feed-container">
       <div className="rss-item">
-        <div className="rss-title" style={{ color: settings.foregroundColor }}>
+        <div
+          className="rss-title"
+          style={{
+            color: settings.foregroundColor,
+            textTransform: settings.capitalRssTitle ? "uppercase" : "none",
+            letterSpacing: settings.reduceRssTitleLetterSpacing
+              ? "-0.5px"
+              : "normal",
+          }}
+        >
           {currentItem?.title || "No title"}
         </div>
         <div className="rss-description-container">
