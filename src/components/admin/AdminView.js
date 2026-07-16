@@ -47,6 +47,7 @@ import {
   LayoutGrid,
   List,
   Undo2,
+  Images,
   MonitorPlay,
 } from "lucide-react";
 
@@ -125,7 +126,7 @@ function AdminView() {
     useState("programma");
   const [modalSportlinkTeams, setModalSportlinkTeams] = useState([]);
   const [modalSportlinkTitle, setModalSportlinkTitle] = useState("");
-const [modalSportlinkMaxItems, setModalSportlinkMaxItems] = useState(10);
+  const [modalSportlinkMaxItems, setModalSportlinkMaxItems] = useState(10);
   const [modalSportlinkBgColor, setModalSportlinkBgColor] = useState("#0f172a");
   const [modalSportlinkTextColor, setModalSportlinkTextColor] =
     useState("#ffffff");
@@ -214,6 +215,8 @@ const [modalSportlinkMaxItems, setModalSportlinkMaxItems] = useState(10);
   // Trash modal state
   const [trashModalOpen, setTrashModalOpen] = useState(false);
   const [trashedSlides, setTrashedSlides] = useState([]);
+
+  const [mediaLibraryOpen, setMediaLibraryOpen] = useState(false);
 
   // Redux hooks
   const dispatch = useAppDispatch();
@@ -1167,7 +1170,7 @@ const [modalSportlinkMaxItems, setModalSportlinkMaxItems] = useState(10);
     toast.success(
       selected.length === 1
         ? `${selected[0].name || "Afbeelding"} toegevoegd aan galerij`
-        : `${selected.length} afbeeldingen toegevoegd aan galerij`
+        : `${selected.length} afbeeldingen toegevoegd aan galerij`,
     );
   };
 
@@ -1848,6 +1851,14 @@ const [modalSportlinkMaxItems, setModalSportlinkMaxItems] = useState(10);
             </button>
 
             <button
+              className="admin-layout-btn"
+              onClick={() => setMediaLibraryOpen(true)}
+              title="Mediabibliotheek"
+            >
+              <Images size={18} />
+            </button>
+
+            <button
               className="admin-settings-btn"
               onClick={toggleSidebarCollapse}
               title={isSidebarCollapsed ? "Open settings" : "Close settings"}
@@ -1856,6 +1867,12 @@ const [modalSportlinkMaxItems, setModalSportlinkMaxItems] = useState(10);
             </button>
           </div>
         </div>
+
+        <ImageLibraryModal
+          isOpen={mediaLibraryOpen}
+          onClose={() => setMediaLibraryOpen(false)}
+          allowUpload
+        />
 
         <PlaylistList
           playlists={playlists}

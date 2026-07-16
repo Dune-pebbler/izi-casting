@@ -1,13 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { X, Upload, Trash2, Search, Image as ImageIcon } from 'lucide-react';
-import { collection, query, orderBy, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
+import { collection, query, orderBy, onSnapshot, deleteDoc, doc, addDoc } from 'firebase/firestore';
 import { db, storage } from '../../../firebase';
-import { ref, deleteObject } from 'firebase/storage';
+import { ref, deleteObject, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { toast } from 'sonner';
 import { useTenant } from '../../../context/TenantContext';
-import { tenantDoc, tenantCollection } from '../../../utils/tenantPaths';
+import { tenantDoc, tenantCollection, tenantStorageRef } from '../../../utils/tenantPaths';
 
-const ImageLibraryModal = ({ isOpen, onClose, onSelectImage, multiple = false }) => {
+const ImageLibraryModal = ({ isOpen, onClose, onSelectImage, multiple = false, allowUpload = false }) => {
   const { tenantId } = useTenant();
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -15,6 +16,9 @@ const ImageLibraryModal = ({ isOpen, onClose, onSelectImage, multiple = false })
   const [selectedImage, setSelectedImage] = useState(null);
   const [selectedImages, setSelectedImages] = useState([]);
   const [deletingImageId, setDeletingImageId] = useState(null);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef(null);
+  const canSelect = typeof onSelectImage === 'function';
 
   useEffect(() => {
     if (!isOpen) return;
@@ -94,7 +98,78 @@ const ImageLibraryModal = ({ isOpen, onClose, onSelectImage, multiple = false })
     }
   };
 
+  const uploadOne = async (file) => {
+    if (!file.type.startsWith('image/')) {
+      toast.error(`${file.name}: geen geldig afbeeldingsbestand.`);
+      return false;
+    }
+    const maxSize = 5 * 1024 * 1024;
+    if (file.size > maxSize) {
+      toast.error(`${file.name}: afbeelding moet kleiner zijn dan 5MB.`);
+      return false;
+    }
+
+    const timestamp = Date.now();
+    const fileName = `${timestamp}_${file.name}`;
+    const storageRef = tenantStorageRef(storage, tenantId, `slides/${fileName}`);
+
+    const snapshot = await uploadBytes(storageRef, file);
+    const downloadURL = await getDownloadURL(snapshot.ref);
+
+    const img = new Image();
+    const dimensionsPromise = new Promise((resolve) => {
+      img.onload = () => resolve({ width: img.width, height: img.height });
+      img.onerror = () => resolve({ width: null, height: null });
+    });
+    img.src = downloadURL;
+    const { width, height } = await dimensionsPromise;
+
+    await addDoc(tenantCollection(db, tenantId, 'mediaLibrary'), {
+      name: file.name,
+      url: downloadURL,
+      storagePath: `tenants/${tenantId}/slides/${fileName}`,
+      size: file.size,
+      type: file.type,
+      width,
+      height,
+      uploadedAt: new Date(),
+    });
+    return true;
+  };
+
+  const handleUpload = async (e) => {
+    const files = Array.from(e.target.files || []);
+    e.target.value = '';
+    if (files.length === 0) return;
+
+    setUploading(true);
+    const loadingToast = toast.loading(
+      files.length > 1 ? `${files.length} afbeeldingen uploaden...` : 'Afbeelding uploaden...'
+    );
+
+    let successCount = 0;
+    for (const file of files) {
+      try {
+        if (await uploadOne(file)) successCount += 1;
+      } catch (error) {
+        console.error('Error uploading image:', error);
+        toast.error(`${file.name}: fout bij uploaden - ${error.message}`);
+      }
+    }
+
+    toast.dismiss(loadingToast);
+    if (successCount > 0) {
+      toast.success(
+        successCount > 1
+          ? `${successCount} afbeeldingen succesvol geüpload!`
+          : 'Afbeelding succesvol geüpload!'
+      );
+    }
+    setUploading(false);
+  };
+
   const handleItemClick = (image) => {
+    if (!canSelect) return;
     if (multiple) {
       setSelectedImages((prev) =>
         prev.some((img) => img.id === image.id)
@@ -124,7 +199,7 @@ const ImageLibraryModal = ({ isOpen, onClose, onSelectImage, multiple = false })
 
   if (!isOpen) return null;
 
-  return (
+  return createPortal(
     <div className="image-library-modal-wrapper">
       <div className="modal-overlay" onClick={onClose}>
         <div className="image-library-modal" onClick={e => e.stopPropagation()}>
@@ -139,15 +214,37 @@ const ImageLibraryModal = ({ isOpen, onClose, onSelectImage, multiple = false })
           </div>
 
           <div className="modal-body">
-            <div className="image-library-search">
-              <Search size={18} />
-              <input
-                type="text"
-                placeholder="Zoek afbeeldingen..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="search-input"
-              />
+            <div className="image-library-toolbar">
+              <div className="image-library-search">
+                <Search size={18} />
+                <input
+                  type="text"
+                  placeholder="Zoek afbeeldingen..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="search-input"
+                />
+              </div>
+              {allowUpload && (
+                <>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={handleUpload}
+                    style={{ display: 'none' }}
+                  />
+                  <button
+                    className="btn btn-primary image-library-upload-btn"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={uploading}
+                  >
+                    <Upload size={16} />
+                    {uploading ? 'Uploaden...' : 'Uploaden'}
+                  </button>
+                </>
+              )}
             </div>
 
             {loading ? (
@@ -207,24 +304,33 @@ const ImageLibraryModal = ({ isOpen, onClose, onSelectImage, multiple = false })
           </div>
 
           <div className="modal-footer">
-            <button className="btn btn-secondary" onClick={onClose}>
-              Annuleren
-            </button>
-            <button
-              className="btn btn-primary"
-              onClick={handleSelect}
-              disabled={multiple ? selectedImages.length === 0 : !selectedImage}
-            >
-              {multiple
-                ? selectedImages.length > 0
-                  ? `Selecteer ${selectedImages.length} afbeelding${selectedImages.length !== 1 ? 'en' : ''}`
-                  : 'Selecteer afbeeldingen'
-                : 'Selecteer afbeelding'}
-            </button>
+            {canSelect ? (
+              <>
+                <button className="btn btn-secondary" onClick={onClose}>
+                  Annuleren
+                </button>
+                <button
+                  className="btn btn-primary"
+                  onClick={handleSelect}
+                  disabled={multiple ? selectedImages.length === 0 : !selectedImage}
+                >
+                  {multiple
+                    ? selectedImages.length > 0
+                      ? `Selecteer ${selectedImages.length} afbeelding${selectedImages.length !== 1 ? 'en' : ''}`
+                      : 'Selecteer afbeeldingen'
+                    : 'Selecteer afbeelding'}
+                </button>
+              </>
+            ) : (
+              <button className="btn btn-primary" onClick={onClose}>
+                Sluiten
+              </button>
+            )}
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 

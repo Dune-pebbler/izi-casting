@@ -108,9 +108,28 @@
 }
 
 // Image Library Search
+.image-library-toolbar {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  margin-bottom: $spacing-lg;
+
+  .image-library-search {
+    flex: 1;
+    margin-bottom: 0;
+  }
+
+  .image-library-upload-btn {
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+}
+
 .image-library-search {
   position: relative;
-  margin-bottom: $spacing-lg;
 
   svg {
     position: absolute;
