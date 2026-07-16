@@ -97,25 +97,12 @@
       border-bottom: none;
     }
 
-    // Row layout for bar style and clock settings
-    &.settings-row {
+    // Row of toggle checkboxes (e.g. Klok Tonen / Datum Tonen)
+    .display-section {
       display: flex;
+      flex-wrap: wrap;
+      align-items: center;
       gap: $spacing-lg;
-      align-items: flex-start;
-
-      .bar-style-settings {
-        flex: 1;
-        min-width: 0;
-      }
-
-      .display-section {
-        flex: 0 0 auto;
-        min-width: 200px;
-        display: flex;
-        align-items: center;
-        justify-content: flex-start;
-        height: 100%;
-      }
     }
 
     h3 {

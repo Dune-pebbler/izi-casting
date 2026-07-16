@@ -68,6 +68,7 @@ function Settings() {
     progressBarColor: "#3dbcc9",
     feedUrl: "",
     showClock: true,
+    clockFormat: "HH:mm:ss",
     capitalRssTitle: false,
     reduceRssTitleLetterSpacing: false,
     showDate: true,
@@ -95,6 +96,8 @@ function Settings() {
               loadedSettings.showClock !== undefined
                 ? loadedSettings.showClock
                 : true,
+            // Ensure clockFormat is always present, default to "HH:mm:ss" if missing
+            clockFormat: loadedSettings.clockFormat || "HH:mm:ss",
             // Ensure showDate is always present, default to true if missing
             showDate:
               loadedSettings.showDate !== undefined
@@ -450,8 +453,8 @@ function Settings() {
               </div>
             </div>
 
-            {/* Bar Style and Clock Settings Row */}
-            <div className="settings-section settings-row">
+            {/* Bar Style */}
+            <div className="settings-section">
               <div className="bar-style-settings">
                 <div className="bar-style-input-group">
                   <label htmlFor="barStyle">Balk Stijl</label>
@@ -480,7 +483,15 @@ function Settings() {
                   </select>
                 </div>
               </div>
+            </div>
 
+            {/* Clock and Date Toggles */}
+            <div
+              className="settings-section"
+              style={{
+                padding: "4px 24px",
+              }}
+            >
               <div className="display-section">
                 <div className="checkbox-setting">
                   <label className="checkbox-label">
@@ -510,6 +521,28 @@ function Settings() {
                 </div>
               </div>
             </div>
+
+            {/* Clock Format */}
+            {settings.showClock && (
+              <div className="settings-section">
+                <div className="bar-style-settings">
+                  <div className="bar-style-input-group">
+                    <label htmlFor="clockFormat">Klok Notatie</label>
+                    <select
+                      id="clockFormat"
+                      value={settings.clockFormat}
+                      onChange={(e) =>
+                        handleInputChange("clockFormat", e.target.value)
+                      }
+                      className="bar-style-select"
+                    >
+                      <option value="HH:mm:ss">UU:MM:SS</option>
+                      <option value="HH:mm">UU:MM</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* RSS Feed Font Size */}
             <div className="settings-section">

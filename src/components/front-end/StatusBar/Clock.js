@@ -21,15 +21,15 @@ const Clock = memo(({ settings }) => {
     const timeOptions = {
       hour: "2-digit",
       minute: "2-digit",
-      second: "2-digit",
       hour12: false,
+      ...(settings.clockFormat !== "HH:mm" && { second: "2-digit" }),
     };
 
     const dateString = currentDateTime.toLocaleDateString("nl-NL", dateOptions);
     const timeString = currentDateTime.toLocaleTimeString("nl-NL", timeOptions);
 
     return { dateString, timeString };
-  }, [currentDateTime]);
+  }, [currentDateTime, settings.clockFormat]);
 
   return (
     <div className="display-bottom-clock">
