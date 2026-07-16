@@ -179,10 +179,10 @@ const [modalSportlinkMaxItems, setModalSportlinkMaxItems] = useState(10);
   const [defaultSlideTransition, setDefaultSlideTransition] = useState("fade");
   const [enabledFonts, setEnabledFonts] = useState([]);
   const [typography, setTypography] = useState({
-    p: { fontSize: 27, fontFamily: "Roboto" },
-    h1: { fontSize: 64, fontFamily: "Roboto" },
-    h2: { fontSize: 53, fontFamily: "Roboto" },
-    h3: { fontSize: 43, fontFamily: "Roboto" },
+    p: { fontSize: 27, fontFamily: "Arial", fontColor: "#000000" },
+    h1: { fontSize: 64, fontFamily: "Arial", fontColor: "#000000" },
+    h2: { fontSize: 53, fontFamily: "Arial", fontColor: "#000000" },
+    h3: { fontSize: 43, fontFamily: "Arial", fontColor: "#000000" },
   });
 
   // Playlist editing state

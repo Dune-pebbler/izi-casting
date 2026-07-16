@@ -3490,6 +3490,7 @@
 .display-sportlink__scoreboard-team div {
   display: flex;
   align-items: center;
+  flex-direction: row-reverse;
   gap: 10px;
   font-size: 2.3rem;
   font-weight: 500;
@@ -3509,10 +3510,16 @@
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+  text-transform: uppercase;
+  font-size: 2.8rem;
+}
+
+.display-sportlink__match-home {
+  text-align: right;
 }
 
 .display-sportlink__match-away {
-  text-align: right;
+  text-align: left;
 }
 
 /* Kleedkamer subtekst */

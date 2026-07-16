@@ -54,10 +54,10 @@ function Settings() {
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const DEFAULT_TYPOGRAPHY = {
-    p: { fontSize: 27, fontFamily: "Roboto" },
-    h1: { fontSize: 64, fontFamily: "Roboto" },
-    h2: { fontSize: 53, fontFamily: "Roboto" },
-    h3: { fontSize: 43, fontFamily: "Roboto" },
+    p: { fontSize: 27, fontFamily: "Arial", fontColor: "#000000" },
+    h1: { fontSize: 64, fontFamily: "Arial", fontColor: "#000000" },
+    h2: { fontSize: 53, fontFamily: "Arial", fontColor: "#000000" },
+    h3: { fontSize: 43, fontFamily: "Arial", fontColor: "#000000" },
   };
 
   const [settings, setSettings] = useState({
@@ -71,7 +71,7 @@ function Settings() {
     showDate: true,
     barStyle: "onder",
     defaultSlideTransition: "fade",
-    enabledFonts: AVAILABLE_FONTS.map((f) => f.name),
+    enabledFonts: ["Arial"],
     typography: DEFAULT_TYPOGRAPHY,
   });
 
@@ -103,9 +103,8 @@ function Settings() {
             // Ensure defaultSlideTransition is always present, default to "fade" if missing
             defaultSlideTransition:
               loadedSettings.defaultSlideTransition || "fade",
-            // Ensure enabledFonts is always present, default to all fonts if missing
-            enabledFonts:
-              loadedSettings.enabledFonts || AVAILABLE_FONTS.map((f) => f.name),
+            // Ensure enabledFonts is always present, default to Arial only if missing
+            enabledFonts: loadedSettings.enabledFonts || ["Arial"],
             typography: {
               ...DEFAULT_TYPOGRAPHY,
               ...(loadedSettings.typography || {}),
@@ -553,7 +552,8 @@ function Settings() {
                         <input
                           type="checkbox"
                           checked={
-                            settings.enabledFonts?.includes(font.name) ?? true
+                            settings.enabledFonts?.includes(font.name) ??
+                            font.name === "Arial"
                           }
                           onChange={() => toggleFont(font.name)}
                           className="font-checkbox"
@@ -574,6 +574,7 @@ function Settings() {
                   <span />
                   <span>Lettertype</span>
                   <span>Grootte</span>
+                  <span>Kleur</span>
                 </div>
                 {[
                   { key: "p", label: "Paragraaf" },
@@ -585,7 +586,7 @@ function Settings() {
                     <span className="typography-grid__label">{label}</span>
                     <select
                       className="typography-grid__select"
-                      value={settings.typography?.[key]?.fontFamily || "Roboto"}
+                      value={settings.typography?.[key]?.fontFamily || "Arial"}
                       onChange={(e) =>
                         setSettings((prev) => ({
                           ...prev,
@@ -599,7 +600,11 @@ function Settings() {
                         }))
                       }
                     >
-                      {AVAILABLE_FONTS.map((f) => (
+                      {AVAILABLE_FONTS.filter(
+                        (f) =>
+                          settings.enabledFonts?.includes(f.name) ||
+                          f.name === settings.typography?.[key]?.fontFamily,
+                      ).map((f) => (
                         <option key={f.name} value={f.name}>
                           {f.name}
                         </option>
@@ -627,6 +632,23 @@ function Settings() {
                       />
                       <span className="typography-grid__size-suffix">px</span>
                     </div>
+                    <input
+                      type="color"
+                      value={settings.typography?.[key]?.fontColor || "#000000"}
+                      onChange={(e) =>
+                        setSettings((prev) => ({
+                          ...prev,
+                          typography: {
+                            ...prev.typography,
+                            [key]: {
+                              ...prev.typography?.[key],
+                              fontColor: e.target.value,
+                            },
+                          },
+                        }))
+                      }
+                      className="typography-grid__color"
+                    />
                   </div>
                 ))}
               </div>

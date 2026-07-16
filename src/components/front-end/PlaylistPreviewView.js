@@ -142,13 +142,13 @@ function PlaylistPreviewView() {
 
         const typo = data.typography || {};
         const defaults = {
-          p: { fontSize: 27, fontFamily: "Roboto" },
-          h1: { fontSize: 64, fontFamily: "Roboto" },
-          h2: { fontSize: 53, fontFamily: "Roboto" },
-          h3: { fontSize: 43, fontFamily: "Roboto" },
+          p: { fontSize: 27, fontFamily: "Arial", fontColor: "#000000" },
+          h1: { fontSize: 64, fontFamily: "Arial", fontColor: "#000000" },
+          h2: { fontSize: 53, fontFamily: "Arial", fontColor: "#000000" },
+          h3: { fontSize: 43, fontFamily: "Arial", fontColor: "#000000" },
         };
         ["p", "h1", "h2", "h3"].forEach((tag) => {
-          const t = typo[tag] || defaults[tag];
+          const t = { ...defaults[tag], ...typo[tag] };
           document.documentElement.style.setProperty(
             `--typo-${tag}-size`,
             `${t.fontSize}px`,
@@ -156,6 +156,10 @@ function PlaylistPreviewView() {
           document.documentElement.style.setProperty(
             `--typo-${tag}-family`,
             t.fontFamily,
+          );
+          document.documentElement.style.setProperty(
+            `--typo-${tag}-color`,
+            t.fontColor,
           );
         });
 
@@ -271,6 +275,7 @@ function PlaylistPreviewView() {
               slide.sportlinkApiKey &&
               slide.sportlinkTeams &&
               slide.sportlinkTeams.length > 0) ||
+            (slide.layout === "qr-feed" && slide.qrUrl) ||
             (!slide.type && slide.text && slide.text.trim())),
       );
 

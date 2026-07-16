@@ -286,6 +286,7 @@ function EditModal({
                 content={modalTinyMCEContent}
                 onContentChange={onContentChange}
                 enabledFonts={enabledFonts}
+                typography={typography}
               />
             </div>
           </div>
