@@ -69,6 +69,7 @@ function Settings() {
     feedUrl: "",
     showClock: true,
     clockFormat: "HH:mm:ss",
+    analogClock: false,
     capitalRssTitle: false,
     reduceRssTitleLetterSpacing: false,
     showDate: true,
@@ -98,6 +99,11 @@ function Settings() {
                 : true,
             // Ensure clockFormat is always present, default to "HH:mm:ss" if missing
             clockFormat: loadedSettings.clockFormat || "HH:mm:ss",
+            // Ensure analogClock is always present, default to false if missing
+            analogClock:
+              loadedSettings.analogClock !== undefined
+                ? loadedSettings.analogClock
+                : false,
             // Ensure showDate is always present, default to true if missing
             showDate:
               loadedSettings.showDate !== undefined
@@ -519,11 +525,26 @@ function Settings() {
                     <span className="checkbox-text">Datum Tonen</span>
                   </label>
                 </div>
+                {settings.showClock && (
+                  <div className="checkbox-setting">
+                    <label className="checkbox-label">
+                      <input
+                        type="checkbox"
+                        checked={settings.analogClock}
+                        onChange={(e) =>
+                          handleInputChange("analogClock", e.target.checked)
+                        }
+                        className="checkbox-input"
+                      />
+                      <span className="checkbox-text">Analoge Klok</span>
+                    </label>
+                  </div>
+                )}
               </div>
             </div>
 
             {/* Clock Format */}
-            {settings.showClock && (
+            {settings.showClock && !settings.analogClock && (
               <div className="settings-section">
                 <div className="bar-style-settings">
                   <div className="bar-style-input-group">

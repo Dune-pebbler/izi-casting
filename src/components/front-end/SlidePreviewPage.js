@@ -25,6 +25,8 @@ function SlidePreviewPage() {
     foregroundColor: "#212121",
     progressBarColor: "#3dbcc9",
     showClock: true,
+    clockFormat: "HH:mm:ss",
+    analogClock: false,
     showDate: true,
     barStyle: "onder",
   });
@@ -116,6 +118,8 @@ function SlidePreviewPage() {
           foregroundColor: data.foregroundColor || "#212121",
           progressBarColor: data.progressBarColor || "#3dbcc9",
           showClock: data.showClock !== undefined ? data.showClock : true,
+          clockFormat: data.clockFormat || "HH:mm:ss",
+          analogClock: data.analogClock || false,
           showDate: data.showDate !== undefined ? data.showDate : true,
           barStyle: data.barStyle || "onder",
         });
