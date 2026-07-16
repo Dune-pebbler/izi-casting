@@ -7,16 +7,20 @@ import { toast } from 'sonner';
 import { useTenant } from '../../../context/TenantContext';
 import { tenantDoc, tenantCollection } from '../../../utils/tenantPaths';
 
-const ImageLibraryModal = ({ isOpen, onClose, onSelectImage }) => {
+const ImageLibraryModal = ({ isOpen, onClose, onSelectImage, multiple = false }) => {
   const { tenantId } = useTenant();
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedImage, setSelectedImage] = useState(null);
+  const [selectedImages, setSelectedImages] = useState([]);
   const [deletingImageId, setDeletingImageId] = useState(null);
 
   useEffect(() => {
     if (!isOpen) return;
+
+    setSelectedImage(null);
+    setSelectedImages([]);
 
     // Listen to media library changes in real-time
     const mediaQuery = query(
@@ -67,6 +71,7 @@ const ImageLibraryModal = ({ isOpen, onClose, onSelectImage }) => {
       if (selectedImage?.id === image.id) {
         setSelectedImage(null);
       }
+      setSelectedImages((prev) => prev.filter((img) => img.id !== image.id));
     } catch (error) {
       console.error('Error deleting image:', error);
       toast.error('Verwijderen van afbeelding mislukt');
@@ -76,10 +81,28 @@ const ImageLibraryModal = ({ isOpen, onClose, onSelectImage }) => {
   };
 
   const handleSelect = () => {
-    if (selectedImage) {
+    if (multiple) {
+      if (selectedImages.length > 0) {
+        onSelectImage(selectedImages);
+        onClose();
+        setSelectedImages([]);
+      }
+    } else if (selectedImage) {
       onSelectImage(selectedImage);
       onClose();
       setSelectedImage(null);
+    }
+  };
+
+  const handleItemClick = (image) => {
+    if (multiple) {
+      setSelectedImages((prev) =>
+        prev.some((img) => img.id === image.id)
+          ? prev.filter((img) => img.id !== image.id)
+          : [...prev, image]
+      );
+    } else {
+      setSelectedImage(image);
     }
   };
 
@@ -140,11 +163,15 @@ const ImageLibraryModal = ({ isOpen, onClose, onSelectImage }) => {
               </div>
             ) : (
               <div className="image-library-grid">
-                {filteredImages.map((image) => (
+                {filteredImages.map((image) => {
+                  const isSelected = multiple
+                    ? selectedImages.some((img) => img.id === image.id)
+                    : selectedImage?.id === image.id;
+                  return (
                   <div
                     key={image.id}
-                    className={`image-library-item ${selectedImage?.id === image.id ? 'selected' : ''}`}
-                    onClick={() => setSelectedImage(image)}
+                    className={`image-library-item ${isSelected ? 'selected' : ''}`}
+                    onClick={() => handleItemClick(image)}
                   >
                     <div className="image-library-thumbnail">
                       <img src={image.url} alt={image.name} />
@@ -165,7 +192,7 @@ const ImageLibraryModal = ({ isOpen, onClose, onSelectImage }) => {
                       </p>
                       <p className="image-date">{formatDate(image.uploadedAt)}</p>
                     </div>
-                    {selectedImage?.id === image.id && (
+                    {isSelected && (
                       <div className="selected-indicator">
                         <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                           <path d="M7 10L9 12L13 8" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -173,7 +200,8 @@ const ImageLibraryModal = ({ isOpen, onClose, onSelectImage }) => {
                       </div>
                     )}
                   </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>
@@ -185,9 +213,13 @@ const ImageLibraryModal = ({ isOpen, onClose, onSelectImage }) => {
             <button
               className="btn btn-primary"
               onClick={handleSelect}
-              disabled={!selectedImage}
+              disabled={multiple ? selectedImages.length === 0 : !selectedImage}
             >
-              Selecteer afbeelding
+              {multiple
+                ? selectedImages.length > 0
+                  ? `Selecteer ${selectedImages.length} afbeelding${selectedImages.length !== 1 ? 'en' : ''}`
+                  : 'Selecteer afbeeldingen'
+                : 'Selecteer afbeelding'}
             </button>
           </div>
         </div>

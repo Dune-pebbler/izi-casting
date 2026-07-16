@@ -1152,18 +1152,23 @@ const [modalSportlinkMaxItems, setModalSportlinkMaxItems] = useState(10);
     setImageLibraryModalOpen(true);
   };
 
-  const handleSelectGalleryImageFromLibrary = (image) => {
+  const handleSelectGalleryImageFromLibrary = (images) => {
+    const selected = Array.isArray(images) ? images : [images];
     setModalGalleryImages((prev) => [
       ...prev,
-      {
-        id: Date.now(),
+      ...selected.map((image, index) => ({
+        id: Date.now() + index,
         url: image.url,
         name: image.name || "Afbeelding",
         storagePath: image.storagePath || "",
         duration: 3,
-      },
+      })),
     ]);
-    toast.success(`${image.name || "Afbeelding"} toegevoegd aan galerij`);
+    toast.success(
+      selected.length === 1
+        ? `${selected[0].name || "Afbeelding"} toegevoegd aan galerij`
+        : `${selected.length} afbeeldingen toegevoegd aan galerij`
+    );
   };
 
   const saveModalChanges = async () => {
@@ -2253,6 +2258,7 @@ const [modalSportlinkMaxItems, setModalSportlinkMaxItems] = useState(10);
         isOpen={galleryLibraryModalOpen}
         onClose={() => setGalleryLibraryModalOpen(false)}
         onSelectImage={handleSelectGalleryImageFromLibrary}
+        multiple
       />
 
       {/* Trash Modal */}
