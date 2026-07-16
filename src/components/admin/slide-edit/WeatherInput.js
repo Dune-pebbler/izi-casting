@@ -7,6 +7,8 @@ function WeatherInput({
   weatherLong,
   weatherCity,
   weatherAccentColor,
+  weatherLeftAccentColor,
+  weatherLeftTextColor,
   weatherForecastDays,
   weatherLeftBgImage,
   weatherLeftBgImagePosition,
@@ -14,6 +16,8 @@ function WeatherInput({
   onLongChange,
   onCityChange,
   onAccentColorChange,
+  onLeftAccentColorChange,
+  onLeftTextColorChange,
   onForecastDaysChange,
   onWeatherLeftBgImageUpload,
   onWeatherLeftBgImagePositionChange,
@@ -81,6 +85,44 @@ function WeatherInput({
                 {weatherAccentColor}
               </span>
             </div>
+          </div>
+
+          <div className="sportlink-input__field">
+            <label>Accentkleur links</label>
+            <div className="slide-color-input__wrapper">
+              <input
+                type="color"
+                value={weatherLeftAccentColor || weatherAccentColor}
+                onChange={(e) => onLeftAccentColorChange(e.target.value)}
+                className="slide-color-input__picker"
+              />
+              <span className="slide-color-input__hex">
+                {weatherLeftAccentColor || weatherAccentColor}
+              </span>
+            </div>
+            <p className="sportlink-input__hint">
+              Kleur van de accenten (rand, gloed) links, los van de
+              accentkleur rechts.
+            </p>
+          </div>
+
+          <div className="sportlink-input__field">
+            <label>Tekstkleur links</label>
+            <div className="slide-color-input__wrapper">
+              <input
+                type="color"
+                value={weatherLeftTextColor || "#ffffff"}
+                onChange={(e) => onLeftTextColorChange(e.target.value)}
+                className="slide-color-input__picker"
+              />
+              <span className="slide-color-input__hex">
+                {weatherLeftTextColor || "#ffffff"}
+              </span>
+            </div>
+            <p className="sportlink-input__hint">
+              Handig als de gekozen achtergrondafbeelding links de tekst
+              moeilijk leesbaar maakt.
+            </p>
           </div>
 
           <div className="sportlink-input__field">

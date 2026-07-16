@@ -143,6 +143,10 @@ function AdminView() {
   const [modalWeatherCity, setModalWeatherCity] = useState("");
   const [modalWeatherAccentColor, setModalWeatherAccentColor] =
     useState("#4f87ff");
+  const [modalWeatherLeftAccentColor, setModalWeatherLeftAccentColor] =
+    useState("#4f87ff");
+  const [modalWeatherLeftTextColor, setModalWeatherLeftTextColor] =
+    useState("#ffffff");
   const [modalWeatherForecastDays, setModalWeatherForecastDays] = useState(7);
   const [modalWeatherLeftBgImage, setModalWeatherLeftBgImage] = useState("");
   const [modalWeatherLeftBgImagePosition, setModalWeatherLeftBgImagePosition] =
@@ -530,6 +534,8 @@ function AdminView() {
         weatherLong: "",
         weatherCity: "",
         weatherAccentColor: "#4f87ff",
+        weatherLeftAccentColor: "#4f87ff",
+        weatherLeftTextColor: "#ffffff",
         weatherForecastDays: 7,
         weatherLeftBgImage: "",
         weatherLeftBgImagePosition: "center",
@@ -723,6 +729,10 @@ function AdminView() {
     setModalWeatherLong(slide.weatherLong || "");
     setModalWeatherCity(slide.weatherCity || "");
     setModalWeatherAccentColor(slide.weatherAccentColor || "#4f87ff");
+    setModalWeatherLeftAccentColor(
+      slide.weatherLeftAccentColor || slide.weatherAccentColor || "#4f87ff",
+    );
+    setModalWeatherLeftTextColor(slide.weatherLeftTextColor || "#ffffff");
     setModalWeatherForecastDays(slide.weatherForecastDays ?? 7);
     setModalWeatherLeftBgImage(slide.weatherLeftBgImage || "");
     setModalWeatherLeftBgImagePosition(
@@ -1277,6 +1287,9 @@ function AdminView() {
                               weatherLong: modalWeatherLong,
                               weatherCity: modalWeatherCity,
                               weatherAccentColor: modalWeatherAccentColor,
+                              weatherLeftAccentColor:
+                                modalWeatherLeftAccentColor,
+                              weatherLeftTextColor: modalWeatherLeftTextColor,
                               weatherForecastDays: modalWeatherForecastDays,
                               weatherLeftBgImage: modalWeatherLeftBgImage,
                               weatherLeftBgImagePosition:
@@ -2059,6 +2072,10 @@ function AdminView() {
           onWeatherCityChange={setModalWeatherCity}
           weatherAccentColor={modalWeatherAccentColor}
           onWeatherAccentColorChange={setModalWeatherAccentColor}
+          weatherLeftAccentColor={modalWeatherLeftAccentColor}
+          onWeatherLeftAccentColorChange={setModalWeatherLeftAccentColor}
+          weatherLeftTextColor={modalWeatherLeftTextColor}
+          onWeatherLeftTextColorChange={setModalWeatherLeftTextColor}
           weatherForecastDays={modalWeatherForecastDays}
           onWeatherForecastDaysChange={setModalWeatherForecastDays}
           weatherLeftBgImage={modalWeatherLeftBgImage}

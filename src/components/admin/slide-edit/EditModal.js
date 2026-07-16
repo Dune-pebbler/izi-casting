@@ -154,6 +154,10 @@ function EditModal({
   onWeatherCityChange,
   weatherAccentColor,
   onWeatherAccentColorChange,
+  weatherLeftAccentColor,
+  onWeatherLeftAccentColorChange,
+  weatherLeftTextColor,
+  onWeatherLeftTextColorChange,
   weatherForecastDays,
   onWeatherForecastDaysChange,
   weatherLeftBgImage,
@@ -489,10 +493,14 @@ function EditModal({
               weatherLong={weatherLong}
               weatherCity={weatherCity}
               weatherAccentColor={weatherAccentColor}
+              weatherLeftAccentColor={weatherLeftAccentColor}
+              weatherLeftTextColor={weatherLeftTextColor}
               onLatChange={onWeatherLatChange}
               onLongChange={onWeatherLongChange}
               onCityChange={onWeatherCityChange}
               onAccentColorChange={onWeatherAccentColorChange}
+              onLeftAccentColorChange={onWeatherLeftAccentColorChange}
+              onLeftTextColorChange={onWeatherLeftTextColorChange}
               weatherForecastDays={weatherForecastDays}
               onForecastDaysChange={onWeatherForecastDaysChange}
               weatherLeftBgImage={weatherLeftBgImage}

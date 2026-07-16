@@ -1503,11 +1503,13 @@ function SlideDisplay({
           <div className="display-weather-wrapper">
             {slide.weatherLat && slide.weatherLong ? (
               <WeatherDisplay
-                key={`${slide.weatherLat}-${slide.weatherLong}-${slide.weatherForecastDays}-${slide.weatherAccentColor}-${slide.weatherLeftBgImage}-${slide.weatherCity}`}
+                key={`${slide.weatherLat}-${slide.weatherLong}-${slide.weatherForecastDays}`}
                 lat={slide.weatherLat}
                 long={slide.weatherLong}
                 cityName={slide.weatherCity || ""}
                 accentColor={slide.weatherAccentColor || "#4f87ff"}
+                leftAccentColor={slide.weatherLeftAccentColor}
+                leftTextColor={slide.weatherLeftTextColor}
                 forecastDays={slide.weatherForecastDays ?? 7}
                 leftBgImage={slide.weatherLeftBgImage || ""}
                 leftBgImagePosition={
