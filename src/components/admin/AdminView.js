@@ -964,7 +964,9 @@ function AdminView() {
 
   const handleGalleryImageDurationChange = (imageId, duration) => {
     setModalGalleryImages((prev) =>
-      prev.map((img) => (img.id === imageId ? { ...img, duration } : img)),
+      imageId == null
+        ? prev.map((img) => ({ ...img, duration }))
+        : prev.map((img) => (img.id === imageId ? { ...img, duration } : img)),
     );
   };
 
