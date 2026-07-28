@@ -1,10 +1,15 @@
 import React from "react";
 
-function ProgressBar({ currentSlide, slideProgress, progressBarRef, barStyle, color }) {
-
-  if (currentSlide?.showBar === false) {
-    return null;
-  }
+function ProgressBar({
+  currentSlide,
+  slideProgress,
+  progressBarRef,
+  barStyle,
+  color,
+}) {
+  // if (currentSlide?.showBar === false) {
+  //   return null;
+  // }
 
   // Determine progress bar position based on bar style
   const getProgressBarStyle = () => {
@@ -14,8 +19,13 @@ function ProgressBar({ currentSlide, slideProgress, progressBarRef, barStyle, co
       case "licht transparant boven":
       case "transparant boven": // legacy
         return {
-          top: "140px",
+          top: currentSlide?.showBar === false ? "0px" : "140px",
           bottom: "auto",
+          margin: currentSlide?.showBar === false ? "0" : "16px",
+          width:
+            currentSlide?.showBar === false
+              ? "calc(100%)"
+              : "calc(100% - 32px)",
         };
       case "onder":
       case "donker transparant onder":
@@ -24,20 +34,25 @@ function ProgressBar({ currentSlide, slideProgress, progressBarRef, barStyle, co
       default:
         return {
           top: "auto",
-          bottom: "140px",
+          bottom: currentSlide?.showBar === false ? "0px" : "140px",
+          margin: currentSlide?.showBar === false ? "0" : "16px",
+          width:
+            currentSlide?.showBar === false
+              ? "calc(100%)"
+              : "calc(100% - 32px)",
         };
     }
   };
 
   return (
-    <div
-      className="display-progress-bar"
-      style={getProgressBarStyle()}
-    >
+    <div className="display-progress-bar" style={getProgressBarStyle()}>
       <div
         ref={progressBarRef}
         className="display-progress-fill"
-        style={{ width: `${slideProgress}%`, backgroundColor: color || undefined }}
+        style={{
+          width: `${slideProgress}%`,
+          backgroundColor: color || undefined,
+        }}
       />
     </div>
   );
