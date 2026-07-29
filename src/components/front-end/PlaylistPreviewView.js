@@ -213,9 +213,18 @@ function PlaylistPreviewView() {
 
       const isTimeActive = (slide) => {
         const tr = slide.timeRestriction;
-        if (!tr?.enabled) return true;
+        if (!tr) return true;
 
-        if (tr.startDate || tr.endDate) {
+        // Legacy data only has a single `enabled` flag — treat it as both
+        // windows being on so previously configured slides keep working.
+        const timeEnabled =
+          tr.timeEnabled !== undefined ? tr.timeEnabled : !!tr.enabled;
+        const dateEnabled =
+          tr.dateEnabled !== undefined ? tr.dateEnabled : !!tr.enabled;
+
+        if (!timeEnabled && !dateEnabled) return true;
+
+        if (dateEnabled && (tr.startDate || tr.endDate)) {
           const pad = (n) => String(n).padStart(2, "0");
           const todayStr = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
           const toDateStr = (val) => {
@@ -231,6 +240,8 @@ function PlaylistPreviewView() {
           if (startStr && todayStr < startStr) return false;
           if (endStr && todayStr > endStr) return false;
         }
+
+        if (!timeEnabled) return true;
 
         if (tr.days) {
           const dayKeys = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];

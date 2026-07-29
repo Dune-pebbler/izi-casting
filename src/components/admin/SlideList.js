@@ -26,6 +26,13 @@ import {
   ScanQrCode,
 } from "lucide-react";
 
+const isTimeRestrictionActive = (tr) => {
+  if (!tr) return false;
+  const timeEnabled = tr.timeEnabled !== undefined ? tr.timeEnabled : !!tr.enabled;
+  const dateEnabled = tr.dateEnabled !== undefined ? tr.dateEnabled : !!tr.enabled;
+  return timeEnabled || dateEnabled;
+};
+
 const iconMap = {
   video: <Play />,
   iframe: <Globe />,
@@ -553,9 +560,9 @@ function SlideList({
                 e.stopPropagation();
                 onToggleSlideTimeRestriction(slide.id);
               }}
-              className={`btn-icon btn-icon--time ${slide.timeRestriction?.enabled ? "btn-icon--success" : ""}`}
+              className={`btn-icon btn-icon--time ${isTimeRestrictionActive(slide.timeRestriction) ? "btn-icon--success" : ""}`}
               title={
-                slide.timeRestriction?.enabled
+                isTimeRestrictionActive(slide.timeRestriction)
                   ? `Tijdvenster aan: ${slide.timeRestriction?.startTime} – ${slide.timeRestriction?.endTime}`
                   : "Tijdvenster uitgeschakeld"
               }
@@ -737,9 +744,9 @@ function SlideList({
               e.stopPropagation();
               onToggleSlideTimeRestriction(slide.id);
             }}
-            className={`btn-icon btn-icon--time ${slide.timeRestriction?.enabled ? "btn-icon--success" : ""}`}
+            className={`btn-icon btn-icon--time ${isTimeRestrictionActive(slide.timeRestriction) ? "btn-icon--success" : ""}`}
             title={
-              slide.timeRestriction?.enabled
+              isTimeRestrictionActive(slide.timeRestriction)
                 ? `Tijdvenster aan: ${slide.timeRestriction?.startTime} – ${slide.timeRestriction?.endTime}`
                 : "Tijdvenster uitgeschakeld"
             }
@@ -816,11 +823,12 @@ function SlideList({
                 onToggleSlideTimeRestriction(slide.id);
                 setActionsOpen(false);
               }}
-              className={`btn-icon slide-row__actions-panel-btn${slide.timeRestriction?.enabled ? " btn-icon--success" : ""}`}
+              className={`btn-icon slide-row__actions-panel-btn${isTimeRestrictionActive(slide.timeRestriction) ? " btn-icon--success" : ""}`}
             >
               <Clock size={16} />
               <span>
-                Tijdvenster {slide.timeRestriction?.enabled ? "uit" : "aan"}
+                Tijdvenster{" "}
+                {isTimeRestrictionActive(slide.timeRestriction) ? "uit" : "aan"}
               </span>
             </button>
             <button

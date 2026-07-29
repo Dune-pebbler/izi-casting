@@ -874,10 +874,19 @@ function DisplayView() {
 
         const isTimeActive = (slide) => {
           const tr = slide.timeRestriction;
-          if (!tr?.enabled) return true;
+          if (!tr) return true;
+
+          // Legacy data only has a single `enabled` flag — treat it as both
+          // windows being on so previously configured slides keep working.
+          const timeEnabled =
+            tr.timeEnabled !== undefined ? tr.timeEnabled : !!tr.enabled;
+          const dateEnabled =
+            tr.dateEnabled !== undefined ? tr.dateEnabled : !!tr.enabled;
+
+          if (!timeEnabled && !dateEnabled) return true;
 
           // Date range check (optional — empty string means no restriction)
-          if (tr.startDate || tr.endDate) {
+          if (dateEnabled && (tr.startDate || tr.endDate)) {
             const pad = (n) => String(n).padStart(2, "0");
             const todayStr = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
 
@@ -897,6 +906,8 @@ function DisplayView() {
             if (startStr && todayStr < startStr) return false;
             if (endStr && todayStr > endStr) return false;
           }
+
+          if (!timeEnabled) return true;
 
           if (tr.days) {
             const dayKeys = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];

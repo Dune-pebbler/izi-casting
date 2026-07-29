@@ -1442,7 +1442,12 @@ function AdminView() {
   const toggleSlideTimeRestriction = async (playlistId, slideId) => {
     const playlist = playlists.find((p) => p.id === playlistId);
     const slide = playlist?.slides.find((s) => s.id === slideId);
-    const willEnable = !slide?.timeRestriction?.enabled;
+    const tr = slide?.timeRestriction;
+    const currentlyActive = tr
+      ? (tr.timeEnabled !== undefined ? tr.timeEnabled : !!tr.enabled) ||
+        (tr.dateEnabled !== undefined ? tr.dateEnabled : !!tr.enabled)
+      : false;
+    const willEnable = !currentlyActive;
     const slideName = slide?.name || "Slide";
 
     const updatedPlaylists = playlists.map((p) => {
@@ -1454,6 +1459,8 @@ function AdminView() {
                 timeRestriction: {
                   ...s.timeRestriction,
                   enabled: willEnable,
+                  timeEnabled: willEnable,
+                  dateEnabled: willEnable,
                 },
               }
             : s,

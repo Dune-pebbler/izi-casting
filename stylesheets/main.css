@@ -7629,8 +7629,8 @@ a:hover {
   border-radius: 4px;
   font-size: 10px;
   font-weight: 500;
-  color: var(--foreground-muted);
-  background: var(--muted);
+  color: white;
+  background: red;
   border: 1px solid transparent;
   cursor: pointer;
   -webkit-user-select: none;
@@ -7647,14 +7647,14 @@ a:hover {
   pointer-events: none;
 }
 .slide-modal__time-popup-wrapper .slide-modal__time-popup .time-popup__day-label:has(input:checked) {
-  background: var(--primary);
-  color: var(--primary-foreground);
-  border-color: var(--primary);
+  background: green;
+  color: white;
+  border-color: green;
 }
 .slide-modal__time-popup-wrapper .slide-modal__time-popup .time-popup__day-label:hover:not(:has(input:checked)) {
-  background: var(--muted-hover);
-  color: var(--foreground);
-  border-color: var(--border);
+  background: red;
+  color: white;
+  border-color: red;
 }
 
 .modal-textarea-overlay {

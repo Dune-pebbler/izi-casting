@@ -194,6 +194,15 @@ function EditModal({
   const [timePopupOpen, setTimePopupOpen] = useState(false);
   const [effectsOpen, setEffectsOpen] = useState(false);
 
+  const timeWindowEnabled =
+    timeRestriction?.timeEnabled !== undefined
+      ? timeRestriction.timeEnabled
+      : !!timeRestriction?.enabled;
+  const dateWindowEnabled =
+    timeRestriction?.dateEnabled !== undefined
+      ? timeRestriction.dateEnabled
+      : !!timeRestriction?.enabled;
+
   const renderLayoutContent = () => {
     switch (slideLayout) {
       case "side-by-side":
@@ -525,7 +534,9 @@ function EditModal({
               weatherLeftBgImage={weatherLeftBgImage}
               weatherLeftBgImagePosition={weatherLeftBgImagePosition}
               onWeatherLeftBgImageUpload={onWeatherLeftBgImageUpload}
-              onWeatherLeftBgImagePositionChange={onWeatherLeftBgImagePositionChange}
+              onWeatherLeftBgImagePositionChange={
+                onWeatherLeftBgImagePositionChange
+              }
               uploadingImage={uploadingImage}
               onOpenWeatherLeftLibrary={onOpenWeatherLeftLibrary}
             />
@@ -649,7 +660,7 @@ function EditModal({
 
               <div className="slide-modal__time-popup-wrapper">
                 <button
-                  className={`btn-icon btn-icon--time ${timeRestriction?.enabled ? "btn-icon--success" : ""}`}
+                  className={`btn-icon btn-icon--time ${timeWindowEnabled || dateWindowEnabled ? "btn-icon--success" : ""}`}
                   title="Tijdvenster instellen"
                   onClick={() => setTimePopupOpen(!timePopupOpen)}
                 >
@@ -666,100 +677,60 @@ function EditModal({
                         ✕
                       </button>
                     </div>
-                    <label className="time-popup__toggle">
-                      <input
-                        type="checkbox"
-                        checked={timeRestriction?.enabled || false}
-                        onChange={(e) =>
-                          onTimeRestrictionChange({
-                            ...timeRestriction,
-                            enabled: e.target.checked,
-                          })
-                        }
-                      />
-                      <span>Tijdvenster inschakelen</span>
-                    </label>
-                    {timeRestriction?.enabled && (
-                      <div className="time-popup__inputs">
-                        <div className="time-popup__row">
-                          <div className="time-popup__field">
-                            <label>Van</label>
-                            <input
-                              type="time"
-                              value={timeRestriction.startTime || "08:00"}
-                              onChange={(e) =>
-                                onTimeRestrictionChange({
-                                  ...timeRestriction,
-                                  startTime: e.target.value,
-                                })
-                              }
-                              className="time-popup__time-input"
-                            />
-                          </div>
-                          <div className="time-popup__field">
-                            <label>Tot</label>
-                            <input
-                              type="time"
-                              value={timeRestriction.endTime || "17:00"}
-                              onChange={(e) =>
-                                onTimeRestrictionChange({
-                                  ...timeRestriction,
-                                  endTime: e.target.value,
-                                })
-                              }
-                              className="time-popup__time-input"
-                            />
-                          </div>
-                        </div>
-                        {timeRestriction.startTime >
-                          timeRestriction.endTime && (
-                          <p className="time-popup__midnight-note">
-                            ↻ Loopt over middernacht
-                          </p>
-                        )}
 
-                        <div className="time-popup__date-section">
-                          <small>Datumvenster (optioneel)</small>
-                          <div className="time-popup__field">
-                            <label>Vanaf</label>
-                            <input
-                              type="date"
-                              value={timeRestriction.startDate || ""}
-                              onChange={(e) =>
-                                onTimeRestrictionChange({
-                                  ...timeRestriction,
-                                  startDate: e.target.value,
-                                })
-                              }
-                              className="time-popup__time-input"
-                            />
+                    <div className="time-popup__date-section">
+                      <label className="time-popup__toggle">
+                        <input
+                          type="checkbox"
+                          checked={timeWindowEnabled}
+                          onChange={(e) =>
+                            onTimeRestrictionChange({
+                              ...timeRestriction,
+                              timeEnabled: e.target.checked,
+                            })
+                          }
+                        />
+                        <span>Tijdvenster inschakelen</span>
+                      </label>
+                      {timeWindowEnabled && (
+                        <div className="time-popup__inputs">
+                          <div className="time-popup__row">
+                            <div className="time-popup__field">
+                              <label>Van</label>
+                              <input
+                                type="time"
+                                value={timeRestriction.startTime || "08:00"}
+                                onChange={(e) =>
+                                  onTimeRestrictionChange({
+                                    ...timeRestriction,
+                                    startTime: e.target.value,
+                                  })
+                                }
+                                className="time-popup__time-input"
+                              />
+                            </div>
+                            <div className="time-popup__field">
+                              <label>Tot</label>
+                              <input
+                                type="time"
+                                value={timeRestriction.endTime || "17:00"}
+                                onChange={(e) =>
+                                  onTimeRestrictionChange({
+                                    ...timeRestriction,
+                                    endTime: e.target.value,
+                                  })
+                                }
+                                className="time-popup__time-input"
+                              />
+                            </div>
                           </div>
-                          <div className="time-popup__field">
-                            <label>Tot en met</label>
-                            <input
-                              type="date"
-                              value={timeRestriction.endDate || ""}
-                              onChange={(e) =>
-                                onTimeRestrictionChange({
-                                  ...timeRestriction,
-                                  endDate: e.target.value,
-                                })
-                              }
-                              className="time-popup__time-input"
-                            />
-                          </div>
-                          {timeRestriction.startDate &&
-                            timeRestriction.endDate &&
-                            timeRestriction.startDate >
-                              timeRestriction.endDate && (
-                              <p className="time-popup__midnight-note">
-                                ⚠ Einddatum ligt voor de startdatum
-                              </p>
-                            )}
-                        </div>
+                          {timeRestriction.startTime >
+                            timeRestriction.endTime && (
+                            <p className="time-popup__midnight-note">
+                              ↻ Loopt over middernacht
+                            </p>
+                          )}
 
-                        <div className="time-popup__date-section">
-                          <small>Dagen (optioneel)</small>
                           <div className="time-popup__days">
                             {[
                               { key: "mon", label: "Ma" },
@@ -801,8 +772,64 @@ function EditModal({
                             ))}
                           </div>
                         </div>
-                      </div>
-                    )}
+                      )}
+                    </div>
+
+                    <div className="time-popup__date-section">
+                      <label className="time-popup__toggle">
+                        <input
+                          type="checkbox"
+                          checked={dateWindowEnabled}
+                          onChange={(e) =>
+                            onTimeRestrictionChange({
+                              ...timeRestriction,
+                              dateEnabled: e.target.checked,
+                            })
+                          }
+                        />
+                        <span>Datumvenster inschakelen</span>
+                      </label>
+                      {dateWindowEnabled && (
+                        <div className="time-popup__row">
+                          <div className="time-popup__field">
+                            <label>Vanaf</label>
+                            <input
+                              type="date"
+                              value={timeRestriction.startDate || ""}
+                              onChange={(e) =>
+                                onTimeRestrictionChange({
+                                  ...timeRestriction,
+                                  startDate: e.target.value,
+                                })
+                              }
+                              className="time-popup__time-input"
+                            />
+                          </div>
+                          <div className="time-popup__field">
+                            <label>Tot en met</label>
+                            <input
+                              type="date"
+                              value={timeRestriction.endDate || ""}
+                              onChange={(e) =>
+                                onTimeRestrictionChange({
+                                  ...timeRestriction,
+                                  endDate: e.target.value,
+                                })
+                              }
+                              className="time-popup__time-input"
+                            />
+                          </div>
+                          {timeRestriction.startDate &&
+                            timeRestriction.endDate &&
+                            timeRestriction.startDate >
+                              timeRestriction.endDate && (
+                              <p className="time-popup__midnight-note">
+                                ⚠ Einddatum ligt voor de startdatum
+                              </p>
+                            )}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 )}
               </div>
