@@ -187,6 +187,7 @@ function SlideList({
       transform: CSS.Transform.toString(transform),
       transition,
       opacity: isDragging ? 0.5 : disabled ? 0.4 : 1,
+      cursor: disabled ? "not-allowed" : undefined,
     };
 
     const renderSlidePreview = (slide) => {
@@ -491,7 +492,7 @@ function SlideList({
         ref={setNodeRef}
         style={style}
         className={`slide-card ${isDragging ? "dragging" : ""}`}
-        onClick={() => onEditSlide(slide)}
+        onClick={() => !disabled && onEditSlide(slide)}
       >
         <div className="slide-card__header">
           <div
@@ -605,6 +606,7 @@ function SlideList({
       transform: CSS.Transform.toString(transform),
       transition,
       opacity: isDragging ? 0.5 : disabled ? 0.4 : 1,
+      cursor: disabled ? "not-allowed" : undefined,
     };
 
     const getPlaceholderIcon = (layout) => {
@@ -655,7 +657,7 @@ function SlideList({
           `slide-row ${isDragging ? "dragging" : ""}`,
           slide.isVisible ? " mobile-green" : " mobile-red",
         ]}
-        onClick={() => onEditSlide(slide)}
+        onClick={() => !disabled && onEditSlide(slide)}
       >
         <div className="slide-row__left" {...attributes} {...listeners}>
           <div className="drag-handle">

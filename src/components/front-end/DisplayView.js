@@ -954,7 +954,7 @@ function DisplayView() {
                 slide.agendaCalendars.length > 0) ||
               (slide.layout === "email" && slide.emailProvider) ||
               (slide.layout === "sportlink" &&
-                slide.sportlinkApiKey &&
+                (slide.sportlinkApiKey || settings.sportlinkApiKey) &&
                 slide.sportlinkTeams &&
                 slide.sportlinkTeams.length > 0) ||
               (slide.layout === "qr-feed" && slide.qrUrl) ||
@@ -1466,6 +1466,7 @@ function DisplayView() {
         nextSlide={nextSlide}
         nextSlideLayout={nextSlideLayout}
         effectsEnabled={!!tenantModules.slideEffects}
+        settings={settings}
       />
 
       <ProgressBar

@@ -287,7 +287,7 @@ function PlaylistPreviewView() {
             (slide.layout === "email" && slide.emailProvider) ||
             (slide.layout === "weather" && slide.weatherLat) ||
             (slide.layout === "sportlink" &&
-              slide.sportlinkApiKey &&
+              (slide.sportlinkApiKey || settings.sportlinkApiKey) &&
               slide.sportlinkTeams &&
               slide.sportlinkTeams.length > 0) ||
             (slide.layout === "qr-feed" && slide.qrUrl) ||
@@ -450,6 +450,7 @@ function PlaylistPreviewView() {
         nextSlide={nextSlide}
         nextSlideLayout={nextSlideLayout}
         effectsEnabled={!!tenantModules.slideEffects}
+        settings={settings}
       />
 
       <ProgressBar

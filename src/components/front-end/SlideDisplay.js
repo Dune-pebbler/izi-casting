@@ -580,14 +580,14 @@ function EmailSlideDisplay({ slide }) {
   );
 }
 
-function SportlinkDisplay({ slide }) {
+function SportlinkDisplay({ slide, settings }) {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const bodyRef = useRef(null);
   const contentRef = useRef(null);
 
-  const apiKey = slide.sportlinkApiKey || "";
+  const apiKey = settings?.sportlinkApiKey || slide.sportlinkApiKey || "";
   const dataType = slide.sportlinkDataType || "programma";
   const teams = slide.sportlinkTeams || [];
   const maxItems = slide.sportlinkMaxItems || 10;
@@ -1193,6 +1193,7 @@ function SlideDisplay({
   nextSlideLayout,
   effectsEnabled = false,
   isPreload = false,
+  settings,
 }) {
   // Get configuration for the current layout
   const textConfig = getTextPaginationConfig(slideLayout);
@@ -1578,7 +1579,9 @@ function SlideDisplay({
 
         {layout === "email" && <EmailSlideDisplay slide={slide} />}
 
-        {layout === "sportlink" && <SportlinkDisplay slide={slide} />}
+        {layout === "sportlink" && (
+          <SportlinkDisplay slide={slide} settings={settings} />
+        )}
 
         {layout === "qr-feed" && <QrFeedDisplay slide={slide} />}
       </>

@@ -19,6 +19,7 @@ import { auth } from "../../../firebase";
 import Devices from "./Devices";
 import FeedList from "./FeedList";
 import AudioSettings from "./AudioSettings";
+import SportlinkSettings from "./SportlinkSettings";
 import SlideArchive from "./SlideArchive";
 import Settings from "./Settings";
 import { useTenantModules } from "../../../hooks/useTenantModules";
@@ -192,7 +193,7 @@ function Sidebar({
   tenantName = "",
 }) {
   const { tenantId } = useTenant();
-  const { modules } = useTenantModules();
+  const { modules, slideTypes } = useTenantModules();
   const [isAdmin, setIsAdmin] = useState(false);
   const [logoUrl, setLogoUrl] = useState("");
   const [privacyOpen, setPrivacyOpen] = useState(false);
@@ -244,6 +245,7 @@ function Sidebar({
         <FeedList />
         {tenantId && isAdmin && <UsersPanel tenantId={tenantId} />}
         {modules.backgroundMusic && <AudioSettings />}
+        {slideTypes.sportlink && <SportlinkSettings />}
         {isAdmin && (
           <Settings
             onOpenTrash={onOpenTrash}

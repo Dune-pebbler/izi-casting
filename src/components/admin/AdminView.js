@@ -230,6 +230,7 @@ function AdminView() {
 
   const [tenantName, setTenantName] = useState("");
   const [tenantLogoUrl, setTenantLogoUrl] = useState("");
+  const [tenantSportlinkApiKey, setTenantSportlinkApiKey] = useState("");
 
   // Load default slide transition, enabled fonts, and tenant name
   useEffect(() => {
@@ -243,6 +244,7 @@ function AdminView() {
           setDefaultSlideTransition(settings.defaultSlideTransition || "fade");
           setEnabledFonts(settings.enabledFonts || []);
           setTenantLogoUrl(settings.logoUrl || "");
+          setTenantSportlinkApiKey(settings.sportlinkApiKey || "");
           if (settings.typography) setTypography(settings.typography);
         }
       } catch (error) {
@@ -2038,8 +2040,7 @@ function AdminView() {
           onEmailTextColorChange={setModalEmailTextColor}
           emailAccentColor={modalEmailAccentColor}
           onEmailAccentColorChange={setModalEmailAccentColor}
-          sportlinkApiKey={modalSportlinkApiKey}
-          onSportlinkApiKeyChange={setModalSportlinkApiKey}
+          sportlinkApiKey={tenantSportlinkApiKey || modalSportlinkApiKey}
           sportlinkDataType={modalSportlinkDataType}
           onSportlinkDataTypeChange={setModalSportlinkDataType}
           sportlinkTeams={modalSportlinkTeams}
