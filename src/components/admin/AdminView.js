@@ -83,6 +83,7 @@ function AdminView() {
   const [modalSlideDuration, setModalSlideDuration] = useState(5);
   const [modalShowBar, setModalShowBar] = useState(true);
   const [modalVideoUrl, setModalVideoUrl] = useState("");
+  const [modalVideoSound, setModalVideoSound] = useState(false);
   const [modalImageSide, setModalImageSide] = useState("left");
   const [modalSlideTransition, setModalSlideTransition] = useState("fade");
   const [modalTeletekstChannel, setModalTeletekstChannel] = useState("101");
@@ -676,6 +677,7 @@ function AdminView() {
     setModalSlideDuration(slide.duration || 5);
     setModalShowBar(slide.showBar !== false);
     setModalVideoUrl(slide.videoUrl || "");
+    setModalVideoSound(slide.videoSound || false);
     setModalImageSide(slide.imageSide || "left");
     setModalSlideTransition(slide.transition || "fade");
     setModalTeletekstChannel(slide.teletekstChannel || "101");
@@ -1322,6 +1324,7 @@ function AdminView() {
                                 tinyMCEContent: modalTinyMCEContent,
                                 imageUrl: modalImageUrl,
                                 videoUrl: modalVideoUrl,
+                                videoSound: modalVideoSound,
                                 teletekstChannel: modalTeletekstChannel,
                                 teletekstTheme: modalTeletekstTheme,
                                 teletekstPages: modalTeletekstPages,
@@ -1964,6 +1967,8 @@ function AdminView() {
           onShowBarChange={setModalShowBar}
           videoUrl={modalVideoUrl}
           onVideoUrlChange={setModalVideoUrl}
+          videoSound={modalVideoSound}
+          onVideoSoundChange={setModalVideoSound}
           imageSide={modalImageSide}
           onImageSideChange={setModalImageSide}
           slideTransition={modalSlideTransition}

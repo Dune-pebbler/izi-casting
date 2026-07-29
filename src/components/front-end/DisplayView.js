@@ -1051,6 +1051,15 @@ function DisplayView() {
       const currentSlide = slides[currentIndex];
       const slideDuration = (currentSlide?.duration || 5) * 1000;
 
+      // Duck background music while a video slide with its own sound is on
+      // screen, and bring it back up once we move past it.
+      const isVideoWithSound =
+        currentSlide?.layout === "video" && !!currentSlide?.videoSound;
+      if (isVideoWithSound !== wasVideoWithSoundRef.current) {
+        audioFadeRef.current?.(isVideoWithSound ? 0 : null, 900);
+        wasVideoWithSoundRef.current = isVideoWithSound;
+      }
+
       console.log("🎠 Current slide details:", {
         index: currentIndex,
         name: currentSlide?.name,
@@ -1110,6 +1119,10 @@ function DisplayView() {
   const activeAudioUrlRef = useRef(null);
   const audioUnlockedRef = useRef(false);
   const pendingMusicRef = useRef(null);
+  const audioBaseVolumeRef = useRef(0.7);
+  const audioFadeIntervalRef = useRef(null);
+  const audioFadeRef = useRef(null);
+  const wasVideoWithSoundRef = useRef(false);
 
   const playAudio = useCallback((music) => {
     const newUrl = music?.enabled && music?.url ? music.url : null;
@@ -1117,8 +1130,11 @@ function DisplayView() {
     // Only restart if URL actually changed
     if (newUrl === activeAudioUrlRef.current) {
       // URL unchanged — just update volume if audio is playing
-      if (audioRef.current && newUrl) {
-        audioRef.current.volume = music.volume ?? 0.7;
+      if (music) {
+        audioBaseVolumeRef.current = music.volume ?? 0.7;
+      }
+      if (audioRef.current && newUrl && !wasVideoWithSoundRef.current) {
+        audioRef.current.volume = audioBaseVolumeRef.current;
       }
       return;
     }
@@ -1138,7 +1154,8 @@ function DisplayView() {
 
     const audio = new Audio(newUrl);
     audio.loop = true;
-    audio.volume = music.volume ?? 0.7;
+    audioBaseVolumeRef.current = music.volume ?? 0.7;
+    audio.volume = wasVideoWithSoundRef.current ? 0 : audioBaseVolumeRef.current;
     audioRef.current = audio;
 
     if (audioUnlockedRef.current) {
@@ -1148,6 +1165,37 @@ function DisplayView() {
       setShowAudioPrompt(true);
     }
   }, []);
+
+  // Ramp background-music volume toward 0 (video slide with sound) or back to
+  // its configured level, instead of snapping instantly.
+  const fadeAudioTo = useCallback((targetVolume, durationMs = 900) => {
+    const audio = audioRef.current;
+    if (audioFadeIntervalRef.current) {
+      clearInterval(audioFadeIntervalRef.current);
+      audioFadeIntervalRef.current = null;
+    }
+    if (!audio) return;
+
+    const target =
+      targetVolume === null ? audioBaseVolumeRef.current : targetVolume;
+    const start = audio.volume;
+    const steps = 20;
+    let step = 0;
+
+    audioFadeIntervalRef.current = setInterval(() => {
+      step += 1;
+      const progress = step / steps;
+      audio.volume = Math.max(
+        0,
+        Math.min(1, start + (target - start) * progress),
+      );
+      if (step >= steps) {
+        clearInterval(audioFadeIntervalRef.current);
+        audioFadeIntervalRef.current = null;
+      }
+    }, durationMs / steps);
+  }, []);
+  audioFadeRef.current = fadeAudioTo;
 
   // Unlock audio on first user interaction (browser autoplay policy)
   useEffect(() => {

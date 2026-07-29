@@ -10,6 +10,8 @@ import {
   Eye,
   EyeOff,
   Sparkles,
+  Volume2,
+  VolumeX,
 } from "lucide-react";
 import LayoutSelector from "./LayoutSelector";
 import ImageUpload from "./ImageUpload";
@@ -39,6 +41,7 @@ function EditModal({
   slideDuration,
   showBar,
   videoUrl,
+  videoSound,
   imageSide,
   slideTransition,
   enabledFonts,
@@ -60,6 +63,7 @@ function EditModal({
   onDurationChange,
   onShowBarChange,
   onVideoUrlChange,
+  onVideoSoundChange,
   onImageSideChange,
   onTransitionChange,
   onTeletekstChannelChange,
@@ -299,6 +303,21 @@ function EditModal({
       case "video":
         return (
           <div className="modal-video">
+            <div className="video-sound-section">
+              <button
+                type="button"
+                className={`video-sound-toggle${videoSound ? " active" : ""}`}
+                onClick={() => onVideoSoundChange(!videoSound)}
+                title={
+                  videoSound
+                    ? "Video speelt af met geluid (achtergrondmuziek fadet automatisch weg)"
+                    : "Video speelt gedempt af"
+                }
+              >
+                {videoSound ? <Volume2 size={16} /> : <VolumeX size={16} />}
+                <span>{videoSound ? "Geluid aan" : "Geluid uit"}</span>
+              </button>
+            </div>
             <div className="video-input-section">
               <VideoUrlInput
                 videoUrl={videoUrl}

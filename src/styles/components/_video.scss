@@ -3,7 +3,6 @@
   width: 100%;
   margin-bottom: 1rem;
 
-
   .video-input-container {
     .video-url-field {
       width: 100%;
@@ -11,7 +10,9 @@
       border: 2px solid var(--border-color);
       border-radius: 8px;
       font-size: 0.9rem;
-      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
       background: var(--bg-primary);
 
       &:focus {
@@ -104,7 +105,6 @@
       position: relative;
       width: 100%;
       height: 400px;
-      margin-top: 1rem;
       border-radius: 12px;
       overflow: hidden;
       background: var(--bg-secondary);
@@ -451,6 +451,37 @@
       }
     }
   }
+
+  .video-sound-section {
+    flex-shrink: 0;
+    margin-bottom: 1rem;
+  }
+
+  .video-sound-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-left: 18px;
+    padding: 0.5rem 0.9rem;
+    border-radius: 8px;
+    border: 1px solid #46bcca;
+    background: rgba(255, 255, 255, 0.05);
+    color: #46bcca;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: all 0.15s ease;
+
+    &:hover {
+      background: #46bcca;
+      color: white;
+    }
+
+    &.active {
+      border-color: #46bcca;
+      background: #46bcca;
+      color: #ffffff;
+    }
+  }
 }
 
 // Frontend Video Player Styles
@@ -488,10 +519,10 @@
   border-radius: 8px;
   display: block;
   margin: 0 auto;
-  
+
   // Hide all YouTube/Vimeo controls and overlays
   &::before {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
     left: 0;
@@ -580,8 +611,12 @@
 
 // Loading spinner animation
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 // Global ad-blocking rules for video content
@@ -590,7 +625,7 @@
   iframe {
     // Force fullscreen and hide all controls
     pointer-events: none;
-    
+
     // Hide any remaining YouTube controls that might appear
     * {
       &[class*="ytp-"],

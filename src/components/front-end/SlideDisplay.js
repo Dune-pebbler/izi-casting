@@ -1192,6 +1192,7 @@ function SlideDisplay({
   nextSlide,
   nextSlideLayout,
   effectsEnabled = false,
+  isPreload = false,
 }) {
   // Get configuration for the current layout
   const textConfig = getTextPaginationConfig(slideLayout);
@@ -1308,7 +1309,7 @@ function SlideDisplay({
   }
 
   // Render slide content helper function
-  const renderSlideContent = (slide, layout) => {
+  const renderSlideContent = (slide, layout, forceMuted = false) => {
     if (!slide) return null;
 
     const slideTextConfig = getTextPaginationConfig(layout);
@@ -1489,7 +1490,7 @@ function SlideDisplay({
                 videoUrl={slide.videoUrl}
                 autoplay={true}
                 loop={true}
-                muted={true}
+                muted={forceMuted || !slide.videoSound}
               />
             ) : (
               <div className="display-video-placeholder">
@@ -1591,12 +1592,12 @@ function SlideDisplay({
       <div className={`display-content slide-transition ${transitionClass}`}>
         <div className="slide-current">
           <div className="display-content">
-            {renderSlideContent(displaySlide, displayLayout)}
+            {renderSlideContent(displaySlide, displayLayout, true)}
           </div>
         </div>
         <div className="slide-next">
           <div className="display-content">
-            {renderSlideContent(currentSlide, slideLayout)}
+            {renderSlideContent(currentSlide, slideLayout, isPreload)}
           </div>
         </div>
       </div>
@@ -1659,15 +1660,16 @@ function SlideDisplay({
 
   return (
     <div className="display-content">
-      {renderSlideContent(displaySlide, displayLayout)}
+      {renderSlideContent(displaySlide, displayLayout, isPreload)}
       {renderEffects(displaySlide)}
 
-      {/* Pre-rendered next slide (hidden) */}
+      {/* Pre-rendered next slide (hidden) — always muted, it isn't on screen yet */}
       {nextSlide && (
         <div className="next-slide-prerender" style={{ display: "none" }}>
           <SlideDisplay
             currentSlide={nextSlide}
             slideLayout={nextSlideLayout || nextSlide.layout || "side-by-side"}
+            isPreload={true}
           />
         </div>
       )}
