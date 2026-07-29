@@ -320,7 +320,7 @@ function AdminView() {
 
         totalSlides += playlistSlides;
         activeSlides += playlistActiveSlides;
-        totalDuration += playlistDuration;
+        totalDuration += playlistDuration * playlist.repeatCount;
       }
     });
 
