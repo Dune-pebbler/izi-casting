@@ -259,7 +259,9 @@ function Devices({ setDeviceToDelete, deleteDevice, isAdmin, canRotate }) {
         processed: false,
       });
 
-      toast.success("Er is een ping verstuurd");
+      toast.success(
+        action === "previous" ? "Vorige slide" : "Volgende slide"
+      );
     } catch (error) {
       console.error("Error sending refresh command:", error);
       toast.error("Fout bij verzenden van refresh commando");
