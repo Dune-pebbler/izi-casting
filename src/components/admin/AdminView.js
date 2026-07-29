@@ -221,8 +221,6 @@ function AdminView() {
   const [trashModalOpen, setTrashModalOpen] = useState(false);
   const [trashedSlides, setTrashedSlides] = useState([]);
 
-  const [mediaLibraryOpen, setMediaLibraryOpen] = useState(false);
-
   // Redux hooks
   const dispatch = useAppDispatch();
   const deviceToDelete = useAppSelector((state) => state.device.deviceToDelete);
@@ -1876,14 +1874,6 @@ function AdminView() {
             </button>
 
             <button
-              className="admin-layout-btn"
-              onClick={() => setMediaLibraryOpen(true)}
-              title="Mediabibliotheek"
-            >
-              <Images size={18} />
-            </button>
-
-            <button
               className="admin-settings-btn"
               onClick={toggleSidebarCollapse}
               title={isSidebarCollapsed ? "Open settings" : "Close settings"}
@@ -1892,12 +1882,6 @@ function AdminView() {
             </button>
           </div>
         </div>
-
-        <ImageLibraryModal
-          isOpen={mediaLibraryOpen}
-          onClose={() => setMediaLibraryOpen(false)}
-          allowUpload
-        />
 
         <PlaylistList
           playlists={playlists}

@@ -10,6 +10,7 @@ import {
   Users,
   UserSearch,
   ShieldCheck,
+  Images,
 } from "lucide-react";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "../../../firebase";
@@ -21,6 +22,8 @@ import AudioSettings from "./AudioSettings";
 import SlideArchive from "./SlideArchive";
 import Settings from "./Settings";
 import { useTenantModules } from "../../../hooks/useTenantModules";
+// import ImageLibraryModal from "./modal/ImageLibraryModal";
+import ImageLibraryModal from "../modal/ImageLibraryModal";
 import { toast } from "sonner";
 
 // Normalise a raw authorizedUsers entry to { email, role }
@@ -193,6 +196,7 @@ function Sidebar({
   const [isAdmin, setIsAdmin] = useState(false);
   const [logoUrl, setLogoUrl] = useState("");
   const [privacyOpen, setPrivacyOpen] = useState(false);
+  const [mediaLibraryOpen, setMediaLibraryOpen] = useState(false);
   useEffect(() => {
     if (!tenantId) {
       setIsAdmin(true);
@@ -256,6 +260,15 @@ function Sidebar({
       <div className="sidebar__footer">
         <button
           className="sidebar__footer-btn"
+          onClick={() => setMediaLibraryOpen(true)}
+          title="Mediabibliotheek"
+        >
+          <Images size={18} />
+          <span>Mediabibliotheek</span>
+        </button>
+
+        <button
+          className="sidebar__footer-btn"
           onClick={() => setPrivacyOpen(true)}
         >
           <ShieldCheck size={15} />
@@ -272,6 +285,12 @@ function Sidebar({
           <span>Contact</span>
         </a>
       </div>
+
+      <ImageLibraryModal
+        isOpen={mediaLibraryOpen}
+        onClose={() => setMediaLibraryOpen(false)}
+        allowUpload
+      />
 
       {privacyOpen &&
         createPortal(
