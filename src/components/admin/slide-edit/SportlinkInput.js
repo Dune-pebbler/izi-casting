@@ -77,7 +77,6 @@ const DATA_TYPES = [
 function SportlinkInput({
   sportlinkApiKey,
   sportlinkDataType,
-  onDataTypeChange,
   sportlinkTeams,
   onTeamsChange,
   sportlinkTitle,
@@ -187,20 +186,24 @@ function SportlinkInput({
           <div className="sportlink-input__field">
             <label>Type data</label>
             <div className="sportlink-input__data-types">
-              {DATA_TYPES.map(({ id, label, description }) => (
-                <button
-                  key={id}
-                  type="button"
-                  className={`sportlink-input__type-btn${sportlinkDataType === id ? " active" : ""}`}
-                  onClick={() => onDataTypeChange(id)}
-                >
-                  <span className="sportlink-input__type-label">{label}</span>
-                  <span className="sportlink-input__type-desc">
-                    {description}
-                  </span>
-                </button>
-              ))}
+              {DATA_TYPES.filter(({ id }) => id === sportlinkDataType).map(
+                ({ id, label, description }) => (
+                  <div key={id} className="sportlink-input__type-btn active">
+                    <span className="sportlink-input__type-label">
+                      {label}
+                    </span>
+                    <span className="sportlink-input__type-desc">
+                      {description}
+                    </span>
+                  </div>
+                ),
+              )}
             </div>
+            <p className="sportlink-input__hint">
+              Het type data ligt vast aan het gekozen slide-type. Kies "Kies
+              layout" bovenin om te wisselen tussen Programma, Uitslagen of
+              Poulestand.
+            </p>
           </div>
 
           {sportlinkDataType !== "poulestand" && (

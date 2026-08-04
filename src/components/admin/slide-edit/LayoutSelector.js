@@ -66,15 +66,39 @@ function LayoutSelector({ currentLayout, onLayoutChange, slideTypes = {} }) {
       label: "Sportlink",
       icon: Trophy,
       title: "Sportlink Club.Dataservice",
+      legacy: true,
+    },
+    {
+      id: "sportlink-programma",
+      label: "Sportlink - Programma",
+      icon: Trophy,
+      title: "Sportlink Club.Dataservice",
+      gateKey: "sportlink",
+    },
+    {
+      id: "sportlink-uitslagen",
+      label: "Sportlink - Uitslagen",
+      icon: Trophy,
+      title: "Sportlink Club.Dataservice",
+      gateKey: "sportlink",
+    },
+    {
+      id: "sportlink-poulestand",
+      label: "Sportlink - Poulestand",
+      icon: Trophy,
+      title: "Sportlink Club.Dataservice",
+      gateKey: "sportlink",
     },
     { id: "weather", label: "Weer", icon: CloudIcon, title: "Weer bericht" },
     { id: "qr-feed", label: "QR + Tekst", icon: QrCode, title: "QR code met tekst-slides" },
   ];
 
   const hasSlideTypeConfig = Object.keys(slideTypes).length > 0;
-  const layouts = hasSlideTypeConfig
-    ? allLayouts.filter(({ id }) => slideTypes[id])
-    : allLayouts;
+  const layouts = (
+    hasSlideTypeConfig
+      ? allLayouts.filter(({ id, gateKey }) => slideTypes[gateKey || id])
+      : allLayouts
+  ).filter((l) => !l.legacy || l.id === currentLayout);
 
   const active = layouts.find((l) => l.id === currentLayout) || layouts[0];
 

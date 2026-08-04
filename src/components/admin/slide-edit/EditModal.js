@@ -128,7 +128,6 @@ function EditModal({
   onEmailAccentColorChange,
   sportlinkApiKey,
   sportlinkDataType,
-  onSportlinkDataTypeChange,
   sportlinkTeams,
   onSportlinkTeamsChange,
   sportlinkTitle,
@@ -454,12 +453,14 @@ function EditModal({
         );
 
       case "sportlink":
+      case "sportlink-programma":
+      case "sportlink-uitslagen":
+      case "sportlink-poulestand":
         return (
           <div className="modal-sportlink">
             <SportlinkInput
               sportlinkApiKey={sportlinkApiKey}
               sportlinkDataType={sportlinkDataType}
-              onDataTypeChange={onSportlinkDataTypeChange}
               sportlinkTeams={sportlinkTeams}
               onTeamsChange={onSportlinkTeamsChange}
               sportlinkTitle={sportlinkTitle}

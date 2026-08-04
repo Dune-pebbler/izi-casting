@@ -12,6 +12,7 @@ import {
 } from "firebase/firestore";
 import { db } from "../../firebase";
 import { tenantDoc } from "../../utils/tenantPaths";
+import { isSportlinkLayout } from "../../utils/sportlinkTypes";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import {
   setIsPaired,
@@ -953,7 +954,7 @@ function DisplayView() {
                 slide.agendaCalendars &&
                 slide.agendaCalendars.length > 0) ||
               (slide.layout === "email" && slide.emailProvider) ||
-              (slide.layout === "sportlink" &&
+              (isSportlinkLayout(slide.layout) &&
                 (slide.sportlinkApiKey || settings.sportlinkApiKey) &&
                 slide.sportlinkTeams &&
                 slide.sportlinkTeams.length > 0) ||

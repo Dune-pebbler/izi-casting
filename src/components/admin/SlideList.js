@@ -1,5 +1,6 @@
 import React, { useMemo, useCallback, useState } from "react";
 import ReactDOM from "react-dom";
+import { getSlideTypeGateKey } from "../../utils/sportlinkTypes";
 import {
   Copy,
   GripVertical,
@@ -45,6 +46,9 @@ const iconMap = {
   agenda: <CalendarDays />,
   email: <Mail />,
   sportlink: <Trophy />,
+  "sportlink-programma": <Trophy />,
+  "sportlink-uitslagen": <Trophy />,
+  "sportlink-poulestand": <Trophy />,
   weather: <CloudIcon />,
   "qr-feed": <ScanQrCode />,
 };
@@ -94,7 +98,7 @@ function SlideList({
   const isSlideTypeDisabled = (slide) => {
     if (!hasSlideTypeConfig) return false;
     const layout = slide.layout || "side-by-side";
-    return slideTypes[layout] === false;
+    return slideTypes[getSlideTypeGateKey(layout)] === false;
   };
   const { tenantId } = useTenant();
 
@@ -633,6 +637,12 @@ function SlideList({
           return "Afteltimer";
         case "sportlink":
           return "sportlink";
+        case "sportlink-programma":
+          return "Sportlink - Programma";
+        case "sportlink-uitslagen":
+          return "Sportlink - Uitslagen";
+        case "sportlink-poulestand":
+          return "Sportlink - Poulestand";
         case "email":
           return "email inbox";
         case "agenda":

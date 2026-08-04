@@ -4,6 +4,7 @@ import { doc, onSnapshot, getDoc } from "firebase/firestore";
 import { auth, db } from "../../firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { tenantDoc } from "../../utils/tenantPaths";
+import { isSportlinkLayout } from "../../utils/sportlinkTypes";
 import SlideDisplay from "./SlideDisplay";
 import ProgressBar from "./ProgressBar";
 import StatusBar from "./StatusBar/StatusBar";
@@ -286,7 +287,7 @@ function PlaylistPreviewView() {
               slide.agendaCalendars.length > 0) ||
             (slide.layout === "email" && slide.emailProvider) ||
             (slide.layout === "weather" && slide.weatherLat) ||
-            (slide.layout === "sportlink" &&
+            (isSportlinkLayout(slide.layout) &&
               (slide.sportlinkApiKey || settings.sportlinkApiKey) &&
               slide.sportlinkTeams &&
               slide.sportlinkTeams.length > 0) ||
