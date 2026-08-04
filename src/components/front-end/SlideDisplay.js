@@ -184,84 +184,70 @@ function AgendaDisplay({ slide }) {
       const cutoff = new Date(now.getTime() + daysAhead * 24 * 60 * 60 * 1000);
       const allEvents = [];
 
-      await Promise.all(
-        calendars.map(async (cal) => {
-          if (!cal.url) return;
-          try {
-            const rawUrl = decodeURIComponent(cal.url).replace(
-              /^webcal:\/\//,
-              "https://",
-            );
-            const proxies = [
-              // Local dev proxy (setupProxy.js) — server-side, no CORS issues
-              () =>
-                fetch(`/api/ical?url=${encodeURIComponent(rawUrl)}`).then(
-                  (r) => (r.ok ? r.text() : Promise.reject()),
-                ),
-              // External fallbacks for production
-              () =>
-                fetch(
-                  `https://corsproxy.io/?${encodeURIComponent(rawUrl)}`,
-                ).then((r) => (r.ok ? r.text() : Promise.reject())),
-              () =>
-                fetch(
-                  `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(rawUrl)}`,
-                ).then((r) => (r.ok ? r.text() : Promise.reject())),
-            ];
+      const calsByUrl = new Map();
+      const rawUrls = [];
+      calendars.forEach((cal) => {
+        if (!cal.url) return;
+        const rawUrl = decodeURIComponent(cal.url).replace(/^webcal:\/\//, "https://");
+        calsByUrl.set(rawUrl, cal);
+        rawUrls.push(rawUrl);
+      });
 
-            let icsText = null;
-            for (const proxyFn of proxies) {
-              try {
-                const controller = new AbortController();
-                const timeout = setTimeout(() => controller.abort(), 10000);
-                const text = await proxyFn();
-                clearTimeout(timeout);
-                if (text && text.includes("BEGIN:VCALENDAR")) {
-                  icsText = text;
-                  break;
+      if (!rawUrls.length) {
+        setEvents([]);
+        setLastFetched(Date.now());
+        setLoading(false);
+        return;
+      }
+
+      try {
+        // Single request for every calendar — the server fetches them in
+        // parallel, so this is one Edge Request regardless of how many
+        // calendars are configured.
+        const res = await fetch(
+          `/api/ical-batch?urls=${rawUrls.map((u) => encodeURIComponent(u)).join(",")}`,
+        );
+        const { results = [] } = res.ok ? await res.json() : {};
+
+        results.forEach(({ url, ok, text }) => {
+          if (!ok || !text || !text.includes("BEGIN:VCALENDAR")) return;
+          const cal = calsByUrl.get(url);
+          if (!cal) return;
+
+          const parsed = parseICS(text);
+          parsed.forEach((ev) => {
+            if (ev.start >= now && ev.start <= cutoff) {
+              allEvents.push({
+                ...ev,
+                calName: cal.name,
+                calColor: cal.color || "#4f87ff",
+              });
+            } else if (ev.rrule && ev.rrule.includes("FREQ=YEARLY")) {
+              const until = ev.rrule.match(/UNTIL=(\d{8})/);
+              const untilDate = until ? parseICSDate(until[1]) : null;
+              const month = ev.start.getMonth();
+              const day = ev.start.getDate();
+              for (const year of [now.getFullYear(), now.getFullYear() + 1]) {
+                const occ = new Date(year, month, day);
+                if (untilDate && occ > untilDate) continue;
+                if (occ >= now && occ <= cutoff) {
+                  allEvents.push({
+                    ...ev,
+                    start: occ,
+                    end: ev.end
+                      ? new Date(year, ev.end.getMonth(), ev.end.getDate())
+                      : null,
+                    calName: cal.name,
+                    calColor: cal.color || "#4f87ff",
+                  });
                 }
-              } catch {
-                // try next proxy
               }
             }
-
-            if (!icsText) return;
-
-            const parsed = parseICS(icsText);
-            parsed.forEach((ev) => {
-              if (ev.start >= now && ev.start <= cutoff) {
-                allEvents.push({
-                  ...ev,
-                  calName: cal.name,
-                  calColor: cal.color || "#4f87ff",
-                });
-              } else if (ev.rrule && ev.rrule.includes("FREQ=YEARLY")) {
-                const until = ev.rrule.match(/UNTIL=(\d{8})/);
-                const untilDate = until ? parseICSDate(until[1]) : null;
-                const month = ev.start.getMonth();
-                const day = ev.start.getDate();
-                for (const year of [now.getFullYear(), now.getFullYear() + 1]) {
-                  const occ = new Date(year, month, day);
-                  if (untilDate && occ > untilDate) continue;
-                  if (occ >= now && occ <= cutoff) {
-                    allEvents.push({
-                      ...ev,
-                      start: occ,
-                      end: ev.end
-                        ? new Date(year, ev.end.getMonth(), ev.end.getDate())
-                        : null,
-                      calName: cal.name,
-                      calColor: cal.color || "#4f87ff",
-                    });
-                  }
-                }
-              }
-            });
-          } catch (err) {
-            console.error("📅 Agenda fetch error:", err);
-          }
-        }),
-      );
+          });
+        });
+      } catch (err) {
+        console.error("📅 Agenda fetch error:", err);
+      }
 
       allEvents.sort((a, b) => a.start - b.start);
       setEvents(allEvents.slice(0, maxEvents));
