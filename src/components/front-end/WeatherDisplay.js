@@ -218,6 +218,8 @@ function WeatherDisplay({
             color: leftTextColor,
             fontFamily: "Poppins",
             fontWeight: "600",
+            padding: "24px",
+            backgroundColor: `${resolvedLeftAccentColor}33`,
           }}
         >
           {cityName}
@@ -243,7 +245,12 @@ function WeatherDisplay({
             </div>
           </div>
         </div>
-        <div className="display-weather__stats">
+        <div
+          className="display-weather__stats"
+          style={{
+            padding: "24px",
+          }}
+        >
           <div
             className="display-weather__stat"
             style={{
