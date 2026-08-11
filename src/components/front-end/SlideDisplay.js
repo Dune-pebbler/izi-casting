@@ -1014,7 +1014,10 @@ function SportlinkDisplay({ slide, settings }) {
                         borderBottomColor: `${textColor}10`,
                         backgroundColor:
                           i % 2 === 0 ? `${bgColor}99` : `${bgColor}75`,
-                        gridTemplateColumns: "230px 1fr 30px 1fr",
+                        gridTemplateColumns:
+                          dataType !== "uitslagen"
+                            ? "230px 1fr 30px 1fr"
+                            : "140px 1fr 200px 1fr",
                       }}
                     >
                       {/* Tijd */}
