@@ -331,6 +331,27 @@ function AdminView() {
     return { totalSlides, activeSlides, totalDuration };
   }, [playlists, calculatePlaylistDuration]);
 
+  // Count how many times each media library image URL is referenced across all slides
+  const imageUsageCounts = useMemo(() => {
+    const counts = new Map();
+    const addUsage = (url) => {
+      if (!url) return;
+      counts.set(url, (counts.get(url) || 0) + 1);
+    };
+
+    playlists.forEach((playlist) => {
+      (playlist.slides || []).forEach((slide) => {
+        addUsage(slide.imageUrl);
+        addUsage(slide.countdownBgImage);
+        addUsage(slide.weatherLeftBgImage);
+        (slide.images || []).forEach((image) => addUsage(image.url));
+        (slide.qrTextSlides || []).forEach((qrSlide) => addUsage(qrSlide.bgImage));
+      });
+    });
+
+    return counts;
+  }, [playlists]);
+
   // Toggle sidebar collapse
   const toggleSidebarCollapse = () => {
     dispatch(setIsSidebarCollapsed(!isSidebarCollapsed));
@@ -1841,6 +1862,7 @@ function AdminView() {
         onOpenTrash={openTrashModal}
         trashedSlidesCount={trashedSlides.length}
         tenantName={tenantName}
+        imageUsageCounts={imageUsageCounts}
       />
 
       {/* Main Content Area */}
@@ -2333,6 +2355,7 @@ function AdminView() {
         isOpen={imageLibraryModalOpen}
         onClose={() => setImageLibraryModalOpen(false)}
         onSelectImage={handleSelectImageFromLibrary}
+        usageCounts={imageUsageCounts}
       />
 
       {/* Gallery Image Library Modal */}
@@ -2340,6 +2363,7 @@ function AdminView() {
         isOpen={galleryLibraryModalOpen}
         onClose={() => setGalleryLibraryModalOpen(false)}
         onSelectImage={handleSelectGalleryImageFromLibrary}
+        usageCounts={imageUsageCounts}
         multiple
       />
 

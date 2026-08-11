@@ -191,6 +191,7 @@ function Sidebar({
   onOpenTrash,
   trashedSlidesCount = 0,
   tenantName = "",
+  imageUsageCounts = null,
 }) {
   const { tenantId } = useTenant();
   const { modules, slideTypes } = useTenantModules();
@@ -292,6 +293,7 @@ function Sidebar({
         isOpen={mediaLibraryOpen}
         onClose={() => setMediaLibraryOpen(false)}
         allowUpload
+        usageCounts={imageUsageCounts}
       />
 
       {privacyOpen &&

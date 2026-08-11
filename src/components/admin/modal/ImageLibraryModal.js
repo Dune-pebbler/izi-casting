@@ -8,7 +8,7 @@ import { toast } from 'sonner';
 import { useTenant } from '../../../context/TenantContext';
 import { tenantDoc, tenantCollection, tenantStorageRef } from '../../../utils/tenantPaths';
 
-const ImageLibraryModal = ({ isOpen, onClose, onSelectImage, multiple = false, allowUpload = false }) => {
+const ImageLibraryModal = ({ isOpen, onClose, onSelectImage, multiple = false, allowUpload = false, usageCounts = null }) => {
   const { tenantId } = useTenant();
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -17,8 +17,11 @@ const ImageLibraryModal = ({ isOpen, onClose, onSelectImage, multiple = false, a
   const [selectedImages, setSelectedImages] = useState([]);
   const [deletingImageId, setDeletingImageId] = useState(null);
   const [uploading, setUploading] = useState(false);
+  const [showOnlyUnused, setShowOnlyUnused] = useState(false);
   const fileInputRef = useRef(null);
   const canSelect = typeof onSelectImage === 'function';
+  const canShowUsage = usageCounts instanceof Map;
+  const getUsageCount = (image) => (canShowUsage ? (usageCounts.get(image.url) || 0) : null);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -55,7 +58,12 @@ const ImageLibraryModal = ({ isOpen, onClose, onSelectImage, multiple = false, a
   const handleDelete = async (image, e) => {
     e.stopPropagation();
 
-    if (!window.confirm(`Weet je zeker dat je "${image.name}" wilt verwijderen? Dit kan niet ongedaan worden gemaakt.`)) {
+    const usageCount = getUsageCount(image);
+    const confirmMessage = usageCount
+      ? `"${image.name}" wordt nog gebruikt in ${usageCount} slide${usageCount !== 1 ? 's' : ''}. Weet je zeker dat je deze afbeelding wilt verwijderen? Dit kan niet ongedaan worden gemaakt.`
+      : `Weet je zeker dat je "${image.name}" wilt verwijderen? Dit kan niet ongedaan worden gemaakt.`;
+
+    if (!window.confirm(confirmMessage)) {
       return;
     }
 
@@ -181,9 +189,9 @@ const ImageLibraryModal = ({ isOpen, onClose, onSelectImage, multiple = false, a
     }
   };
 
-  const filteredImages = images.filter(image =>
-    image.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredImages = images
+    .filter(image => image.name.toLowerCase().includes(searchTerm.toLowerCase()))
+    .filter(image => !showOnlyUnused || getUsageCount(image) === 0);
 
   const formatFileSize = (bytes) => {
     if (bytes < 1024) return bytes + ' B';
@@ -225,6 +233,16 @@ const ImageLibraryModal = ({ isOpen, onClose, onSelectImage, multiple = false, a
                   className="search-input"
                 />
               </div>
+              {canShowUsage && (
+                <label className="image-library-unused-filter">
+                  <input
+                    type="checkbox"
+                    checked={showOnlyUnused}
+                    onChange={(e) => setShowOnlyUnused(e.target.checked)}
+                  />
+                  Alleen ongebruikte
+                </label>
+              )}
               {allowUpload && (
                 <>
                   <input
@@ -272,6 +290,18 @@ const ImageLibraryModal = ({ isOpen, onClose, onSelectImage, multiple = false, a
                   >
                     <div className="image-library-thumbnail">
                       <img src={image.url} alt={image.name} />
+                      {canShowUsage && (
+                        <span
+                          className={`image-usage-badge ${getUsageCount(image) === 0 ? 'unused' : ''}`}
+                          title={
+                            getUsageCount(image) === 0
+                              ? 'Niet gebruikt in een slide'
+                              : `Gebruikt in ${getUsageCount(image)} slide${getUsageCount(image) !== 1 ? 's' : ''}`
+                          }
+                        >
+                          {getUsageCount(image)}×
+                        </span>
+                      )}
                       <button
                         className="image-delete-btn"
                         onClick={(e) => handleDelete(image, e)}
