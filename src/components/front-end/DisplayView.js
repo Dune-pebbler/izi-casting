@@ -12,6 +12,7 @@ import {
 } from "firebase/firestore";
 import { db } from "../../firebase";
 import { tenantDoc } from "../../utils/tenantPaths";
+import { hideExpiredCountdownSlides } from "../../utils/countdownUtils";
 import { isSportlinkLayout } from "../../utils/sportlinkTypes";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import {
@@ -86,6 +87,7 @@ function DisplayView() {
   const generateDisplayPairingCodeRef = useRef();
   const isPairedRef = useRef(isPaired);
   const tenantDeletedRef = useRef(false);
+  const rawPlaylistsRef = useRef([]);
   const lastFeedsSignatureRef = useRef(null);
   const isGeneratingCodeRef = useRef(isGeneratingCode);
   const displayPairingCodeRef = useRef(displayPairingCode);
@@ -703,6 +705,7 @@ function DisplayView() {
     let unsubscribeTenant;
     let unsubscribeContent;
     let unsubscribeSettings;
+    let expiredCountdownInterval;
 
     const setup = async () => {
       // Check tenant deletion status before setting up the content listener
@@ -714,12 +717,29 @@ function DisplayView() {
         setPlaylists([]);
       }
 
+      // Displays run unattended for days at a time, so a countdown slide's
+      // expiry has to be caught here rather than waiting for an admin to
+      // open the panel. Re-check periodically and persist the "hidden"
+      // state back to Firestore so the admin's eye toggle reflects it too.
+      const checkExpiredCountdowns = () => {
+        if (tenantDeletedRef.current || rawPlaylistsRef.current.length === 0)
+          return;
+        const { playlists: updatedPlaylists, changed } =
+          hideExpiredCountdownSlides(rawPlaylistsRef.current);
+        if (changed) {
+          rawPlaylistsRef.current = updatedPlaylists;
+          setDoc(displayDocRef, { playlists: updatedPlaylists }, { merge: true });
+        }
+      };
+
       const applyContentDoc = (snap) => {
         if (!snap.exists()) return;
         const data = snap.data();
         if (data.playlists) {
+          rawPlaylistsRef.current = data.playlists;
           setPlaylists(data.playlists);
         } else if (data.slides) {
+          rawPlaylistsRef.current = [];
           setPlaylists([
             {
               id: "default",
@@ -728,9 +748,13 @@ function DisplayView() {
             },
           ]);
         } else {
+          rawPlaylistsRef.current = [];
           setPlaylists([]);
         }
+        checkExpiredCountdowns();
       };
+
+      expiredCountdownInterval = setInterval(checkExpiredCountdowns, 30000);
 
       unsubscribeTenant = onSnapshot(
         doc(db, "tenants", displayTenantId),
@@ -851,6 +875,7 @@ function DisplayView() {
       unsubscribeTenant?.();
       unsubscribeContent?.();
       unsubscribeSettings?.();
+      clearInterval(expiredCountdownInterval);
     };
   }, [isPaired, displayTenantId]);
 

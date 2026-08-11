@@ -5,6 +5,7 @@ import { db, storage } from "../../firebase";
 import { toast } from "sonner";
 import { useTenant } from "../../context/TenantContext";
 import { tenantDoc, tenantStorageRef } from "../../utils/tenantPaths";
+import { hideExpiredCountdownSlides } from "../../utils/countdownUtils";
 
 // Custom hook for playlist management
 export const usePlaylistManager = () => {
@@ -33,7 +34,13 @@ export const usePlaylistManager = () => {
               totalDuration: recalculatedDuration, // Always recalculate with new logic
             };
           });
-          setPlaylists(migratedPlaylists);
+
+          const { playlists: finalPlaylists, changed } =
+            hideExpiredCountdownSlides(migratedPlaylists);
+          setPlaylists(finalPlaylists);
+          if (changed) {
+            savePlaylistsToFirebase(finalPlaylists);
+          }
         } else if (data.slides) {
           // Migrate old single playlist structure to new multiple playlists structure
           const defaultPlaylist = {

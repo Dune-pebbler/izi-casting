@@ -1487,12 +1487,39 @@ function AdminView() {
     await savePlaylistsToFirebase(updatedPlaylists);
   };
 
-  const toggleSlideVisibility = async (playlistId, slideId) => {
+  const toggleSlideVisibility = async (playlistId, slideId, overrides = {}) => {
+    const playlist = playlists.find((p) => p.id === playlistId);
+    const slide = playlist?.slides.find((s) => s.id === slideId);
+    const effectiveLayout = overrides.layout ?? slide?.layout;
+    const effectiveTargetDate =
+      overrides.countdownTargetDate ?? slide?.countdownTargetDate;
+    if (
+      slide &&
+      !slide.isVisible &&
+      effectiveLayout === "countdown" &&
+      effectiveTargetDate &&
+      new Date(effectiveTargetDate).getTime() <= Date.now()
+    ) {
+      toast.error(
+        `"${slide.name || "Slide"}" kan niet worden aangezet: de afteldatum is al verstreken.`,
+      );
+      return false;
+    }
+
+    // When toggled from the edit modal, the countdown date shown there may
+    // not be saved yet — persist it together with the toggle so the
+    // background expiry check (which reads Firestore, not modal state)
+    // doesn't immediately flip it back off again.
+    const dateOverride =
+      overrides.countdownTargetDate !== undefined
+        ? { countdownTargetDate: overrides.countdownTargetDate }
+        : {};
+
     const updatedPlaylists = playlists.map((playlist) => {
       if (playlist.id === playlistId) {
         const updatedSlides = playlist.slides.map((slide) =>
           slide.id === slideId
-            ? { ...slide, isVisible: !slide.isVisible }
+            ? { ...slide, ...dateOverride, isVisible: !slide.isVisible }
             : slide,
         );
         return { ...playlist, slides: updatedSlides };
@@ -1501,6 +1528,7 @@ function AdminView() {
     });
     setPlaylists(updatedPlaylists);
     await savePlaylistsToFirebase(updatedPlaylists);
+    return true;
   };
 
   const handleImageUpload = async (playlistId, slideId, file) => {
@@ -1990,12 +2018,21 @@ function AdminView() {
           onTeletekstSkipBottomLinesChange={setModalTeletekstSkipBottomLines}
           iframeUrl={modalIframeUrl}
           onIframeUrlChange={setModalIframeUrl}
-          onToggleSlideVisibility={(slideId) => {
-            toggleSlideVisibility(currentEditingPlaylistId, slideId);
-            setEditingSlide((prev) => ({
-              ...prev,
-              isVisible: !prev.isVisible,
-            }));
+          onToggleSlideVisibility={async (slideId) => {
+            const didToggle = await toggleSlideVisibility(
+              currentEditingPlaylistId,
+              slideId,
+              {
+                layout: slideLayout,
+                countdownTargetDate: modalCountdownTargetDate,
+              },
+            );
+            if (didToggle) {
+              setEditingSlide((prev) => ({
+                ...prev,
+                isVisible: !prev.isVisible,
+              }));
+            }
           }}
           onOpenLibrary={handleOpenImageLibrary}
           timeRestriction={modalTimeRestriction}
