@@ -38,6 +38,7 @@ function PlaylistPreviewView() {
     showDate: true,
     barStyle: "onder",
     backgroundMusic: null,
+    sportlinkApiKey: "",
   });
   const [feeds, setFeeds] = useState([]);
   const [showControls, setShowControls] = useState(false);
@@ -143,6 +144,7 @@ function PlaylistPreviewView() {
           showDate: data.showDate !== undefined ? data.showDate : true,
           barStyle: data.barStyle || "onder",
           backgroundMusic: data.backgroundMusic || null,
+          sportlinkApiKey: data.sportlinkApiKey || "",
         });
 
         const typo = data.typography || {};

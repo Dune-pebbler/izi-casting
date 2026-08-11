@@ -13,7 +13,10 @@ import {
 import { db } from "../../firebase";
 import { tenantDoc } from "../../utils/tenantPaths";
 import { hideExpiredCountdownSlides } from "../../utils/countdownUtils";
-import { isSportlinkLayout } from "../../utils/sportlinkTypes";
+import {
+  isSportlinkLayout,
+  getSlideTypeGateKey,
+} from "../../utils/sportlinkTypes";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import {
   setIsPaired,
@@ -72,6 +75,7 @@ function DisplayView() {
     reduceRssTitleLetterSpacing: false,
     barStyle: "onder",
     backgroundMusic: null,
+    sportlinkApiKey: "",
   });
   const [feeds, setFeeds] = useState([]);
 
@@ -801,6 +805,7 @@ function DisplayView() {
             capitalRssTitle: data.capitalRssTitle || false,
             reduceRssTitleLetterSpacing:
               data.reduceRssTitleLetterSpacing || false,
+            sportlinkApiKey: data.sportlinkApiKey || "",
           });
 
           // Apply typography as CSS custom properties
@@ -954,7 +959,7 @@ function DisplayView() {
         const hasSlideTypeConfig = Object.keys(tenantSlideTypes).length > 0;
         const isSlideTypeAllowed = (slide) => {
           if (!hasSlideTypeConfig) return true;
-          const typeKey = slide.layout || slide.type;
+          const typeKey = getSlideTypeGateKey(slide.layout) || slide.type;
           return typeKey ? tenantSlideTypes[typeKey] : true;
         };
 
