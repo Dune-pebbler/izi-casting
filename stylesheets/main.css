@@ -2277,7 +2277,6 @@ a:hover {
 }
 
 .display-weather__left {
-  padding: 24px;
   display: flex;
   flex-direction: column;
 }
@@ -2318,7 +2317,7 @@ a:hover {
 .display-weather__stat-value {
   display: block;
   color: white;
-  font-size: 2.5rem;
+  font-size: 3rem;
 }
 
 .display-weather__stat-label {
@@ -2413,7 +2412,7 @@ a:hover {
   font-size: 1.5rem !important;
 }
 .display--portrait .display-weather__stat-value {
-  font-size: 2rem;
+  font-size: 2.5rem;
 }
 .display--portrait .display-weather__stat-label {
   font-size: 1.25rem;
