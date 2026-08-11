@@ -2,6 +2,11 @@ import React, { useMemo, useCallback, useState } from "react";
 import ReactDOM from "react-dom";
 import { getSlideTypeGateKey } from "../../utils/sportlinkTypes";
 import {
+  isTimeRestrictionEnabled,
+  isSlideCurrentlyInWindow,
+} from "../../utils/timeRestriction";
+import { isCountdownExpired } from "../../utils/countdownUtils";
+import {
   Copy,
   GripVertical,
   Eye,
@@ -27,13 +32,24 @@ import {
   ScanQrCode,
 } from "lucide-react";
 
-const isTimeRestrictionActive = (tr) => {
-  if (!tr) return false;
-  const timeEnabled =
-    tr.timeEnabled !== undefined ? tr.timeEnabled : !!tr.enabled;
-  const dateEnabled =
-    tr.dateEnabled !== undefined ? tr.dateEnabled : !!tr.enabled;
-  return timeEnabled || dateEnabled;
+const isTimeRestrictionActive = isTimeRestrictionEnabled;
+
+// When a time window is active, the eye toggle becomes a read-only
+// indicator of whether the window currently allows the slide to show —
+// isVisible stops being the deciding factor (see DisplayView filtering).
+// Countdown expiry always wins — it isn't something the time-window
+// bypass below should be able to mask.
+const getSlideVisibilityState = (slide) => {
+  const timeRestrictionActive = isTimeRestrictionActive(slide.timeRestriction);
+  const expired = isCountdownExpired(slide);
+  return {
+    timeRestrictionActive,
+    effectivelyVisible: expired
+      ? false
+      : timeRestrictionActive
+        ? isSlideCurrentlyInWindow(slide)
+        : slide.isVisible,
+  };
 };
 
 const timeRestrictionTooltip = (tr) => {
@@ -608,16 +624,33 @@ function SlideList({
               <Clock size={16} />
             </button>
 
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onToggleSlideVisibility(slide.id);
-              }}
-              className={`btn-icon ${slide.isVisible ? "btn-icon--success" : ""}`}
-              title={slide.isVisible ? "Hide slide" : "Show slide"}
-            >
-              {slide.isVisible ? <Eye size={16} /> : <EyeOff size={16} />}
-            </button>
+            {(() => {
+              const { timeRestrictionActive, effectivelyVisible } =
+                getSlideVisibilityState(slide);
+              return (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onToggleSlideVisibility(slide.id);
+                  }}
+                  disabled={timeRestrictionActive}
+                  className={`btn-icon ${effectivelyVisible ? "btn-icon--success" : ""}`}
+                  title={
+                    timeRestrictionActive
+                      ? `Tijdvenster actief — nu ${effectivelyVisible ? "zichtbaar" : "verborgen"}`
+                      : slide.isVisible
+                        ? "Hide slide"
+                        : "Show slide"
+                  }
+                >
+                  {effectivelyVisible ? (
+                    <Eye size={16} />
+                  ) : (
+                    <EyeOff size={16} />
+                  )}
+                </button>
+              );
+            })()}
           </div>
         </div>
 
@@ -799,16 +832,29 @@ function SlideList({
             <Clock size={16} />
           </button>
 
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onToggleSlideVisibility(slide.id);
-            }}
-            className={`btn-icon ${slide.isVisible ? "btn-icon--success" : ""}`}
-            title={slide.isVisible ? "Hide slide" : "Show slide"}
-          >
-            {slide.isVisible ? <Eye size={16} /> : <EyeOff size={16} />}
-          </button>
+          {(() => {
+            const { timeRestrictionActive, effectivelyVisible } =
+              getSlideVisibilityState(slide);
+            return (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onToggleSlideVisibility(slide.id);
+                }}
+                disabled={timeRestrictionActive}
+                className={`btn-icon ${effectivelyVisible ? "btn-icon--success" : ""}`}
+                title={
+                  timeRestrictionActive
+                    ? `Tijdvenster actief — nu ${effectivelyVisible ? "zichtbaar" : "verborgen"}`
+                    : slide.isVisible
+                      ? "Hide slide"
+                      : "Show slide"
+                }
+              >
+                {effectivelyVisible ? <Eye size={16} /> : <EyeOff size={16} />}
+              </button>
+            );
+          })()}
 
           <button
             onClick={(e) => {
@@ -851,17 +897,36 @@ function SlideList({
               <Copy size={16} />
               <span>Kopiëren</span>
             </button>
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onToggleSlideVisibility(slide.id);
-                setActionsOpen(false);
-              }}
-              className={`btn-icon slide-row__actions-panel-btn${slide.isVisible ? " btn-icon--success" : ""}`}
-            >
-              {slide.isVisible ? <Eye size={16} /> : <EyeOff size={16} />}
-              <span>{slide.isVisible ? "Verbergen" : "Tonen"}</span>
-            </button>
+            {(() => {
+              const { timeRestrictionActive, effectivelyVisible } =
+                getSlideVisibilityState(slide);
+              return (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onToggleSlideVisibility(slide.id);
+                    setActionsOpen(false);
+                  }}
+                  disabled={timeRestrictionActive}
+                  className={`btn-icon slide-row__actions-panel-btn${effectivelyVisible ? " btn-icon--success" : ""}`}
+                >
+                  {effectivelyVisible ? (
+                    <Eye size={16} />
+                  ) : (
+                    <EyeOff size={16} />
+                  )}
+                  <span>
+                    {timeRestrictionActive
+                      ? effectivelyVisible
+                        ? "Zichtbaar (tijdvenster)"
+                        : "Verborgen (tijdvenster)"
+                      : effectivelyVisible
+                        ? "Verbergen"
+                        : "Tonen"}
+                  </span>
+                </button>
+              );
+            })()}
             <button
               onClick={(e) => {
                 e.stopPropagation();

@@ -12,11 +12,18 @@ import {
 } from "firebase/firestore";
 import { db } from "../../firebase";
 import { tenantDoc } from "../../utils/tenantPaths";
-import { hideExpiredCountdownSlides } from "../../utils/countdownUtils";
+import {
+  hideExpiredCountdownSlides,
+  isCountdownExpired,
+} from "../../utils/countdownUtils";
 import {
   isSportlinkLayout,
   getSlideTypeGateKey,
 } from "../../utils/sportlinkTypes";
+import {
+  isTimeRestrictionEnabled,
+  isSlideCurrentlyInWindow,
+} from "../../utils/timeRestriction";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import {
   setIsPaired,
@@ -901,60 +908,16 @@ function DisplayView() {
 
       if (playlist.slides) {
         const now = new Date();
-        const currentMinutes = now.getHours() * 60 + now.getMinutes();
+        const isTimeActive = (slide) => isSlideCurrentlyInWindow(slide, now);
 
-        const isTimeActive = (slide) => {
-          const tr = slide.timeRestriction;
-          if (!tr) return true;
-
-          // Legacy data only has a single `enabled` flag — treat it as both
-          // windows being on so previously configured slides keep working.
-          const timeEnabled =
-            tr.timeEnabled !== undefined ? tr.timeEnabled : !!tr.enabled;
-          const dateEnabled =
-            tr.dateEnabled !== undefined ? tr.dateEnabled : !!tr.enabled;
-
-          if (!timeEnabled && !dateEnabled) return true;
-
-          // Date range check (optional — empty string means no restriction)
-          if (dateEnabled && (tr.startDate || tr.endDate)) {
-            const pad = (n) => String(n).padStart(2, "0");
-            const todayStr = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
-
-            // Normalize to YYYY-MM-DD string — handles plain strings, Date objects,
-            // and Firestore Timestamps (which have a .toDate() method)
-            const toDateStr = (val) => {
-              if (!val) return null;
-              if (typeof val === "string") return val.slice(0, 10);
-              if (typeof val.toDate === "function")
-                return val.toDate().toISOString().slice(0, 10);
-              if (val instanceof Date) return val.toISOString().slice(0, 10);
-              return null;
-            };
-
-            const startStr = toDateStr(tr.startDate);
-            const endStr = toDateStr(tr.endDate);
-            if (startStr && todayStr < startStr) return false;
-            if (endStr && todayStr > endStr) return false;
-          }
-
-          if (!timeEnabled) return true;
-
-          if (tr.days) {
-            const dayKeys = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
-            const key = dayKeys[now.getDay()];
-            if (tr.days[key] === false) return false;
-          }
-
-          const [sh, sm] = tr.startTime.split(":").map(Number);
-          const [eh, em] = tr.endTime.split(":").map(Number);
-          const start = sh * 60 + sm;
-          const end = eh * 60 + em;
-          // Midnight overlap: start > end means e.g. 22:00 – 02:00
-          return start <= end
-            ? currentMinutes >= start && currentMinutes <= end
-            : currentMinutes >= start || currentMinutes <= end;
-        };
+        // A slide with an active time window is shown or hidden purely by
+        // that window — the manual isVisible toggle is disabled in the
+        // admin UI in that case, so it must not gate display here either.
+        // Countdown expiry still applies on top, since it isn't something
+        // the time-window bypass should be able to mask.
+        const isEffectivelyVisible = (slide) =>
+          !isCountdownExpired(slide) &&
+          (isTimeRestrictionEnabled(slide.timeRestriction) || slide.isVisible);
 
         const hasSlideTypeConfig = Object.keys(tenantSlideTypes).length > 0;
         const isSlideTypeAllowed = (slide) => {
@@ -965,7 +928,7 @@ function DisplayView() {
 
         const visibleSlides = playlist.slides.filter(
           (slide) =>
-            slide.isVisible &&
+            isEffectivelyVisible(slide) &&
             isTimeActive(slide) &&
             isSlideTypeAllowed(slide) &&
             ((slide.type === "text" && slide.text && slide.text.trim()) ||

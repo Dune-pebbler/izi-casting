@@ -1,3 +1,8 @@
+export const isCountdownExpired = (slide, now = Date.now()) =>
+  slide.layout === "countdown" &&
+  !!slide.countdownTargetDate &&
+  new Date(slide.countdownTargetDate).getTime() <= now;
+
 // Once a countdown slide's target date/time has passed, it should stop
 // being shown automatically instead of requiring someone to manually flip
 // the "visible" toggle off in the admin panel.
@@ -10,10 +15,7 @@ export const hideExpiredCountdownSlides = (playlists) => {
 
     const nextSlides = playlist.slides.map((slide) => {
       const isExpiredCountdown =
-        slide.layout === "countdown" &&
-        slide.countdownTargetDate &&
-        slide.isVisible !== false &&
-        new Date(slide.countdownTargetDate).getTime() <= now;
+        slide.isVisible !== false && isCountdownExpired(slide, now);
 
       if (!isExpiredCountdown) return slide;
 

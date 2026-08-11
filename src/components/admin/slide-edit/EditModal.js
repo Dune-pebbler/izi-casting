@@ -28,6 +28,8 @@ import SportlinkInput from "./SportlinkInput";
 import WeatherInput from "./WeatherInput";
 import QrFeedInput from "./QrFeedInput";
 import SlideEffectsModal from "../SlideEffectsModal";
+import { isSlideCurrentlyInWindow } from "../../../utils/timeRestriction";
+import { isCountdownExpired } from "../../../utils/countdownUtils";
 
 function EditModal({
   slide,
@@ -646,16 +648,37 @@ function EditModal({
             </div>
 
             <div className="slide-modal__header-actions">
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onToggleSlideVisibility(slide.id);
-                }}
-                className={`btn-icon btn-icon--time ${slide.isVisible ? "btn-icon--success" : ""}`}
-                title="Toggle slide"
-              >
-                {slide.isVisible ? <Eye size={16} /> : <EyeOff size={16} />}
-              </button>
+              {(() => {
+                const timeRestrictionActive =
+                  timeWindowEnabled || dateWindowEnabled;
+                const expired = isCountdownExpired(slide);
+                const effectivelyVisible = expired
+                  ? false
+                  : timeRestrictionActive
+                    ? isSlideCurrentlyInWindow(slide)
+                    : slide.isVisible;
+                return (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onToggleSlideVisibility(slide.id);
+                    }}
+                    disabled={timeRestrictionActive}
+                    className={`btn-icon btn-icon--time ${effectivelyVisible ? "btn-icon--success" : ""}`}
+                    title={
+                      timeRestrictionActive
+                        ? `Tijdvenster actief — nu ${effectivelyVisible ? "zichtbaar" : "verborgen"}`
+                        : "Toggle slide"
+                    }
+                  >
+                    {effectivelyVisible ? (
+                      <Eye size={16} />
+                    ) : (
+                      <EyeOff size={16} />
+                    )}
+                  </button>
+                );
+              })()}
 
               <div className="slide-modal__time-popup-wrapper">
                 <button

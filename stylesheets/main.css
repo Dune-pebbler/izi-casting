@@ -3005,6 +3005,10 @@ a:hover {
 .btn-icon:active:not(:disabled) {
   background-color: var(--muted);
 }
+.btn-icon:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
 .btn-icon svg {
   width: 16px;
   height: 16px;
@@ -3753,6 +3757,20 @@ a:hover {
   flex-shrink: 0;
 }
 
+.image-library-unused-filter {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.875rem;
+  color: var(--foreground-muted);
+  white-space: nowrap;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+.image-library-unused-filter input[type=checkbox] {
+  cursor: pointer;
+}
+
 .image-library-search {
   position: relative;
 }
@@ -3875,6 +3893,21 @@ a:hover {
 }
 .image-library-item:hover .image-library-thumbnail .image-delete-btn {
   opacity: 1;
+}
+.image-library-thumbnail .image-usage-badge {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  padding: 2px 8px;
+  background: rgba(0, 0, 0, 0.65);
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 999px;
+  z-index: 2;
+}
+.image-library-thumbnail .image-usage-badge.unused {
+  background: var(--destructive);
 }
 
 .image-library-info {
