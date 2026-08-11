@@ -320,7 +320,7 @@ function WeatherDisplay({
           style={{ borderBottomColor: accentColor }}
         >
           <h2 style={{ color: accentColor }}>VERWACHTING</h2>
-          <h2>
+          <h2 style={{ color: accentColor }}>
             {formatDateTime.dateString} {formatDateTime.timeString}
           </h2>
         </div>
@@ -343,7 +343,7 @@ function WeatherDisplay({
                 return (
                   <div key={dateStr} className="display-weather__forecast-row">
                     <div className="display-weather__row-day">
-                      <span>{dateString}</span>
+                      <span style={{ color: accentColor }}>{dateString}</span>
                     </div>
                     <div className="display-weather__row-emoji">
                       <wmo.Icon
@@ -352,7 +352,10 @@ function WeatherDisplay({
                         color={wmo.color}
                       />
                     </div>
-                    <div className="display-weather__row-label">
+                    <div
+                      className="display-weather__row-label"
+                      style={{ color: accentColor }}
+                    >
                       {wmo.label}
                     </div>
                     <div
@@ -361,7 +364,10 @@ function WeatherDisplay({
                     >
                       {Math.round(daily.temperature_2m_max[i])}°
                     </div>
-                    <div className="display-weather__row-min">
+                    <div
+                      className="display-weather__row-min"
+                      style={{ color: `${accentColor}50` }}
+                    >
                       {Math.round(daily.temperature_2m_min[i])}°
                     </div>
                   </div>
