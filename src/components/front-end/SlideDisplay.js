@@ -979,14 +979,20 @@ function SportlinkDisplay({ slide, settings }) {
                   className="display-sportlink__scoreboard-header"
                   style={{
                     backgroundColor: `${accentColor}`,
-                    gridTemplateColumns: slide.sportlinkShowVeldInfo
-                      ? "140px 1fr 200px 1fr 90px"
-                      : "140px 1fr 200px 1fr",
+                    gridTemplateColumns: "230px 1fr 30px 1fr 1fr",
                   }}
                 >
                   <span style={{ color: headerTextColor }}>Tijd</span>
-                  <span style={{ color: headerTextColor }}>Thuisteam</span>
-                  <span style={{ textAlign: "center", color: headerTextColor }}>
+                  <span style={{ color: headerTextColor, textAlign: "right" }}>
+                    Thuisteam
+                  </span>
+                  <span
+                    style={{ textAlign: "center", color: headerTextColor }}
+                  ></span>
+                  <span style={{ color: headerTextColor, textAlign: "left" }}>
+                    Bezoekers
+                  </span>
+                  <span style={{ textAlign: "right" }}>
                     {sportlinkDate &&
                       new Date(sportlinkDate).toLocaleDateString("nl-NL", {
                         weekday: "long",
@@ -994,16 +1000,6 @@ function SportlinkDisplay({ slide, settings }) {
                         month: "short",
                       })}
                   </span>
-                  <span style={{ color: headerTextColor, textAlign: "right" }}>
-                    Bezoekers
-                  </span>
-                  {slide.sportlinkShowVeldInfo && (
-                    <span
-                      style={{ color: headerTextColor, textAlign: "right" }}
-                    >
-                      Veld
-                    </span>
-                  )}
                 </div>
               )}
 
@@ -1018,9 +1014,7 @@ function SportlinkDisplay({ slide, settings }) {
                         borderBottomColor: `${textColor}10`,
                         backgroundColor:
                           i % 2 === 0 ? `${bgColor}99` : `${bgColor}75`,
-                        gridTemplateColumns: slide.sportlinkShowVeldInfo
-                          ? "140px 1fr 200px 1fr 90px"
-                          : "140px 1fr 200px 1fr",
+                        gridTemplateColumns: "230px 1fr 30px 1fr",
                       }}
                     >
                       {/* Tijd */}
@@ -1028,7 +1022,18 @@ function SportlinkDisplay({ slide, settings }) {
                         className="display-sportlink__scoreboard-time"
                         style={{ color: accentColor }}
                       >
-                        {row.aanvangstijd}
+                        <span style={{ display: "block" }}>
+                          {row.aanvangstijd}
+                        </span>
+
+                        {row.accommodatie && slide.sportlinkShowVeldInfo && (
+                          <span
+                            className="display-sportlink__scoreboard-veld"
+                            style={{ color: accentColor, textAlign: "right" }}
+                          >
+                            {slide.sportlinkShowVeldInfo && `${row.veld}`}
+                          </span>
+                        )}
                       </span>
 
                       {/* Thuisteam + kleedkamer */}
@@ -1049,7 +1054,10 @@ function SportlinkDisplay({ slide, settings }) {
                         {slide.sportlinkShowVeldInfo && (
                           <span
                             className="display-sportlink__scoreboard-room"
-                            style={{ color: `${textColor}` }}
+                            style={{
+                              color: `${textColor}`,
+                              textAlign: "right",
+                            }}
                           >
                             Kleedkamer:{" "}
                             {row.kleedkamerthuisteam
@@ -1071,12 +1079,7 @@ function SportlinkDisplay({ slide, settings }) {
                           {row.uitslag}
                         </span>
                       ) : (
-                        <span
-                          className="display-sportlink__match-vs"
-                          style={{ color: `${textColor}55` }}
-                        >
-                          vs
-                        </span>
+                        <span style={{ textAlign: "center" }}>-</span>
                       )}
 
                       {/* Uitteam + kleedkamer */}
@@ -1097,7 +1100,7 @@ function SportlinkDisplay({ slide, settings }) {
                         {slide.sportlinkShowVeldInfo && (
                           <span
                             className="display-sportlink__scoreboard-room"
-                            style={{ color: `${textColor}` }}
+                            style={{ color: `${textColor}`, textAlign: "left" }}
                           >
                             Kleedkamer:{" "}
                             {row.kleedkameruitteam
@@ -1106,16 +1109,6 @@ function SportlinkDisplay({ slide, settings }) {
                           </span>
                         )}
                       </div>
-
-                      {/* Veld */}
-                      {row.accommodatie && slide.sportlinkShowVeldInfo && (
-                        <span
-                          className="display-sportlink__scoreboard-veld"
-                          style={{ color: accentColor }}
-                        >
-                          {slide.sportlinkShowVeldInfo && `${row.veld}`}
-                        </span>
-                      )}
                     </div>
                   ))}
                 </div>
