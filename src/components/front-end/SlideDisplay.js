@@ -6,6 +6,10 @@ import TeletekstDisplay from "./TeletekstDisplay";
 import WeatherDisplay from "./WeatherDisplay";
 import QrFeedDisplay from "./QrFeedDisplay";
 import { getTextPaginationConfig } from "../../config/textPagination";
+import {
+  isSportlinkLayout,
+  getSportlinkDataType,
+} from "../../utils/sportlinkTypes";
 
 function CountdownDisplay({ slide }) {
   const [timeLeft, setTimeLeft] = useState(null);
@@ -574,7 +578,7 @@ function SportlinkDisplay({ slide, settings }) {
   const contentRef = useRef(null);
 
   const apiKey = settings?.sportlinkApiKey || slide.sportlinkApiKey || "";
-  const dataType = slide.sportlinkDataType || "programma";
+  const dataType = getSportlinkDataType(slide.layout, slide.sportlinkDataType);
   const teams = slide.sportlinkTeams || [];
   const maxItems = slide.sportlinkMaxItems || 10;
   const bgColor = slide.sportlinkBgColor || "#0f172a";
@@ -721,6 +725,7 @@ function SportlinkDisplay({ slide, settings }) {
     const interval = setInterval(fetchData, 5 * 60 * 1000);
     return () => clearInterval(interval);
   }, [
+    slide.layout,
     slide.sportlinkApiKey,
     slide.sportlinkTeams,
     slide.sportlinkDataType,
@@ -1565,7 +1570,7 @@ function SlideDisplay({
 
         {layout === "email" && <EmailSlideDisplay slide={slide} />}
 
-        {layout === "sportlink" && (
+        {isSportlinkLayout(layout) && (
           <SportlinkDisplay slide={slide} settings={settings} />
         )}
 

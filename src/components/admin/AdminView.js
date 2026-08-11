@@ -23,6 +23,10 @@ import {
   tenantStorageRef,
 } from "../../utils/tenantPaths";
 import { sanitizeHTMLContent } from "../../utils/sanitize";
+import {
+  isSportlinkLayout,
+  getSportlinkDataType,
+} from "../../utils/sportlinkTypes";
 import { toast } from "sonner";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import {
@@ -475,6 +479,9 @@ function AdminView() {
       agenda: "agenda",
       email: "email",
       sportlink: "sportlink",
+      "sportlink-programma": "sportlink",
+      "sportlink-uitslagen": "sportlink",
+      "sportlink-poulestand": "sportlink",
       weather: "weather",
     };
     const newSlide = {
@@ -515,9 +522,9 @@ function AdminView() {
         emailAccentColor: "#4f87ff",
         duration: 30,
       }),
-      ...(slideLayout === "sportlink" && {
+      ...(isSportlinkLayout(slideLayout) && {
         sportlinkApiKey: "",
-        sportlinkDataType: "programma",
+        sportlinkDataType: getSportlinkDataType(slideLayout),
         sportlinkTeams: [],
         sportlinkTitle: "",
         sportlinkMaxItems: 10,
@@ -1201,7 +1208,7 @@ function AdminView() {
             const isCountdown = slideLayout === "countdown";
             const isAgenda = slideLayout === "agenda";
             const isEmail = slideLayout === "email";
-            const isSportlink = slideLayout === "sportlink";
+            const isSportlink = isSportlinkLayout(slideLayout);
             const isWeather = slideLayout === "weather";
             const isQrFeed = slideLayout === "qr-feed";
             const galleryDuration = isGallery
@@ -1267,7 +1274,10 @@ function AdminView() {
                         ? {
                             type: "sportlink",
                             sportlinkApiKey: modalSportlinkApiKey,
-                            sportlinkDataType: modalSportlinkDataType,
+                            sportlinkDataType: getSportlinkDataType(
+                              slideLayout,
+                              modalSportlinkDataType,
+                            ),
                             sportlinkTeams: modalSportlinkTeams,
                             sportlinkTitle: modalSportlinkTitle,
                             sportlinkMaxItems: modalSportlinkMaxItems,
@@ -2041,8 +2051,10 @@ function AdminView() {
           emailAccentColor={modalEmailAccentColor}
           onEmailAccentColorChange={setModalEmailAccentColor}
           sportlinkApiKey={tenantSportlinkApiKey || modalSportlinkApiKey}
-          sportlinkDataType={modalSportlinkDataType}
-          onSportlinkDataTypeChange={setModalSportlinkDataType}
+          sportlinkDataType={getSportlinkDataType(
+            slideLayout,
+            modalSportlinkDataType,
+          )}
           sportlinkTeams={modalSportlinkTeams}
           onSportlinkTeamsChange={setModalSportlinkTeams}
           sportlinkTitle={modalSportlinkTitle}
