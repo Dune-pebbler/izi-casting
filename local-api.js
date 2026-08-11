@@ -38,6 +38,9 @@ const server = http.createServer(async (req, res) => {
       res.setHeader("Content-Type", "application/json");
       res.end(JSON.stringify(data));
     };
+    res.send = (data) => {
+      res.end(data);
+    };
 
     try {
       await handler(req, res);
