@@ -192,7 +192,10 @@ function AgendaDisplay({ slide }) {
       const rawUrls = [];
       calendars.forEach((cal) => {
         if (!cal.url) return;
-        const rawUrl = decodeURIComponent(cal.url).replace(/^webcal:\/\//, "https://");
+        const rawUrl = decodeURIComponent(cal.url).replace(
+          /^webcal:\/\//,
+          "https://",
+        );
         calsByUrl.set(rawUrl, cal);
         rawUrls.push(rawUrl);
       });
@@ -802,12 +805,14 @@ function SportlinkDisplay({ slide, settings }) {
             </div>
           )}
 
-          <span
-            className="display-sportlink__badge"
-            style={{ backgroundColor: accentColor }}
-          >
-            {dataTypeLabel}
-          </span>
+          {dataTypeLabel !== "Poulestand" && (
+            <span
+              className="display-sportlink__badge"
+              style={{ backgroundColor: accentColor }}
+            >
+              {dataTypeLabel}
+            </span>
+          )}
         </div>
       )}
 

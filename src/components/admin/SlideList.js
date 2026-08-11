@@ -29,9 +29,46 @@ import {
 
 const isTimeRestrictionActive = (tr) => {
   if (!tr) return false;
-  const timeEnabled = tr.timeEnabled !== undefined ? tr.timeEnabled : !!tr.enabled;
-  const dateEnabled = tr.dateEnabled !== undefined ? tr.dateEnabled : !!tr.enabled;
+  const timeEnabled =
+    tr.timeEnabled !== undefined ? tr.timeEnabled : !!tr.enabled;
+  const dateEnabled =
+    tr.dateEnabled !== undefined ? tr.dateEnabled : !!tr.enabled;
   return timeEnabled || dateEnabled;
+};
+
+const timeRestrictionTooltip = (tr) => {
+  if (!isTimeRestrictionActive(tr)) return "Tijdvenster uitgeschakeld";
+  const timeEnabled =
+    tr.timeEnabled !== undefined ? tr.timeEnabled : !!tr.enabled;
+  const dateEnabled =
+    tr.dateEnabled !== undefined ? tr.dateEnabled : !!tr.enabled;
+  const parts = [];
+
+  if (dateEnabled && (tr.startDate || tr.endDate)) {
+    parts.push(`${tr.startDate || "?"} t/m ${tr.endDate || "?"}`);
+  }
+  if (timeEnabled && (tr.startTime || tr.endTime)) {
+    parts.push(`${tr.startTime || "?"} – ${tr.endTime || "?"}`);
+  }
+  if (timeEnabled && tr.days) {
+    const dayLabels = {
+      mon: "ma",
+      tue: "di",
+      wed: "wo",
+      thu: "do",
+      fri: "vr",
+      sat: "za",
+      sun: "zo",
+    };
+    const activeDays = Object.keys(dayLabels).filter(
+      (key) => tr.days[key] !== false,
+    );
+    if (activeDays.length > 0 && activeDays.length < 7) {
+      parts.push(activeDays.map((key) => dayLabels[key]).join(" "));
+    }
+  }
+
+  return `Tijdvenster aan: ${parts.join(", ")}`;
 };
 
 const iconMap = {
@@ -566,11 +603,7 @@ function SlideList({
                 onToggleSlideTimeRestriction(slide.id);
               }}
               className={`btn-icon btn-icon--time ${isTimeRestrictionActive(slide.timeRestriction) ? "btn-icon--success" : ""}`}
-              title={
-                isTimeRestrictionActive(slide.timeRestriction)
-                  ? `Tijdvenster aan: ${slide.timeRestriction?.startTime} – ${slide.timeRestriction?.endTime}`
-                  : "Tijdvenster uitgeschakeld"
-              }
+              title={timeRestrictionTooltip(slide.timeRestriction)}
             >
               <Clock size={16} />
             </button>
@@ -704,7 +737,11 @@ function SlideList({
           </h4>
           <div className="slide-row__info">
             <span className="slide-row__type">{getSlideTypeLabel(slide)}</span>
-            <span className="slide-row__duration">{formatDuration ? formatDuration(slide.duration || 5) : `${slide.duration || 5}s`}</span>
+            <span className="slide-row__duration">
+              {formatDuration
+                ? formatDuration(slide.duration || 5)
+                : `${slide.duration || 5}s`}
+            </span>
           </div>
         </div>
         <div className="slide-row__actions">
@@ -757,11 +794,7 @@ function SlideList({
               onToggleSlideTimeRestriction(slide.id);
             }}
             className={`btn-icon btn-icon--time ${isTimeRestrictionActive(slide.timeRestriction) ? "btn-icon--success" : ""}`}
-            title={
-              isTimeRestrictionActive(slide.timeRestriction)
-                ? `Tijdvenster aan: ${slide.timeRestriction?.startTime} – ${slide.timeRestriction?.endTime}`
-                : "Tijdvenster uitgeschakeld"
-            }
+            title={timeRestrictionTooltip(slide.timeRestriction)}
           >
             <Clock size={16} />
           </button>
