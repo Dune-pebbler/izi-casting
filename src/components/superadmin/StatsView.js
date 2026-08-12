@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { collection, getDocs, doc, getDoc } from "firebase/firestore";
 import { db } from "../../firebase";
-import { ArrowLeft, BarChart3 } from "lucide-react";
+import { ArrowLeft, BarChart3, ChevronDown, ChevronUp } from "lucide-react";
 import { Check } from "lucide-react";
 import {
   isSportlinkLayout,
@@ -70,6 +70,14 @@ function countSlideTypes(contentData) {
 function StatsView({ onBack }) {
   const [loading, setLoading] = useState(true);
   const [rows, setRows] = useState([]);
+  const [selectedModules, setSelectedModules] = useState(
+    () => new Set(MODULE_COLUMNS.map((m) => m.key)),
+  );
+  const [selectedSlideTypes, setSelectedSlideTypes] = useState(
+    () => new Set(SLIDE_TYPE_COLUMNS.map((s) => s.key)),
+  );
+  const [selectedTenants, setSelectedTenants] = useState(null);
+  const [filtersOpen, setFiltersOpen] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -95,6 +103,7 @@ function StatsView({ onBack }) {
       if (!cancelled) {
         results.sort((a, b) => a.tenant.name?.localeCompare(b.tenant.name));
         setRows(results);
+        setSelectedTenants(new Set(results.map((r) => r.tenant.id)));
         setLoading(false);
       }
     }
@@ -105,11 +114,39 @@ function StatsView({ onBack }) {
     };
   }, []);
 
+  function toggleInSet(setter) {
+    return (key) => {
+      setter((prev) => {
+        const next = new Set(prev);
+        if (next.has(key)) {
+          next.delete(key);
+        } else {
+          next.add(key);
+        }
+        return next;
+      });
+    };
+  }
+
+  const toggleModule = toggleInSet(setSelectedModules);
+  const toggleSlideType = toggleInSet(setSelectedSlideTypes);
+  const toggleTenant = toggleInSet(setSelectedTenants);
+
+  const visibleRows = rows.filter(({ tenant }) =>
+    selectedTenants ? selectedTenants.has(tenant.id) : true,
+  );
+  const visibleModuleColumns = MODULE_COLUMNS.filter((m) =>
+    selectedModules.has(m.key),
+  );
+  const visibleSlideTypeColumns = SLIDE_TYPE_COLUMNS.filter((s) =>
+    selectedSlideTypes.has(s.key),
+  );
+
   function renderSectionRow(label) {
     return (
       <tr key={label} className="superadmin-stats-section-row">
         <td className="superadmin-stats-row-label">{label}</td>
-        {rows.map(({ tenant }) => (
+        {visibleRows.map(({ tenant }) => (
           <td key={tenant.id} />
         ))}
       </tr>
@@ -120,7 +157,7 @@ function StatsView({ onBack }) {
     return (
       <tr key={key}>
         <td className="superadmin-stats-row-label">{label}</td>
-        {rows.map(({ tenant }) => {
+        {visibleRows.map(({ tenant }) => {
           const enabled = tenant.modules?.[key] === true;
           return (
             <td
@@ -145,7 +182,7 @@ function StatsView({ onBack }) {
     return (
       <tr key={key}>
         <td className="superadmin-stats-row-label">{label}</td>
-        {rows.map(({ tenant, counts }) => {
+        {visibleRows.map(({ tenant, counts }) => {
           const hasSlideTypeConfig =
             Object.keys(tenant.slideTypes || {}).length > 0;
           const enabled = hasSlideTypeConfig
@@ -183,10 +220,101 @@ function StatsView({ onBack }) {
         </h2>
       </div>
 
+      {!loading && rows.length > 0 && (
+        <div className="superadmin-stats-filters">
+          <button
+            type="button"
+            className="superadmin-stats-filters-toggle"
+            onClick={() => setFiltersOpen((open) => !open)}
+            aria-expanded={filtersOpen}
+          >
+            Filters
+            {filtersOpen ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+          </button>
+
+          <div
+            className={
+              filtersOpen
+                ? "superadmin-stats-filters-collapse superadmin-stats-filters-collapse--open"
+                : "superadmin-stats-filters-collapse"
+            }
+          >
+            <div className="superadmin-stats-filters-collapse-inner">
+            <div className="superadmin-stats-filters-body">
+              <div className="superadmin-stats-filter-group">
+                <div className="superadmin-stats-filter-title">Modules</div>
+                <div className="superadmin-stats-filter-options">
+                  {MODULE_COLUMNS.map(({ key, label }) => (
+                    <label
+                      key={key}
+                      className="superadmin-stats-filter-option"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={selectedModules.has(key)}
+                        onChange={() => toggleModule(key)}
+                      />
+                      {label}
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              <div className="superadmin-stats-filter-group">
+                <div className="superadmin-stats-filter-title">
+                  Slide types
+                </div>
+                <div className="superadmin-stats-filter-options">
+                  {SLIDE_TYPE_COLUMNS.map(({ key, label }) => (
+                    <label
+                      key={key}
+                      className="superadmin-stats-filter-option"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={selectedSlideTypes.has(key)}
+                        onChange={() => toggleSlideType(key)}
+                      />
+                      {label}
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              <div className="superadmin-stats-filter-group">
+                <div className="superadmin-stats-filter-title">
+                  Omgevingen
+                </div>
+                <div className="superadmin-stats-filter-options">
+                  {rows.map(({ tenant }) => (
+                    <label
+                      key={tenant.id}
+                      className="superadmin-stats-filter-option"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={selectedTenants?.has(tenant.id) ?? true}
+                        onChange={() => toggleTenant(tenant.id)}
+                      />
+                      {tenant.name}
+                    </label>
+                  ))}
+                </div>
+              </div>
+            </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {loading ? (
         <div className="loading">Statistieken laden...</div>
       ) : rows.length === 0 ? (
         <div className="superadmin-empty">Geen omgevingen gevonden.</div>
+      ) : visibleRows.length === 0 ? (
+        <div className="superadmin-empty">
+          Geen omgevingen geselecteerd.
+        </div>
       ) : (
         <div className="superadmin-stats-table-wrapper">
           <table className="superadmin-stats-table">
@@ -195,16 +323,24 @@ function StatsView({ onBack }) {
                 <th className="superadmin-stats-row-label superadmin-stats-corner">
                   Omgeving
                 </th>
-                {rows.map(({ tenant }) => (
+                {visibleRows.map(({ tenant }) => (
                   <th key={tenant.id}>{tenant.name}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
-              {renderSectionRow("Modules")}
-              {MODULE_COLUMNS.map(renderModuleRow)}
-              {renderSectionRow("Slide types")}
-              {SLIDE_TYPE_COLUMNS.map(renderSlideTypeRow)}
+              {visibleModuleColumns.length > 0 && (
+                <>
+                  {renderSectionRow("Modules")}
+                  {visibleModuleColumns.map(renderModuleRow)}
+                </>
+              )}
+              {visibleSlideTypeColumns.length > 0 && (
+                <>
+                  {renderSectionRow("Slide types")}
+                  {visibleSlideTypeColumns.map(renderSlideTypeRow)}
+                </>
+              )}
             </tbody>
           </table>
         </div>
