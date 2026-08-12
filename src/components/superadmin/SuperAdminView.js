@@ -29,9 +29,11 @@ import {
   Clock,
   ListMusic,
   File,
+  BarChart3,
 } from "lucide-react";
 import CreateTenantModal from "./CreateTenantModal";
 import EditTenantModal from "./EditTenantModal";
+import StatsView from "./StatsView";
 import { toast } from "sonner";
 import { useConfirm } from "../../context/ConfirmContext";
 
@@ -507,6 +509,7 @@ function SuperAdminView() {
   const [editingTenantSettings, setEditingTenantSettings] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("active");
+  const [view, setView] = useState("tenants");
 
   useEffect(() => {
     const unsubscribe = onSnapshot(collection(db, "tenants"), (snapshot) => {
@@ -546,14 +549,102 @@ function SuperAdminView() {
         </div>
       </div>
 
-      <div className="superadmin-body">
-        <div className="superadmin-content">
-          <div className="superadmin-toolbar">
-            <h2>
-              <Monitor size={20} />
-              Omgevingen (
-              {
-                tenants.filter((tenant) => {
+      {view === "stats" ? (
+        <StatsView onBack={() => setView("tenants")} />
+      ) : (
+        <div className="superadmin-body">
+          <div className="superadmin-content">
+            <div className="superadmin-toolbar">
+              <h2>
+                <button
+                  className={`btn btn-primary`}
+                  onClick={() =>
+                    setView(view === "stats" ? "tenants" : "stats")
+                  }
+                >
+                  <BarChart3 size={14} />
+                  Statistieken
+                </button>
+                <Monitor size={20} />
+                Omgevingen (
+                {
+                  tenants.filter((tenant) => {
+                    const matchesSearch = tenant.name
+                      ?.toLowerCase()
+                      .includes(searchQuery.toLowerCase());
+                    const isDeleted = !!tenant.deletedAt;
+                    const matchesStatus =
+                      statusFilter === "all" ||
+                      (statusFilter === "active" && !isDeleted) ||
+                      (statusFilter === "deleted" && isDeleted);
+                    return matchesSearch && matchesStatus;
+                  }).length
+                }
+                )
+              </h2>
+              <div className="superadmin-toolbar-right">
+                <input
+                  type="text"
+                  className="form-input search-desktop"
+                  placeholder="Zoek omgeving..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+                <button
+                  className="btn btn-primary"
+                  onClick={() => setShowCreateModal(true)}
+                >
+                  <Plus size={16} />
+                  Nieuwe omgeving
+                </button>
+              </div>
+            </div>
+
+            <div className="superadmin-filters">
+              <div className="filter-group">
+                {STATUS_FILTERS.map((f) => (
+                  <button
+                    key={f.key}
+                    className={`filter-pill${statusFilter === f.key ? " filter-pill--active" : ""}`}
+                    onClick={() => setStatusFilter(f.key)}
+                  >
+                    {f.label}
+                    <span className="filter-pill-count">
+                      {f.key === "all"
+                        ? tenants.length
+                        : tenants.filter((t) =>
+                            f.key === "active" ? !t.deletedAt : !!t.deletedAt,
+                          ).length}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <input
+              type="text"
+              className="form-input search-mobile"
+              placeholder="Zoek omgeving..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+
+            {loading ? (
+              <div className="loading">Tenants laden...</div>
+            ) : tenants.length === 0 ? (
+              <div className="superadmin-empty">
+                <p>Nog geen omgevingen aangemaakt.</p>
+                <button
+                  className="btn btn-primary"
+                  onClick={() => setShowCreateModal(true)}
+                >
+                  <Plus size={16} />
+                  Eerste omgeving aanmaken
+                </button>
+              </div>
+            ) : (
+              (() => {
+                const filtered = tenants.filter((tenant) => {
                   const matchesSearch = tenant.name
                     ?.toLowerCase()
                     .includes(searchQuery.toLowerCase());
@@ -563,110 +654,35 @@ function SuperAdminView() {
                     (statusFilter === "active" && !isDeleted) ||
                     (statusFilter === "deleted" && isDeleted);
                   return matchesSearch && matchesStatus;
-                }).length
-              }
-              )
-            </h2>
-            <div className="superadmin-toolbar-right">
-              <input
-                type="text"
-                className="form-input search-desktop"
-                placeholder="Zoek omgeving..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-              <button
-                className="btn btn-primary"
-                onClick={() => setShowCreateModal(true)}
-              >
-                <Plus size={16} />
-                Nieuwe omgeving
-              </button>
-            </div>
+                });
+                return filtered.length === 0 ? (
+                  <div className="superadmin-empty">
+                    <p>
+                      {searchQuery
+                        ? `Geen omgevingen gevonden voor "${searchQuery}".`
+                        : "Geen omgevingen in deze categorie."}
+                    </p>
+                  </div>
+                ) : (
+                  <div className="tenant-grid">
+                    {filtered.map((tenant) => (
+                      <TenantCard
+                        key={tenant.id}
+                        tenant={tenant}
+                        onEdit={setEditingTenantSettings}
+                      />
+                    ))}
+                  </div>
+                );
+              })()
+            )}
           </div>
 
-          <div className="superadmin-filters">
-            <div className="filter-group">
-              {STATUS_FILTERS.map((f) => (
-                <button
-                  key={f.key}
-                  className={`filter-pill${statusFilter === f.key ? " filter-pill--active" : ""}`}
-                  onClick={() => setStatusFilter(f.key)}
-                >
-                  {f.label}
-                  <span className="filter-pill-count">
-                    {f.key === "all"
-                      ? tenants.length
-                      : tenants.filter((t) =>
-                          f.key === "active" ? !t.deletedAt : !!t.deletedAt,
-                        ).length}
-                  </span>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <input
-            type="text"
-            className="form-input search-mobile"
-            placeholder="Zoek omgeving..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-
-          {loading ? (
-            <div className="loading">Tenants laden...</div>
-          ) : tenants.length === 0 ? (
-            <div className="superadmin-empty">
-              <p>Nog geen omgevingen aangemaakt.</p>
-              <button
-                className="btn btn-primary"
-                onClick={() => setShowCreateModal(true)}
-              >
-                <Plus size={16} />
-                Eerste omgeving aanmaken
-              </button>
-            </div>
-          ) : (
-            (() => {
-              const filtered = tenants.filter((tenant) => {
-                const matchesSearch = tenant.name
-                  ?.toLowerCase()
-                  .includes(searchQuery.toLowerCase());
-                const isDeleted = !!tenant.deletedAt;
-                const matchesStatus =
-                  statusFilter === "all" ||
-                  (statusFilter === "active" && !isDeleted) ||
-                  (statusFilter === "deleted" && isDeleted);
-                return matchesSearch && matchesStatus;
-              });
-              return filtered.length === 0 ? (
-                <div className="superadmin-empty">
-                  <p>
-                    {searchQuery
-                      ? `Geen omgevingen gevonden voor "${searchQuery}".`
-                      : "Geen omgevingen in deze categorie."}
-                  </p>
-                </div>
-              ) : (
-                <div className="tenant-grid">
-                  {filtered.map((tenant) => (
-                    <TenantCard
-                      key={tenant.id}
-                      tenant={tenant}
-                      onEdit={setEditingTenantSettings}
-                    />
-                  ))}
-                </div>
-              );
-            })()
-          )}
+          <aside className="superadmin-sidebar">
+            <SuperAdminUsersPanel />
+          </aside>
         </div>
-
-        <aside className="superadmin-sidebar">
-          <SuperAdminUsersPanel />
-        </aside>
-      </div>
+      )}
 
       <CreateTenantModal
         isOpen={showCreateModal}
