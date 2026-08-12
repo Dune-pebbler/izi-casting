@@ -100,7 +100,8 @@
 
 .superadmin-stats-table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
   font-size: $font-size-sm;
   white-space: nowrap;
 
@@ -159,9 +160,9 @@
 }
 
 .superadmin-stats-section-row td {
-  background: var(--surface);
+  background: var(--primary);
   font-weight: $font-weight-semibold;
-  color: var(--foreground-muted);
+  color: white;
   text-transform: uppercase;
   font-size: $font-size-xs;
   letter-spacing: 0.03em;

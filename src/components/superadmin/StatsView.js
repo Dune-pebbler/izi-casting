@@ -105,7 +105,16 @@ function StatsView({ onBack }) {
     };
   }, []);
 
-  const colCount = rows.length + 1;
+  function renderSectionRow(label) {
+    return (
+      <tr key={label} className="superadmin-stats-section-row">
+        <td className="superadmin-stats-row-label">{label}</td>
+        {rows.map(({ tenant }) => (
+          <td key={tenant.id} />
+        ))}
+      </tr>
+    );
+  }
 
   function renderModuleRow({ key, label }) {
     return (
@@ -192,17 +201,9 @@ function StatsView({ onBack }) {
               </tr>
             </thead>
             <tbody>
-              <tr className="superadmin-stats-section-row">
-                <td className="superadmin-stats-row-label" colSpan={colCount}>
-                  Modules
-                </td>
-              </tr>
+              {renderSectionRow("Modules")}
               {MODULE_COLUMNS.map(renderModuleRow)}
-              <tr className="superadmin-stats-section-row">
-                <td className="superadmin-stats-row-label" colSpan={colCount}>
-                  Slide types
-                </td>
-              </tr>
+              {renderSectionRow("Slide types")}
               {SLIDE_TYPE_COLUMNS.map(renderSlideTypeRow)}
             </tbody>
           </table>
