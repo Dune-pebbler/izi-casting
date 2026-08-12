@@ -12192,7 +12192,8 @@ a:hover {
 
 .superadmin-stats-table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
   font-size: 12px;
   white-space: nowrap;
 }
@@ -12207,6 +12208,7 @@ a:hover {
   color: var(--foreground-muted);
   position: sticky;
   top: 0;
+  border-right: 1px solid var(--border);
 }
 .superadmin-stats-table tbody tr:last-child td {
   border-bottom: none;
@@ -12235,6 +12237,7 @@ a:hover {
 
 .superadmin-stats-count {
   text-align: center;
+  border-right: 1px solid var(--border);
 }
 .superadmin-stats-count svg {
   display: inline-block;
@@ -12243,13 +12246,12 @@ a:hover {
 
 .superadmin-stats-count--disabled {
   color: var(--foreground-muted);
-  opacity: 0.5;
 }
 
 .superadmin-stats-section-row td {
-  background: var(--surface);
+  background: var(--primary);
   font-weight: 600;
-  color: var(--foreground-muted);
+  color: white;
   text-transform: uppercase;
   font-size: 10px;
   letter-spacing: 0.03em;
