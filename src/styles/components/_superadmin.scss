@@ -107,7 +107,6 @@
   th,
   td {
     padding: $spacing-sm $spacing-md;
-    text-align: left;
     border-bottom: 1px solid var(--border);
   }
 
@@ -123,12 +122,26 @@
     border-bottom: none;
   }
 }
-
+.superadmin-stats-section-row {
+  .superadmin-stats-row-label {
+    background: var(--primary);
+    color: white;
+    border-right: none;
+  }
+}
 .superadmin-stats-row-label {
   font-weight: $font-weight-medium;
   position: sticky;
   left: 0;
-  background: var(--background);
+  z-index: 1;
+  background: white;
+  border-right: 1px solid var(--border);
+}
+
+.superadmin-stats-corner {
+  z-index: 2;
+  text-align: left;
+  background: var(--surface);
 }
 
 .superadmin-stats-count {
@@ -152,8 +165,6 @@
   text-transform: uppercase;
   font-size: $font-size-xs;
   letter-spacing: 0.03em;
-  position: sticky;
-  left: 0;
 }
 
 // Body: main content + sidebar

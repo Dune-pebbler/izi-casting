@@ -183,7 +183,9 @@ function StatsView({ onBack }) {
           <table className="superadmin-stats-table">
             <thead>
               <tr>
-                <th>Omgeving</th>
+                <th className="superadmin-stats-row-label superadmin-stats-corner">
+                  Omgeving
+                </th>
                 {rows.map(({ tenant }) => (
                   <th key={tenant.id}>{tenant.name}</th>
                 ))}
@@ -191,11 +193,15 @@ function StatsView({ onBack }) {
             </thead>
             <tbody>
               <tr className="superadmin-stats-section-row">
-                <td colSpan={colCount}>Modules</td>
+                <td className="superadmin-stats-row-label" colSpan={colCount}>
+                  Modules
+                </td>
               </tr>
               {MODULE_COLUMNS.map(renderModuleRow)}
               <tr className="superadmin-stats-section-row">
-                <td colSpan={colCount}>Slide types</td>
+                <td className="superadmin-stats-row-label" colSpan={colCount}>
+                  Slide types
+                </td>
               </tr>
               {SLIDE_TYPE_COLUMNS.map(renderSlideTypeRow)}
             </tbody>
