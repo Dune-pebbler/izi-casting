@@ -199,7 +199,7 @@ function ApiKeysPanel({ tenantId }) {
                 </li>
               ))}
             </ul>
-            <div className="user-add-form mt-2">
+            <div className="user-add-form mt-1">
               <input
                 type="text"
                 className="user-email-input"
