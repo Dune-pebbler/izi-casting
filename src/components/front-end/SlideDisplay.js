@@ -728,8 +728,8 @@ function SportlinkDisplay({ slide, settings }) {
     const interval = setInterval(fetchData, 5 * 60 * 1000);
     return () => clearInterval(interval);
   }, [
+    apiKey,
     slide.layout,
-    slide.sportlinkApiKey,
     slide.sportlinkTeams,
     slide.sportlinkDataType,
     slide.sportlinkMaxItems,
