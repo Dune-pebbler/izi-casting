@@ -23,6 +23,10 @@ import {
   tenantStorageRef,
 } from "../../utils/tenantPaths";
 import { sanitizeHTMLContent } from "../../utils/sanitize";
+import {
+  isSportlinkLayout,
+  getSportlinkDataType,
+} from "../../utils/sportlinkTypes";
 import { toast } from "sonner";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import {
@@ -47,6 +51,7 @@ import {
   LayoutGrid,
   List,
   Undo2,
+  Images,
   MonitorPlay,
 } from "lucide-react";
 
@@ -82,6 +87,7 @@ function AdminView() {
   const [modalSlideDuration, setModalSlideDuration] = useState(5);
   const [modalShowBar, setModalShowBar] = useState(true);
   const [modalVideoUrl, setModalVideoUrl] = useState("");
+  const [modalVideoSound, setModalVideoSound] = useState(false);
   const [modalImageSide, setModalImageSide] = useState("left");
   const [modalSlideTransition, setModalSlideTransition] = useState("fade");
   const [modalTeletekstChannel, setModalTeletekstChannel] = useState("101");
@@ -125,7 +131,7 @@ function AdminView() {
     useState("programma");
   const [modalSportlinkTeams, setModalSportlinkTeams] = useState([]);
   const [modalSportlinkTitle, setModalSportlinkTitle] = useState("");
-const [modalSportlinkMaxItems, setModalSportlinkMaxItems] = useState(10);
+  const [modalSportlinkMaxItems, setModalSportlinkMaxItems] = useState(10);
   const [modalSportlinkBgColor, setModalSportlinkBgColor] = useState("#0f172a");
   const [modalSportlinkTextColor, setModalSportlinkTextColor] =
     useState("#ffffff");
@@ -142,6 +148,10 @@ const [modalSportlinkMaxItems, setModalSportlinkMaxItems] = useState(10);
   const [modalWeatherCity, setModalWeatherCity] = useState("");
   const [modalWeatherAccentColor, setModalWeatherAccentColor] =
     useState("#4f87ff");
+  const [modalWeatherLeftAccentColor, setModalWeatherLeftAccentColor] =
+    useState("#4f87ff");
+  const [modalWeatherLeftTextColor, setModalWeatherLeftTextColor] =
+    useState("#ffffff");
   const [modalWeatherForecastDays, setModalWeatherForecastDays] = useState(7);
   const [modalWeatherLeftBgImage, setModalWeatherLeftBgImage] = useState("");
   const [modalWeatherLeftBgImagePosition, setModalWeatherLeftBgImagePosition] =
@@ -179,10 +189,10 @@ const [modalSportlinkMaxItems, setModalSportlinkMaxItems] = useState(10);
   const [defaultSlideTransition, setDefaultSlideTransition] = useState("fade");
   const [enabledFonts, setEnabledFonts] = useState([]);
   const [typography, setTypography] = useState({
-    p: { fontSize: 27, fontFamily: "Roboto" },
-    h1: { fontSize: 64, fontFamily: "Roboto" },
-    h2: { fontSize: 53, fontFamily: "Roboto" },
-    h3: { fontSize: 43, fontFamily: "Roboto" },
+    p: { fontSize: 27, fontFamily: "Arial", fontColor: "#000000" },
+    h1: { fontSize: 64, fontFamily: "Arial", fontColor: "#000000" },
+    h2: { fontSize: 53, fontFamily: "Arial", fontColor: "#000000" },
+    h3: { fontSize: 43, fontFamily: "Arial", fontColor: "#000000" },
   });
 
   // Playlist editing state
@@ -224,6 +234,7 @@ const [modalSportlinkMaxItems, setModalSportlinkMaxItems] = useState(10);
 
   const [tenantName, setTenantName] = useState("");
   const [tenantLogoUrl, setTenantLogoUrl] = useState("");
+  const [tenantSportlinkApiKey, setTenantSportlinkApiKey] = useState("");
 
   // Load default slide transition, enabled fonts, and tenant name
   useEffect(() => {
@@ -237,6 +248,7 @@ const [modalSportlinkMaxItems, setModalSportlinkMaxItems] = useState(10);
           setDefaultSlideTransition(settings.defaultSlideTransition || "fade");
           setEnabledFonts(settings.enabledFonts || []);
           setTenantLogoUrl(settings.logoUrl || "");
+          setTenantSportlinkApiKey(settings.sportlinkApiKey || "");
           if (settings.typography) setTypography(settings.typography);
         }
       } catch (error) {
@@ -312,12 +324,33 @@ const [modalSportlinkMaxItems, setModalSportlinkMaxItems] = useState(10);
 
         totalSlides += playlistSlides;
         activeSlides += playlistActiveSlides;
-        totalDuration += playlistDuration;
+        totalDuration += playlistDuration * playlist.repeatCount;
       }
     });
 
     return { totalSlides, activeSlides, totalDuration };
   }, [playlists, calculatePlaylistDuration]);
+
+  // Count how many times each media library image URL is referenced across all slides
+  const imageUsageCounts = useMemo(() => {
+    const counts = new Map();
+    const addUsage = (url) => {
+      if (!url) return;
+      counts.set(url, (counts.get(url) || 0) + 1);
+    };
+
+    playlists.forEach((playlist) => {
+      (playlist.slides || []).forEach((slide) => {
+        addUsage(slide.imageUrl);
+        addUsage(slide.countdownBgImage);
+        addUsage(slide.weatherLeftBgImage);
+        (slide.images || []).forEach((image) => addUsage(image.url));
+        (slide.qrTextSlides || []).forEach((qrSlide) => addUsage(qrSlide.bgImage));
+      });
+    });
+
+    return counts;
+  }, [playlists]);
 
   // Toggle sidebar collapse
   const toggleSidebarCollapse = () => {
@@ -467,6 +500,9 @@ const [modalSportlinkMaxItems, setModalSportlinkMaxItems] = useState(10);
       agenda: "agenda",
       email: "email",
       sportlink: "sportlink",
+      "sportlink-programma": "sportlink",
+      "sportlink-uitslagen": "sportlink",
+      "sportlink-poulestand": "sportlink",
       weather: "weather",
     };
     const newSlide = {
@@ -507,9 +543,9 @@ const [modalSportlinkMaxItems, setModalSportlinkMaxItems] = useState(10);
         emailAccentColor: "#4f87ff",
         duration: 30,
       }),
-      ...(slideLayout === "sportlink" && {
+      ...(isSportlinkLayout(slideLayout) && {
         sportlinkApiKey: "",
-        sportlinkDataType: "programma",
+        sportlinkDataType: getSportlinkDataType(slideLayout),
         sportlinkTeams: [],
         sportlinkTitle: "",
         sportlinkMaxItems: 10,
@@ -527,6 +563,8 @@ const [modalSportlinkMaxItems, setModalSportlinkMaxItems] = useState(10);
         weatherLong: "",
         weatherCity: "",
         weatherAccentColor: "#4f87ff",
+        weatherLeftAccentColor: "#4f87ff",
+        weatherLeftTextColor: "#ffffff",
         weatherForecastDays: 7,
         weatherLeftBgImage: "",
         weatherLeftBgImagePosition: "center",
@@ -667,6 +705,7 @@ const [modalSportlinkMaxItems, setModalSportlinkMaxItems] = useState(10);
     setModalSlideDuration(slide.duration || 5);
     setModalShowBar(slide.showBar !== false);
     setModalVideoUrl(slide.videoUrl || "");
+    setModalVideoSound(slide.videoSound || false);
     setModalImageSide(slide.imageSide || "left");
     setModalSlideTransition(slide.transition || "fade");
     setModalTeletekstChannel(slide.teletekstChannel || "101");
@@ -720,6 +759,10 @@ const [modalSportlinkMaxItems, setModalSportlinkMaxItems] = useState(10);
     setModalWeatherLong(slide.weatherLong || "");
     setModalWeatherCity(slide.weatherCity || "");
     setModalWeatherAccentColor(slide.weatherAccentColor || "#4f87ff");
+    setModalWeatherLeftAccentColor(
+      slide.weatherLeftAccentColor || slide.weatherAccentColor || "#4f87ff",
+    );
+    setModalWeatherLeftTextColor(slide.weatherLeftTextColor || "#ffffff");
     setModalWeatherForecastDays(slide.weatherForecastDays ?? 7);
     setModalWeatherLeftBgImage(slide.weatherLeftBgImage || "");
     setModalWeatherLeftBgImagePosition(
@@ -951,7 +994,9 @@ const [modalSportlinkMaxItems, setModalSportlinkMaxItems] = useState(10);
 
   const handleGalleryImageDurationChange = (imageId, duration) => {
     setModalGalleryImages((prev) =>
-      prev.map((img) => (img.id === imageId ? { ...img, duration } : img)),
+      imageId == null
+        ? prev.map((img) => ({ ...img, duration }))
+        : prev.map((img) => (img.id === imageId ? { ...img, duration } : img)),
     );
   };
 
@@ -1152,18 +1197,23 @@ const [modalSportlinkMaxItems, setModalSportlinkMaxItems] = useState(10);
     setImageLibraryModalOpen(true);
   };
 
-  const handleSelectGalleryImageFromLibrary = (image) => {
+  const handleSelectGalleryImageFromLibrary = (images) => {
+    const selected = Array.isArray(images) ? images : [images];
     setModalGalleryImages((prev) => [
       ...prev,
-      {
-        id: Date.now(),
+      ...selected.map((image, index) => ({
+        id: Date.now() + index,
         url: image.url,
         name: image.name || "Afbeelding",
         storagePath: image.storagePath || "",
         duration: 3,
-      },
+      })),
     ]);
-    toast.success(`${image.name || "Afbeelding"} toegevoegd aan galerij`);
+    toast.success(
+      selected.length === 1
+        ? `${selected[0].name || "Afbeelding"} toegevoegd aan galerij`
+        : `${selected.length} afbeeldingen toegevoegd aan galerij`,
+    );
   };
 
   const saveModalChanges = async () => {
@@ -1179,7 +1229,7 @@ const [modalSportlinkMaxItems, setModalSportlinkMaxItems] = useState(10);
             const isCountdown = slideLayout === "countdown";
             const isAgenda = slideLayout === "agenda";
             const isEmail = slideLayout === "email";
-            const isSportlink = slideLayout === "sportlink";
+            const isSportlink = isSportlinkLayout(slideLayout);
             const isWeather = slideLayout === "weather";
             const isQrFeed = slideLayout === "qr-feed";
             const galleryDuration = isGallery
@@ -1245,7 +1295,10 @@ const [modalSportlinkMaxItems, setModalSportlinkMaxItems] = useState(10);
                         ? {
                             type: "sportlink",
                             sportlinkApiKey: modalSportlinkApiKey,
-                            sportlinkDataType: modalSportlinkDataType,
+                            sportlinkDataType: getSportlinkDataType(
+                              slideLayout,
+                              modalSportlinkDataType,
+                            ),
                             sportlinkTeams: modalSportlinkTeams,
                             sportlinkTitle: modalSportlinkTitle,
                             sportlinkMaxItems: modalSportlinkMaxItems,
@@ -1269,6 +1322,9 @@ const [modalSportlinkMaxItems, setModalSportlinkMaxItems] = useState(10);
                               weatherLong: modalWeatherLong,
                               weatherCity: modalWeatherCity,
                               weatherAccentColor: modalWeatherAccentColor,
+                              weatherLeftAccentColor:
+                                modalWeatherLeftAccentColor,
+                              weatherLeftTextColor: modalWeatherLeftTextColor,
                               weatherForecastDays: modalWeatherForecastDays,
                               weatherLeftBgImage: modalWeatherLeftBgImage,
                               weatherLeftBgImagePosition:
@@ -1299,6 +1355,7 @@ const [modalSportlinkMaxItems, setModalSportlinkMaxItems] = useState(10);
                                 tinyMCEContent: modalTinyMCEContent,
                                 imageUrl: modalImageUrl,
                                 videoUrl: modalVideoUrl,
+                                videoSound: modalVideoSound,
                                 teletekstChannel: modalTeletekstChannel,
                                 teletekstTheme: modalTeletekstTheme,
                                 teletekstPages: modalTeletekstPages,
@@ -1416,7 +1473,12 @@ const [modalSportlinkMaxItems, setModalSportlinkMaxItems] = useState(10);
   const toggleSlideTimeRestriction = async (playlistId, slideId) => {
     const playlist = playlists.find((p) => p.id === playlistId);
     const slide = playlist?.slides.find((s) => s.id === slideId);
-    const willEnable = !slide?.timeRestriction?.enabled;
+    const tr = slide?.timeRestriction;
+    const currentlyActive = tr
+      ? (tr.timeEnabled !== undefined ? tr.timeEnabled : !!tr.enabled) ||
+        (tr.dateEnabled !== undefined ? tr.dateEnabled : !!tr.enabled)
+      : false;
+    const willEnable = !currentlyActive;
     const slideName = slide?.name || "Slide";
 
     const updatedPlaylists = playlists.map((p) => {
@@ -1428,6 +1490,8 @@ const [modalSportlinkMaxItems, setModalSportlinkMaxItems] = useState(10);
                 timeRestriction: {
                   ...s.timeRestriction,
                   enabled: willEnable,
+                  timeEnabled: willEnable,
+                  dateEnabled: willEnable,
                 },
               }
             : s,
@@ -1444,12 +1508,39 @@ const [modalSportlinkMaxItems, setModalSportlinkMaxItems] = useState(10);
     await savePlaylistsToFirebase(updatedPlaylists);
   };
 
-  const toggleSlideVisibility = async (playlistId, slideId) => {
+  const toggleSlideVisibility = async (playlistId, slideId, overrides = {}) => {
+    const playlist = playlists.find((p) => p.id === playlistId);
+    const slide = playlist?.slides.find((s) => s.id === slideId);
+    const effectiveLayout = overrides.layout ?? slide?.layout;
+    const effectiveTargetDate =
+      overrides.countdownTargetDate ?? slide?.countdownTargetDate;
+    if (
+      slide &&
+      !slide.isVisible &&
+      effectiveLayout === "countdown" &&
+      effectiveTargetDate &&
+      new Date(effectiveTargetDate).getTime() <= Date.now()
+    ) {
+      toast.error(
+        `"${slide.name || "Slide"}" kan niet worden aangezet: de afteldatum is al verstreken.`,
+      );
+      return false;
+    }
+
+    // When toggled from the edit modal, the countdown date shown there may
+    // not be saved yet — persist it together with the toggle so the
+    // background expiry check (which reads Firestore, not modal state)
+    // doesn't immediately flip it back off again.
+    const dateOverride =
+      overrides.countdownTargetDate !== undefined
+        ? { countdownTargetDate: overrides.countdownTargetDate }
+        : {};
+
     const updatedPlaylists = playlists.map((playlist) => {
       if (playlist.id === playlistId) {
         const updatedSlides = playlist.slides.map((slide) =>
           slide.id === slideId
-            ? { ...slide, isVisible: !slide.isVisible }
+            ? { ...slide, ...dateOverride, isVisible: !slide.isVisible }
             : slide,
         );
         return { ...playlist, slides: updatedSlides };
@@ -1458,6 +1549,7 @@ const [modalSportlinkMaxItems, setModalSportlinkMaxItems] = useState(10);
     });
     setPlaylists(updatedPlaylists);
     await savePlaylistsToFirebase(updatedPlaylists);
+    return true;
   };
 
   const handleImageUpload = async (playlistId, slideId, file) => {
@@ -1770,6 +1862,7 @@ const [modalSportlinkMaxItems, setModalSportlinkMaxItems] = useState(10);
         onOpenTrash={openTrashModal}
         trashedSlidesCount={trashedSlides.length}
         tenantName={tenantName}
+        imageUsageCounts={imageUsageCounts}
       />
 
       {/* Main Content Area */}
@@ -1927,6 +2020,8 @@ const [modalSportlinkMaxItems, setModalSportlinkMaxItems] = useState(10);
           onShowBarChange={setModalShowBar}
           videoUrl={modalVideoUrl}
           onVideoUrlChange={setModalVideoUrl}
+          videoSound={modalVideoSound}
+          onVideoSoundChange={setModalVideoSound}
           imageSide={modalImageSide}
           onImageSideChange={setModalImageSide}
           slideTransition={modalSlideTransition}
@@ -1945,12 +2040,21 @@ const [modalSportlinkMaxItems, setModalSportlinkMaxItems] = useState(10);
           onTeletekstSkipBottomLinesChange={setModalTeletekstSkipBottomLines}
           iframeUrl={modalIframeUrl}
           onIframeUrlChange={setModalIframeUrl}
-          onToggleSlideVisibility={(slideId) => {
-            toggleSlideVisibility(currentEditingPlaylistId, slideId);
-            setEditingSlide((prev) => ({
-              ...prev,
-              isVisible: !prev.isVisible,
-            }));
+          onToggleSlideVisibility={async (slideId) => {
+            const didToggle = await toggleSlideVisibility(
+              currentEditingPlaylistId,
+              slideId,
+              {
+                layout: slideLayout,
+                countdownTargetDate: modalCountdownTargetDate,
+              },
+            );
+            if (didToggle) {
+              setEditingSlide((prev) => ({
+                ...prev,
+                isVisible: !prev.isVisible,
+              }));
+            }
           }}
           onOpenLibrary={handleOpenImageLibrary}
           timeRestriction={modalTimeRestriction}
@@ -2005,10 +2109,11 @@ const [modalSportlinkMaxItems, setModalSportlinkMaxItems] = useState(10);
           onEmailTextColorChange={setModalEmailTextColor}
           emailAccentColor={modalEmailAccentColor}
           onEmailAccentColorChange={setModalEmailAccentColor}
-          sportlinkApiKey={modalSportlinkApiKey}
-          onSportlinkApiKeyChange={setModalSportlinkApiKey}
-          sportlinkDataType={modalSportlinkDataType}
-          onSportlinkDataTypeChange={setModalSportlinkDataType}
+          sportlinkApiKey={tenantSportlinkApiKey || modalSportlinkApiKey}
+          sportlinkDataType={getSportlinkDataType(
+            slideLayout,
+            modalSportlinkDataType,
+          )}
           sportlinkTeams={modalSportlinkTeams}
           onSportlinkTeamsChange={setModalSportlinkTeams}
           sportlinkTitle={modalSportlinkTitle}
@@ -2037,6 +2142,10 @@ const [modalSportlinkMaxItems, setModalSportlinkMaxItems] = useState(10);
           onWeatherCityChange={setModalWeatherCity}
           weatherAccentColor={modalWeatherAccentColor}
           onWeatherAccentColorChange={setModalWeatherAccentColor}
+          weatherLeftAccentColor={modalWeatherLeftAccentColor}
+          onWeatherLeftAccentColorChange={setModalWeatherLeftAccentColor}
+          weatherLeftTextColor={modalWeatherLeftTextColor}
+          onWeatherLeftTextColorChange={setModalWeatherLeftTextColor}
           weatherForecastDays={modalWeatherForecastDays}
           onWeatherForecastDaysChange={setModalWeatherForecastDays}
           weatherLeftBgImage={modalWeatherLeftBgImage}
@@ -2246,6 +2355,7 @@ const [modalSportlinkMaxItems, setModalSportlinkMaxItems] = useState(10);
         isOpen={imageLibraryModalOpen}
         onClose={() => setImageLibraryModalOpen(false)}
         onSelectImage={handleSelectImageFromLibrary}
+        usageCounts={imageUsageCounts}
       />
 
       {/* Gallery Image Library Modal */}
@@ -2253,6 +2363,8 @@ const [modalSportlinkMaxItems, setModalSportlinkMaxItems] = useState(10);
         isOpen={galleryLibraryModalOpen}
         onClose={() => setGalleryLibraryModalOpen(false)}
         onSelectImage={handleSelectGalleryImageFromLibrary}
+        usageCounts={imageUsageCounts}
+        multiple
       />
 
       {/* Trash Modal */}

@@ -10,6 +10,7 @@ import {
   Users,
   UserSearch,
   ShieldCheck,
+  Images,
 } from "lucide-react";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "../../../firebase";
@@ -19,9 +20,12 @@ import Devices from "./Devices";
 import FeedList from "./FeedList";
 import ApiKeysPanel from "./ApiKeysPanel";
 import AudioSettings from "./AudioSettings";
+import SportlinkSettings from "./SportlinkSettings";
 import SlideArchive from "./SlideArchive";
 import Settings from "./Settings";
 import { useTenantModules } from "../../../hooks/useTenantModules";
+// import ImageLibraryModal from "./modal/ImageLibraryModal";
+import ImageLibraryModal from "../modal/ImageLibraryModal";
 import { toast } from "sonner";
 
 // Normalise a raw authorizedUsers entry to { email, role }
@@ -188,12 +192,14 @@ function Sidebar({
   onOpenTrash,
   trashedSlidesCount = 0,
   tenantName = "",
+  imageUsageCounts = null,
 }) {
   const { tenantId } = useTenant();
-  const { modules } = useTenantModules();
+  const { modules, slideTypes } = useTenantModules();
   const [isAdmin, setIsAdmin] = useState(false);
   const [logoUrl, setLogoUrl] = useState("");
   const [privacyOpen, setPrivacyOpen] = useState(false);
+  const [mediaLibraryOpen, setMediaLibraryOpen] = useState(false);
   useEffect(() => {
     if (!tenantId) {
       setIsAdmin(true);
@@ -242,6 +248,7 @@ function Sidebar({
         {tenantId && isAdmin && <UsersPanel tenantId={tenantId} />}
         {tenantId && isAdmin && <ApiKeysPanel tenantId={tenantId} />}
         {modules.backgroundMusic && <AudioSettings />}
+        {slideTypes.sportlink && <SportlinkSettings />}
         {isAdmin && (
           <Settings
             onOpenTrash={onOpenTrash}
@@ -256,6 +263,15 @@ function Sidebar({
         )}
       </div>
       <div className="sidebar__footer">
+        <button
+          className="sidebar__footer-btn"
+          onClick={() => setMediaLibraryOpen(true)}
+          title="Mediabibliotheek"
+        >
+          <Images size={18} />
+          <span>Mediabibliotheek</span>
+        </button>
+
         <button
           className="sidebar__footer-btn"
           onClick={() => setPrivacyOpen(true)}
@@ -274,6 +290,13 @@ function Sidebar({
           <span>Contact</span>
         </a>
       </div>
+
+      <ImageLibraryModal
+        isOpen={mediaLibraryOpen}
+        onClose={() => setMediaLibraryOpen(false)}
+        allowUpload
+        usageCounts={imageUsageCounts}
+      />
 
       {privacyOpen &&
         createPortal(

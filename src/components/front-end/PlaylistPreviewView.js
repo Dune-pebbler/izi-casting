@@ -4,6 +4,7 @@ import { doc, onSnapshot, getDoc } from "firebase/firestore";
 import { auth, db } from "../../firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { tenantDoc } from "../../utils/tenantPaths";
+import { isSportlinkLayout } from "../../utils/sportlinkTypes";
 import SlideDisplay from "./SlideDisplay";
 import ProgressBar from "./ProgressBar";
 import StatusBar from "./StatusBar/StatusBar";
@@ -32,9 +33,12 @@ function PlaylistPreviewView() {
     progressBarColor: "#3dbcc9",
     feedUrl: "",
     showClock: true,
+    clockFormat: "HH:mm:ss",
+    analogClock: false,
     showDate: true,
     barStyle: "onder",
     backgroundMusic: null,
+    sportlinkApiKey: "",
   });
   const [feeds, setFeeds] = useState([]);
   const [showControls, setShowControls] = useState(false);
@@ -135,20 +139,23 @@ function PlaylistPreviewView() {
           progressBarColor: data.progressBarColor || "#3dbcc9",
           feedUrl: data.feedUrl || "",
           showClock: data.showClock !== undefined ? data.showClock : true,
+          clockFormat: data.clockFormat || "HH:mm:ss",
+          analogClock: data.analogClock || false,
           showDate: data.showDate !== undefined ? data.showDate : true,
           barStyle: data.barStyle || "onder",
           backgroundMusic: data.backgroundMusic || null,
+          sportlinkApiKey: data.sportlinkApiKey || "",
         });
 
         const typo = data.typography || {};
         const defaults = {
-          p: { fontSize: 27, fontFamily: "Roboto" },
-          h1: { fontSize: 64, fontFamily: "Roboto" },
-          h2: { fontSize: 53, fontFamily: "Roboto" },
-          h3: { fontSize: 43, fontFamily: "Roboto" },
+          p: { fontSize: 27, fontFamily: "Arial", fontColor: "#000000" },
+          h1: { fontSize: 64, fontFamily: "Arial", fontColor: "#000000" },
+          h2: { fontSize: 53, fontFamily: "Arial", fontColor: "#000000" },
+          h3: { fontSize: 43, fontFamily: "Arial", fontColor: "#000000" },
         };
         ["p", "h1", "h2", "h3"].forEach((tag) => {
-          const t = typo[tag] || defaults[tag];
+          const t = { ...defaults[tag], ...typo[tag] };
           document.documentElement.style.setProperty(
             `--typo-${tag}-size`,
             `${t.fontSize}px`,
@@ -156,6 +163,10 @@ function PlaylistPreviewView() {
           document.documentElement.style.setProperty(
             `--typo-${tag}-family`,
             t.fontFamily,
+          );
+          document.documentElement.style.setProperty(
+            `--typo-${tag}-color`,
+            t.fontColor,
           );
         });
 
@@ -205,9 +216,18 @@ function PlaylistPreviewView() {
 
       const isTimeActive = (slide) => {
         const tr = slide.timeRestriction;
-        if (!tr?.enabled) return true;
+        if (!tr) return true;
 
-        if (tr.startDate || tr.endDate) {
+        // Legacy data only has a single `enabled` flag — treat it as both
+        // windows being on so previously configured slides keep working.
+        const timeEnabled =
+          tr.timeEnabled !== undefined ? tr.timeEnabled : !!tr.enabled;
+        const dateEnabled =
+          tr.dateEnabled !== undefined ? tr.dateEnabled : !!tr.enabled;
+
+        if (!timeEnabled && !dateEnabled) return true;
+
+        if (dateEnabled && (tr.startDate || tr.endDate)) {
           const pad = (n) => String(n).padStart(2, "0");
           const todayStr = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
           const toDateStr = (val) => {
@@ -223,6 +243,8 @@ function PlaylistPreviewView() {
           if (startStr && todayStr < startStr) return false;
           if (endStr && todayStr > endStr) return false;
         }
+
+        if (!timeEnabled) return true;
 
         if (tr.days) {
           const dayKeys = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
@@ -267,10 +289,11 @@ function PlaylistPreviewView() {
               slide.agendaCalendars.length > 0) ||
             (slide.layout === "email" && slide.emailProvider) ||
             (slide.layout === "weather" && slide.weatherLat) ||
-            (slide.layout === "sportlink" &&
-              slide.sportlinkApiKey &&
+            (isSportlinkLayout(slide.layout) &&
+              (slide.sportlinkApiKey || settings.sportlinkApiKey) &&
               slide.sportlinkTeams &&
               slide.sportlinkTeams.length > 0) ||
+            (slide.layout === "qr-feed" && slide.qrUrl) ||
             (!slide.type && slide.text && slide.text.trim())),
       );
 
@@ -430,6 +453,7 @@ function PlaylistPreviewView() {
         nextSlide={nextSlide}
         nextSlideLayout={nextSlideLayout}
         effectsEnabled={!!tenantModules.slideEffects}
+        settings={settings}
       />
 
       <ProgressBar

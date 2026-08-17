@@ -10,6 +10,8 @@ import {
   Eye,
   EyeOff,
   Sparkles,
+  Volume2,
+  VolumeX,
 } from "lucide-react";
 import LayoutSelector from "./LayoutSelector";
 import ImageUpload from "./ImageUpload";
@@ -26,6 +28,8 @@ import SportlinkInput from "./SportlinkInput";
 import WeatherInput from "./WeatherInput";
 import QrFeedInput from "./QrFeedInput";
 import SlideEffectsModal from "../SlideEffectsModal";
+import { isSlideCurrentlyInWindow } from "../../../utils/timeRestriction";
+import { isCountdownExpired } from "../../../utils/countdownUtils";
 
 function EditModal({
   slide,
@@ -39,6 +43,7 @@ function EditModal({
   slideDuration,
   showBar,
   videoUrl,
+  videoSound,
   imageSide,
   slideTransition,
   enabledFonts,
@@ -60,6 +65,7 @@ function EditModal({
   onDurationChange,
   onShowBarChange,
   onVideoUrlChange,
+  onVideoSoundChange,
   onImageSideChange,
   onTransitionChange,
   onTeletekstChannelChange,
@@ -123,9 +129,7 @@ function EditModal({
   emailAccentColor,
   onEmailAccentColorChange,
   sportlinkApiKey,
-  onSportlinkApiKeyChange,
   sportlinkDataType,
-  onSportlinkDataTypeChange,
   sportlinkTeams,
   onSportlinkTeamsChange,
   sportlinkTitle,
@@ -154,6 +158,10 @@ function EditModal({
   onWeatherCityChange,
   weatherAccentColor,
   onWeatherAccentColorChange,
+  weatherLeftAccentColor,
+  onWeatherLeftAccentColorChange,
+  weatherLeftTextColor,
+  onWeatherLeftTextColorChange,
   weatherForecastDays,
   onWeatherForecastDaysChange,
   weatherLeftBgImage,
@@ -185,6 +193,15 @@ function EditModal({
 }) {
   const [timePopupOpen, setTimePopupOpen] = useState(false);
   const [effectsOpen, setEffectsOpen] = useState(false);
+
+  const timeWindowEnabled =
+    timeRestriction?.timeEnabled !== undefined
+      ? timeRestriction.timeEnabled
+      : !!timeRestriction?.enabled;
+  const dateWindowEnabled =
+    timeRestriction?.dateEnabled !== undefined
+      ? timeRestriction.dateEnabled
+      : !!timeRestriction?.enabled;
 
   const renderLayoutContent = () => {
     switch (slideLayout) {
@@ -286,6 +303,7 @@ function EditModal({
                 content={modalTinyMCEContent}
                 onContentChange={onContentChange}
                 enabledFonts={enabledFonts}
+                typography={typography}
               />
             </div>
           </div>
@@ -294,6 +312,21 @@ function EditModal({
       case "video":
         return (
           <div className="modal-video">
+            <div className="video-sound-section">
+              <button
+                type="button"
+                className={`video-sound-toggle${videoSound ? " active" : ""}`}
+                onClick={() => onVideoSoundChange(!videoSound)}
+                title={
+                  videoSound
+                    ? "Video speelt af met geluid (achtergrondmuziek fadet automatisch weg)"
+                    : "Video speelt gedempt af"
+                }
+              >
+                {videoSound ? <Volume2 size={16} /> : <VolumeX size={16} />}
+                <span>{videoSound ? "Geluid aan" : "Geluid uit"}</span>
+              </button>
+            </div>
             <div className="video-input-section">
               <VideoUrlInput
                 videoUrl={videoUrl}
@@ -422,13 +455,14 @@ function EditModal({
         );
 
       case "sportlink":
+      case "sportlink-programma":
+      case "sportlink-uitslagen":
+      case "sportlink-poulestand":
         return (
           <div className="modal-sportlink">
             <SportlinkInput
               sportlinkApiKey={sportlinkApiKey}
-              onApiKeyChange={onSportlinkApiKeyChange}
               sportlinkDataType={sportlinkDataType}
-              onDataTypeChange={onSportlinkDataTypeChange}
               sportlinkTeams={sportlinkTeams}
               onTeamsChange={onSportlinkTeamsChange}
               sportlinkTitle={sportlinkTitle}
@@ -488,16 +522,22 @@ function EditModal({
               weatherLong={weatherLong}
               weatherCity={weatherCity}
               weatherAccentColor={weatherAccentColor}
+              weatherLeftAccentColor={weatherLeftAccentColor}
+              weatherLeftTextColor={weatherLeftTextColor}
               onLatChange={onWeatherLatChange}
               onLongChange={onWeatherLongChange}
               onCityChange={onWeatherCityChange}
               onAccentColorChange={onWeatherAccentColorChange}
+              onLeftAccentColorChange={onWeatherLeftAccentColorChange}
+              onLeftTextColorChange={onWeatherLeftTextColorChange}
               weatherForecastDays={weatherForecastDays}
               onForecastDaysChange={onWeatherForecastDaysChange}
               weatherLeftBgImage={weatherLeftBgImage}
               weatherLeftBgImagePosition={weatherLeftBgImagePosition}
               onWeatherLeftBgImageUpload={onWeatherLeftBgImageUpload}
-              onWeatherLeftBgImagePositionChange={onWeatherLeftBgImagePositionChange}
+              onWeatherLeftBgImagePositionChange={
+                onWeatherLeftBgImagePositionChange
+              }
               uploadingImage={uploadingImage}
               onOpenWeatherLeftLibrary={onOpenWeatherLeftLibrary}
             />
@@ -608,20 +648,41 @@ function EditModal({
             </div>
 
             <div className="slide-modal__header-actions">
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onToggleSlideVisibility(slide.id);
-                }}
-                className={`btn-icon btn-icon--time ${slide.isVisible ? "btn-icon--success" : ""}`}
-                title="Toggle slide"
-              >
-                {slide.isVisible ? <Eye size={16} /> : <EyeOff size={16} />}
-              </button>
+              {(() => {
+                const timeRestrictionActive =
+                  timeWindowEnabled || dateWindowEnabled;
+                const expired = isCountdownExpired(slide);
+                const effectivelyVisible = expired
+                  ? false
+                  : timeRestrictionActive
+                    ? isSlideCurrentlyInWindow(slide)
+                    : slide.isVisible;
+                return (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onToggleSlideVisibility(slide.id);
+                    }}
+                    disabled={timeRestrictionActive}
+                    className={`btn-icon btn-icon--time ${effectivelyVisible ? "btn-icon--success" : ""}`}
+                    title={
+                      timeRestrictionActive
+                        ? `Tijdvenster actief — nu ${effectivelyVisible ? "zichtbaar" : "verborgen"}`
+                        : "Toggle slide"
+                    }
+                  >
+                    {effectivelyVisible ? (
+                      <Eye size={16} />
+                    ) : (
+                      <EyeOff size={16} />
+                    )}
+                  </button>
+                );
+              })()}
 
               <div className="slide-modal__time-popup-wrapper">
                 <button
-                  className={`btn-icon btn-icon--time ${timeRestriction?.enabled ? "btn-icon--success" : ""}`}
+                  className={`btn-icon btn-icon--time ${timeWindowEnabled || dateWindowEnabled ? "btn-icon--success" : ""}`}
                   title="Tijdvenster instellen"
                   onClick={() => setTimePopupOpen(!timePopupOpen)}
                 >
@@ -638,100 +699,60 @@ function EditModal({
                         ✕
                       </button>
                     </div>
-                    <label className="time-popup__toggle">
-                      <input
-                        type="checkbox"
-                        checked={timeRestriction?.enabled || false}
-                        onChange={(e) =>
-                          onTimeRestrictionChange({
-                            ...timeRestriction,
-                            enabled: e.target.checked,
-                          })
-                        }
-                      />
-                      <span>Tijdvenster inschakelen</span>
-                    </label>
-                    {timeRestriction?.enabled && (
-                      <div className="time-popup__inputs">
-                        <div className="time-popup__row">
-                          <div className="time-popup__field">
-                            <label>Van</label>
-                            <input
-                              type="time"
-                              value={timeRestriction.startTime || "08:00"}
-                              onChange={(e) =>
-                                onTimeRestrictionChange({
-                                  ...timeRestriction,
-                                  startTime: e.target.value,
-                                })
-                              }
-                              className="time-popup__time-input"
-                            />
-                          </div>
-                          <div className="time-popup__field">
-                            <label>Tot</label>
-                            <input
-                              type="time"
-                              value={timeRestriction.endTime || "17:00"}
-                              onChange={(e) =>
-                                onTimeRestrictionChange({
-                                  ...timeRestriction,
-                                  endTime: e.target.value,
-                                })
-                              }
-                              className="time-popup__time-input"
-                            />
-                          </div>
-                        </div>
-                        {timeRestriction.startTime >
-                          timeRestriction.endTime && (
-                          <p className="time-popup__midnight-note">
-                            ↻ Loopt over middernacht
-                          </p>
-                        )}
 
-                        <div className="time-popup__date-section">
-                          <small>Datumvenster (optioneel)</small>
-                          <div className="time-popup__field">
-                            <label>Vanaf</label>
-                            <input
-                              type="date"
-                              value={timeRestriction.startDate || ""}
-                              onChange={(e) =>
-                                onTimeRestrictionChange({
-                                  ...timeRestriction,
-                                  startDate: e.target.value,
-                                })
-                              }
-                              className="time-popup__time-input"
-                            />
+                    <div className="time-popup__date-section">
+                      <label className="time-popup__toggle">
+                        <input
+                          type="checkbox"
+                          checked={timeWindowEnabled}
+                          onChange={(e) =>
+                            onTimeRestrictionChange({
+                              ...timeRestriction,
+                              timeEnabled: e.target.checked,
+                            })
+                          }
+                        />
+                        <span>Tijdvenster inschakelen</span>
+                      </label>
+                      {timeWindowEnabled && (
+                        <div className="time-popup__inputs">
+                          <div className="time-popup__row">
+                            <div className="time-popup__field">
+                              <label>Van</label>
+                              <input
+                                type="time"
+                                value={timeRestriction.startTime || "08:00"}
+                                onChange={(e) =>
+                                  onTimeRestrictionChange({
+                                    ...timeRestriction,
+                                    startTime: e.target.value,
+                                  })
+                                }
+                                className="time-popup__time-input"
+                              />
+                            </div>
+                            <div className="time-popup__field">
+                              <label>Tot</label>
+                              <input
+                                type="time"
+                                value={timeRestriction.endTime || "17:00"}
+                                onChange={(e) =>
+                                  onTimeRestrictionChange({
+                                    ...timeRestriction,
+                                    endTime: e.target.value,
+                                  })
+                                }
+                                className="time-popup__time-input"
+                              />
+                            </div>
                           </div>
-                          <div className="time-popup__field">
-                            <label>Tot en met</label>
-                            <input
-                              type="date"
-                              value={timeRestriction.endDate || ""}
-                              onChange={(e) =>
-                                onTimeRestrictionChange({
-                                  ...timeRestriction,
-                                  endDate: e.target.value,
-                                })
-                              }
-                              className="time-popup__time-input"
-                            />
-                          </div>
-                          {timeRestriction.startDate &&
-                            timeRestriction.endDate &&
-                            timeRestriction.startDate >
-                              timeRestriction.endDate && (
-                              <p className="time-popup__midnight-note">
-                                ⚠ Einddatum ligt voor de startdatum
-                              </p>
-                            )}
-                        </div>
+                          {timeRestriction.startTime >
+                            timeRestriction.endTime && (
+                            <p className="time-popup__midnight-note">
+                              ↻ Loopt over middernacht
+                            </p>
+                          )}
 
-                        <div className="time-popup__date-section">
-                          <small>Dagen (optioneel)</small>
                           <div className="time-popup__days">
                             {[
                               { key: "mon", label: "Ma" },
@@ -773,8 +794,64 @@ function EditModal({
                             ))}
                           </div>
                         </div>
-                      </div>
-                    )}
+                      )}
+                    </div>
+
+                    <div className="time-popup__date-section">
+                      <label className="time-popup__toggle">
+                        <input
+                          type="checkbox"
+                          checked={dateWindowEnabled}
+                          onChange={(e) =>
+                            onTimeRestrictionChange({
+                              ...timeRestriction,
+                              dateEnabled: e.target.checked,
+                            })
+                          }
+                        />
+                        <span>Datumvenster inschakelen</span>
+                      </label>
+                      {dateWindowEnabled && (
+                        <div className="time-popup__row">
+                          <div className="time-popup__field">
+                            <label>Vanaf</label>
+                            <input
+                              type="date"
+                              value={timeRestriction.startDate || ""}
+                              onChange={(e) =>
+                                onTimeRestrictionChange({
+                                  ...timeRestriction,
+                                  startDate: e.target.value,
+                                })
+                              }
+                              className="time-popup__time-input"
+                            />
+                          </div>
+                          <div className="time-popup__field">
+                            <label>Tot en met</label>
+                            <input
+                              type="date"
+                              value={timeRestriction.endDate || ""}
+                              onChange={(e) =>
+                                onTimeRestrictionChange({
+                                  ...timeRestriction,
+                                  endDate: e.target.value,
+                                })
+                              }
+                              className="time-popup__time-input"
+                            />
+                          </div>
+                          {timeRestriction.startDate &&
+                            timeRestriction.endDate &&
+                            timeRestriction.startDate >
+                              timeRestriction.endDate && (
+                              <p className="time-popup__midnight-note">
+                                ⚠ Einddatum ligt voor de startdatum
+                              </p>
+                            )}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 )}
               </div>

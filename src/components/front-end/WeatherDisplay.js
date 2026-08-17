@@ -54,10 +54,13 @@ function WeatherDisplay({
   long,
   cityName = "",
   accentColor = "#4f87ff",
+  leftAccentColor,
+  leftTextColor = "#ffffff",
   forecastDays = 7,
   leftBgImage = "",
   leftBgImagePosition = "center",
 }) {
+  const resolvedLeftAccentColor = leftAccentColor || accentColor;
   const [weather, setWeather] = useState(null);
   const [error, setError] = useState(null);
   const forecastBodyRef = useRef(null);
@@ -212,9 +215,11 @@ function WeatherDisplay({
         <div
           className="display-weather__city"
           style={{
-            color: `${accentColor}`,
+            color: leftTextColor,
             fontFamily: "Poppins",
             fontWeight: "600",
+            padding: "24px",
+            backgroundColor: `${resolvedLeftAccentColor}33`,
           }}
         >
           {cityName}
@@ -222,41 +227,89 @@ function WeatherDisplay({
         <div className="display-weather__center">
           <div className="display-weather__current">
             <div className="display-weather__main">
-              <span className="display-weather__temp">{temp}°C</span>
-              <span className="display-weather__desc">{currentWmo.label}</span>
+              <span
+                className="display-weather__temp"
+                style={{
+                  color: "white",
+                  textShadow: `-2px -2px 0 ${resolvedLeftAccentColor}, 2px -2px 0 ${resolvedLeftAccentColor}, -2px 2px 0 ${resolvedLeftAccentColor}, 2px 2px 0 ${resolvedLeftAccentColor}`,
+                }}
+              >
+                {temp}°C
+              </span>
+              <span
+                className="display-weather__desc"
+                style={{ color: leftTextColor }}
+              >
+                {currentWmo.label}
+              </span>
             </div>
           </div>
         </div>
-        <div className="display-weather__stats">
+        <div
+          className="display-weather__stats"
+          style={{
+            padding: "24px",
+          }}
+        >
           <div
             className="display-weather__stat"
             style={{
-              borderColor: accentColor,
-              backgroundColor: `${accentColor}34`,
+              borderColor: resolvedLeftAccentColor,
+              backgroundColor: `${resolvedLeftAccentColor}34`,
             }}
           >
-            <span className="display-weather__stat-value">{feelsLike}°C</span>
-            <span className="display-weather__stat-label">gevoel</span>
+            <span
+              className="display-weather__stat-value"
+              style={{ color: leftTextColor }}
+            >
+              {feelsLike}°C
+            </span>
+            <span
+              className="display-weather__stat-label"
+              style={{ color: leftTextColor }}
+            >
+              gevoel
+            </span>
           </div>
           <div
             className="display-weather__stat"
             style={{
-              borderColor: accentColor,
-              backgroundColor: `${accentColor}33`,
+              borderColor: resolvedLeftAccentColor,
+              backgroundColor: `${resolvedLeftAccentColor}33`,
             }}
           >
-            <span className="display-weather__stat-value">{wind}</span>
-            <span className="display-weather__stat-label">km/u</span>
+            <span
+              className="display-weather__stat-value"
+              style={{ color: leftTextColor }}
+            >
+              {wind}
+            </span>
+            <span
+              className="display-weather__stat-label"
+              style={{ color: leftTextColor }}
+            >
+              km/u
+            </span>
           </div>
           <div
             className="display-weather__stat"
             style={{
-              borderColor: accentColor,
-              backgroundColor: `${accentColor}33`,
+              borderColor: resolvedLeftAccentColor,
+              backgroundColor: `${resolvedLeftAccentColor}33`,
             }}
           >
-            <span className="display-weather__stat-value">{precipProb}%</span>
-            <span className="display-weather__stat-label">Regen</span>
+            <span
+              className="display-weather__stat-value"
+              style={{ color: leftTextColor }}
+            >
+              {precipProb}%
+            </span>
+            <span
+              className="display-weather__stat-label"
+              style={{ color: leftTextColor }}
+            >
+              Regen
+            </span>
           </div>
         </div>
       </div>
@@ -267,7 +320,7 @@ function WeatherDisplay({
           style={{ borderBottomColor: accentColor }}
         >
           <h2 style={{ color: accentColor }}>VERWACHTING</h2>
-          <h2>
+          <h2 style={{ color: accentColor }}>
             {formatDateTime.dateString} {formatDateTime.timeString}
           </h2>
         </div>
@@ -290,7 +343,7 @@ function WeatherDisplay({
                 return (
                   <div key={dateStr} className="display-weather__forecast-row">
                     <div className="display-weather__row-day">
-                      <span>{dateString}</span>
+                      <span style={{ color: accentColor }}>{dateString}</span>
                     </div>
                     <div className="display-weather__row-emoji">
                       <wmo.Icon
@@ -299,7 +352,10 @@ function WeatherDisplay({
                         color={wmo.color}
                       />
                     </div>
-                    <div className="display-weather__row-label">
+                    <div
+                      className="display-weather__row-label"
+                      style={{ color: accentColor }}
+                    >
                       {wmo.label}
                     </div>
                     <div
@@ -308,7 +364,10 @@ function WeatherDisplay({
                     >
                       {Math.round(daily.temperature_2m_max[i])}°
                     </div>
-                    <div className="display-weather__row-min">
+                    <div
+                      className="display-weather__row-min"
+                      style={{ color: `${accentColor}50` }}
+                    >
                       {Math.round(daily.temperature_2m_min[i])}°
                     </div>
                   </div>

@@ -94,6 +94,7 @@ function StatusBar({ currentSlide, settings, feeds }) {
     shouldShowBar,
   ]);
 
+  console.log(settings);
   return (
     <div className="display-bottom-bar" style={barStyle}>
       <Logo logoUrl={settings.logoUrl} />

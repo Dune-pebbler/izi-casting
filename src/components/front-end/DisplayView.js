@@ -12,6 +12,18 @@ import {
 } from "firebase/firestore";
 import { db } from "../../firebase";
 import { tenantDoc } from "../../utils/tenantPaths";
+import {
+  hideExpiredCountdownSlides,
+  isCountdownExpired,
+} from "../../utils/countdownUtils";
+import {
+  isSportlinkLayout,
+  getSlideTypeGateKey,
+} from "../../utils/sportlinkTypes";
+import {
+  isTimeRestrictionEnabled,
+  isSlideCurrentlyInWindow,
+} from "../../utils/timeRestriction";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import {
   setIsPaired,
@@ -63,9 +75,14 @@ function DisplayView() {
     foregroundColor: "#212121",
     feedUrl: "",
     showClock: true,
+    clockFormat: "HH:mm:ss",
+    analogClock: false,
     showDate: true,
+    capitalRssTitle: false,
+    reduceRssTitleLetterSpacing: false,
     barStyle: "onder",
     backgroundMusic: null,
+    sportlinkApiKey: "",
   });
   const [feeds, setFeeds] = useState([]);
 
@@ -81,6 +98,8 @@ function DisplayView() {
   const generateDisplayPairingCodeRef = useRef();
   const isPairedRef = useRef(isPaired);
   const tenantDeletedRef = useRef(false);
+  const rawPlaylistsRef = useRef([]);
+  const lastFeedsSignatureRef = useRef(null);
   const isGeneratingCodeRef = useRef(isGeneratingCode);
   const displayPairingCodeRef = useRef(displayPairingCode);
   const isGeneratingCodeInternalRef = useRef(false);
@@ -697,6 +716,7 @@ function DisplayView() {
     let unsubscribeTenant;
     let unsubscribeContent;
     let unsubscribeSettings;
+    let expiredCountdownInterval;
 
     const setup = async () => {
       // Check tenant deletion status before setting up the content listener
@@ -708,12 +728,29 @@ function DisplayView() {
         setPlaylists([]);
       }
 
+      // Displays run unattended for days at a time, so a countdown slide's
+      // expiry has to be caught here rather than waiting for an admin to
+      // open the panel. Re-check periodically and persist the "hidden"
+      // state back to Firestore so the admin's eye toggle reflects it too.
+      const checkExpiredCountdowns = () => {
+        if (tenantDeletedRef.current || rawPlaylistsRef.current.length === 0)
+          return;
+        const { playlists: updatedPlaylists, changed } =
+          hideExpiredCountdownSlides(rawPlaylistsRef.current);
+        if (changed) {
+          rawPlaylistsRef.current = updatedPlaylists;
+          setDoc(displayDocRef, { playlists: updatedPlaylists }, { merge: true });
+        }
+      };
+
       const applyContentDoc = (snap) => {
         if (!snap.exists()) return;
         const data = snap.data();
         if (data.playlists) {
+          rawPlaylistsRef.current = data.playlists;
           setPlaylists(data.playlists);
         } else if (data.slides) {
+          rawPlaylistsRef.current = [];
           setPlaylists([
             {
               id: "default",
@@ -722,9 +759,13 @@ function DisplayView() {
             },
           ]);
         } else {
+          rawPlaylistsRef.current = [];
           setPlaylists([]);
         }
+        checkExpiredCountdowns();
       };
+
+      expiredCountdownInterval = setInterval(checkExpiredCountdowns, 30000);
 
       unsubscribeTenant = onSnapshot(
         doc(db, "tenants", displayTenantId),
@@ -763,21 +804,27 @@ function DisplayView() {
             progressBarColor: data.progressBarColor || "#3dbcc9",
             feedUrl: data.feedUrl || "",
             showClock: data.showClock !== undefined ? data.showClock : true,
+            clockFormat: data.clockFormat || "HH:mm:ss",
+            analogClock: data.analogClock || false,
             showDate: data.showDate !== undefined ? data.showDate : true,
             barStyle: data.barStyle || "onder",
             backgroundMusic: data.backgroundMusic || null,
+            capitalRssTitle: data.capitalRssTitle || false,
+            reduceRssTitleLetterSpacing:
+              data.reduceRssTitleLetterSpacing || false,
+            sportlinkApiKey: data.sportlinkApiKey || "",
           });
 
           // Apply typography as CSS custom properties
           const typo = data.typography || {};
           const defaults = {
-            p: { fontSize: 27, fontFamily: "Roboto" },
-            h1: { fontSize: 64, fontFamily: "Roboto" },
-            h2: { fontSize: 53, fontFamily: "Roboto" },
-            h3: { fontSize: 43, fontFamily: "Roboto" },
+            p: { fontSize: 27, fontFamily: "Arial", fontColor: "#000000" },
+            h1: { fontSize: 64, fontFamily: "Arial", fontColor: "#000000" },
+            h2: { fontSize: 53, fontFamily: "Arial", fontColor: "#000000" },
+            h3: { fontSize: 43, fontFamily: "Arial", fontColor: "#000000" },
           };
           ["p", "h1", "h2", "h3"].forEach((tag) => {
-            const t = typo[tag] || defaults[tag];
+            const t = { ...defaults[tag], ...typo[tag] };
             document.documentElement.style.setProperty(
               `--typo-${tag}-size`,
               `${t.fontSize}px`,
@@ -786,25 +833,49 @@ function DisplayView() {
               `--typo-${tag}-family`,
               t.fontFamily,
             );
+            document.documentElement.style.setProperty(
+              `--typo-${tag}-color`,
+              t.fontColor,
+            );
           });
 
+          // Apply feed font size scale as a CSS custom property
+          const feedFontScales = { groot: 1.5, normaal: 1, klein: 0.5 };
+          const feedFontScale = feedFontScales[data.feedFontSize] ?? 1;
+          document.documentElement.style.setProperty(
+            "--feed-font-scale",
+            feedFontScale,
+          );
+
+          let nextFeeds;
           if (data.feeds && Array.isArray(data.feeds)) {
-            const enabledFeeds = data.feeds.filter(
+            nextFeeds = data.feeds.filter(
               (feed) => feed.isEnabled !== false && feed.isVisible !== false,
             );
-            setFeeds(enabledFeeds);
           } else if (data.feedUrl) {
-            const migratedFeed = {
-              id: "legacy",
-              name: "Legacy Feed",
-              url: data.feedUrl,
-              isEnabled: true,
-              duration: 10,
-              isVisible: true,
-            };
-            setFeeds([migratedFeed]);
+            nextFeeds = [
+              {
+                id: "legacy",
+                name: "Legacy Feed",
+                url: data.feedUrl,
+                isEnabled: true,
+                duration: 10,
+                isVisible: true,
+              },
+            ];
           } else {
-            setFeeds([]);
+            nextFeeds = [];
+          }
+
+          // Only produce a new `feeds` array reference when the feed content
+          // actually changed. Otherwise every unrelated settings update (a
+          // color, the clock toggle, etc.) recreates the array, which
+          // Feed.js's fetch/rotation effects treat as "feeds changed" and
+          // restart the RSS ticker from scratch.
+          const nextFeedsSignature = JSON.stringify(nextFeeds);
+          if (nextFeedsSignature !== lastFeedsSignatureRef.current) {
+            lastFeedsSignatureRef.current = nextFeedsSignature;
+            setFeeds(nextFeeds);
           }
         }
       });
@@ -816,6 +887,7 @@ function DisplayView() {
       unsubscribeTenant?.();
       unsubscribeContent?.();
       unsubscribeSettings?.();
+      clearInterval(expiredCountdownInterval);
     };
   }, [isPaired, displayTenantId]);
 
@@ -836,60 +908,27 @@ function DisplayView() {
 
       if (playlist.slides) {
         const now = new Date();
-        const currentMinutes = now.getHours() * 60 + now.getMinutes();
+        const isTimeActive = (slide) => isSlideCurrentlyInWindow(slide, now);
 
-        const isTimeActive = (slide) => {
-          const tr = slide.timeRestriction;
-          if (!tr?.enabled) return true;
-
-          // Date range check (optional — empty string means no restriction)
-          if (tr.startDate || tr.endDate) {
-            const pad = (n) => String(n).padStart(2, "0");
-            const todayStr = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
-
-            // Normalize to YYYY-MM-DD string — handles plain strings, Date objects,
-            // and Firestore Timestamps (which have a .toDate() method)
-            const toDateStr = (val) => {
-              if (!val) return null;
-              if (typeof val === "string") return val.slice(0, 10);
-              if (typeof val.toDate === "function")
-                return val.toDate().toISOString().slice(0, 10);
-              if (val instanceof Date) return val.toISOString().slice(0, 10);
-              return null;
-            };
-
-            const startStr = toDateStr(tr.startDate);
-            const endStr = toDateStr(tr.endDate);
-            if (startStr && todayStr < startStr) return false;
-            if (endStr && todayStr > endStr) return false;
-          }
-
-          if (tr.days) {
-            const dayKeys = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
-            const key = dayKeys[now.getDay()];
-            if (tr.days[key] === false) return false;
-          }
-
-          const [sh, sm] = tr.startTime.split(":").map(Number);
-          const [eh, em] = tr.endTime.split(":").map(Number);
-          const start = sh * 60 + sm;
-          const end = eh * 60 + em;
-          // Midnight overlap: start > end means e.g. 22:00 – 02:00
-          return start <= end
-            ? currentMinutes >= start && currentMinutes <= end
-            : currentMinutes >= start || currentMinutes <= end;
-        };
+        // A slide with an active time window is shown or hidden purely by
+        // that window — the manual isVisible toggle is disabled in the
+        // admin UI in that case, so it must not gate display here either.
+        // Countdown expiry still applies on top, since it isn't something
+        // the time-window bypass should be able to mask.
+        const isEffectivelyVisible = (slide) =>
+          !isCountdownExpired(slide) &&
+          (isTimeRestrictionEnabled(slide.timeRestriction) || slide.isVisible);
 
         const hasSlideTypeConfig = Object.keys(tenantSlideTypes).length > 0;
         const isSlideTypeAllowed = (slide) => {
           if (!hasSlideTypeConfig) return true;
-          const typeKey = slide.layout || slide.type;
+          const typeKey = getSlideTypeGateKey(slide.layout) || slide.type;
           return typeKey ? tenantSlideTypes[typeKey] : true;
         };
 
         const visibleSlides = playlist.slides.filter(
           (slide) =>
-            slide.isVisible &&
+            isEffectivelyVisible(slide) &&
             isTimeActive(slide) &&
             isSlideTypeAllowed(slide) &&
             ((slide.type === "text" && slide.text && slide.text.trim()) ||
@@ -908,8 +947,8 @@ function DisplayView() {
                 slide.agendaCalendars &&
                 slide.agendaCalendars.length > 0) ||
               (slide.layout === "email" && slide.emailProvider) ||
-              (slide.layout === "sportlink" &&
-                slide.sportlinkApiKey &&
+              (isSportlinkLayout(slide.layout) &&
+                (slide.sportlinkApiKey || settings.sportlinkApiKey) &&
                 slide.sportlinkTeams &&
                 slide.sportlinkTeams.length > 0) ||
               (slide.layout === "qr-feed" && slide.qrUrl) ||
@@ -1017,6 +1056,15 @@ function DisplayView() {
       const currentSlide = slides[currentIndex];
       const slideDuration = (currentSlide?.duration || 5) * 1000;
 
+      // Duck background music while a video slide with its own sound is on
+      // screen, and bring it back up once we move past it.
+      const isVideoWithSound =
+        currentSlide?.layout === "video" && !!currentSlide?.videoSound;
+      if (isVideoWithSound !== wasVideoWithSoundRef.current) {
+        audioFadeRef.current?.(isVideoWithSound ? 0 : null, 900);
+        wasVideoWithSoundRef.current = isVideoWithSound;
+      }
+
       console.log("🎠 Current slide details:", {
         index: currentIndex,
         name: currentSlide?.name,
@@ -1076,6 +1124,10 @@ function DisplayView() {
   const activeAudioUrlRef = useRef(null);
   const audioUnlockedRef = useRef(false);
   const pendingMusicRef = useRef(null);
+  const audioBaseVolumeRef = useRef(0.7);
+  const audioFadeIntervalRef = useRef(null);
+  const audioFadeRef = useRef(null);
+  const wasVideoWithSoundRef = useRef(false);
 
   const playAudio = useCallback((music) => {
     const newUrl = music?.enabled && music?.url ? music.url : null;
@@ -1083,8 +1135,11 @@ function DisplayView() {
     // Only restart if URL actually changed
     if (newUrl === activeAudioUrlRef.current) {
       // URL unchanged — just update volume if audio is playing
-      if (audioRef.current && newUrl) {
-        audioRef.current.volume = music.volume ?? 0.7;
+      if (music) {
+        audioBaseVolumeRef.current = music.volume ?? 0.7;
+      }
+      if (audioRef.current && newUrl && !wasVideoWithSoundRef.current) {
+        audioRef.current.volume = audioBaseVolumeRef.current;
       }
       return;
     }
@@ -1104,7 +1159,8 @@ function DisplayView() {
 
     const audio = new Audio(newUrl);
     audio.loop = true;
-    audio.volume = music.volume ?? 0.7;
+    audioBaseVolumeRef.current = music.volume ?? 0.7;
+    audio.volume = wasVideoWithSoundRef.current ? 0 : audioBaseVolumeRef.current;
     audioRef.current = audio;
 
     if (audioUnlockedRef.current) {
@@ -1114,6 +1170,37 @@ function DisplayView() {
       setShowAudioPrompt(true);
     }
   }, []);
+
+  // Ramp background-music volume toward 0 (video slide with sound) or back to
+  // its configured level, instead of snapping instantly.
+  const fadeAudioTo = useCallback((targetVolume, durationMs = 900) => {
+    const audio = audioRef.current;
+    if (audioFadeIntervalRef.current) {
+      clearInterval(audioFadeIntervalRef.current);
+      audioFadeIntervalRef.current = null;
+    }
+    if (!audio) return;
+
+    const target =
+      targetVolume === null ? audioBaseVolumeRef.current : targetVolume;
+    const start = audio.volume;
+    const steps = 20;
+    let step = 0;
+
+    audioFadeIntervalRef.current = setInterval(() => {
+      step += 1;
+      const progress = step / steps;
+      audio.volume = Math.max(
+        0,
+        Math.min(1, start + (target - start) * progress),
+      );
+      if (step >= steps) {
+        clearInterval(audioFadeIntervalRef.current);
+        audioFadeIntervalRef.current = null;
+      }
+    }, durationMs / steps);
+  }, []);
+  audioFadeRef.current = fadeAudioTo;
 
   // Unlock audio on first user interaction (browser autoplay policy)
   useEffect(() => {
@@ -1373,6 +1460,7 @@ function DisplayView() {
         nextSlide={nextSlide}
         nextSlideLayout={nextSlideLayout}
         effectsEnabled={!!tenantModules.slideEffects}
+        settings={settings}
       />
 
       <ProgressBar

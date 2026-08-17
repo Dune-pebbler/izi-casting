@@ -30,7 +30,13 @@
       "Bash(kill 9116 2>/dev/null; echo \"killed\")",
       "Bash(python3 -m json.tool)",
       "WebFetch(domain:dexels.github.io)",
-      "WebFetch(domain:sportlinkservices.github.io)"
+      "WebFetch(domain:sportlinkservices.github.io)",
+      "Bash(git grep *)",
+      "Bash(grep -rnIE \"AIza[0-9A-Za-z_-]{35}|sk-[A-Za-z0-9]{20,}|-----BEGIN \\(RSA |EC |DSA \\)?PRIVATE KEY-----|xox[baprs]-[0-9A-Za-z-]+|ghp_[0-9A-Za-z]{36}|AKIA[0-9A-Z]{16}\" --exclude-dir=node_modules --exclude-dir=build --exclude-dir=.git .)",
+      "Bash(grep -iE '^\\\\.env$|\\\\.env\\\\.')",
+      "Bash(grep -nE 'AKIA[0-9A-Z]{16}|ghp_[A-Za-z0-9]{36}|gho_[A-Za-z0-9]{36}|sk-[A-Za-z0-9]{20,}|xox[baprs]-[A-Za-z0-9-]+|AIza[0-9A-Za-z_-]{35}|-----BEGIN[ A-Z]*PRIVATE KEY-----')",
+      "Bash(grep -cE 'AKIA[0-9A-Z]{16}|ghp_[A-Za-z0-9]{36}|gho_[A-Za-z0-9]{36}|sk-[A-Za-z0-9]{20,}|xox[baprs]-[A-Za-z0-9-]+|AIza[0-9A-Za-z_-]{35}|-----BEGIN[ A-Z]*PRIVATE KEY-----')",
+      "Bash(grep -rnE 'AKIA[0-9A-Z]{16}|ghp_[A-Za-z0-9]{36}|gho_[A-Za-z0-9]{36}|sk-[A-Za-z0-9]{20,}|xox[baprs]-[A-Za-z0-9-]+|AIza[0-9A-Za-z_-]{35}|-----BEGIN[ A-Z]*PRIVATE KEY-----' --exclude-dir=node_modules --exclude-dir=build --exclude-dir=.git .)"
     ],
     "deny": [],
     "ask": []

@@ -993,8 +993,8 @@
       border-radius: $border-radius-sm;
       font-size: $font-size-xs;
       font-weight: $font-weight-medium;
-      color: var(--foreground-muted);
-      background: var(--muted);
+      color: white;
+      background: red;
       border: 1px solid transparent;
       cursor: pointer;
       user-select: none;
@@ -1010,15 +1010,15 @@
       }
 
       &:has(input:checked) {
-        background: var(--primary);
-        color: var(--primary-foreground);
-        border-color: var(--primary);
+        background: green;
+        color: white;
+        border-color: green;
       }
 
       &:hover:not(:has(input:checked)) {
-        background: var(--muted-hover);
-        color: var(--foreground);
-        border-color: var(--border);
+        background: red;
+        color: white;
+        border-color: red;
       }
     }
   }

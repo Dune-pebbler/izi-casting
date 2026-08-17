@@ -25,6 +25,8 @@ function SlidePreviewPage() {
     foregroundColor: "#212121",
     progressBarColor: "#3dbcc9",
     showClock: true,
+    clockFormat: "HH:mm:ss",
+    analogClock: false,
     showDate: true,
     barStyle: "onder",
   });
@@ -116,19 +118,21 @@ function SlidePreviewPage() {
           foregroundColor: data.foregroundColor || "#212121",
           progressBarColor: data.progressBarColor || "#3dbcc9",
           showClock: data.showClock !== undefined ? data.showClock : true,
+          clockFormat: data.clockFormat || "HH:mm:ss",
+          analogClock: data.analogClock || false,
           showDate: data.showDate !== undefined ? data.showDate : true,
           barStyle: data.barStyle || "onder",
         });
 
         const typo = data.typography || {};
         const defaults = {
-          p: { fontSize: 27, fontFamily: "Roboto" },
-          h1: { fontSize: 64, fontFamily: "Roboto" },
-          h2: { fontSize: 53, fontFamily: "Roboto" },
-          h3: { fontSize: 43, fontFamily: "Roboto" },
+          p: { fontSize: 27, fontFamily: "Roboto", fontColor: "#000000" },
+          h1: { fontSize: 64, fontFamily: "Roboto", fontColor: "#000000" },
+          h2: { fontSize: 53, fontFamily: "Roboto", fontColor: "#000000" },
+          h3: { fontSize: 43, fontFamily: "Roboto", fontColor: "#000000" },
         };
         ["p", "h1", "h2", "h3"].forEach((tag) => {
-          const t = typo[tag] || defaults[tag];
+          const t = { ...defaults[tag], ...typo[tag] };
           document.documentElement.style.setProperty(
             `--typo-${tag}-size`,
             `${t.fontSize}px`,
@@ -136,6 +140,10 @@ function SlidePreviewPage() {
           document.documentElement.style.setProperty(
             `--typo-${tag}-family`,
             t.fontFamily,
+          );
+          document.documentElement.style.setProperty(
+            `--typo-${tag}-color`,
+            t.fontColor,
           );
         });
 

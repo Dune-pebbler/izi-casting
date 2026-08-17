@@ -24,10 +24,30 @@ const AVAILABLE_FONTS = {
 
 function TextEditor({ content, onContentChange, enabledFonts, typography }) {
   const typo = {
-    p: { fontSize: 27, fontFamily: "Roboto", ...(typography?.p || {}) },
-    h1: { fontSize: 64, fontFamily: "Roboto", ...(typography?.h1 || {}) },
-    h2: { fontSize: 53, fontFamily: "Roboto", ...(typography?.h2 || {}) },
-    h3: { fontSize: 43, fontFamily: "Roboto", ...(typography?.h3 || {}) },
+    p: {
+      fontSize: 27,
+      fontFamily: "Arial",
+      fontColor: "#000000",
+      ...(typography?.p || {}),
+    },
+    h1: {
+      fontSize: 64,
+      fontFamily: "Arial",
+      fontColor: "#000000",
+      ...(typography?.h1 || {}),
+    },
+    h2: {
+      fontSize: 53,
+      fontFamily: "Arial",
+      fontColor: "#000000",
+      ...(typography?.h2 || {}),
+    },
+    h3: {
+      fontSize: 43,
+      fontFamily: "Arial",
+      fontColor: "#000000",
+      ...(typography?.h3 || {}),
+    },
   };
 
   // Build font_family_formats string from enabled fonts
@@ -103,12 +123,12 @@ function TextEditor({ content, onContentChange, enabledFonts, typography }) {
     textcolor_rows: 3,
     content_style: `
       body {
-        font-family: 'Roboto', Arial, Helvetica, sans-serif;
-        font-size: 27px;
+        font-family: ${typo.p.fontFamily}, sans-serif;
+        font-size: ${typo.p.fontSize}px;
         line-height: 1.6;
         margin: 0;
         padding: 20px;
-        color: #333;
+        color: ${typo.p.fontColor};
       }
 
       h1 {
@@ -117,7 +137,7 @@ function TextEditor({ content, onContentChange, enabledFonts, typography }) {
         font-weight: 600;
         margin: 0.5em 0 0.25em 0;
         line-height: 1.2;
-        color: #1a1a1a;
+        color: ${typo.h1.fontColor};
         padding-bottom: 0.3em;
       }
 
@@ -127,7 +147,7 @@ function TextEditor({ content, onContentChange, enabledFonts, typography }) {
         font-weight: 600;
         margin: 0.5em 0 0.25em 0;
         line-height: 1.3;
-        color: #1a1a1a;
+        color: ${typo.h2.fontColor};
       }
 
       h3 {
@@ -136,7 +156,7 @@ function TextEditor({ content, onContentChange, enabledFonts, typography }) {
         font-weight: 600;
         margin: 0.5em 0 0.25em 0;
         line-height: 1.4;
-        color: #1a1a1a;
+        color: ${typo.h3.fontColor};
       }
 
       p {
@@ -144,7 +164,7 @@ function TextEditor({ content, onContentChange, enabledFonts, typography }) {
         font-family: ${typo.p.fontFamily}, sans-serif;
         margin: 0 0 1em 0;
         line-height: 1.6;
-        color: #333;
+        color: ${typo.p.fontColor};
       }
       
       ul, ol {
@@ -172,7 +192,6 @@ function TextEditor({ content, onContentChange, enabledFonts, typography }) {
       
       strong, b {
         font-weight: 600;
-        color: #1a1a1a;
       }
       
       em, i {

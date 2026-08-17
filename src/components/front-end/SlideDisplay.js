@@ -6,6 +6,10 @@ import TeletekstDisplay from "./TeletekstDisplay";
 import WeatherDisplay from "./WeatherDisplay";
 import QrFeedDisplay from "./QrFeedDisplay";
 import { getTextPaginationConfig } from "../../config/textPagination";
+import {
+  isSportlinkLayout,
+  getSportlinkDataType,
+} from "../../utils/sportlinkTypes";
 
 function CountdownDisplay({ slide }) {
   const [timeLeft, setTimeLeft] = useState(null);
@@ -184,84 +188,73 @@ function AgendaDisplay({ slide }) {
       const cutoff = new Date(now.getTime() + daysAhead * 24 * 60 * 60 * 1000);
       const allEvents = [];
 
-      await Promise.all(
-        calendars.map(async (cal) => {
-          if (!cal.url) return;
-          try {
-            const rawUrl = decodeURIComponent(cal.url).replace(
-              /^webcal:\/\//,
-              "https://",
-            );
-            const proxies = [
-              // Local dev proxy (setupProxy.js) — server-side, no CORS issues
-              () =>
-                fetch(`/api/ical?url=${encodeURIComponent(rawUrl)}`).then(
-                  (r) => (r.ok ? r.text() : Promise.reject()),
-                ),
-              // External fallbacks for production
-              () =>
-                fetch(
-                  `https://corsproxy.io/?${encodeURIComponent(rawUrl)}`,
-                ).then((r) => (r.ok ? r.text() : Promise.reject())),
-              () =>
-                fetch(
-                  `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(rawUrl)}`,
-                ).then((r) => (r.ok ? r.text() : Promise.reject())),
-            ];
+      const calsByUrl = new Map();
+      const rawUrls = [];
+      calendars.forEach((cal) => {
+        if (!cal.url) return;
+        const rawUrl = decodeURIComponent(cal.url).replace(
+          /^webcal:\/\//,
+          "https://",
+        );
+        calsByUrl.set(rawUrl, cal);
+        rawUrls.push(rawUrl);
+      });
 
-            let icsText = null;
-            for (const proxyFn of proxies) {
-              try {
-                const controller = new AbortController();
-                const timeout = setTimeout(() => controller.abort(), 10000);
-                const text = await proxyFn();
-                clearTimeout(timeout);
-                if (text && text.includes("BEGIN:VCALENDAR")) {
-                  icsText = text;
-                  break;
+      if (!rawUrls.length) {
+        setEvents([]);
+        setLastFetched(Date.now());
+        setLoading(false);
+        return;
+      }
+
+      try {
+        // Single request for every calendar — the server fetches them in
+        // parallel, so this is one Edge Request regardless of how many
+        // calendars are configured.
+        const res = await fetch(
+          `/api/ical-batch?urls=${rawUrls.map((u) => encodeURIComponent(u)).join(",")}`,
+        );
+        const { results = [] } = res.ok ? await res.json() : {};
+
+        results.forEach(({ url, ok, text }) => {
+          if (!ok || !text || !text.includes("BEGIN:VCALENDAR")) return;
+          const cal = calsByUrl.get(url);
+          if (!cal) return;
+
+          const parsed = parseICS(text);
+          parsed.forEach((ev) => {
+            if (ev.start >= now && ev.start <= cutoff) {
+              allEvents.push({
+                ...ev,
+                calName: cal.name,
+                calColor: cal.color || "#4f87ff",
+              });
+            } else if (ev.rrule && ev.rrule.includes("FREQ=YEARLY")) {
+              const until = ev.rrule.match(/UNTIL=(\d{8})/);
+              const untilDate = until ? parseICSDate(until[1]) : null;
+              const month = ev.start.getMonth();
+              const day = ev.start.getDate();
+              for (const year of [now.getFullYear(), now.getFullYear() + 1]) {
+                const occ = new Date(year, month, day);
+                if (untilDate && occ > untilDate) continue;
+                if (occ >= now && occ <= cutoff) {
+                  allEvents.push({
+                    ...ev,
+                    start: occ,
+                    end: ev.end
+                      ? new Date(year, ev.end.getMonth(), ev.end.getDate())
+                      : null,
+                    calName: cal.name,
+                    calColor: cal.color || "#4f87ff",
+                  });
                 }
-              } catch {
-                // try next proxy
               }
             }
-
-            if (!icsText) return;
-
-            const parsed = parseICS(icsText);
-            parsed.forEach((ev) => {
-              if (ev.start >= now && ev.start <= cutoff) {
-                allEvents.push({
-                  ...ev,
-                  calName: cal.name,
-                  calColor: cal.color || "#4f87ff",
-                });
-              } else if (ev.rrule && ev.rrule.includes("FREQ=YEARLY")) {
-                const until = ev.rrule.match(/UNTIL=(\d{8})/);
-                const untilDate = until ? parseICSDate(until[1]) : null;
-                const month = ev.start.getMonth();
-                const day = ev.start.getDate();
-                for (const year of [now.getFullYear(), now.getFullYear() + 1]) {
-                  const occ = new Date(year, month, day);
-                  if (untilDate && occ > untilDate) continue;
-                  if (occ >= now && occ <= cutoff) {
-                    allEvents.push({
-                      ...ev,
-                      start: occ,
-                      end: ev.end
-                        ? new Date(year, ev.end.getMonth(), ev.end.getDate())
-                        : null,
-                      calName: cal.name,
-                      calColor: cal.color || "#4f87ff",
-                    });
-                  }
-                }
-              }
-            });
-          } catch (err) {
-            console.error("📅 Agenda fetch error:", err);
-          }
-        }),
-      );
+          });
+        });
+      } catch (err) {
+        console.error("📅 Agenda fetch error:", err);
+      }
 
       allEvents.sort((a, b) => a.start - b.start);
       setEvents(allEvents.slice(0, maxEvents));
@@ -580,15 +573,15 @@ function EmailSlideDisplay({ slide }) {
   );
 }
 
-function SportlinkDisplay({ slide }) {
+function SportlinkDisplay({ slide, settings }) {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const bodyRef = useRef(null);
   const contentRef = useRef(null);
 
-  const apiKey = slide.sportlinkApiKey || "";
-  const dataType = slide.sportlinkDataType || "programma";
+  const apiKey = settings?.sportlinkApiKey || slide.sportlinkApiKey || "";
+  const dataType = getSportlinkDataType(slide.layout, slide.sportlinkDataType);
   const teams = slide.sportlinkTeams || [];
   const maxItems = slide.sportlinkMaxItems || 10;
   const bgColor = slide.sportlinkBgColor || "#0f172a";
@@ -735,6 +728,7 @@ function SportlinkDisplay({ slide }) {
     const interval = setInterval(fetchData, 5 * 60 * 1000);
     return () => clearInterval(interval);
   }, [
+    slide.layout,
     slide.sportlinkApiKey,
     slide.sportlinkTeams,
     slide.sportlinkDataType,
@@ -811,12 +805,14 @@ function SportlinkDisplay({ slide }) {
             </div>
           )}
 
-          <span
-            className="display-sportlink__badge"
-            style={{ backgroundColor: accentColor }}
-          >
-            {dataTypeLabel}
-          </span>
+          {dataTypeLabel !== "Poulestand" && (
+            <span
+              className="display-sportlink__badge"
+              style={{ backgroundColor: accentColor }}
+            >
+              {dataTypeLabel}
+            </span>
+          )}
         </div>
       )}
 
@@ -983,14 +979,20 @@ function SportlinkDisplay({ slide }) {
                   className="display-sportlink__scoreboard-header"
                   style={{
                     backgroundColor: `${accentColor}`,
-                    gridTemplateColumns: slide.sportlinkShowVeldInfo
-                      ? "140px 1fr 200px 1fr 90px"
-                      : "140px 1fr 200px 1fr",
+                    gridTemplateColumns: "230px 1fr 30px 1fr 1fr",
                   }}
                 >
                   <span style={{ color: headerTextColor }}>Tijd</span>
-                  <span style={{ color: headerTextColor }}>Thuisteam</span>
-                  <span style={{ textAlign: "center", color: headerTextColor }}>
+                  <span style={{ color: headerTextColor, textAlign: "right" }}>
+                    Thuisteam
+                  </span>
+                  <span
+                    style={{ textAlign: "center", color: headerTextColor }}
+                  ></span>
+                  <span style={{ color: headerTextColor, textAlign: "left" }}>
+                    Bezoekers
+                  </span>
+                  <span style={{ textAlign: "right" }}>
                     {sportlinkDate &&
                       new Date(sportlinkDate).toLocaleDateString("nl-NL", {
                         weekday: "long",
@@ -998,16 +1000,6 @@ function SportlinkDisplay({ slide }) {
                         month: "short",
                       })}
                   </span>
-                  <span style={{ color: headerTextColor, textAlign: "right" }}>
-                    Bezoekers
-                  </span>
-                  {slide.sportlinkShowVeldInfo && (
-                    <span
-                      style={{ color: headerTextColor, textAlign: "right" }}
-                    >
-                      Veld
-                    </span>
-                  )}
                 </div>
               )}
 
@@ -1022,9 +1014,10 @@ function SportlinkDisplay({ slide }) {
                         borderBottomColor: `${textColor}10`,
                         backgroundColor:
                           i % 2 === 0 ? `${bgColor}99` : `${bgColor}75`,
-                        gridTemplateColumns: slide.sportlinkShowVeldInfo
-                          ? "140px 1fr 200px 1fr 90px"
-                          : "140px 1fr 200px 1fr",
+                        gridTemplateColumns:
+                          dataType !== "uitslagen"
+                            ? "230px 1fr 30px 1fr"
+                            : "140px 1fr 200px 1fr",
                       }}
                     >
                       {/* Tijd */}
@@ -1032,7 +1025,18 @@ function SportlinkDisplay({ slide }) {
                         className="display-sportlink__scoreboard-time"
                         style={{ color: accentColor }}
                       >
-                        {row.aanvangstijd}
+                        <span style={{ display: "block" }}>
+                          {row.aanvangstijd}
+                        </span>
+
+                        {row.accommodatie && slide.sportlinkShowVeldInfo && (
+                          <span
+                            className="display-sportlink__scoreboard-veld"
+                            style={{ color: accentColor, textAlign: "right" }}
+                          >
+                            {slide.sportlinkShowVeldInfo && `${row.veld}`}
+                          </span>
+                        )}
                       </span>
 
                       {/* Thuisteam + kleedkamer */}
@@ -1053,7 +1057,10 @@ function SportlinkDisplay({ slide }) {
                         {slide.sportlinkShowVeldInfo && (
                           <span
                             className="display-sportlink__scoreboard-room"
-                            style={{ color: `${textColor}` }}
+                            style={{
+                              color: `${textColor}`,
+                              textAlign: "right",
+                            }}
                           >
                             Kleedkamer:{" "}
                             {row.kleedkamerthuisteam
@@ -1075,12 +1082,7 @@ function SportlinkDisplay({ slide }) {
                           {row.uitslag}
                         </span>
                       ) : (
-                        <span
-                          className="display-sportlink__match-vs"
-                          style={{ color: `${textColor}55` }}
-                        >
-                          vs
-                        </span>
+                        <span style={{ textAlign: "center" }}>-</span>
                       )}
 
                       {/* Uitteam + kleedkamer */}
@@ -1101,7 +1103,7 @@ function SportlinkDisplay({ slide }) {
                         {slide.sportlinkShowVeldInfo && (
                           <span
                             className="display-sportlink__scoreboard-room"
-                            style={{ color: `${textColor}` }}
+                            style={{ color: `${textColor}`, textAlign: "left" }}
                           >
                             Kleedkamer:{" "}
                             {row.kleedkameruitteam
@@ -1110,16 +1112,6 @@ function SportlinkDisplay({ slide }) {
                           </span>
                         )}
                       </div>
-
-                      {/* Veld */}
-                      {row.accommodatie && slide.sportlinkShowVeldInfo && (
-                        <span
-                          className="display-sportlink__scoreboard-veld"
-                          style={{ color: accentColor }}
-                        >
-                          {slide.sportlinkShowVeldInfo && `${row.veld}`}
-                        </span>
-                      )}
                     </div>
                   ))}
                 </div>
@@ -1192,6 +1184,8 @@ function SlideDisplay({
   nextSlide,
   nextSlideLayout,
   effectsEnabled = false,
+  isPreload = false,
+  settings,
 }) {
   // Get configuration for the current layout
   const textConfig = getTextPaginationConfig(slideLayout);
@@ -1308,7 +1302,7 @@ function SlideDisplay({
   }
 
   // Render slide content helper function
-  const renderSlideContent = (slide, layout) => {
+  const renderSlideContent = (slide, layout, forceMuted = false) => {
     if (!slide) return null;
 
     const slideTextConfig = getTextPaginationConfig(layout);
@@ -1489,7 +1483,7 @@ function SlideDisplay({
                 videoUrl={slide.videoUrl}
                 autoplay={true}
                 loop={true}
-                muted={true}
+                muted={forceMuted || !slide.videoSound}
               />
             ) : (
               <div className="display-video-placeholder">
@@ -1503,11 +1497,13 @@ function SlideDisplay({
           <div className="display-weather-wrapper">
             {slide.weatherLat && slide.weatherLong ? (
               <WeatherDisplay
-                key={`${slide.weatherLat}-${slide.weatherLong}-${slide.weatherForecastDays}-${slide.weatherAccentColor}-${slide.weatherLeftBgImage}-${slide.weatherCity}`}
+                key={`${slide.weatherLat}-${slide.weatherLong}-${slide.weatherForecastDays}`}
                 lat={slide.weatherLat}
                 long={slide.weatherLong}
                 cityName={slide.weatherCity || ""}
                 accentColor={slide.weatherAccentColor || "#4f87ff"}
+                leftAccentColor={slide.weatherLeftAccentColor}
+                leftTextColor={slide.weatherLeftTextColor}
                 forecastDays={slide.weatherForecastDays ?? 7}
                 leftBgImage={slide.weatherLeftBgImage || ""}
                 leftBgImagePosition={
@@ -1575,7 +1571,9 @@ function SlideDisplay({
 
         {layout === "email" && <EmailSlideDisplay slide={slide} />}
 
-        {layout === "sportlink" && <SportlinkDisplay slide={slide} />}
+        {isSportlinkLayout(layout) && (
+          <SportlinkDisplay slide={slide} settings={settings} />
+        )}
 
         {layout === "qr-feed" && <QrFeedDisplay slide={slide} />}
       </>
@@ -1589,12 +1587,12 @@ function SlideDisplay({
       <div className={`display-content slide-transition ${transitionClass}`}>
         <div className="slide-current">
           <div className="display-content">
-            {renderSlideContent(displaySlide, displayLayout)}
+            {renderSlideContent(displaySlide, displayLayout, true)}
           </div>
         </div>
         <div className="slide-next">
           <div className="display-content">
-            {renderSlideContent(currentSlide, slideLayout)}
+            {renderSlideContent(currentSlide, slideLayout, isPreload)}
           </div>
         </div>
       </div>
@@ -1657,15 +1655,16 @@ function SlideDisplay({
 
   return (
     <div className="display-content">
-      {renderSlideContent(displaySlide, displayLayout)}
+      {renderSlideContent(displaySlide, displayLayout, isPreload)}
       {renderEffects(displaySlide)}
 
-      {/* Pre-rendered next slide (hidden) */}
+      {/* Pre-rendered next slide (hidden) — always muted, it isn't on screen yet */}
       {nextSlide && (
         <div className="next-slide-prerender" style={{ display: "none" }}>
           <SlideDisplay
             currentSlide={nextSlide}
             slideLayout={nextSlideLayout || nextSlide.layout || "side-by-side"}
+            isPreload={true}
           />
         </div>
       )}

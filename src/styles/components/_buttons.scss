@@ -137,6 +137,11 @@
     background-color: var(--muted);
   }
 
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
   svg {
     width: 16px;
     height: 16px;

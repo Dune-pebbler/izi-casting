@@ -1,22 +1,33 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { X, Upload, Trash2, Search, Image as ImageIcon } from 'lucide-react';
-import { collection, query, orderBy, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
+import { collection, query, orderBy, onSnapshot, deleteDoc, doc, addDoc } from 'firebase/firestore';
 import { db, storage } from '../../../firebase';
-import { ref, deleteObject } from 'firebase/storage';
+import { ref, deleteObject, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { toast } from 'sonner';
 import { useTenant } from '../../../context/TenantContext';
-import { tenantDoc, tenantCollection } from '../../../utils/tenantPaths';
+import { tenantDoc, tenantCollection, tenantStorageRef } from '../../../utils/tenantPaths';
 
-const ImageLibraryModal = ({ isOpen, onClose, onSelectImage }) => {
+const ImageLibraryModal = ({ isOpen, onClose, onSelectImage, multiple = false, allowUpload = false, usageCounts = null }) => {
   const { tenantId } = useTenant();
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedImage, setSelectedImage] = useState(null);
+  const [selectedImages, setSelectedImages] = useState([]);
   const [deletingImageId, setDeletingImageId] = useState(null);
+  const [uploading, setUploading] = useState(false);
+  const [showOnlyUnused, setShowOnlyUnused] = useState(false);
+  const fileInputRef = useRef(null);
+  const canSelect = typeof onSelectImage === 'function';
+  const canShowUsage = usageCounts instanceof Map;
+  const getUsageCount = (image) => (canShowUsage ? (usageCounts.get(image.url) || 0) : null);
 
   useEffect(() => {
     if (!isOpen) return;
+
+    setSelectedImage(null);
+    setSelectedImages([]);
 
     // Listen to media library changes in real-time
     const mediaQuery = query(
@@ -47,7 +58,12 @@ const ImageLibraryModal = ({ isOpen, onClose, onSelectImage }) => {
   const handleDelete = async (image, e) => {
     e.stopPropagation();
 
-    if (!window.confirm(`Weet je zeker dat je "${image.name}" wilt verwijderen? Dit kan niet ongedaan worden gemaakt.`)) {
+    const usageCount = getUsageCount(image);
+    const confirmMessage = usageCount
+      ? `"${image.name}" wordt nog gebruikt in ${usageCount} slide${usageCount !== 1 ? 's' : ''}. Weet je zeker dat je deze afbeelding wilt verwijderen? Dit kan niet ongedaan worden gemaakt.`
+      : `Weet je zeker dat je "${image.name}" wilt verwijderen? Dit kan niet ongedaan worden gemaakt.`;
+
+    if (!window.confirm(confirmMessage)) {
       return;
     }
 
@@ -67,6 +83,7 @@ const ImageLibraryModal = ({ isOpen, onClose, onSelectImage }) => {
       if (selectedImage?.id === image.id) {
         setSelectedImage(null);
       }
+      setSelectedImages((prev) => prev.filter((img) => img.id !== image.id));
     } catch (error) {
       console.error('Error deleting image:', error);
       toast.error('Verwijderen van afbeelding mislukt');
@@ -76,16 +93,105 @@ const ImageLibraryModal = ({ isOpen, onClose, onSelectImage }) => {
   };
 
   const handleSelect = () => {
-    if (selectedImage) {
+    if (multiple) {
+      if (selectedImages.length > 0) {
+        onSelectImage(selectedImages);
+        onClose();
+        setSelectedImages([]);
+      }
+    } else if (selectedImage) {
       onSelectImage(selectedImage);
       onClose();
       setSelectedImage(null);
     }
   };
 
-  const filteredImages = images.filter(image =>
-    image.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const uploadOne = async (file) => {
+    if (!file.type.startsWith('image/')) {
+      toast.error(`${file.name}: geen geldig afbeeldingsbestand.`);
+      return false;
+    }
+    const maxSize = 5 * 1024 * 1024;
+    if (file.size > maxSize) {
+      toast.error(`${file.name}: afbeelding moet kleiner zijn dan 5MB.`);
+      return false;
+    }
+
+    const timestamp = Date.now();
+    const fileName = `${timestamp}_${file.name}`;
+    const storageRef = tenantStorageRef(storage, tenantId, `slides/${fileName}`);
+
+    const snapshot = await uploadBytes(storageRef, file);
+    const downloadURL = await getDownloadURL(snapshot.ref);
+
+    const img = new Image();
+    const dimensionsPromise = new Promise((resolve) => {
+      img.onload = () => resolve({ width: img.width, height: img.height });
+      img.onerror = () => resolve({ width: null, height: null });
+    });
+    img.src = downloadURL;
+    const { width, height } = await dimensionsPromise;
+
+    await addDoc(tenantCollection(db, tenantId, 'mediaLibrary'), {
+      name: file.name,
+      url: downloadURL,
+      storagePath: `tenants/${tenantId}/slides/${fileName}`,
+      size: file.size,
+      type: file.type,
+      width,
+      height,
+      uploadedAt: new Date(),
+    });
+    return true;
+  };
+
+  const handleUpload = async (e) => {
+    const files = Array.from(e.target.files || []);
+    e.target.value = '';
+    if (files.length === 0) return;
+
+    setUploading(true);
+    const loadingToast = toast.loading(
+      files.length > 1 ? `${files.length} afbeeldingen uploaden...` : 'Afbeelding uploaden...'
+    );
+
+    let successCount = 0;
+    for (const file of files) {
+      try {
+        if (await uploadOne(file)) successCount += 1;
+      } catch (error) {
+        console.error('Error uploading image:', error);
+        toast.error(`${file.name}: fout bij uploaden - ${error.message}`);
+      }
+    }
+
+    toast.dismiss(loadingToast);
+    if (successCount > 0) {
+      toast.success(
+        successCount > 1
+          ? `${successCount} afbeeldingen succesvol geüpload!`
+          : 'Afbeelding succesvol geüpload!'
+      );
+    }
+    setUploading(false);
+  };
+
+  const handleItemClick = (image) => {
+    if (!canSelect) return;
+    if (multiple) {
+      setSelectedImages((prev) =>
+        prev.some((img) => img.id === image.id)
+          ? prev.filter((img) => img.id !== image.id)
+          : [...prev, image]
+      );
+    } else {
+      setSelectedImage(image);
+    }
+  };
+
+  const filteredImages = images
+    .filter(image => image.name.toLowerCase().includes(searchTerm.toLowerCase()))
+    .filter(image => !showOnlyUnused || getUsageCount(image) === 0);
 
   const formatFileSize = (bytes) => {
     if (bytes < 1024) return bytes + ' B';
@@ -101,7 +207,7 @@ const ImageLibraryModal = ({ isOpen, onClose, onSelectImage }) => {
 
   if (!isOpen) return null;
 
-  return (
+  return createPortal(
     <div className="image-library-modal-wrapper">
       <div className="modal-overlay" onClick={onClose}>
         <div className="image-library-modal" onClick={e => e.stopPropagation()}>
@@ -116,15 +222,47 @@ const ImageLibraryModal = ({ isOpen, onClose, onSelectImage }) => {
           </div>
 
           <div className="modal-body">
-            <div className="image-library-search">
-              <Search size={18} />
-              <input
-                type="text"
-                placeholder="Zoek afbeeldingen..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="search-input"
-              />
+            <div className="image-library-toolbar">
+              <div className="image-library-search">
+                <Search size={18} />
+                <input
+                  type="text"
+                  placeholder="Zoek afbeeldingen..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="search-input"
+                />
+              </div>
+              {canShowUsage && (
+                <label className="image-library-unused-filter">
+                  <input
+                    type="checkbox"
+                    checked={showOnlyUnused}
+                    onChange={(e) => setShowOnlyUnused(e.target.checked)}
+                  />
+                  Alleen ongebruikte
+                </label>
+              )}
+              {allowUpload && (
+                <>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={handleUpload}
+                    style={{ display: 'none' }}
+                  />
+                  <button
+                    className="btn btn-primary image-library-upload-btn"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={uploading}
+                  >
+                    <Upload size={16} />
+                    {uploading ? 'Uploaden...' : 'Uploaden'}
+                  </button>
+                </>
+              )}
             </div>
 
             {loading ? (
@@ -140,14 +278,30 @@ const ImageLibraryModal = ({ isOpen, onClose, onSelectImage }) => {
               </div>
             ) : (
               <div className="image-library-grid">
-                {filteredImages.map((image) => (
+                {filteredImages.map((image) => {
+                  const isSelected = multiple
+                    ? selectedImages.some((img) => img.id === image.id)
+                    : selectedImage?.id === image.id;
+                  return (
                   <div
                     key={image.id}
-                    className={`image-library-item ${selectedImage?.id === image.id ? 'selected' : ''}`}
-                    onClick={() => setSelectedImage(image)}
+                    className={`image-library-item ${isSelected ? 'selected' : ''}`}
+                    onClick={() => handleItemClick(image)}
                   >
                     <div className="image-library-thumbnail">
                       <img src={image.url} alt={image.name} />
+                      {canShowUsage && (
+                        <span
+                          className={`image-usage-badge ${getUsageCount(image) === 0 ? 'unused' : ''}`}
+                          title={
+                            getUsageCount(image) === 0
+                              ? 'Niet gebruikt in een slide'
+                              : `Gebruikt in ${getUsageCount(image)} slide${getUsageCount(image) !== 1 ? 's' : ''}`
+                          }
+                        >
+                          {getUsageCount(image)}×
+                        </span>
+                      )}
                       <button
                         className="image-delete-btn"
                         onClick={(e) => handleDelete(image, e)}
@@ -165,7 +319,7 @@ const ImageLibraryModal = ({ isOpen, onClose, onSelectImage }) => {
                       </p>
                       <p className="image-date">{formatDate(image.uploadedAt)}</p>
                     </div>
-                    {selectedImage?.id === image.id && (
+                    {isSelected && (
                       <div className="selected-indicator">
                         <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                           <path d="M7 10L9 12L13 8" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -173,26 +327,40 @@ const ImageLibraryModal = ({ isOpen, onClose, onSelectImage }) => {
                       </div>
                     )}
                   </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>
 
           <div className="modal-footer">
-            <button className="btn btn-secondary" onClick={onClose}>
-              Annuleren
-            </button>
-            <button
-              className="btn btn-primary"
-              onClick={handleSelect}
-              disabled={!selectedImage}
-            >
-              Selecteer afbeelding
-            </button>
+            {canSelect ? (
+              <>
+                <button className="btn btn-secondary" onClick={onClose}>
+                  Annuleren
+                </button>
+                <button
+                  className="btn btn-primary"
+                  onClick={handleSelect}
+                  disabled={multiple ? selectedImages.length === 0 : !selectedImage}
+                >
+                  {multiple
+                    ? selectedImages.length > 0
+                      ? `Selecteer ${selectedImages.length} afbeelding${selectedImages.length !== 1 ? 'en' : ''}`
+                      : 'Selecteer afbeeldingen'
+                    : 'Selecteer afbeelding'}
+                </button>
+              </>
+            ) : (
+              <button className="btn btn-primary" onClick={onClose}>
+                Sluiten
+              </button>
+            )}
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 

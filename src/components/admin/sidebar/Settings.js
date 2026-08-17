@@ -54,10 +54,10 @@ function Settings() {
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const DEFAULT_TYPOGRAPHY = {
-    p: { fontSize: 27, fontFamily: "Roboto" },
-    h1: { fontSize: 64, fontFamily: "Roboto" },
-    h2: { fontSize: 53, fontFamily: "Roboto" },
-    h3: { fontSize: 43, fontFamily: "Roboto" },
+    p: { fontSize: 27, fontFamily: "Arial", fontColor: "#000000" },
+    h1: { fontSize: 64, fontFamily: "Arial", fontColor: "#000000" },
+    h2: { fontSize: 53, fontFamily: "Arial", fontColor: "#000000" },
+    h3: { fontSize: 43, fontFamily: "Arial", fontColor: "#000000" },
   };
 
   const [settings, setSettings] = useState({
@@ -68,10 +68,15 @@ function Settings() {
     progressBarColor: "#3dbcc9",
     feedUrl: "",
     showClock: true,
+    clockFormat: "HH:mm:ss",
+    analogClock: false,
+    capitalRssTitle: false,
+    reduceRssTitleLetterSpacing: false,
     showDate: true,
     barStyle: "onder",
+    feedFontSize: "normaal",
     defaultSlideTransition: "fade",
-    enabledFonts: AVAILABLE_FONTS.map((f) => f.name),
+    enabledFonts: ["Arial"],
     typography: DEFAULT_TYPOGRAPHY,
   });
 
@@ -92,6 +97,13 @@ function Settings() {
               loadedSettings.showClock !== undefined
                 ? loadedSettings.showClock
                 : true,
+            // Ensure clockFormat is always present, default to "HH:mm:ss" if missing
+            clockFormat: loadedSettings.clockFormat || "HH:mm:ss",
+            // Ensure analogClock is always present, default to false if missing
+            analogClock:
+              loadedSettings.analogClock !== undefined
+                ? loadedSettings.analogClock
+                : false,
             // Ensure showDate is always present, default to true if missing
             showDate:
               loadedSettings.showDate !== undefined
@@ -99,17 +111,28 @@ function Settings() {
                 : true,
             // Ensure barStyle is always present, default to "onder" if missing
             barStyle: loadedSettings.barStyle || "onder",
+            // Ensure feedFontSize is always present, default to "normaal" if missing
+            feedFontSize: loadedSettings.feedFontSize || "normaal",
             progressBarColor: loadedSettings.progressBarColor || "#6366f1",
             // Ensure defaultSlideTransition is always present, default to "fade" if missing
             defaultSlideTransition:
               loadedSettings.defaultSlideTransition || "fade",
-            // Ensure enabledFonts is always present, default to all fonts if missing
-            enabledFonts:
-              loadedSettings.enabledFonts || AVAILABLE_FONTS.map((f) => f.name),
+            // Ensure enabledFonts is always present, default to Arial only if missing
+            enabledFonts: loadedSettings.enabledFonts || ["Arial"],
             typography: {
               ...DEFAULT_TYPOGRAPHY,
               ...(loadedSettings.typography || {}),
             },
+            // Ensure capitalRssTitle is always present, default to false if missing
+            capitalRssTitle:
+              loadedSettings.capitalRssTitle !== undefined
+                ? loadedSettings.capitalRssTitle
+                : false,
+            // Ensure reduceRssTitleLetterSpacing is always present, default to false if missing
+            reduceRssTitleLetterSpacing:
+              loadedSettings.reduceRssTitleLetterSpacing !== undefined
+                ? loadedSettings.reduceRssTitleLetterSpacing
+                : false,
           }));
         }
       } catch (error) {
@@ -436,8 +459,8 @@ function Settings() {
               </div>
             </div>
 
-            {/* Bar Style and Clock Settings Row */}
-            <div className="settings-section settings-row">
+            {/* Bar Style */}
+            <div className="settings-section">
               <div className="bar-style-settings">
                 <div className="bar-style-input-group">
                   <label htmlFor="barStyle">Balk Stijl</label>
@@ -466,7 +489,15 @@ function Settings() {
                   </select>
                 </div>
               </div>
+            </div>
 
+            {/* Clock and Date Toggles */}
+            <div
+              className="settings-section"
+              style={{
+                padding: "4px 24px",
+              }}
+            >
               <div className="display-section">
                 <div className="checkbox-setting">
                   <label className="checkbox-label">
@@ -492,6 +523,97 @@ function Settings() {
                       className="checkbox-input"
                     />
                     <span className="checkbox-text">Datum Tonen</span>
+                  </label>
+                </div>
+                {settings.showClock && (
+                  <div className="checkbox-setting">
+                    <label className="checkbox-label">
+                      <input
+                        type="checkbox"
+                        checked={settings.analogClock}
+                        onChange={(e) =>
+                          handleInputChange("analogClock", e.target.checked)
+                        }
+                        className="checkbox-input"
+                      />
+                      <span className="checkbox-text">Analoge Klok</span>
+                    </label>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Clock Format */}
+            {settings.showClock && !settings.analogClock && (
+              <div className="settings-section">
+                <div className="bar-style-settings">
+                  <div className="bar-style-input-group">
+                    <label htmlFor="clockFormat">Klok Notatie</label>
+                    <select
+                      id="clockFormat"
+                      value={settings.clockFormat}
+                      onChange={(e) =>
+                        handleInputChange("clockFormat", e.target.value)
+                      }
+                      className="bar-style-select"
+                    >
+                      <option value="HH:mm:ss">UU:MM:SS</option>
+                      <option value="HH:mm">UU:MM</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* RSS Feed Font Size */}
+            <div className="settings-section">
+              <div className="bar-style-settings">
+                <div className="bar-style-input-group">
+                  <label htmlFor="feedFontSize">
+                    Lettergrootte RSS titel &amp; beschrijving
+                  </label>
+                  <select
+                    id="feedFontSize"
+                    value={settings.feedFontSize}
+                    onChange={(e) =>
+                      handleInputChange("feedFontSize", e.target.value)
+                    }
+                    className="bar-style-select"
+                  >
+                    <option value="groot">Groot (1,5x)</option>
+                    <option value="normaal">Normaal</option>
+                    <option value="klein">Klein (0,5x)</option>
+                  </select>
+                </div>
+              </div>
+              <div className="display-section d-flex justify-between mt-2">
+                <div className="checkbox-setting">
+                  <label className="checkbox-label">
+                    <input
+                      type="checkbox"
+                      checked={settings.capitalRssTitle}
+                      onChange={(e) =>
+                        handleInputChange("capitalRssTitle", e.target.checked)
+                      }
+                      className="checkbox-input"
+                    />
+                    <span className="checkbox-text">Title in hoofdletters</span>
+                  </label>
+                </div>
+                <div className="checkbox-setting">
+                  <label className="checkbox-label">
+                    <input
+                      type="checkbox"
+                      checked={settings.reduceRssTitleLetterSpacing}
+                      onChange={(e) =>
+                        handleInputChange(
+                          "reduceRssTitleLetterSpacing",
+                          e.target.checked,
+                        )
+                      }
+                      className="checkbox-input"
+                    />
+                    <span className="checkbox-text">Kleine letterspacing</span>
                   </label>
                 </div>
               </div>
@@ -553,7 +675,8 @@ function Settings() {
                         <input
                           type="checkbox"
                           checked={
-                            settings.enabledFonts?.includes(font.name) ?? true
+                            settings.enabledFonts?.includes(font.name) ??
+                            font.name === "Arial"
                           }
                           onChange={() => toggleFont(font.name)}
                           className="font-checkbox"
@@ -574,6 +697,7 @@ function Settings() {
                   <span />
                   <span>Lettertype</span>
                   <span>Grootte</span>
+                  <span>Kleur</span>
                 </div>
                 {[
                   { key: "p", label: "Paragraaf" },
@@ -585,7 +709,7 @@ function Settings() {
                     <span className="typography-grid__label">{label}</span>
                     <select
                       className="typography-grid__select"
-                      value={settings.typography?.[key]?.fontFamily || "Roboto"}
+                      value={settings.typography?.[key]?.fontFamily || "Arial"}
                       onChange={(e) =>
                         setSettings((prev) => ({
                           ...prev,
@@ -599,7 +723,11 @@ function Settings() {
                         }))
                       }
                     >
-                      {AVAILABLE_FONTS.map((f) => (
+                      {AVAILABLE_FONTS.filter(
+                        (f) =>
+                          settings.enabledFonts?.includes(f.name) ||
+                          f.name === settings.typography?.[key]?.fontFamily,
+                      ).map((f) => (
                         <option key={f.name} value={f.name}>
                           {f.name}
                         </option>
@@ -627,6 +755,23 @@ function Settings() {
                       />
                       <span className="typography-grid__size-suffix">px</span>
                     </div>
+                    <input
+                      type="color"
+                      value={settings.typography?.[key]?.fontColor || "#000000"}
+                      onChange={(e) =>
+                        setSettings((prev) => ({
+                          ...prev,
+                          typography: {
+                            ...prev.typography,
+                            [key]: {
+                              ...prev.typography?.[key],
+                              fontColor: e.target.value,
+                            },
+                          },
+                        }))
+                      }
+                      className="typography-grid__color"
+                    />
                   </div>
                 ))}
               </div>

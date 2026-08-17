@@ -27,7 +27,24 @@ const SLIDE_TYPES = [
   { id: "countdown", label: "Afteltimer", icon: Timer },
   { id: "agenda", label: "Agenda", icon: CalendarDays },
   { id: "email", label: "E-mail inbox", icon: Mail },
-  { id: "sportlink", label: "Sportlink", icon: Trophy },
+  {
+    id: "sportlink-programma",
+    label: "Sportlink - Programma",
+    icon: Trophy,
+    gateKey: "sportlink",
+  },
+  {
+    id: "sportlink-uitslagen",
+    label: "Sportlink - Uitslagen",
+    icon: Trophy,
+    gateKey: "sportlink",
+  },
+  {
+    id: "sportlink-poulestand",
+    label: "Sportlink - Poulestand",
+    icon: Trophy,
+    gateKey: "sportlink",
+  },
   { id: "weather", label: "Weer", icon: CloudIcon },
   { id: "qr-feed", label: "QR + Tekst", icon: QrCode },
 ];
@@ -42,7 +59,7 @@ const AddSlideModal = ({ isOpen, onClose, onConfirm, slideTypes = {} }) => {
       setName("");
       const hasSlideTypeConfig = Object.keys(slideTypes).length > 0;
       const firstAllowed = hasSlideTypeConfig
-        ? SLIDE_TYPES.find(({ id }) => slideTypes[id])?.id
+        ? SLIDE_TYPES.find(({ id, gateKey }) => slideTypes[gateKey || id])?.id
         : "side-by-side";
       setLayout(firstAllowed || "side-by-side");
       setTimeout(() => inputRef.current?.focus(), 50);
@@ -53,7 +70,7 @@ const AddSlideModal = ({ isOpen, onClose, onConfirm, slideTypes = {} }) => {
 
   const hasSlideTypeConfig = Object.keys(slideTypes).length > 0;
   const visibleTypes = hasSlideTypeConfig
-    ? SLIDE_TYPES.filter(({ id }) => slideTypes[id])
+    ? SLIDE_TYPES.filter(({ id, gateKey }) => slideTypes[gateKey || id])
     : SLIDE_TYPES;
 
   const handleConfirm = () => {

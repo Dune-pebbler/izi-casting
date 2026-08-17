@@ -29,16 +29,85 @@
       text-align: center;
 
       .date-line {
-        font-size: 2.6rem;
+        font-size: calc(2.6rem * var(--feed-font-scale, 1));
         font-weight: 400;
         line-height: 1.1;
         margin-bottom: 6px;
+        font-family: var(--typo-p-family, inherit) !important;
       }
       .time-line {
-        font-size: 2.6rem;
+        font-size: calc(2.6rem * var(--feed-font-scale, 1));
         font-weight: 600;
         line-height: 1.1;
-        font-family: "Courier New", monospace;
+        font-family: var(--typo-p-family, inherit) !important;
+      }
+
+      .analog-clock {
+        --clock-size: 80px;
+        position: relative;
+        width: var(--clock-size);
+        height: var(--clock-size);
+        border-radius: 50%;
+        border: calc(var(--clock-size) * 0.025) solid;
+        box-sizing: border-box;
+
+        .analog-clock-tick {
+          position: absolute;
+          top: 50%;
+          left: calc(50% - 1px);
+          width: 2px;
+          height: calc(var(--clock-size) * 0.075);
+          transform-origin: top center;
+        }
+
+        .analog-clock-number {
+          position: absolute;
+          transform: translate(-50%, -50%);
+          font-size: calc(var(--clock-size) * 0.16);
+          font-weight: 600;
+          line-height: 1;
+          font-family: var(--typo-p-family, inherit) !important;
+        }
+
+        .analog-clock-hand {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform-origin: bottom center;
+          border-radius: 2px;
+        }
+
+        .analog-clock-hand-hour {
+          width: calc(var(--clock-size) * 0.0375);
+          height: calc(var(--clock-size) * 0.275);
+          margin-left: calc(var(--clock-size) * -0.01875);
+          margin-top: calc(var(--clock-size) * -0.275);
+        }
+
+        .analog-clock-hand-minute {
+          width: calc(var(--clock-size) * 0.025);
+          height: calc(var(--clock-size) * 0.375);
+          margin-left: calc(var(--clock-size) * -0.0125);
+          margin-top: calc(var(--clock-size) * -0.375);
+        }
+
+        .analog-clock-hand-second {
+          width: calc(var(--clock-size) * 0.0125);
+          height: calc(var(--clock-size) * 0.4);
+          margin-left: calc(var(--clock-size) * -0.00625);
+          margin-top: calc(var(--clock-size) * -0.4);
+        }
+
+        .analog-clock-center {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          width: calc(var(--clock-size) * 0.075);
+          height: calc(var(--clock-size) * 0.075);
+          margin-left: calc(var(--clock-size) * -0.0375);
+          margin-top: calc(var(--clock-size) * -0.0375);
+          border-radius: 50%;
+        }
       }
     }
   }

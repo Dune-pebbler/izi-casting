@@ -334,6 +334,40 @@
   }
 }
 
+// Media library entry point
+.sidebar-media-library {
+  .settings-toggle-btn {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: $spacing-sm;
+    width: 100%;
+    padding: $spacing-sm $spacing-md;
+    border: 1px solid var(--border);
+    border-radius: $border-radius-lg;
+    background: var(--muted);
+    color: var(--foreground);
+    cursor: pointer;
+    transition: $transition-base;
+    font-size: $font-size-base;
+    font-weight: $font-weight-medium;
+
+    &:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    svg {
+      color: var(--foreground-secondary);
+      transition: $transition-base;
+    }
+
+    &:hover svg {
+      color: var(--primary);
+    }
+  }
+}
+
 // Users panel
 .sidebar-users {
   display: flex;

@@ -1,5 +1,11 @@
 import React, { useMemo, useCallback, useState } from "react";
 import ReactDOM from "react-dom";
+import { getSlideTypeGateKey } from "../../utils/sportlinkTypes";
+import {
+  isTimeRestrictionEnabled,
+  isSlideCurrentlyInWindow,
+} from "../../utils/timeRestriction";
+import { isCountdownExpired } from "../../utils/countdownUtils";
 import {
   Copy,
   GripVertical,
@@ -26,6 +32,61 @@ import {
   ScanQrCode,
 } from "lucide-react";
 
+const isTimeRestrictionActive = isTimeRestrictionEnabled;
+
+// When a time window is active, the eye toggle becomes a read-only
+// indicator of whether the window currently allows the slide to show —
+// isVisible stops being the deciding factor (see DisplayView filtering).
+// Countdown expiry always wins — it isn't something the time-window
+// bypass below should be able to mask.
+const getSlideVisibilityState = (slide) => {
+  const timeRestrictionActive = isTimeRestrictionActive(slide.timeRestriction);
+  const expired = isCountdownExpired(slide);
+  return {
+    timeRestrictionActive,
+    effectivelyVisible: expired
+      ? false
+      : timeRestrictionActive
+        ? isSlideCurrentlyInWindow(slide)
+        : slide.isVisible,
+  };
+};
+
+const timeRestrictionTooltip = (tr) => {
+  if (!isTimeRestrictionActive(tr)) return "Tijdvenster uitgeschakeld";
+  const timeEnabled =
+    tr.timeEnabled !== undefined ? tr.timeEnabled : !!tr.enabled;
+  const dateEnabled =
+    tr.dateEnabled !== undefined ? tr.dateEnabled : !!tr.enabled;
+  const parts = [];
+
+  if (dateEnabled && (tr.startDate || tr.endDate)) {
+    parts.push(`${tr.startDate || "?"} t/m ${tr.endDate || "?"}`);
+  }
+  if (timeEnabled && (tr.startTime || tr.endTime)) {
+    parts.push(`${tr.startTime || "?"} – ${tr.endTime || "?"}`);
+  }
+  if (timeEnabled && tr.days) {
+    const dayLabels = {
+      mon: "ma",
+      tue: "di",
+      wed: "wo",
+      thu: "do",
+      fri: "vr",
+      sat: "za",
+      sun: "zo",
+    };
+    const activeDays = Object.keys(dayLabels).filter(
+      (key) => tr.days[key] !== false,
+    );
+    if (activeDays.length > 0 && activeDays.length < 7) {
+      parts.push(activeDays.map((key) => dayLabels[key]).join(" "));
+    }
+  }
+
+  return `Tijdvenster aan: ${parts.join(", ")}`;
+};
+
 const iconMap = {
   video: <Play />,
   iframe: <Globe />,
@@ -38,6 +99,9 @@ const iconMap = {
   agenda: <CalendarDays />,
   email: <Mail />,
   sportlink: <Trophy />,
+  "sportlink-programma": <Trophy />,
+  "sportlink-uitslagen": <Trophy />,
+  "sportlink-poulestand": <Trophy />,
   weather: <CloudIcon />,
   "qr-feed": <ScanQrCode />,
 };
@@ -87,7 +151,7 @@ function SlideList({
   const isSlideTypeDisabled = (slide) => {
     if (!hasSlideTypeConfig) return false;
     const layout = slide.layout || "side-by-side";
-    return slideTypes[layout] === false;
+    return slideTypes[getSlideTypeGateKey(layout)] === false;
   };
   const { tenantId } = useTenant();
 
@@ -180,6 +244,7 @@ function SlideList({
       transform: CSS.Transform.toString(transform),
       transition,
       opacity: isDragging ? 0.5 : disabled ? 0.4 : 1,
+      cursor: disabled ? "not-allowed" : undefined,
     };
 
     const renderSlidePreview = (slide) => {
@@ -484,7 +549,7 @@ function SlideList({
         ref={setNodeRef}
         style={style}
         className={`slide-card ${isDragging ? "dragging" : ""}`}
-        onClick={() => onEditSlide(slide)}
+        onClick={() => !disabled && onEditSlide(slide)}
       >
         <div className="slide-card__header">
           <div
@@ -553,26 +618,39 @@ function SlideList({
                 e.stopPropagation();
                 onToggleSlideTimeRestriction(slide.id);
               }}
-              className={`btn-icon btn-icon--time ${slide.timeRestriction?.enabled ? "btn-icon--success" : ""}`}
-              title={
-                slide.timeRestriction?.enabled
-                  ? `Tijdvenster aan: ${slide.timeRestriction?.startTime} – ${slide.timeRestriction?.endTime}`
-                  : "Tijdvenster uitgeschakeld"
-              }
+              className={`btn-icon btn-icon--time ${isTimeRestrictionActive(slide.timeRestriction) ? "btn-icon--success" : ""}`}
+              title={timeRestrictionTooltip(slide.timeRestriction)}
             >
               <Clock size={16} />
             </button>
 
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onToggleSlideVisibility(slide.id);
-              }}
-              className={`btn-icon ${slide.isVisible ? "btn-icon--success" : ""}`}
-              title={slide.isVisible ? "Hide slide" : "Show slide"}
-            >
-              {slide.isVisible ? <Eye size={16} /> : <EyeOff size={16} />}
-            </button>
+            {(() => {
+              const { timeRestrictionActive, effectivelyVisible } =
+                getSlideVisibilityState(slide);
+              return (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onToggleSlideVisibility(slide.id);
+                  }}
+                  disabled={timeRestrictionActive}
+                  className={`btn-icon ${effectivelyVisible ? "btn-icon--success" : ""}`}
+                  title={
+                    timeRestrictionActive
+                      ? `Tijdvenster actief — nu ${effectivelyVisible ? "zichtbaar" : "verborgen"}`
+                      : slide.isVisible
+                        ? "Hide slide"
+                        : "Show slide"
+                  }
+                >
+                  {effectivelyVisible ? (
+                    <Eye size={16} />
+                  ) : (
+                    <EyeOff size={16} />
+                  )}
+                </button>
+              );
+            })()}
           </div>
         </div>
 
@@ -598,6 +676,7 @@ function SlideList({
       transform: CSS.Transform.toString(transform),
       transition,
       opacity: isDragging ? 0.5 : disabled ? 0.4 : 1,
+      cursor: disabled ? "not-allowed" : undefined,
     };
 
     const getPlaceholderIcon = (layout) => {
@@ -624,6 +703,12 @@ function SlideList({
           return "Afteltimer";
         case "sportlink":
           return "sportlink";
+        case "sportlink-programma":
+          return "Sportlink - Programma";
+        case "sportlink-uitslagen":
+          return "Sportlink - Uitslagen";
+        case "sportlink-poulestand":
+          return "Sportlink - Poulestand";
         case "email":
           return "email inbox";
         case "agenda":
@@ -648,7 +733,7 @@ function SlideList({
           `slide-row ${isDragging ? "dragging" : ""}`,
           slide.isVisible ? " mobile-green" : " mobile-red",
         ]}
-        onClick={() => onEditSlide(slide)}
+        onClick={() => !disabled && onEditSlide(slide)}
       >
         <div className="slide-row__left" {...attributes} {...listeners}>
           <div className="drag-handle">
@@ -685,7 +770,11 @@ function SlideList({
           </h4>
           <div className="slide-row__info">
             <span className="slide-row__type">{getSlideTypeLabel(slide)}</span>
-            <span className="slide-row__duration">{formatDuration ? formatDuration(slide.duration || 5) : `${slide.duration || 5}s`}</span>
+            <span className="slide-row__duration">
+              {formatDuration
+                ? formatDuration(slide.duration || 5)
+                : `${slide.duration || 5}s`}
+            </span>
           </div>
         </div>
         <div className="slide-row__actions">
@@ -737,26 +826,35 @@ function SlideList({
               e.stopPropagation();
               onToggleSlideTimeRestriction(slide.id);
             }}
-            className={`btn-icon btn-icon--time ${slide.timeRestriction?.enabled ? "btn-icon--success" : ""}`}
-            title={
-              slide.timeRestriction?.enabled
-                ? `Tijdvenster aan: ${slide.timeRestriction?.startTime} – ${slide.timeRestriction?.endTime}`
-                : "Tijdvenster uitgeschakeld"
-            }
+            className={`btn-icon btn-icon--time ${isTimeRestrictionActive(slide.timeRestriction) ? "btn-icon--success" : ""}`}
+            title={timeRestrictionTooltip(slide.timeRestriction)}
           >
             <Clock size={16} />
           </button>
 
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onToggleSlideVisibility(slide.id);
-            }}
-            className={`btn-icon ${slide.isVisible ? "btn-icon--success" : ""}`}
-            title={slide.isVisible ? "Hide slide" : "Show slide"}
-          >
-            {slide.isVisible ? <Eye size={16} /> : <EyeOff size={16} />}
-          </button>
+          {(() => {
+            const { timeRestrictionActive, effectivelyVisible } =
+              getSlideVisibilityState(slide);
+            return (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onToggleSlideVisibility(slide.id);
+                }}
+                disabled={timeRestrictionActive}
+                className={`btn-icon ${effectivelyVisible ? "btn-icon--success" : ""}`}
+                title={
+                  timeRestrictionActive
+                    ? `Tijdvenster actief — nu ${effectivelyVisible ? "zichtbaar" : "verborgen"}`
+                    : slide.isVisible
+                      ? "Hide slide"
+                      : "Show slide"
+                }
+              >
+                {effectivelyVisible ? <Eye size={16} /> : <EyeOff size={16} />}
+              </button>
+            );
+          })()}
 
           <button
             onClick={(e) => {
@@ -799,28 +897,48 @@ function SlideList({
               <Copy size={16} />
               <span>Kopiëren</span>
             </button>
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onToggleSlideVisibility(slide.id);
-                setActionsOpen(false);
-              }}
-              className={`btn-icon slide-row__actions-panel-btn${slide.isVisible ? " btn-icon--success" : ""}`}
-            >
-              {slide.isVisible ? <Eye size={16} /> : <EyeOff size={16} />}
-              <span>{slide.isVisible ? "Verbergen" : "Tonen"}</span>
-            </button>
+            {(() => {
+              const { timeRestrictionActive, effectivelyVisible } =
+                getSlideVisibilityState(slide);
+              return (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onToggleSlideVisibility(slide.id);
+                    setActionsOpen(false);
+                  }}
+                  disabled={timeRestrictionActive}
+                  className={`btn-icon slide-row__actions-panel-btn${effectivelyVisible ? " btn-icon--success" : ""}`}
+                >
+                  {effectivelyVisible ? (
+                    <Eye size={16} />
+                  ) : (
+                    <EyeOff size={16} />
+                  )}
+                  <span>
+                    {timeRestrictionActive
+                      ? effectivelyVisible
+                        ? "Zichtbaar (tijdvenster)"
+                        : "Verborgen (tijdvenster)"
+                      : effectivelyVisible
+                        ? "Verbergen"
+                        : "Tonen"}
+                  </span>
+                </button>
+              );
+            })()}
             <button
               onClick={(e) => {
                 e.stopPropagation();
                 onToggleSlideTimeRestriction(slide.id);
                 setActionsOpen(false);
               }}
-              className={`btn-icon slide-row__actions-panel-btn${slide.timeRestriction?.enabled ? " btn-icon--success" : ""}`}
+              className={`btn-icon slide-row__actions-panel-btn${isTimeRestrictionActive(slide.timeRestriction) ? " btn-icon--success" : ""}`}
             >
               <Clock size={16} />
               <span>
-                Tijdvenster {slide.timeRestriction?.enabled ? "uit" : "aan"}
+                Tijdvenster{" "}
+                {isTimeRestrictionActive(slide.timeRestriction) ? "uit" : "aan"}
               </span>
             </button>
             <button

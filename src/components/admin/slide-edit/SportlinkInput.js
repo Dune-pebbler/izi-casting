@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { RefreshCw, Check, X, Eye, EyeOff, GripVertical } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { RefreshCw, Check, X, GripVertical } from "lucide-react";
 import {
   DndContext,
   closestCenter,
@@ -76,9 +76,7 @@ const DATA_TYPES = [
 
 function SportlinkInput({
   sportlinkApiKey,
-  onApiKeyChange,
   sportlinkDataType,
-  onDataTypeChange,
   sportlinkTeams,
   onTeamsChange,
   sportlinkTitle,
@@ -104,7 +102,6 @@ function SportlinkInput({
   const [loadingTeams, setLoadingTeams] = useState(false);
   const [teamLoadError, setTeamLoadError] = useState(null);
   const [teamSearch, setTeamSearch] = useState("");
-  const [showApiKey, setShowApiKey] = useState(false);
 
   const selectedTeams = sportlinkTeams || [];
 
@@ -145,6 +142,11 @@ function SportlinkInput({
     }
   };
 
+  useEffect(() => {
+    if (sportlinkApiKey) fetchTeams();
+    // eslint-disable-next-line
+  }, [sportlinkApiKey]);
+
   const toggleTeam = (team) => {
     const exists = selectedTeams.find((t) => t.teamcode === team.teamcode);
     if (exists) {
@@ -184,20 +186,24 @@ function SportlinkInput({
           <div className="sportlink-input__field">
             <label>Type data</label>
             <div className="sportlink-input__data-types">
-              {DATA_TYPES.map(({ id, label, description }) => (
-                <button
-                  key={id}
-                  type="button"
-                  className={`sportlink-input__type-btn${sportlinkDataType === id ? " active" : ""}`}
-                  onClick={() => onDataTypeChange(id)}
-                >
-                  <span className="sportlink-input__type-label">{label}</span>
-                  <span className="sportlink-input__type-desc">
-                    {description}
-                  </span>
-                </button>
-              ))}
+              {DATA_TYPES.filter(({ id }) => id === sportlinkDataType).map(
+                ({ id, label, description }) => (
+                  <div key={id} className="sportlink-input__type-btn active">
+                    <span className="sportlink-input__type-label">
+                      {label}
+                    </span>
+                    <span className="sportlink-input__type-desc">
+                      {description}
+                    </span>
+                  </div>
+                ),
+              )}
             </div>
+            <p className="sportlink-input__hint">
+              Het type data ligt vast aan het gekozen slide-type. Kies "Kies
+              layout" bovenin om te wisselen tussen Programma, Uitslagen of
+              Poulestand.
+            </p>
           </div>
 
           {sportlinkDataType !== "poulestand" && (
@@ -352,40 +358,24 @@ function SportlinkInput({
           <div className="sportlink-input__field">
             <label>API key (Client ID)</label>
             <div className="sportlink-input__api-row">
-              <div className="sportlink-input__api-key-wrapper">
-                <input
-                  type={showApiKey ? "text" : "password"}
-                  className="form-input sportlink-input__api-key"
-                  value={sportlinkApiKey}
-                  onChange={(e) => onApiKeyChange(e.target.value)}
-                  placeholder="API key..."
-                />
-                <button
-                  type="button"
-                  className="sportlink-input__api-key-toggle"
-                  onClick={() => setShowApiKey((v) => !v)}
-                  title={showApiKey ? "Verberg API key" : "Toon API key"}
-                >
-                  {showApiKey ? <EyeOff size={16} /> : <Eye size={16} />}
-                </button>
-              </div>
               <button
                 type="button"
                 className="btn btn-secondary sportlink-input__fetch-btn"
                 onClick={fetchTeams}
                 disabled={!sportlinkApiKey || loadingTeams}
-                title="Teams ophalen van Sportlink"
+                title="Teams vernieuwen van Sportlink"
               >
                 <RefreshCw
                   size={14}
                   className={loadingTeams ? "spinning" : ""}
                 />
-                {loadingTeams ? "Laden…" : "Haal teams op"}
+                {loadingTeams ? "Laden…" : "Vernieuwen"}
               </button>
             </div>
             <p className="sportlink-input__hint">
-              Je Client ID vind je in Sportlink Club.Dataservice. Klik op "Haal
-              teams op" om je teams te laden.
+              {sportlinkApiKey
+                ? 'De API key wordt beheerd via "Sportlink instellingen" in de sidebar. Teams worden automatisch geladen; klik op "Vernieuwen" om de lijst opnieuw op te halen.'
+                : 'Er is nog geen API key ingesteld. Vul deze in bij "Sportlink instellingen" in de sidebar om teams te kunnen ophalen.'}
             </p>
           </div>
 

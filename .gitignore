@@ -25,3 +25,6 @@ yarn-error.log*
 .env
 .vercel
 .env*.local
+
+firestore.rules
+storage.rules

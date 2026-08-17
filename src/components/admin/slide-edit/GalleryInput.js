@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { Plus, Trash2, Images, BookImage, GripVertical } from "lucide-react";
 import {
   DndContext,
@@ -36,8 +36,16 @@ function SortableImageItem({ image, onRemove, onDurationChange }) {
   };
 
   return (
-    <div ref={setNodeRef} style={style} className={`gallery-input__item${isDragging ? " dragging" : ""}`}>
-      <div className="gallery-input__drag-handle" {...attributes} {...listeners}>
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`gallery-input__item${isDragging ? " dragging" : ""}`}
+    >
+      <div
+        className="gallery-input__drag-handle"
+        {...attributes}
+        {...listeners}
+      >
         <GripVertical size={16} />
       </div>
       <div className="gallery-input__thumb">
@@ -52,7 +60,10 @@ function SortableImageItem({ image, onRemove, onDurationChange }) {
           min={1}
           value={image.duration ?? 3}
           onChange={(e) =>
-            onDurationChange(image.id, Math.max(1, parseInt(e.target.value) || 1))
+            onDurationChange(
+              image.id,
+              Math.max(1, parseInt(e.target.value) || 1),
+            )
           }
           className="gallery-input__duration-input"
         />
@@ -69,14 +80,31 @@ function SortableImageItem({ image, onRemove, onDurationChange }) {
   );
 }
 
-function GalleryInput({ images = [], onAddImage, onRemoveImage, onDurationChange, onReorder, uploading, onOpenLibrary }) {
+function GalleryInput({
+  images = [],
+  onAddImage,
+  onRemoveImage,
+  onDurationChange,
+  onReorder,
+  uploading,
+  onOpenLibrary,
+}) {
   const fileInputRef = useRef(null);
-  const totalDuration = images.reduce((sum, img) => sum + (img.duration || 3), 0);
+  const totalDuration = images.reduce(
+    (sum, img) => sum + (img.duration || 3),
+    0,
+  );
+
+  const [itemsDuration, setItemsDuration] = useState(3);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
-    useSensor(TouchSensor, { activationConstraint: { delay: 150, tolerance: 5 } }),
-    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+    useSensor(TouchSensor, {
+      activationConstraint: { delay: 150, tolerance: 5 },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
   );
 
   const handleDragEnd = ({ active, over }) => {
@@ -129,7 +157,50 @@ function GalleryInput({ images = [], onAddImage, onRemoveImage, onDurationChange
             collisionDetection={closestCenter}
             onDragEnd={handleDragEnd}
           >
-            <SortableContext items={images.map((i) => i.id)} strategy={verticalListSortingStrategy}>
+            <SortableContext
+              items={images.map((i) => i.id)}
+              strategy={verticalListSortingStrategy}
+            >
+              <div
+                style={{
+                  justifyContent: "end",
+                  padding: "0px 16px",
+                  display: "flex",
+                }}
+              >
+                <div className="gallery-input__duration gap-4">
+                  <div>
+                    <input
+                      type="number"
+                      min={1}
+                      value={itemsDuration ?? 3}
+                      onChange={(e) =>
+                        setItemsDuration(
+                          Math.max(1, parseInt(e.target.value) || 1),
+                        )
+                      }
+                      className="gallery-input__duration-input"
+                      style={{
+                        padding: "8px",
+                      }}
+                    />
+                    <span
+                      className="gallery-input__duration-suffix"
+                      style={{ marginLeft: "8px" }}
+                    >
+                      s
+                    </span>
+                  </div>
+
+                  <button
+                    type="button"
+                    className="btn btn-primary ml-2"
+                    onClick={() => onDurationChange(null, itemsDuration)}
+                  >
+                    Verander secondens van alle afbeeldingen
+                  </button>
+                </div>
+              </div>
               <div className="gallery-input__list">
                 {images.map((image) => (
                   <SortableImageItem
@@ -146,7 +217,8 @@ function GalleryInput({ images = [], onAddImage, onRemoveImage, onDurationChange
           <div className="gallery-input__footer">
             <AddButtons />
             <span className="gallery-input__total">
-              {images.length} foto{images.length !== 1 ? "'s" : ""} · {totalDuration}s totaal
+              {images.length} foto{images.length !== 1 ? "'s" : ""} ·{" "}
+              {totalDuration}s totaal
             </span>
           </div>
         </>

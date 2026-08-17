@@ -108,9 +108,43 @@
 }
 
 // Image Library Search
+.image-library-toolbar {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  margin-bottom: $spacing-lg;
+
+  .image-library-search {
+    flex: 1;
+    margin-bottom: 0;
+  }
+
+  .image-library-upload-btn {
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+}
+
+.image-library-unused-filter {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+  font-size: 0.875rem;
+  color: var(--foreground-muted);
+  white-space: nowrap;
+  flex-shrink: 0;
+  cursor: pointer;
+
+  input[type='checkbox'] {
+    cursor: pointer;
+  }
+}
+
 .image-library-search {
   position: relative;
-  margin-bottom: $spacing-lg;
 
   svg {
     position: absolute;
@@ -241,6 +275,23 @@
 
   .image-library-item:hover & .image-delete-btn {
     opacity: 1;
+  }
+
+  .image-usage-badge {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    padding: 2px 8px;
+    background: rgba(0, 0, 0, 0.65);
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border-radius: 999px;
+    z-index: 2;
+
+    &.unused {
+      background: var(--destructive);
+    }
   }
 }
 
