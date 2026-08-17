@@ -8,7 +8,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "api": "node local-api.js"
+    "api": "node --env-file=.env.development.local local-api.js"
   },
   "proxy": "http://localhost:3001",
   "dependencies": {

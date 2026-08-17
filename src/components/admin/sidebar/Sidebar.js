@@ -246,7 +246,7 @@ function Sidebar({
         />
         <FeedList />
         {tenantId && isAdmin && <UsersPanel tenantId={tenantId} />}
-        {/* {tenantId && isAdmin && <ApiKeysPanel tenantId={tenantId} />} */}
+        {tenantId && isAdmin && <ApiKeysPanel tenantId={tenantId} />}
         {modules.backgroundMusic && <AudioSettings />}
         {slideTypes.sportlink && <SportlinkSettings />}
         {isAdmin && (
