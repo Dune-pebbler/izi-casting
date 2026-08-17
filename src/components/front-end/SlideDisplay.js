@@ -788,7 +788,7 @@ function SportlinkDisplay({ slide, settings }) {
   return (
     <div
       className="display-sportlink"
-      style={{ color: textColor, width: "100%" }}
+      style={{ backgroundColor: bgColor, color: textColor, width: "100%" }}
     >
       {dataTypeLabel !== "Programma" && (
         <div
