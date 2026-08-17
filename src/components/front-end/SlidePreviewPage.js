@@ -29,6 +29,7 @@ function SlidePreviewPage() {
     analogClock: false,
     showDate: true,
     barStyle: "onder",
+    sportlinkApiKey: "",
   });
   const [feeds, setFeeds] = useState([]);
 
@@ -122,6 +123,7 @@ function SlidePreviewPage() {
           analogClock: data.analogClock || false,
           showDate: data.showDate !== undefined ? data.showDate : true,
           barStyle: data.barStyle || "onder",
+          sportlinkApiKey: data.sportlinkApiKey || "",
         });
 
         const typo = data.typography || {};
@@ -213,6 +215,7 @@ function SlidePreviewPage() {
         currentSlide={slide}
         slideLayout={slide.layout}
         effectsEnabled={false}
+        settings={settings}
       />
       <ProgressBar
         currentSlide={slide}
