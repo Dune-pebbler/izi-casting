@@ -27,6 +27,7 @@ import EmailInput from "./EmailInput";
 import SportlinkInput from "./SportlinkInput";
 import WeatherInput from "./WeatherInput";
 import QrFeedInput from "./QrFeedInput";
+import BackgroundColorInput from "./BackgroundColorInput";
 import SlideEffectsModal from "../SlideEffectsModal";
 import { isSlideCurrentlyInWindow } from "../../../utils/timeRestriction";
 import { isCountdownExpired } from "../../../utils/countdownUtils";
@@ -45,6 +46,9 @@ function EditModal({
   videoUrl,
   videoSound,
   imageSide,
+  slideBgColor,
+  onSlideBgColorChange,
+  defaultSlideBgColor = "#FFFFFF",
   slideTransition,
   enabledFonts,
   typography,
@@ -203,6 +207,12 @@ function EditModal({
       ? timeRestriction.dateEnabled
       : !!timeRestriction?.enabled;
 
+  // Layouts with a plain background that follows the global default
+  const supportsSlideBg = ["side-by-side", "text-only", "image-only"].includes(
+    slideLayout,
+  );
+  const effectiveBgColor = slideBgColor || defaultSlideBgColor;
+
   const renderLayoutContent = () => {
     switch (slideLayout) {
       case "side-by-side":
@@ -235,6 +245,7 @@ function EditModal({
 
             <div
               className={`slide-modal__body-right ${imageSide === "right" ? "flipped" : ""}`}
+              style={{ backgroundColor: effectiveBgColor }}
             >
               <div className="text-input-section">
                 <TextEditor
@@ -242,6 +253,7 @@ function EditModal({
                   onContentChange={onContentChange}
                   enabledFonts={enabledFonts}
                   typography={typography}
+                  backgroundColor={effectiveBgColor}
                 />
               </div>
             </div>
@@ -250,7 +262,10 @@ function EditModal({
 
       case "image-only":
         return (
-          <div className="slide-modal__full-image">
+          <div
+            className="slide-modal__full-image"
+            style={{ backgroundColor: effectiveBgColor }}
+          >
             <ImageUpload
               imageUrl={modalImageUrl}
               uploadingImage={uploadingImage}
@@ -297,13 +312,17 @@ function EditModal({
 
       case "text-only":
         return (
-          <div className="slide-modal__text-only">
+          <div
+            className="slide-modal__text-only"
+            style={{ backgroundColor: effectiveBgColor }}
+          >
             <div className="text-input-section-full">
               <TextEditor
                 content={modalTinyMCEContent}
                 onContentChange={onContentChange}
                 enabledFonts={enabledFonts}
                 typography={typography}
+                backgroundColor={effectiveBgColor}
               />
             </div>
           </div>
@@ -427,6 +446,7 @@ function EditModal({
               agendaMaxEvents={agendaMaxEvents}
               onAgendaMaxEventsChange={onAgendaMaxEventsChange}
               agendaBgColor={agendaBgColor}
+              defaultBgColor={defaultSlideBgColor}
               onAgendaBgColorChange={onAgendaBgColorChange}
               agendaTextColor={agendaTextColor}
               onAgendaTextColorChange={onAgendaTextColorChange}
@@ -445,6 +465,7 @@ function EditModal({
               emailShowUnreadOnly={emailShowUnreadOnly}
               onEmailShowUnreadOnlyChange={onEmailShowUnreadOnlyChange}
               emailBgColor={emailBgColor}
+              defaultBgColor={defaultSlideBgColor}
               onEmailBgColorChange={onEmailBgColorChange}
               emailTextColor={emailTextColor}
               onEmailTextColorChange={onEmailTextColorChange}
@@ -470,6 +491,7 @@ function EditModal({
               sportlinkMaxItems={sportlinkMaxItems}
               onMaxItemsChange={onSportlinkMaxItemsChange}
               sportlinkBgColor={sportlinkBgColor}
+              defaultBgColor={defaultSlideBgColor}
               onBgColorChange={onSportlinkBgColorChange}
               sportlinkTextColor={sportlinkTextColor}
               onTextColorChange={onSportlinkTextColorChange}
@@ -496,6 +518,7 @@ function EditModal({
               qrLabel={qrLabel}
               onQrLabelChange={onQrLabelChange}
               qrLeftBgColor={qrLeftBgColor}
+              defaultBgColor={defaultSlideBgColor}
               onQrLeftBgColorChange={onQrLeftBgColorChange}
               qrDotsColor={qrDotsColor}
               onQrDotsColorChange={onQrDotsColorChange}
@@ -637,6 +660,18 @@ function EditModal({
                   <option value="none">None</option>
                 </select>
               </div>
+              {supportsSlideBg && (
+                <div
+                  className="slide-modal__bg-container"
+                  title="Achtergrondkleur van deze slide"
+                >
+                  <BackgroundColorInput
+                    value={slideBgColor}
+                    defaultColor={defaultSlideBgColor}
+                    onChange={onSlideBgColorChange}
+                  />
+                </div>
+              )}
             </div>
 
             <div className="slide-modal__header-center">

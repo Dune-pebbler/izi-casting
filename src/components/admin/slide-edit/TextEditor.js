@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { Editor } from "@tinymce/tinymce-react";
 
 // Available fonts mapping
@@ -22,7 +22,21 @@ const AVAILABLE_FONTS = {
   Verdana: "Verdana=verdana,geneva",
 };
 
-function TextEditor({ content, onContentChange, enabledFonts, typography }) {
+function TextEditor({
+  content,
+  onContentChange,
+  enabledFonts,
+  typography,
+  backgroundColor,
+}) {
+  const editorRef = useRef(null);
+
+  // Keep the editor body in sync with the slide background (no re-init needed)
+  useEffect(() => {
+    const body = editorRef.current?.getBody?.();
+    if (body) body.style.backgroundColor = backgroundColor || "";
+  }, [backgroundColor]);
+
   const typo = {
     p: {
       fontSize: 27,
@@ -386,6 +400,10 @@ function TextEditor({ content, onContentChange, enabledFonts, typography }) {
       apiKey="l1htx10scfunizdawurrb9j2njqukthv8eb30m6rr0r64177"
       value={content}
       onEditorChange={onContentChange}
+      onInit={(evt, editor) => {
+        editorRef.current = editor;
+        editor.getBody().style.backgroundColor = backgroundColor || "";
+      }}
       init={editorConfig}
     />
   );

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Eye, EyeOff, ExternalLink } from "lucide-react";
+import BackgroundColorInput from "./BackgroundColorInput";
 
 function EmailInput({
   emailCredentials,
@@ -9,6 +10,7 @@ function EmailInput({
   emailShowUnreadOnly,
   onEmailShowUnreadOnlyChange,
   emailBgColor,
+  defaultBgColor,
   onEmailBgColorChange,
   emailTextColor,
   onEmailTextColorChange,
@@ -123,11 +125,10 @@ function EmailInput({
         <div className="email-input__row">
           <div className="email-input__field">
             <label>Achtergrond</label>
-            <input
-              type="color"
-              className="form-input form-input--color"
-              value={emailBgColor || "#0f172a"}
-              onChange={(e) => onEmailBgColorChange(e.target.value)}
+            <BackgroundColorInput
+              value={emailBgColor}
+              defaultColor={defaultBgColor}
+              onChange={onEmailBgColorChange}
             />
           </div>
           <div className="email-input__field">

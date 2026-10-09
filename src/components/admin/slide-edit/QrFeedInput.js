@@ -15,6 +15,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import BackgroundColorInput from "./BackgroundColorInput";
 
 function ColorField({ label, value, onChange }) {
   return (
@@ -182,6 +183,7 @@ function QrFeedInput({
   qrLabel,
   onQrLabelChange,
   qrLeftBgColor,
+  defaultBgColor,
   onQrLeftBgColorChange,
   qrDotsColor,
   onQrDotsColorChange,
@@ -246,11 +248,14 @@ function QrFeedInput({
         </div>
 
         <div className="qr-feed-input__colors">
-          <ColorField
-            label="Standaard achtergrond"
-            value={qrLeftBgColor}
-            onChange={onQrLeftBgColorChange}
-          />
+          <div className="slide-color-input">
+            <BackgroundColorInput
+              label="Standaard achtergrond"
+              value={qrLeftBgColor}
+              defaultColor={defaultBgColor}
+              onChange={onQrLeftBgColorChange}
+            />
+          </div>
           <ColorField
             label="Bolletjes kleur"
             value={qrDotsColor}

@@ -123,6 +123,30 @@
   }
 }
 
+// Background color with "use global default" fallback
+.slide-bg-input {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  &__reset {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    border: none;
+    border-radius: 4px;
+    background: none;
+    color: var(--muted-foreground);
+    cursor: pointer;
+
+    &:hover {
+      color: var(--foreground);
+      background: var(--muted);
+    }
+  }
+}
+
 // =============================================================================
 // AGENDA SLIDE - Admin Input
 // =============================================================================

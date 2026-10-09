@@ -147,6 +147,12 @@ function PlaylistPreviewView() {
           sportlinkApiKey: data.sportlinkApiKey || "",
         });
 
+        // Default slide background (slides can override per slide)
+        document.documentElement.style.setProperty(
+          "--slide-bg",
+          data.slideBackgroundColor || "#FFFFFF",
+        );
+
         const typo = data.typography || {};
         const defaults = {
           p: { fontSize: 27, fontFamily: "Arial", fontColor: "#000000" },

@@ -1,5 +1,6 @@
 import React from "react";
 import { Plus, Trash2, GripVertical } from "lucide-react";
+import BackgroundColorInput from "./BackgroundColorInput";
 
 function AgendaInput({
   agendaCalendars,
@@ -11,6 +12,7 @@ function AgendaInput({
   agendaMaxEvents,
   onAgendaMaxEventsChange,
   agendaBgColor,
+  defaultBgColor,
   onAgendaBgColorChange,
   agendaTextColor,
   onAgendaTextColorChange,
@@ -82,17 +84,11 @@ function AgendaInput({
           <div className="agenda-input__row">
             <div className="agenda-input__field">
               <label>Achtergrondkleur</label>
-              <div className="slide-color-input__wrapper">
-                <input
-                  type="color"
-                  value={agendaBgColor}
-                  onChange={(e) => onAgendaBgColorChange(e.target.value)}
-                  className="slide-color-input__picker"
-                />
-                <span className="slide-color-input__hex">
-                  {agendaBgColor}
-                </span>
-              </div>
+              <BackgroundColorInput
+                value={agendaBgColor}
+                defaultColor={defaultBgColor}
+                onChange={onAgendaBgColorChange}
+              />
             </div>
             <div className="agenda-input__field">
               <label>Tekstkleur</label>

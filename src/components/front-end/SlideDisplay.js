@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { sanitizeHTMLContent } from "../../utils/sanitize";
+import { resolveSlideBg } from "../../utils/slideBackground";
 import TextPagination from "./TextPagination";
 import VideoPlayer from "./VideoPlayer";
 import TeletekstDisplay from "./TeletekstDisplay";
@@ -172,7 +173,7 @@ function AgendaDisplay({ slide }) {
   const calendars = slide.agendaCalendars || [];
   const daysAhead = slide.agendaDaysAhead || 14;
   const maxEvents = slide.agendaMaxEvents || 8;
-  const bgColor = slide.agendaBgColor || "#0f172a";
+  const bgColor = resolveSlideBg(slide.agendaBgColor);
   const textColor = slide.agendaTextColor || "#ffffff";
 
   useEffect(() => {
@@ -417,7 +418,7 @@ function EmailSlideDisplay({ slide }) {
   const credentials = slide.emailCredentials || {};
   const maxItems = slide.emailMaxItems || 10;
   const unreadOnly = slide.emailShowUnreadOnly ?? true;
-  const bgColor = slide.emailBgColor || "#0f172a";
+  const bgColor = resolveSlideBg(slide.emailBgColor);
   const textColor = slide.emailTextColor || "#ffffff";
   const accentColor = slide.emailAccentColor || "#4f87ff";
 
@@ -584,7 +585,7 @@ function SportlinkDisplay({ slide, settings }) {
   const dataType = getSportlinkDataType(slide.layout, slide.sportlinkDataType);
   const teams = slide.sportlinkTeams || [];
   const maxItems = slide.sportlinkMaxItems || 10;
-  const bgColor = slide.sportlinkBgColor || "#0f172a";
+  const bgColor = resolveSlideBg(slide.sportlinkBgColor);
   const textColor = slide.sportlinkTextColor || "#ffffff";
   const accentColor = slide.sportlinkAccentColor || "#ff6600";
   const headerTextColor = slide.sportlinkHeaderTextColor || textColor;
@@ -1013,7 +1014,7 @@ function SportlinkDisplay({ slide, settings }) {
                       style={{
                         borderBottomColor: `${textColor}10`,
                         backgroundColor:
-                          i % 2 === 0 ? `${bgColor}99` : `${bgColor}75`,
+                          `color-mix(in srgb, ${bgColor} ${i % 2 === 0 ? 60 : 46}%, transparent)`,
                         gridTemplateColumns:
                           dataType !== "uitslagen"
                             ? "230px 1fr 30px 1fr"
@@ -1307,6 +1308,10 @@ function SlideDisplay({
 
     const slideTextConfig = getTextPaginationConfig(layout);
     const slideShouldUsePagination = slideTextConfig !== null;
+    // Per-slide override; otherwise CSS falls back to the global --slide-bg
+    const slideBgStyle = slide.backgroundColor
+      ? { backgroundColor: slide.backgroundColor }
+      : undefined;
 
     return (
       <>
@@ -1343,6 +1348,7 @@ function SlideDisplay({
 
             <div
               className={`display-right ${slide.imageSide === "right" ? "flipped" : ""}`}
+              style={slideBgStyle}
             >
               <div className="display-text-container">
                 {slide.text ? (
@@ -1373,7 +1379,7 @@ function SlideDisplay({
         )}
 
         {layout === "image-only" && (
-          <div className="display-full-image">
+          <div className="display-full-image" style={slideBgStyle}>
             {slide.imageUrl ? (
               <div className="display-image-container-full">
                 <img
@@ -1448,7 +1454,7 @@ function SlideDisplay({
         )}
 
         {layout === "text-only" && (
-          <div className="display-text-only">
+          <div className="display-text-only" style={slideBgStyle}>
             <div className="display-text-container-full">
               {slide.text ? (
                 slideShouldUsePagination ? (

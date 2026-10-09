@@ -815,6 +815,12 @@ function DisplayView() {
             sportlinkApiKey: data.sportlinkApiKey || "",
           });
 
+          // Default slide background (slides can override per slide)
+          document.documentElement.style.setProperty(
+            "--slide-bg",
+            data.slideBackgroundColor || "#FFFFFF",
+          );
+
           // Apply typography as CSS custom properties
           const typo = data.typography || {};
           const defaults = {

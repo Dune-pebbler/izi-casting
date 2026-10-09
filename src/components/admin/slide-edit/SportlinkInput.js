@@ -14,6 +14,7 @@ import {
   arrayMove,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import BackgroundColorInput from "./BackgroundColorInput";
 
 function SortableTeamRow({ team, index, total, onRemove }) {
   const {
@@ -84,6 +85,7 @@ function SportlinkInput({
   sportlinkMaxItems,
   onMaxItemsChange,
   sportlinkBgColor,
+  defaultBgColor,
   onBgColorChange,
   sportlinkTextColor,
   onTextColorChange,
@@ -286,17 +288,11 @@ function SportlinkInput({
           <div className="sportlink-input__row">
             <div className="sportlink-input__field">
               <label>Achtergrondkleur</label>
-              <div className="slide-color-input__wrapper">
-                <input
-                  type="color"
-                  value={sportlinkBgColor}
-                  onChange={(e) => onBgColorChange(e.target.value)}
-                  className="slide-color-input__picker"
-                />
-                <span className="slide-color-input__hex">
-                  {sportlinkBgColor}
-                </span>
-              </div>
+              <BackgroundColorInput
+                value={sportlinkBgColor}
+                defaultColor={defaultBgColor}
+                onChange={onBgColorChange}
+              />
             </div>
             <div className="sportlink-input__field">
               <label>Tekstkleur</label>

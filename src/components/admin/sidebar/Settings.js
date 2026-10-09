@@ -65,6 +65,7 @@ function Settings() {
     logoName: "",
     backgroundColor: "#FAFAFA",
     foregroundColor: "#212121",
+    slideBackgroundColor: "#FFFFFF",
     progressBarColor: "#3dbcc9",
     feedUrl: "",
     showClock: true,
@@ -119,6 +120,8 @@ function Settings() {
               loadedSettings.defaultSlideTransition || "fade",
             // Ensure enabledFonts is always present, default to Arial only if missing
             enabledFonts: loadedSettings.enabledFonts || ["Arial"],
+            slideBackgroundColor:
+              loadedSettings.slideBackgroundColor || "#FFFFFF",
             typography: {
               ...DEFAULT_TYPOGRAPHY,
               ...(loadedSettings.typography || {}),
@@ -453,6 +456,38 @@ function Settings() {
                       }
                       className="color-text-input"
                       placeholder="#3dbcc9"
+                    />
+                  </div>
+                </div>
+
+                <div className="color-input-group">
+                  <label htmlFor="slideBackgroundColor">
+                    Slide-achtergrond
+                  </label>
+                  <div className="color-input-wrapper">
+                    <input
+                      type="color"
+                      id="slideBackgroundColor"
+                      value={settings.slideBackgroundColor}
+                      onChange={(e) =>
+                        handleInputChange(
+                          "slideBackgroundColor",
+                          e.target.value,
+                        )
+                      }
+                      className="color-picker"
+                    />
+                    <input
+                      type="text"
+                      value={settings.slideBackgroundColor}
+                      onChange={(e) =>
+                        handleInputChange(
+                          "slideBackgroundColor",
+                          e.target.value,
+                        )
+                      }
+                      className="color-text-input"
+                      placeholder="#FFFFFF"
                     />
                   </div>
                 </div>

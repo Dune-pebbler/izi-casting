@@ -8,6 +8,7 @@ import {
   collection,
   getDocs,
   deleteDoc,
+  onSnapshot,
 } from "firebase/firestore";
 import {
   ref,
@@ -43,6 +44,7 @@ import AddSlideModal from "./AddSlideModal";
 import ImageLibraryModal from "./modal/ImageLibraryModal";
 import TrashModal from "./TrashModal";
 import Sidebar from "./sidebar/Sidebar";
+import { getSlideBgOverride } from "../../utils/slideBackground";
 import {
   Monitor,
   Clock,
@@ -89,6 +91,7 @@ function AdminView() {
   const [modalVideoUrl, setModalVideoUrl] = useState("");
   const [modalVideoSound, setModalVideoSound] = useState(false);
   const [modalImageSide, setModalImageSide] = useState("left");
+  const [modalSlideBgColor, setModalSlideBgColor] = useState("");
   const [modalSlideTransition, setModalSlideTransition] = useState("fade");
   const [modalTeletekstChannel, setModalTeletekstChannel] = useState("101");
   const [modalTeletekstTheme, setModalTeletekstTheme] = useState("classic");
@@ -116,14 +119,14 @@ function AdminView() {
   const [modalAgendaTitle, setModalAgendaTitle] = useState("Agenda");
   const [modalAgendaDaysAhead, setModalAgendaDaysAhead] = useState(14);
   const [modalAgendaMaxEvents, setModalAgendaMaxEvents] = useState(8);
-  const [modalAgendaBgColor, setModalAgendaBgColor] = useState("#0f172a");
+  const [modalAgendaBgColor, setModalAgendaBgColor] = useState("");
   const [modalAgendaTextColor, setModalAgendaTextColor] = useState("#ffffff");
   const [modalEmailProvider, setModalEmailProvider] = useState("gmail");
   const [modalEmailCredentials, setModalEmailCredentials] = useState({});
   const [modalEmailMaxItems, setModalEmailMaxItems] = useState(10);
   const [modalEmailShowUnreadOnly, setModalEmailShowUnreadOnly] =
     useState(true);
-  const [modalEmailBgColor, setModalEmailBgColor] = useState("#0f172a");
+  const [modalEmailBgColor, setModalEmailBgColor] = useState("");
   const [modalEmailTextColor, setModalEmailTextColor] = useState("#ffffff");
   const [modalEmailAccentColor, setModalEmailAccentColor] = useState("#4f87ff");
   const [modalSportlinkApiKey, setModalSportlinkApiKey] = useState("");
@@ -132,7 +135,7 @@ function AdminView() {
   const [modalSportlinkTeams, setModalSportlinkTeams] = useState([]);
   const [modalSportlinkTitle, setModalSportlinkTitle] = useState("");
   const [modalSportlinkMaxItems, setModalSportlinkMaxItems] = useState(10);
-  const [modalSportlinkBgColor, setModalSportlinkBgColor] = useState("#0f172a");
+  const [modalSportlinkBgColor, setModalSportlinkBgColor] = useState("");
   const [modalSportlinkTextColor, setModalSportlinkTextColor] =
     useState("#ffffff");
   const [modalSportlinkAccentColor, setModalSportlinkAccentColor] =
@@ -158,7 +161,7 @@ function AdminView() {
     useState("center");
   const [modalQrUrl, setModalQrUrl] = useState("");
   const [modalQrLabel, setModalQrLabel] = useState("");
-  const [modalQrLeftBgColor, setModalQrLeftBgColor] = useState("#0f172a");
+  const [modalQrLeftBgColor, setModalQrLeftBgColor] = useState("");
   const [modalQrDotsColor, setModalQrDotsColor] = useState("#ffffff");
   const [modalQrPanelColor, setModalQrPanelColor] = useState("#1d4ed8");
   const [modalQrPanelTextColor, setModalQrPanelTextColor] = useState("#ffffff");
@@ -188,6 +191,7 @@ function AdminView() {
   const [slideToDelete, setSlideToDelete] = useState(null);
   const [defaultSlideTransition, setDefaultSlideTransition] = useState("fade");
   const [enabledFonts, setEnabledFonts] = useState([]);
+  const [defaultSlideBgColor, setDefaultSlideBgColor] = useState("#FFFFFF");
   const [typography, setTypography] = useState({
     p: { fontSize: 27, fontFamily: "Arial", fontColor: "#000000" },
     h1: { fontSize: 64, fontFamily: "Arial", fontColor: "#000000" },
@@ -236,26 +240,28 @@ function AdminView() {
   const [tenantLogoUrl, setTenantLogoUrl] = useState("");
   const [tenantSportlinkApiKey, setTenantSportlinkApiKey] = useState("");
 
-  // Load default slide transition, enabled fonts, and tenant name
+  // Listen to settings (default transition, fonts, slide background, ...) so
+  // changes made in the Settings sidebar are reflected in the editor right away
   useEffect(() => {
-    const loadSettings = async () => {
-      try {
-        const settingsDoc = await getDoc(
-          tenantDoc(db, tenantId, "display", "settings"),
-        );
-        if (settingsDoc.exists()) {
-          const settings = settingsDoc.data();
-          setDefaultSlideTransition(settings.defaultSlideTransition || "fade");
-          setEnabledFonts(settings.enabledFonts || []);
-          setTenantLogoUrl(settings.logoUrl || "");
-          setTenantSportlinkApiKey(settings.sportlinkApiKey || "");
-          if (settings.typography) setTypography(settings.typography);
-        }
-      } catch (error) {
-        console.error("Error loading settings:", error);
-      }
-    };
+    const unsubscribe = onSnapshot(
+      tenantDoc(db, tenantId, "display", "settings"),
+      (settingsDoc) => {
+        if (!settingsDoc.exists()) return;
+        const settings = settingsDoc.data();
+        setDefaultSlideTransition(settings.defaultSlideTransition || "fade");
+        setEnabledFonts(settings.enabledFonts || []);
+        setTenantLogoUrl(settings.logoUrl || "");
+        setTenantSportlinkApiKey(settings.sportlinkApiKey || "");
+        if (settings.typography) setTypography(settings.typography);
+        setDefaultSlideBgColor(settings.slideBackgroundColor || "#FFFFFF");
+      },
+      (error) => console.error("Error loading settings:", error),
+    );
+    return unsubscribe;
+  }, [tenantId]);
 
+  // Load tenant name
+  useEffect(() => {
     const loadTenantName = async () => {
       if (!tenantId) return;
       try {
@@ -266,7 +272,6 @@ function AdminView() {
       }
     };
 
-    loadSettings();
     loadTenantName();
   }, [tenantId]);
 
@@ -518,7 +523,7 @@ function AdminView() {
         agendaTitle: "Agenda",
         agendaDaysAhead: 14,
         agendaMaxEvents: 8,
-        agendaBgColor: "#0f172a",
+        agendaBgColor: "",
         agendaTextColor: "#ffffff",
         duration: 30,
       }),
@@ -538,7 +543,7 @@ function AdminView() {
         emailCredentials: {},
         emailMaxItems: 10,
         emailShowUnreadOnly: true,
-        emailBgColor: "#0f172a",
+        emailBgColor: "",
         emailTextColor: "#ffffff",
         emailAccentColor: "#4f87ff",
         duration: 30,
@@ -549,7 +554,7 @@ function AdminView() {
         sportlinkTeams: [],
         sportlinkTitle: "",
         sportlinkMaxItems: 10,
-        sportlinkBgColor: "#0f172a",
+        sportlinkBgColor: "",
         sportlinkTextColor: "#ffffff",
         sportlinkAccentColor: "#ff6600",
         sportlinkHeaderTextColor: "#ffffff",
@@ -572,7 +577,7 @@ function AdminView() {
       ...(slideLayout === "qr-feed" && {
         qrUrl: "",
         qrLabel: "",
-        qrLeftBgColor: "#0f172a",
+        qrLeftBgColor: "",
         qrDotsColor: "#ffffff",
         qrPanelColor: "#1d4ed8",
         qrPanelTextColor: "#ffffff",
@@ -707,6 +712,7 @@ function AdminView() {
     setModalVideoUrl(slide.videoUrl || "");
     setModalVideoSound(slide.videoSound || false);
     setModalImageSide(slide.imageSide || "left");
+    setModalSlideBgColor(slide.backgroundColor || "");
     setModalSlideTransition(slide.transition || "fade");
     setModalTeletekstChannel(slide.teletekstChannel || "101");
     setModalTeletekstTheme(slide.teletekstTheme || "classic");
@@ -732,13 +738,13 @@ function AdminView() {
     setModalAgendaTitle(slide.agendaTitle || "Agenda");
     setModalAgendaDaysAhead(slide.agendaDaysAhead || 14);
     setModalAgendaMaxEvents(slide.agendaMaxEvents || 8);
-    setModalAgendaBgColor(slide.agendaBgColor || "#0f172a");
+    setModalAgendaBgColor(getSlideBgOverride(slide.agendaBgColor));
     setModalAgendaTextColor(slide.agendaTextColor || "#ffffff");
     setModalEmailProvider(slide.emailProvider || "gmail");
     setModalEmailCredentials(slide.emailCredentials || {});
     setModalEmailMaxItems(slide.emailMaxItems ?? 10);
     setModalEmailShowUnreadOnly(slide.emailShowUnreadOnly ?? true);
-    setModalEmailBgColor(slide.emailBgColor || "#0f172a");
+    setModalEmailBgColor(getSlideBgOverride(slide.emailBgColor));
     setModalEmailTextColor(slide.emailTextColor || "#ffffff");
     setModalEmailAccentColor(slide.emailAccentColor || "#4f87ff");
     setModalSportlinkApiKey(slide.sportlinkApiKey || "");
@@ -746,7 +752,7 @@ function AdminView() {
     setModalSportlinkTeams(slide.sportlinkTeams || []);
     setModalSportlinkTitle(slide.sportlinkTitle || "");
     setModalSportlinkMaxItems(slide.sportlinkMaxItems || 10);
-    setModalSportlinkBgColor(slide.sportlinkBgColor || "#0f172a");
+    setModalSportlinkBgColor(getSlideBgOverride(slide.sportlinkBgColor));
     setModalSportlinkTextColor(slide.sportlinkTextColor || "#ffffff");
     setModalSportlinkAccentColor(slide.sportlinkAccentColor || "#ff6600");
     setModalSportlinkHeaderTextColor(
@@ -770,7 +776,7 @@ function AdminView() {
     );
     setModalQrUrl(slide.qrUrl || "");
     setModalQrLabel(slide.qrLabel || "");
-    setModalQrLeftBgColor(slide.qrLeftBgColor || "#0f172a");
+    setModalQrLeftBgColor(getSlideBgOverride(slide.qrLeftBgColor));
     setModalQrDotsColor(slide.qrDotsColor || "#ffffff");
     setModalQrPanelColor(slide.qrPanelColor || "#1d4ed8");
     setModalQrPanelTextColor(slide.qrPanelTextColor || "#ffffff");
@@ -823,14 +829,15 @@ function AdminView() {
     setModalAgendaTitle("Agenda");
     setModalAgendaDaysAhead(14);
     setModalAgendaMaxEvents(8);
-    setModalAgendaBgColor("#0f172a");
+    setModalAgendaBgColor("");
+    setModalSlideBgColor("");
     setModalAgendaTextColor("#ffffff");
     setModalSportlinkApiKey("");
     setModalSportlinkDataType("programma");
     setModalSportlinkTeams([]);
     setModalSportlinkTitle("");
     setModalSportlinkMaxItems(10);
-    setModalSportlinkBgColor("#0f172a");
+    setModalSportlinkBgColor("");
     setModalSportlinkTextColor("#ffffff");
     setModalSportlinkAccentColor("#ff6600");
     setModalSportlinkDate("");
@@ -838,7 +845,7 @@ function AdminView() {
     setModalSportlinkOnlyThuis(false);
     setModalQrUrl("");
     setModalQrLabel("");
-    setModalQrLeftBgColor("#0f172a");
+    setModalQrLeftBgColor("");
     setModalQrDotsColor("#ffffff");
     setModalQrPanelColor("#1d4ed8");
     setModalQrPanelTextColor("#ffffff");
@@ -1376,6 +1383,7 @@ function AdminView() {
                                           : "text",
                                 imagePosition: imagePosition,
                                 imageSide: modalImageSide,
+                                backgroundColor: modalSlideBgColor,
                                 duration:
                                   modalSlideDuration === ""
                                     ? 5
@@ -2024,6 +2032,9 @@ function AdminView() {
           onVideoSoundChange={setModalVideoSound}
           imageSide={modalImageSide}
           onImageSideChange={setModalImageSide}
+          slideBgColor={modalSlideBgColor}
+          onSlideBgColorChange={setModalSlideBgColor}
+          defaultSlideBgColor={defaultSlideBgColor}
           slideTransition={modalSlideTransition}
           onTransitionChange={setModalSlideTransition}
           enabledFonts={enabledFonts}

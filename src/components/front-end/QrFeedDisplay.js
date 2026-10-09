@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useRef } from "react";
 import QRCode from "react-qr-code";
+import { resolveSlideBg } from "../../utils/slideBackground";
 
 function QrFeedDisplay({ slide }) {
   const qrUrl = slide.qrUrl || "";
   const qrLabel = slide.qrLabel || "";
   const panelColor = slide.qrPanelColor || "#1d4ed8";
   const panelTextColor = slide.qrPanelTextColor || "#ffffff";
-  const leftBgColor = slide.qrLeftBgColor || "#0f172a";
+  const leftBgColor = resolveSlideBg(slide.qrLeftBgColor);
   const dotsColor = slide.qrDotsColor || "#ffffff";
   const textSlides = slide.qrTextSlides || [];
   const intervalSeconds = slide.qrTextInterval || 5;
