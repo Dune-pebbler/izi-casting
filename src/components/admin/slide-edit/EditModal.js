@@ -93,6 +93,8 @@ function EditModal({
   onCountdownTitleChange,
   countdownTargetDate,
   onCountdownTargetDateChange,
+  countdownFormat,
+  onCountdownFormatChange,
   countdownBgImage,
   onCountdownBgImageUpload,
   countdownBgImagePosition,
@@ -413,6 +415,8 @@ function EditModal({
               onCountdownTitleChange={onCountdownTitleChange}
               countdownTargetDate={countdownTargetDate}
               onCountdownTargetDateChange={onCountdownTargetDateChange}
+              countdownFormat={countdownFormat}
+              onCountdownFormatChange={onCountdownFormatChange}
               countdownBgImage={countdownBgImage}
               onCountdownBgImageUpload={onCountdownBgImageUpload}
               countdownBgImagePosition={countdownBgImagePosition}

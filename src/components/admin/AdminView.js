@@ -105,6 +105,7 @@ function AdminView() {
   const [uploadingGalleryImage, setUploadingGalleryImage] = useState(false);
   const [modalCountdownTitle, setModalCountdownTitle] = useState("");
   const [modalCountdownTargetDate, setModalCountdownTargetDate] = useState("");
+  const [modalCountdownFormat, setModalCountdownFormat] = useState("dhms");
   const [modalCountdownBgImage, setModalCountdownBgImage] = useState("");
   const [modalCountdownBgImagePosition, setModalCountdownBgImagePosition] =
     useState("center");
@@ -530,6 +531,7 @@ function AdminView() {
       ...(slideLayout === "countdown" && {
         countdownTitle: "",
         countdownTargetDate: "",
+        countdownFormat: "dhms",
         countdownBgImage: "",
         countdownBgImagePosition: "center",
         countdownTextColor: "#ffffff",
@@ -726,6 +728,7 @@ function AdminView() {
     setModalGalleryImages(slide.images || []);
     setModalCountdownTitle(slide.countdownTitle || "");
     setModalCountdownTargetDate(slide.countdownTargetDate || "");
+    setModalCountdownFormat(slide.countdownFormat || "dhms");
     setModalCountdownBgImage(slide.countdownBgImage || "");
     setModalCountdownBgImagePosition(
       slide.countdownBgImagePosition || "center",
@@ -819,6 +822,7 @@ function AdminView() {
     setModalGalleryImages([]);
     setModalCountdownTitle("");
     setModalCountdownTargetDate("");
+    setModalCountdownFormat("dhms");
     setModalCountdownBgImage("");
     setModalCountdownBgImagePosition("center");
     setModalCountdownTextColor("#ffffff");
@@ -1264,6 +1268,7 @@ function AdminView() {
                       type: "countdown",
                       countdownTitle: modalCountdownTitle,
                       countdownTargetDate: modalCountdownTargetDate,
+                      countdownFormat: modalCountdownFormat,
                       countdownBgImage: modalCountdownBgImage,
                       countdownBgImagePosition: modalCountdownBgImagePosition,
                       countdownTextColor: modalCountdownTextColor,
@@ -2081,6 +2086,8 @@ function AdminView() {
           onCountdownTitleChange={setModalCountdownTitle}
           countdownTargetDate={modalCountdownTargetDate}
           onCountdownTargetDateChange={setModalCountdownTargetDate}
+          countdownFormat={modalCountdownFormat}
+          onCountdownFormatChange={setModalCountdownFormat}
           countdownBgImage={modalCountdownBgImage}
           onCountdownBgImageUpload={handleModalCountdownBgImageUpload}
           countdownBgImagePosition={modalCountdownBgImagePosition}

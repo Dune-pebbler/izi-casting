@@ -1,5 +1,9 @@
 import React from 'react';
 import ImageUpload from './ImageUpload';
+import {
+  COUNTDOWN_FORMAT_OPTIONS,
+  DEFAULT_COUNTDOWN_FORMAT,
+} from '../../../utils/countdownUtils';
 
 function ColorField({ label, value, onChange }) {
   return (
@@ -23,6 +27,8 @@ function CountdownInput({
   onCountdownTitleChange,
   countdownTargetDate,
   onCountdownTargetDateChange,
+  countdownFormat,
+  onCountdownFormatChange,
   countdownBgImage,
   onCountdownBgImageUpload,
   countdownBgImagePosition,
@@ -61,6 +67,20 @@ function CountdownInput({
               value={countdownTargetDate}
               onChange={(e) => onCountdownTargetDateChange(e.target.value)}
             />
+          </div>
+          <div className="countdown-input__field">
+            <label>Notatie</label>
+            <select
+              className="form-input"
+              value={countdownFormat || DEFAULT_COUNTDOWN_FORMAT}
+              onChange={(e) => onCountdownFormatChange(e.target.value)}
+            >
+              {COUNTDOWN_FORMAT_OPTIONS.map(({ value, label }) => (
+                <option key={value} value={value}>
+                  {label}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
 

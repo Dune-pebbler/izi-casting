@@ -11,6 +11,7 @@ import {
   isSportlinkLayout,
   getSportlinkDataType,
 } from "../../utils/sportlinkTypes";
+import { getCountdownUnits } from "../../utils/countdownUtils";
 
 function CountdownDisplay({ slide }) {
   const [timeLeft, setTimeLeft] = useState(null);
@@ -22,17 +23,7 @@ function CountdownDisplay({ slide }) {
       const target = new Date(slide.countdownTargetDate).getTime();
       const now = Date.now();
       const diff = target - now;
-      if (diff <= 0) {
-        setTimeLeft(null);
-      } else {
-        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-        const hours = Math.floor(
-          (diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60),
-        );
-        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-        setTimeLeft({ days, hours, minutes, seconds });
-      }
+      setTimeLeft(diff > 0 ? diff : null);
     };
 
     tick();
@@ -46,12 +37,7 @@ function CountdownDisplay({ slide }) {
   const labelColor = slide.countdownLabelColor || "#aaaaaa";
 
   const units = timeLeft
-    ? [
-        { value: timeLeft.days, label: "Dagen" },
-        { value: timeLeft.hours, label: "Uren" },
-        { value: timeLeft.minutes, label: "Minuten" },
-        { value: timeLeft.seconds, label: "Seconden" },
-      ]
+    ? getCountdownUnits(timeLeft, slide.countdownFormat)
     : null;
 
   return (
