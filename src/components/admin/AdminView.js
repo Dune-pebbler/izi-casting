@@ -14,7 +14,6 @@ import {
   ref,
   uploadBytes,
   getDownloadURL,
-  deleteObject,
 } from "firebase/storage";
 import { db, storage, auth } from "../../firebase";
 import { useTenant } from "../../context/TenantContext";
@@ -46,6 +45,11 @@ import TrashModal from "./TrashModal";
 import Sidebar from "./sidebar/Sidebar";
 import { getSlideBgOverride } from "../../utils/slideBackground";
 import {
+  getSlideImageUrls,
+  getTrashItemImageUrls,
+  deleteImagesIfUnused,
+} from "../../utils/imageUsage";
+import {
   Monitor,
   Clock,
   X,
@@ -67,6 +71,7 @@ function AdminView() {
     setPlaylists,
     addPlaylist,
     removePlaylist,
+    restorePlaylist,
     updatePlaylistName,
     updatePlaylistRepeatCount,
     togglePlaylistEnabled,
@@ -337,6 +342,15 @@ function AdminView() {
     return { totalSlides, activeSlides, totalDuration };
   }, [playlists, calculatePlaylistDuration]);
 
+  // Newest trash items first
+  const sortedTrashedSlides = useMemo(
+    () =>
+      [...trashedSlides].sort((a, b) =>
+        (b.deletedAt || "").localeCompare(a.deletedAt || ""),
+      ),
+    [trashedSlides],
+  );
+
   // Count how many times each media library image URL is referenced across all slides
   const imageUsageCounts = useMemo(() => {
     const counts = new Map();
@@ -347,11 +361,7 @@ function AdminView() {
 
     playlists.forEach((playlist) => {
       (playlist.slides || []).forEach((slide) => {
-        addUsage(slide.imageUrl);
-        addUsage(slide.countdownBgImage);
-        addUsage(slide.weatherLeftBgImage);
-        (slide.images || []).forEach((image) => addUsage(image.url));
-        (slide.qrTextSlides || []).forEach((qrSlide) => addUsage(qrSlide.bgImage));
+        getSlideImageUrls(slide).forEach(addUsage);
       });
     });
 
@@ -463,7 +473,10 @@ function AdminView() {
 
   const handleDeletePlaylist = async () => {
     if (playlistToDelete) {
-      await removePlaylist(playlistToDelete.id);
+      const trashItem = await removePlaylist(playlistToDelete.id);
+      if (trashItem) {
+        setTrashedSlides((prev) => [...prev, trashItem]);
+      }
       setPlaylistToDelete(null);
     }
   };
@@ -1624,17 +1637,10 @@ function AdminView() {
     const playlist = playlists.find((p) => p.id === playlistId);
     const slide = playlist?.slides.find((slide) => slide.id === slideId);
 
-    if (slide && slide.imageUrl && slide.imageName) {
+    if (slide && slide.imageUrl) {
       const loadingToast = toast.loading("Afbeelding verwijderen...");
 
       try {
-        const imageRef = tenantStorageRef(
-          storage,
-          tenantId,
-          `slides/${slide.imageName}`,
-        );
-        await deleteObject(imageRef);
-
         const updatedPlaylists = playlists.map((playlist) => {
           if (playlist.id === playlistId) {
             const updatedSlides = playlist.slides.map((s) =>
@@ -1648,6 +1654,14 @@ function AdminView() {
         });
         setPlaylists(updatedPlaylists);
         await savePlaylistsToFirebase(updatedPlaylists);
+
+        // Only removes the file when no other slide still uses it.
+        await deleteImagesIfUnused({
+          db,
+          storage,
+          tenantId,
+          candidateUrls: [slide.imageUrl],
+        });
 
         toast.dismiss(loadingToast);
         toast.success("Afbeelding succesvol verwijderd!");
@@ -1749,28 +1763,47 @@ function AdminView() {
     }
   };
 
+  const restorePlaylistFromTrash = async (trashedPlaylist) => {
+    const loadingToast = toast.loading(
+      `${trashedPlaylist.name || "afspeellijst"} herstellen...`,
+    );
+
+    try {
+      await restorePlaylist(trashedPlaylist);
+
+      // Update local trash state
+      setTrashedSlides((prev) =>
+        prev.filter((item) => item.trashId !== trashedPlaylist.trashId),
+      );
+
+      toast.dismiss(loadingToast);
+      toast.success(
+        `${trashedPlaylist.name || "Afspeellijst"} hersteld (uitgeschakeld)`,
+      );
+    } catch (error) {
+      console.error("Error restoring playlist:", error);
+      toast.dismiss(loadingToast);
+      toast.error(`Fout bij herstellen van afspeellijst: ` + error.message);
+    }
+  };
+
   const permanentDeleteSlide = async (trashedSlide) => {
     const loadingToast = toast.loading(
       `${trashedSlide.name || "slide"} permanent verwijderen...`,
     );
 
     try {
-      // Delete image from storage if exists
-      if (trashedSlide.imageUrl && trashedSlide.imageName) {
-        try {
-          const imageRef = tenantStorageRef(
-            storage,
-            tenantId,
-            `slides/${trashedSlide.imageName}`,
-          );
-          await deleteObject(imageRef);
-        } catch (error) {
-          console.error("Error deleting image:", error);
-        }
-      }
-
       // Remove from trash collection
       await deleteDoc(tenantDoc(db, tenantId, "trash", trashedSlide.trashId));
+
+      // Delete images that are no longer used anywhere
+      await deleteImagesIfUnused({
+        db,
+        storage,
+        tenantId,
+        candidateUrls: getTrashItemImageUrls(trashedSlide),
+        excludeTrashIds: [trashedSlide.trashId],
+      });
 
       // Update local trash state
       setTrashedSlides((prev) =>
@@ -1790,27 +1823,20 @@ function AdminView() {
     const loadingToast = toast.loading(`Prullenbak legen...`);
 
     try {
-      // Delete all images from storage
-      for (const slide of trashedSlides) {
-        if (slide.imageUrl && slide.imageName) {
-          try {
-            const imageRef = tenantStorageRef(
-              storage,
-              tenantId,
-              `slides/${slide.imageName}`,
-            );
-            await deleteObject(imageRef);
-          } catch (error) {
-            console.error("Error deleting image:", error);
-          }
-        }
-      }
-
       // Delete all trash documents
       const deletePromises = trashedSlides.map((slide) =>
         deleteDoc(tenantDoc(db, tenantId, "trash", slide.trashId)),
       );
       await Promise.all(deletePromises);
+
+      // Delete images that are no longer used anywhere
+      await deleteImagesIfUnused({
+        db,
+        storage,
+        tenantId,
+        candidateUrls: trashedSlides.flatMap(getTrashItemImageUrls),
+        excludeTrashIds: trashedSlides.map((slide) => slide.trashId),
+      });
 
       // Clear local trash state
       setTrashedSlides([]);
@@ -2275,9 +2301,8 @@ function AdminView() {
                   <strong> {playlistToDelete.name}</strong> wilt verwijderen?
                 </p>
                 <p className="delete-warning">
-                  Deze actie kan niet ongedaan worden gemaakt. Alle slides en
-                  afbeeldingen in deze playlist zullen permanent worden
-                  verwijderd.
+                  Deze playlist met alle slides en afbeeldingen wordt naar de
+                  prullenbak verplaatst. Je kunt hem daar herstellen.
                 </p>
               </div>
               <div className="modal-footer">
@@ -2385,9 +2410,10 @@ function AdminView() {
       <TrashModal
         isOpen={trashModalOpen}
         onClose={closeTrashModal}
-        trashedSlides={trashedSlides}
+        trashedSlides={sortedTrashedSlides}
         playlists={playlists}
         onRestoreSlide={restoreSlideFromTrash}
+        onRestorePlaylist={restorePlaylistFromTrash}
         onPermanentDelete={permanentDeleteSlide}
         onEmptyTrash={emptyTrash}
       />

@@ -104,10 +104,66 @@
   }
 
   .trash-slide-preview-container {
+    position: relative;
     width: 100%;
     height: 150px;
     background: rgba(0, 0, 0, 0.3);
     overflow: hidden;
+  }
+
+  // A whole playlist in the trash: stacked-card look so it reads as
+  // "multiple slides" at a glance.
+  .trash-slide-card--playlist {
+    overflow: visible;
+    border-color: var(--primary);
+    box-shadow:
+      4px 4px 0 -1px rgba(255, 255, 255, 0.05),
+      4px 4px 0 0 rgba(255, 255, 255, 0.15),
+      8px 8px 0 -1px rgba(255, 255, 255, 0.03),
+      8px 8px 0 0 rgba(255, 255, 255, 0.1);
+
+    .trash-slide-preview-container {
+      border-radius: 8px 8px 0 0;
+    }
+  }
+
+  .trash-playlist-badge {
+    position: absolute;
+    top: 0.5rem;
+    left: 0.5rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 999px;
+    background: var(--primary);
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  .trash-playlist-preview {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 2px;
+    width: 100%;
+    height: 100%;
+
+    > .preview-placeholder {
+      grid-column: 1 / -1;
+      grid-row: 1 / -1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    &__item {
+      overflow: hidden;
+      min-width: 0;
+      min-height: 0;
+      font-size: 0.6rem;
+    }
   }
 
   .trash-slide-preview {

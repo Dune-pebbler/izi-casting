@@ -5,12 +5,14 @@ import {
   onSnapshot,
   updateDoc,
   runTransaction,
+  addDoc,
+  deleteDoc,
 } from "firebase/firestore";
-import { ref, deleteObject } from "firebase/storage";
-import { db, storage } from "../../firebase";
+import { db } from "../../firebase";
 import { toast } from "sonner";
 import { useTenant } from "../../context/TenantContext";
-import { tenantDoc, tenantStorageRef } from "../../utils/tenantPaths";
+import { tenantDoc, tenantCollection } from "../../utils/tenantPaths";
+import { getTrashItemImageUrls } from "../../utils/imageUsage";
 import { hideExpiredCountdownSlides } from "../../utils/countdownUtils";
 
 // Custom hook for playlist management
@@ -169,6 +171,32 @@ export const usePlaylistManager = () => {
     }
   };
 
+  // Appends a playlist inside a transaction so we always build on what is
+  // actually stored in Firestore, not on (possibly stale or empty) local state.
+  // `buildPlaylist` receives the current playlists and returns the new one.
+  const appendPlaylist = async (buildPlaylist) => {
+    const displayDocRef = tenantDoc(db, tenantId, "display", "content");
+    const { newPlaylist, updatedPlaylists } = await runTransaction(
+      db,
+      async (transaction) => {
+        const snap = await transaction.get(displayDocRef);
+        const currentPlaylists =
+          (snap.exists() && snap.data().playlists) || [];
+        const newPlaylist = buildPlaylist(currentPlaylists);
+        const updatedPlaylists = [...currentPlaylists, newPlaylist];
+        transaction.set(
+          displayDocRef,
+          { playlists: updatedPlaylists },
+          { merge: true },
+        );
+        return { newPlaylist, updatedPlaylists };
+      },
+    );
+
+    await saveStats(updatedPlaylists);
+    return newPlaylist;
+  };
+
   const addPlaylist = async () => {
     if (!hasLoadedRef.current) {
       toast.error("Playlists zijn nog niet geladen, probeer het opnieuw.");
@@ -176,34 +204,14 @@ export const usePlaylistManager = () => {
     }
 
     try {
-      // Append inside a transaction so we always build on what is actually
-      // stored in Firestore, not on (possibly stale or empty) local state.
-      const displayDocRef = tenantDoc(db, tenantId, "display", "content");
-      const { newPlaylist, updatedPlaylists } = await runTransaction(
-        db,
-        async (transaction) => {
-          const snap = await transaction.get(displayDocRef);
-          const currentPlaylists =
-            (snap.exists() && snap.data().playlists) || [];
-          const newPlaylist = {
-            id: `playlist_${Date.now()}`,
-            name: `Afspeellijst ${currentPlaylists.length + 1}`,
-            slides: [],
-            isEnabled: false,
-            repeatCount: 1,
-            totalDuration: 0,
-          };
-          const updatedPlaylists = [...currentPlaylists, newPlaylist];
-          transaction.set(
-            displayDocRef,
-            { playlists: updatedPlaylists },
-            { merge: true },
-          );
-          return { newPlaylist, updatedPlaylists };
-        },
-      );
-
-      await saveStats(updatedPlaylists);
+      const newPlaylist = await appendPlaylist((currentPlaylists) => ({
+        id: `playlist_${Date.now()}`,
+        name: `Afspeellijst ${currentPlaylists.length + 1}`,
+        slides: [],
+        isEnabled: false,
+        repeatCount: 1,
+        totalDuration: 0,
+      }));
       toast.success("Playlist added successfully!");
       return newPlaylist.id; // Return the new playlist ID
     } catch (error) {
@@ -213,33 +221,38 @@ export const usePlaylistManager = () => {
     }
   };
 
+  // Moves a playlist (with all its slides) to the trash. Images stay in
+  // Storage until the trash item is permanently deleted.
+  // Returns the new trash item, or null on failure.
   const removePlaylist = async (playlistId) => {
     const playlistToRemove = playlists.find(
       (playlist) => playlist.id === playlistId,
     );
-    const playlistName = playlistToRemove?.name || "Playlist";
+    if (!playlistToRemove) return null;
+    const playlistName = playlistToRemove.name || "Playlist";
 
-    // Show loading toast
-    const loadingToast = toast.loading(`Deleting ${playlistName}...`);
+    const loadingToast = toast.loading(
+      `${playlistName} verplaatsen naar prullenbak...`,
+    );
 
+    let trashDocRef = null;
     try {
-      // Delete all images from storage if they exist
-      if (playlistToRemove && playlistToRemove.slides) {
-        for (const slide of playlistToRemove.slides) {
-          if (slide.imageUrl && slide.imageName) {
-            try {
-              const imageRef = tenantStorageRef(
-                storage,
-                tenantId,
-                `slides/${slide.imageName}`,
-              );
-              await deleteObject(imageRef);
-            } catch (error) {
-              console.error("Error deleting image:", error);
-            }
-          }
-        }
-      }
+      const trashData = {
+        type: "playlist",
+        name: playlistName,
+        playlist: playlistToRemove,
+        slideCount: (playlistToRemove.slides || []).length,
+        imageCount: getTrashItemImageUrls({
+          type: "playlist",
+          playlist: playlistToRemove,
+        }).length,
+        deletedAt: new Date().toISOString(),
+      };
+      // Write the trash copy first, so the playlist is never lost.
+      trashDocRef = await addDoc(
+        tenantCollection(db, tenantId, "trash"),
+        trashData,
+      );
 
       const updatedPlaylists = playlists.filter(
         (playlist) => playlist.id !== playlistId,
@@ -247,16 +260,41 @@ export const usePlaylistManager = () => {
       setPlaylists(updatedPlaylists);
       await savePlaylistsToFirebase(updatedPlaylists, { allowedRemovals: 1 });
 
-      // Dismiss loading toast and show success
       toast.dismiss(loadingToast);
-      toast.success(`${playlistName} deleted successfully!`);
+      toast.success(`${playlistName} verplaatst naar prullenbak`);
+      return { trashId: trashDocRef.id, ...trashData };
     } catch (error) {
-      console.error("Error deleting playlist:", error);
-
-      // Dismiss loading toast and show error
+      console.error("Error moving playlist to trash:", error);
+      setPlaylists(playlists);
+      // Roll back the trash copy if the playlist could not be removed.
+      if (trashDocRef) {
+        await deleteDoc(trashDocRef).catch((rollbackError) =>
+          console.error("Error rolling back trash item:", rollbackError),
+        );
+      }
       toast.dismiss(loadingToast);
-      toast.error(`Error deleting ${playlistName}: ` + error.message);
+      toast.error(
+        `Fout bij verplaatsen van ${playlistName} naar prullenbak: ` +
+          error.message,
+      );
+      return null;
     }
+  };
+
+  // Restores a playlist trash item as a disabled playlist, then removes it
+  // from the trash. Throws on failure so the caller can report it.
+  const restorePlaylist = async (trashItem) => {
+    await appendPlaylist((currentPlaylists) => {
+      const idTaken = currentPlaylists.some(
+        (playlist) => playlist.id === trashItem.playlist.id,
+      );
+      return {
+        ...trashItem.playlist,
+        id: idTaken ? `playlist_${Date.now()}` : trashItem.playlist.id,
+        isEnabled: false,
+      };
+    });
+    await deleteDoc(tenantDoc(db, tenantId, "trash", trashItem.trashId));
   };
 
   const updatePlaylistName = async (playlistId, newName) => {
@@ -327,6 +365,7 @@ export const usePlaylistManager = () => {
     setPlaylists,
     addPlaylist,
     removePlaylist,
+    restorePlaylist,
     updatePlaylistName,
     updatePlaylistRepeatCount,
     togglePlaylistEnabled,

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { X, Trash2, RotateCcw, AlertTriangle } from 'lucide-react';
+import { X, Trash2, RotateCcw, AlertTriangle, ListVideo } from 'lucide-react';
 import { sanitizeHTMLContent } from '../../utils/sanitize';
 import { extractVideoInfo } from '../../utils/videoMetadata';
+import { isPlaylistTrashItem, getTrashItemImageUrls } from '../../utils/imageUsage';
 
 function TrashModal({
   isOpen,
@@ -9,6 +10,7 @@ function TrashModal({
   trashedSlides,
   playlists,
   onRestoreSlide,
+  onRestorePlaylist,
   onPermanentDelete,
   onEmptyTrash
 }) {
@@ -17,6 +19,11 @@ function TrashModal({
   const [showRestoreModal, setShowRestoreModal] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(null);
   const [showEmptyTrashConfirm, setShowEmptyTrashConfirm] = useState(false);
+  const [playlistToRestore, setPlaylistToRestore] = useState(null);
+
+  const getSlideCount = (item) => item.slideCount ?? (item.playlist?.slides || []).length;
+  const getImageCount = (item) => item.imageCount ?? getTrashItemImageUrls(item).length;
+  const plural = (count, singular, pluralForm) => `${count} ${count === 1 ? singular : pluralForm}`;
 
   // Function to strip HTML tags and get clean text
   const stripHtml = (html) => {
@@ -47,6 +54,10 @@ function TrashModal({
   };
 
   const handleRestore = (slide) => {
+    if (isPlaylistTrashItem(slide)) {
+      setPlaylistToRestore(slide);
+      return;
+    }
     setSelectedSlide(slide);
     setSelectedPlaylistId(slide.originalPlaylistId || '');
     setShowRestoreModal(true);
@@ -61,6 +72,13 @@ function TrashModal({
     }
   };
 
+  const confirmRestorePlaylist = () => {
+    if (playlistToRestore) {
+      onRestorePlaylist(playlistToRestore);
+      setPlaylistToRestore(null);
+    }
+  };
+
   const handlePermanentDelete = (slide) => {
     setShowDeleteConfirm(slide);
   };
@@ -71,6 +89,13 @@ function TrashModal({
       setShowDeleteConfirm(null);
     }
   };
+
+  const trashedPlaylistCount = trashedSlides.filter(isPlaylistTrashItem).length;
+  const trashedSlideCount = trashedSlides.length - trashedPlaylistCount;
+  const emptyTrashSummary = [
+    trashedSlideCount > 0 && plural(trashedSlideCount, 'slide', 'slides'),
+    trashedPlaylistCount > 0 && plural(trashedPlaylistCount, 'afspeellijst', 'afspeellijsten'),
+  ].filter(Boolean).join(' en ');
 
   const confirmEmptyTrash = () => {
     onEmptyTrash();
@@ -150,6 +175,23 @@ function TrashModal({
     }
   };
 
+  const renderPlaylistPreview = (item) => {
+    const slides = (item.playlist?.slides || []).slice(0, 4);
+    return (
+      <div className="trash-playlist-preview">
+        {slides.length === 0 ? (
+          <div className="preview-placeholder">📂</div>
+        ) : (
+          slides.map((slide, index) => (
+            <div key={slide.id ?? index} className="trash-playlist-preview__item">
+              {renderSlidePreview(slide)}
+            </div>
+          ))
+        )}
+      </div>
+    );
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -186,18 +228,35 @@ function TrashModal({
               </div>
             ) : (
               <div className="trash-slides-grid">
-                {trashedSlides.map((slide) => (
-                  <div key={slide.trashId} className="trash-slide-card">
+                {trashedSlides.map((slide) => {
+                  const isPlaylist = isPlaylistTrashItem(slide);
+                  return (
+                  <div
+                    key={slide.trashId}
+                    className={`trash-slide-card${isPlaylist ? ' trash-slide-card--playlist' : ''}`}
+                  >
                     <div className="trash-slide-preview-container">
-                      {renderSlidePreview(slide)}
+                      {isPlaylist ? renderPlaylistPreview(slide) : renderSlidePreview(slide)}
+                      {isPlaylist && (
+                        <span className="trash-playlist-badge">
+                          <ListVideo size={14} />
+                          Afspeellijst
+                        </span>
+                      )}
                     </div>
 
                     <div className="trash-slide-info">
-                      <h4>{slide.name || 'Untitled Slide'}</h4>
+                      <h4>{slide.name || (isPlaylist ? 'Naamloze afspeellijst' : 'Untitled Slide')}</h4>
                       <div className="trash-slide-meta">
-                        <span className="original-playlist">
-                          Van: {slide.originalPlaylistName || 'Onbekende playlist'}
-                        </span>
+                        {isPlaylist ? (
+                          <span className="original-playlist">
+                            {plural(getSlideCount(slide), 'slide', 'slides')} · {plural(getImageCount(slide), 'afbeelding', 'afbeeldingen')}
+                          </span>
+                        ) : (
+                          <span className="original-playlist">
+                            Van: {slide.originalPlaylistName || 'Onbekende playlist'}
+                          </span>
+                        )}
                         <span className="deleted-date">
                           Verwijderd: {formatDate(slide.deletedAt)}
                         </span>
@@ -208,7 +267,7 @@ function TrashModal({
                       <button
                         onClick={() => handleRestore(slide)}
                         className="btn btn-primary"
-                        title="Herstel slide"
+                        title={isPlaylist ? 'Herstel afspeellijst' : 'Herstel slide'}
                       >
                         <RotateCcw size={16} />
                         Herstel
@@ -223,7 +282,8 @@ function TrashModal({
                       </button>
                     </div>
                   </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>
@@ -282,6 +342,50 @@ function TrashModal({
         </div>
       )}
 
+      {/* Restore Playlist Modal */}
+      {playlistToRestore && (
+        <div className="restore-modal-overlay" onClick={() => setPlaylistToRestore(null)}>
+          <div className="restore-modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>Herstel Afspeellijst</h3>
+              <button
+                onClick={() => setPlaylistToRestore(null)}
+                className="modal-close-btn"
+                title="Sluiten"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="modal-body">
+              <p>
+                <strong>{playlistToRestore.name || 'Deze afspeellijst'}</strong> wordt hersteld met{' '}
+                {plural(getSlideCount(playlistToRestore), 'slide', 'slides')}.
+              </p>
+              <p>
+                De afspeellijst wordt <strong>uitgeschakeld</strong> teruggezet, zodat hij niet direct op de schermen verschijnt.
+              </p>
+            </div>
+
+            <div className="modal-footer">
+              <button
+                onClick={() => setPlaylistToRestore(null)}
+                className="btn btn-secondary"
+              >
+                Annuleren
+              </button>
+              <button
+                onClick={confirmRestorePlaylist}
+                className="btn btn-primary"
+              >
+                <RotateCcw size={16} />
+                Herstel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Permanent Delete Confirmation Modal */}
       {showDeleteConfirm && (
         <div className="delete-confirm-modal-overlay" onClick={() => setShowDeleteConfirm(null)}>
@@ -302,10 +406,15 @@ function TrashModal({
 
             <div className="modal-body">
               <p>
-                Weet je zeker dat je <strong>{showDeleteConfirm.name || 'deze slide'}</strong> permanent wilt verwijderen?
+                Weet je zeker dat je <strong>{showDeleteConfirm.name || (isPlaylistTrashItem(showDeleteConfirm) ? 'deze afspeellijst' : 'deze slide')}</strong> permanent wilt verwijderen?
               </p>
               <p className="delete-warning">
-                Deze actie kan niet ongedaan worden gemaakt. De slide zal definitief worden verwijderd.
+                {isPlaylistTrashItem(showDeleteConfirm)
+                  ? `Deze afspeellijst met ${plural(getSlideCount(showDeleteConfirm), 'slide', 'slides')} en ${plural(getImageCount(showDeleteConfirm), 'afbeelding', 'afbeeldingen')} wordt definitief verwijderd. Deze actie kan niet ongedaan worden gemaakt.`
+                  : 'Deze actie kan niet ongedaan worden gemaakt. De slide zal definitief worden verwijderd.'}
+              </p>
+              <p>
+                Afbeeldingen die nog in andere slides of in de mediabibliotheek staan, blijven bewaard.
               </p>
             </div>
 
@@ -351,7 +460,7 @@ function TrashModal({
                 Weet je zeker dat je de hele prullenbak wilt legen?
               </p>
               <p className="delete-warning">
-                Dit zal <strong>{trashedSlides.length} slide(s)</strong> permanent verwijderen. Deze actie kan niet ongedaan worden gemaakt.
+                Dit zal <strong>{emptyTrashSummary}</strong> permanent verwijderen. Deze actie kan niet ongedaan worden gemaakt.
               </p>
             </div>
 
