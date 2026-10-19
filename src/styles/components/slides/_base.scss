@@ -233,6 +233,12 @@
     transform: translateY(1px);
   }
 
+  &--disabled {
+    cursor: wait;
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
   &__content {
     display: flex;
     flex-direction: column;

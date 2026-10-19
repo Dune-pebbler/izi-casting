@@ -23,6 +23,7 @@ const PlaylistList = ({
   onToggleExpansion,
   globalLayout,
   onAddPlaylist,
+  canAddPlaylist = true,
   onReorderPlaylists,
   onUpdatePlaylistName,
   onUpdatePlaylistRepeatCount,
@@ -188,10 +189,14 @@ const PlaylistList = ({
       </SortableContext>
 
       {/* Add Playlist Button */}
-      <div className="add-button" onClick={onAddPlaylist}>
+      <div
+        className={`add-button${canAddPlaylist ? "" : " add-button--disabled"}`}
+        onClick={canAddPlaylist ? onAddPlaylist : undefined}
+        aria-disabled={!canAddPlaylist}
+      >
         <div className="add-button__content">
           <Plus size={24} />
-          <span>Playlist toevoegen </span>
+          <span>{canAddPlaylist ? "Playlist toevoegen " : "Laden..."}</span>
         </div>
       </div>
     </DndContext>

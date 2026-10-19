@@ -1411,21 +1411,16 @@ function AdminView() {
     const loadingToast = toast.loading("Saving slide changes...");
 
     try {
-      const displayDocRef = tenantDoc(db, tenantId, "display", "content");
-      await setDoc(
-        displayDocRef,
-        { playlists: updatedPlaylists },
-        { merge: true },
-      );
+      await savePlaylistsToFirebase(updatedPlaylists);
 
       toast.dismiss(loadingToast);
       toast.success("Slide saved successfully!");
 
       closeEditModal();
     } catch (error) {
+      // savePlaylistsToFirebase already shows an error toast.
       console.error("Error saving modal changes to Firebase:", error);
       toast.dismiss(loadingToast);
-      toast.error("Error saving slide: " + error.message);
     }
   };
 
@@ -1964,6 +1959,7 @@ function AdminView() {
           onToggleExpansion={togglePlaylistExpansion}
           globalLayout={globalLayout}
           onAddPlaylist={handleAddPlaylist}
+          canAddPlaylist={hasLoaded}
           onReorderPlaylists={reorderPlaylists}
           onUpdatePlaylistName={updatePlaylistName}
           onUpdatePlaylistRepeatCount={updatePlaylistRepeatCount}
