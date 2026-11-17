@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { RRule } from "rrule";
 import { sanitizeHTMLContent } from "../../utils/sanitize";
 import { resolveSlideBg } from "../../utils/slideBackground";
 import TextPagination from "./TextPagination";
@@ -209,34 +210,12 @@ function AgendaDisplay({ slide }) {
           if (!cal) return;
 
           const parsed = parseICS(text);
-          parsed.forEach((ev) => {
-            if (ev.start >= now && ev.start <= cutoff) {
-              allEvents.push({
-                ...ev,
-                calName: cal.name,
-                calColor: cal.color || "#4f87ff",
-              });
-            } else if (ev.rrule && ev.rrule.includes("FREQ=YEARLY")) {
-              const until = ev.rrule.match(/UNTIL=(\d{8})/);
-              const untilDate = until ? parseICSDate(until[1]) : null;
-              const month = ev.start.getMonth();
-              const day = ev.start.getDate();
-              for (const year of [now.getFullYear(), now.getFullYear() + 1]) {
-                const occ = new Date(year, month, day);
-                if (untilDate && occ > untilDate) continue;
-                if (occ >= now && occ <= cutoff) {
-                  allEvents.push({
-                    ...ev,
-                    start: occ,
-                    end: ev.end
-                      ? new Date(year, ev.end.getMonth(), ev.end.getDate())
-                      : null,
-                    calName: cal.name,
-                    calColor: cal.color || "#4f87ff",
-                  });
-                }
-              }
-            }
+          expandICSEvents(parsed, now, cutoff).forEach((ev) => {
+            allEvents.push({
+              ...ev,
+              calName: cal.name,
+              calColor: cal.color || "#4f87ff",
+            });
           });
         });
       } catch (err) {
@@ -1129,6 +1108,19 @@ function parseICS(icsText) {
     } else if (current) {
       if (line.startsWith("SUMMARY:") || line.startsWith("SUMMARY;")) {
         current.summary = line.replace(/^SUMMARY[^:]*:/, "").trim();
+      } else if (line.startsWith("UID:")) {
+        current.uid = line.slice(4).trim();
+      } else if (line.startsWith("STATUS:")) {
+        current.status = line.slice(7).trim().toUpperCase();
+      } else if (line.match(/^RECURRENCE-ID(;[^:]*)?:/)) {
+        current.recurrenceId = parseICSDate(
+          line.replace(/^RECURRENCE-ID[^:]*:/, "").trim(),
+        );
+      } else if (line.match(/^EXDATE(;[^:]*)?:/)) {
+        const vals = line.replace(/^EXDATE[^:]*:/, "").trim().split(",");
+        current.exdates = (current.exdates || []).concat(
+          vals.map((v) => parseICSDate(v.trim())).filter(Boolean),
+        );
       } else if (line.match(/^DTSTART(;[^:]*)?:/)) {
         const val = line.replace(/^DTSTART[^:]*:/, "").trim();
         current.isAllDay = val.length === 8;
@@ -1143,6 +1135,89 @@ function parseICS(icsText) {
   }
 
   return events.filter((e) => e.start);
+}
+
+// rrule works in UTC. To keep wall-clock times stable across DST changes we
+// run it in "floating" time: local date components are stored as UTC
+// components, expanded, and converted back to local afterwards.
+const toFloating = (d) =>
+  new Date(
+    Date.UTC(
+      d.getFullYear(),
+      d.getMonth(),
+      d.getDate(),
+      d.getHours(),
+      d.getMinutes(),
+      d.getSeconds(),
+    ),
+  );
+const fromFloating = (d) =>
+  new Date(
+    d.getUTCFullYear(),
+    d.getUTCMonth(),
+    d.getUTCDate(),
+    d.getUTCHours(),
+    d.getUTCMinutes(),
+    d.getUTCSeconds(),
+  );
+
+/**
+ * Turns parsed VEVENTs into concrete occurrences within [rangeStart, rangeEnd].
+ * Expands RRULEs (weekly, monthly, yearly, …), honours EXDATE and replaces
+ * occurrences that were moved/edited individually (RECURRENCE-ID overrides).
+ */
+function expandICSEvents(events, rangeStart, rangeEnd) {
+  const result = [];
+  const overridden = new Set();
+
+  events.forEach((ev) => {
+    if (ev.recurrenceId && ev.uid) {
+      overridden.add(`${ev.uid}|${ev.recurrenceId.getTime()}`);
+    }
+  });
+
+  const inRange = (d) => d >= rangeStart && d <= rangeEnd;
+
+  events.forEach((ev) => {
+    if (ev.status === "CANCELLED") return;
+
+    if (!ev.rrule || ev.recurrenceId) {
+      if (inRange(ev.start)) result.push(ev);
+      return;
+    }
+
+    try {
+      const options = RRule.parseString(ev.rrule);
+      // A UTC UNTIL (…Z) is a real instant; convert it to floating local time.
+      // A date-only UNTIL is already parsed as floating midnight by rrule.
+      if (options.until && /UNTIL=\d{8}T\d{6}Z/.test(ev.rrule)) {
+        options.until = toFloating(options.until);
+      }
+      options.dtstart = toFloating(ev.start);
+      const rule = new RRule(options);
+
+      const duration = ev.end ? ev.end - ev.start : null;
+      const exdates = new Set((ev.exdates || []).map((d) => d.getTime()));
+
+      rule
+        .between(toFloating(rangeStart), toFloating(rangeEnd), true)
+        .map(fromFloating)
+        .forEach((occ) => {
+          const t = occ.getTime();
+          if (exdates.has(t) || overridden.has(`${ev.uid}|${t}`)) return;
+          result.push({
+            ...ev,
+            start: occ,
+            end: duration !== null ? new Date(t + duration) : null,
+          });
+        });
+    } catch (err) {
+      console.warn("📅 Kon herhaling niet verwerken:", ev.summary, err);
+      if (inRange(ev.start)) result.push(ev);
+    }
+  });
+
+  return result;
 }
 
 function parseICSDate(val) {
