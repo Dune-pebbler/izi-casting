@@ -57,15 +57,27 @@ export default async function handler(req, res) {
       headers: {
         Accept: 'application/json',
         Authorization: `Bearer ${token}`,
+        'User-Agent': 'izi-casting/1.0 (+https://www.izi-casting.com)',
       },
       signal: AbortSignal.timeout(UPSTREAM_TIMEOUT_MS),
     });
 
     if (!upstream.ok) {
-      console.error(`[dpdm] ${endpoint} upstream returned ${upstream.status}`);
-      return res
-        .status(502)
-        .json({ error: `DPDM gaf status ${upstream.status}` });
+      // Include what answered and a snippet of the body: a 401 comes from
+      // DPDM itself (wrong token), a 403 usually from a firewall/WAF in
+      // front of it that is blocking Vercel's IPs.
+      const server = upstream.headers.get('server') || 'onbekend';
+      const snippet = (await upstream.text().catch(() => ''))
+        .replace(/<[^>]*>/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim()
+        .slice(0, 160);
+      console.error(
+        `[dpdm] ${endpoint} upstream returned ${upstream.status} (server: ${server}): ${snippet}`,
+      );
+      return res.status(502).json({
+        error: `DPDM gaf status ${upstream.status} (server: ${server})${snippet ? ` – ${snippet}` : ''}`,
+      });
     }
 
     const json = await upstream.json();
