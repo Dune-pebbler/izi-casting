@@ -1,6 +1,5 @@
 import { initializeApp, getApps, cert } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
-import { getAuth } from 'firebase-admin/auth';
 
 function getAdminApp() {
   if (getApps().length) return getApps()[0];
@@ -23,7 +22,6 @@ function getAdminApp() {
 }
 
 let db;
-let auth;
 
 // Lazily initialized so a missing/invalid env var surfaces as a normal
 // caught error inside a request handler, instead of crashing the whole
@@ -31,9 +29,4 @@ let auth;
 export function getAdminDb() {
   if (!db) db = getFirestore(getAdminApp());
   return db;
-}
-
-export function getAdminAuth() {
-  if (!auth) auth = getAuth(getAdminApp());
-  return auth;
 }

@@ -1,4 +1,4 @@
-import { getAdminDb, getAdminAuth } from './firebaseAdmin.js';
+import { getAdminDb } from './firebaseAdmin.js';
 
 // DPDM (pdm-dunepebbler) slides are exclusively for the Dune Pebbler tenant.
 // Locally the tenant id can be overridden (DPDM_TENANT_ID) because the local
@@ -28,6 +28,31 @@ function extractBearerToken(req) {
   return match ? match[1].trim() : null;
 }
 
+// Verifies a Firebase ID token via the Identity Toolkit REST API instead of
+// firebase-admin/auth: that module pulls in jwks-rsa → jose@6 (ESM-only),
+// which crashes the Vercel function at load time. Google validates the
+// token's signature and expiry and returns the account it belongs to.
+async function getVerifiedEmail(idToken) {
+  const apiKey =
+    process.env.FIREBASE_WEB_API_KEY || process.env.REACT_APP_FIREBASE_API_KEY;
+  if (!apiKey) throw new Error('Firebase web API key is not set');
+
+  const res = await fetch(
+    `https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=${encodeURIComponent(apiKey)}`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ idToken }),
+      signal: AbortSignal.timeout(5000),
+    },
+  );
+  if (!res.ok) return null; // invalid/expired token → 400
+  const json = await res.json();
+  const user = json?.users?.[0];
+  if (!user || user.disabled) return null;
+  return (user.email || '').toLowerCase() || null;
+}
+
 function listIncludesEmail(list, email) {
   return (list || []).some((u) =>
     (typeof u === 'string' ? u : u?.email || '').toLowerCase() === email,
@@ -47,13 +72,7 @@ export async function isDpdmRequestAllowed(req) {
 
   const idToken = extractBearerToken(req);
   if (idToken) {
-    let decoded;
-    try {
-      decoded = await getAdminAuth().verifyIdToken(idToken);
-    } catch {
-      decoded = null;
-    }
-    const email = (decoded?.email || '').toLowerCase();
+    const email = await getVerifiedEmail(idToken);
     if (email) {
       if (/@dunepebbler\.nl$/.test(email)) return true;
 

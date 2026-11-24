@@ -152,7 +152,13 @@ function DpdmDisplay({ slide }) {
           headers: await buildAuthHeaders(),
         });
         const json = await res.json().catch(() => ({}));
-        if (!res.ok) throw new Error(json.error || `Status ${res.status}`);
+        if (!res.ok) {
+          const message =
+            typeof json.error === "string"
+              ? json.error
+              : json.error?.message || `Serverfout (${res.status})`;
+          throw new Error(message);
+        }
         if (cancelled) return;
         const data = Array.isArray(json.data) ? json.data : [];
         setTotal(data.length);
