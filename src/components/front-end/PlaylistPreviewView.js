@@ -4,7 +4,11 @@ import { doc, onSnapshot, getDoc } from "firebase/firestore";
 import { auth, db } from "../../firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { tenantDoc } from "../../utils/tenantPaths";
-import { isSportlinkLayout } from "../../utils/sportlinkTypes";
+import {
+  isSportlinkLayout,
+  getSlideTypeGateKey,
+} from "../../utils/sportlinkTypes";
+import { isDpdmLayout, isLayoutAllowedForTenant } from "../../utils/dpdmTypes";
 import SlideDisplay from "./SlideDisplay";
 import ProgressBar from "./ProgressBar";
 import StatusBar from "./StatusBar/StatusBar";
@@ -269,8 +273,9 @@ function PlaylistPreviewView() {
 
       const hasSlideTypeConfig = Object.keys(tenantSlideTypes).length > 0;
       const isSlideTypeAllowed = (slide) => {
+        if (!isLayoutAllowedForTenant(slide.layout, tenantId)) return false;
         if (!hasSlideTypeConfig) return true;
-        const typeKey = slide.layout || slide.type;
+        const typeKey = getSlideTypeGateKey(slide.layout) || slide.type;
         return typeKey ? tenantSlideTypes[typeKey] : true;
       };
 
@@ -300,6 +305,7 @@ function PlaylistPreviewView() {
               slide.sportlinkTeams &&
               slide.sportlinkTeams.length > 0) ||
             (slide.layout === "qr-feed" && slide.qrUrl) ||
+            isDpdmLayout(slide.layout) ||
             (!slide.type && slide.text && slide.text.trim())),
       );
 
@@ -318,7 +324,7 @@ function PlaylistPreviewView() {
 
     setSlides(allSlides);
     setCurrentSlideIndex(0);
-  }, [playlists, tenantSlideTypes]);
+  }, [playlists, tenantSlideTypes, tenantId]);
 
   // Slide rotation
   useEffect(() => {

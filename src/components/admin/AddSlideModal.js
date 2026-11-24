@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import {
   X,
   LayoutGrid,
@@ -14,7 +14,14 @@ import {
   Trophy,
   CloudIcon,
   QrCode,
+  Activity,
 } from "lucide-react";
+import { useTenant } from "../../context/TenantContext";
+import {
+  DPDM_SOURCES,
+  DPDM_GATE_KEY,
+  isLayoutAllowedForTenant,
+} from "../../utils/dpdmTypes";
 
 const SLIDE_TYPES = [
   { id: "side-by-side", label: "Afbeelding + Tekst", icon: LayoutGrid },
@@ -47,31 +54,42 @@ const SLIDE_TYPES = [
   },
   { id: "weather", label: "Weer", icon: CloudIcon },
   { id: "qr-feed", label: "QR + Tekst", icon: QrCode },
+  ...Object.entries(DPDM_SOURCES).map(([id, { label }]) => ({
+    id,
+    label,
+    icon: Activity,
+    gateKey: DPDM_GATE_KEY,
+  })),
 ];
 
 const AddSlideModal = ({ isOpen, onClose, onConfirm, slideTypes = {} }) => {
   const [name, setName] = useState("");
   const [layout, setLayout] = useState("side-by-side");
   const inputRef = useRef(null);
+  const { tenantId } = useTenant();
+  const tenantTypes = useMemo(
+    () => SLIDE_TYPES.filter(({ id }) => isLayoutAllowedForTenant(id, tenantId)),
+    [tenantId],
+  );
 
   useEffect(() => {
     if (isOpen) {
       setName("");
       const hasSlideTypeConfig = Object.keys(slideTypes).length > 0;
       const firstAllowed = hasSlideTypeConfig
-        ? SLIDE_TYPES.find(({ id, gateKey }) => slideTypes[gateKey || id])?.id
+        ? tenantTypes.find(({ id, gateKey }) => slideTypes[gateKey || id])?.id
         : "side-by-side";
       setLayout(firstAllowed || "side-by-side");
       setTimeout(() => inputRef.current?.focus(), 50);
     }
-  }, [isOpen, slideTypes]);
+  }, [isOpen, slideTypes, tenantTypes]);
 
   if (!isOpen) return null;
 
   const hasSlideTypeConfig = Object.keys(slideTypes).length > 0;
   const visibleTypes = hasSlideTypeConfig
-    ? SLIDE_TYPES.filter(({ id, gateKey }) => slideTypes[gateKey || id])
-    : SLIDE_TYPES;
+    ? tenantTypes.filter(({ id, gateKey }) => slideTypes[gateKey || id])
+    : tenantTypes;
 
   const handleConfirm = () => {
     const trimmed = name.trim();

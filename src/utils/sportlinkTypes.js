@@ -1,3 +1,5 @@
+import { isDpdmLayout, DPDM_GATE_KEY } from "./dpdmTypes";
+
 // Sportlink used to be a single slide type with a `sportlinkDataType` field
 // ("programma" | "uitslagen" | "poulestand") chosen inside the editor. It is
 // now split into 3 distinct slide types, one per data type, so tenants and
@@ -24,6 +26,9 @@ export function getSportlinkDataType(layout, legacyDataType) {
 // Tenants only have a single `slideTypes.sportlink` flag gating access to all
 // Sportlink slide types (and the sidebar Sportlink instellingen), so any of
 // the 3 specific layouts must check that shared key instead of their own id.
+// The same goes for the 3 DPDM layouts, which share `slideTypes.dpdm`.
 export function getSlideTypeGateKey(layout) {
-  return isSportlinkLayout(layout) ? "sportlink" : layout;
+  if (isSportlinkLayout(layout)) return "sportlink";
+  if (isDpdmLayout(layout)) return DPDM_GATE_KEY;
+  return layout;
 }

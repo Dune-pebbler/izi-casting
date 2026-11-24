@@ -27,6 +27,10 @@ import {
   isSportlinkLayout,
   getSportlinkDataType,
 } from "../../utils/sportlinkTypes";
+import {
+  isDpdmLayout,
+  isLayoutAllowedForTenant,
+} from "../../utils/dpdmTypes";
 import { toast } from "sonner";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import {
@@ -173,6 +177,8 @@ function AdminView() {
   const [modalQrPanelTextColor, setModalQrPanelTextColor] = useState("#ffffff");
   const [modalQrTextSlides, setModalQrTextSlides] = useState([]);
   const [modalQrTextInterval, setModalQrTextInterval] = useState(5);
+  const [modalDpdmTitle, setModalDpdmTitle] = useState("");
+  const [modalDpdmMaxItems, setModalDpdmMaxItems] = useState(20);
   const [uploadingQrSlideId, setUploadingQrSlideId] = useState(null);
   const [qrSlideLibraryTargetId, setQrSlideLibraryTargetId] = useState(null);
   const [imageLibraryTarget, setImageLibraryTarget] = useState("main");
@@ -491,6 +497,7 @@ function AdminView() {
     const playlistId = addSlideTargetPlaylistId;
     const playlist = playlists.find((p) => p.id === playlistId);
     if (!playlist) return;
+    if (!isLayoutAllowedForTenant(slideLayout, tenantId)) return;
 
     let currentDefaultTransition = defaultSlideTransition;
     let currentEnabledFonts = enabledFonts;
@@ -523,6 +530,9 @@ function AdminView() {
       "sportlink-uitslagen": "sportlink",
       "sportlink-poulestand": "sportlink",
       weather: "weather",
+      "dpdm-updates": "dpdm",
+      "dpdm-ssl": "dpdm",
+      "dpdm-uptime": "dpdm",
     };
     const newSlide = {
       id: Date.now(),
@@ -598,6 +608,11 @@ function AdminView() {
         qrPanelTextColor: "#ffffff",
         qrTextSlides: [],
         qrTextInterval: 5,
+        duration: 30,
+      }),
+      ...(isDpdmLayout(slideLayout) && {
+        dpdmTitle: "",
+        dpdmMaxItems: 20,
         duration: 30,
       }),
       imagePosition: "center",
@@ -798,6 +813,8 @@ function AdminView() {
     setModalQrPanelTextColor(slide.qrPanelTextColor || "#ffffff");
     setModalQrTextSlides(slide.qrTextSlides || []);
     setModalQrTextInterval(slide.qrTextInterval || 5);
+    setModalDpdmTitle(slide.dpdmTitle || "");
+    setModalDpdmMaxItems(slide.dpdmMaxItems || 20);
     setModalTimeRestriction(
       slide.timeRestriction || {
         enabled: false,
@@ -868,6 +885,8 @@ function AdminView() {
     setModalQrPanelTextColor("#ffffff");
     setModalQrTextSlides([]);
     setModalQrTextInterval(5);
+    setModalDpdmTitle("");
+    setModalDpdmMaxItems(20);
     setModalTimeRestriction({
       enabled: false,
       startTime: "08:00",
@@ -1256,6 +1275,7 @@ function AdminView() {
             const isSportlink = isSportlinkLayout(slideLayout);
             const isWeather = slideLayout === "weather";
             const isQrFeed = slideLayout === "qr-feed";
+            const isDpdm = isDpdmLayout(slideLayout);
             const galleryDuration = isGallery
               ? modalGalleryImages.reduce(
                   (sum, img) => sum + (img.duration || 3),
@@ -1375,7 +1395,17 @@ function AdminView() {
                                     ? 30
                                     : modalSlideDuration,
                               }
-                            : {
+                            : isDpdm
+                              ? {
+                                  type: "dpdm",
+                                  dpdmTitle: modalDpdmTitle,
+                                  dpdmMaxItems: modalDpdmMaxItems,
+                                  duration:
+                                    modalSlideDuration === ""
+                                      ? 30
+                                      : modalSlideDuration,
+                                }
+                              : {
                                 text: sanitizeHTMLContent(modalTinyMCEContent),
                                 tinyMCEContent: modalTinyMCEContent,
                                 imageUrl: modalImageUrl,
@@ -2195,6 +2225,10 @@ function AdminView() {
             setModalWeatherLeftBgImagePosition
           }
           onOpenWeatherLeftLibrary={handleOpenWeatherLeftBgLibrary}
+          dpdmTitle={modalDpdmTitle}
+          onDpdmTitleChange={setModalDpdmTitle}
+          dpdmMaxItems={modalDpdmMaxItems}
+          onDpdmMaxItemsChange={setModalDpdmMaxItems}
           qrUrl={modalQrUrl}
           onQrUrlChange={setModalQrUrl}
           qrLabel={modalQrLabel}

@@ -26,7 +26,9 @@ import {
   CloudIcon,
   ScanQrCode,
   Rotate3dIcon,
+  Activity,
 } from "lucide-react";
+import { DPDM_GATE_KEY, isDpdmTenant } from "../../utils/dpdmTypes";
 import { doc, setDoc } from "firebase/firestore";
 import { db } from "../../firebase";
 import { toast } from "sonner";
@@ -134,16 +136,27 @@ const SLIDETYPES = [
     description: "Toon inhoud met een QR code om te scannen voor jou content!",
     icon: ScanQrCode,
   },
+  {
+    key: DPDM_GATE_KEY,
+    label: "DPDM",
+    description:
+      "Updates, SSL- en uptime-fouten uit DPDM. Alleen voor Dune Pebbler.",
+    icon: Activity,
+    dpdmOnly: true,
+  },
 ];
 
 function EditTenantModal({ tenant, onClose }) {
+  const tenantSlideTypeList = SLIDETYPES.filter(
+    ({ dpdmOnly }) => !dpdmOnly || isDpdmTenant(tenant.id),
+  );
   const [displayName, setDisplayName] = useState(tenant.name || "");
   const [modules, setModules] = useState(tenant.modules || {});
   const hasSlideTypeConfig = Object.keys(tenant.slideTypes || {}).length > 0;
   const [slideTypes, setSlideTypes] = useState(
     hasSlideTypeConfig
       ? tenant.slideTypes
-      : Object.fromEntries(SLIDETYPES.map(({ key }) => [key, true])),
+      : Object.fromEntries(tenantSlideTypeList.map(({ key }) => [key, true])),
   );
   const [isSaving, setIsSaving] = useState(false);
 
@@ -164,7 +177,10 @@ function EditTenantModal({ tenant, onClose }) {
     setIsSaving(true);
 
     const normalizedSlideTypes = Object.fromEntries(
-      SLIDETYPES.map(({ key }) => [key, slideTypes[key] === true]),
+      SLIDETYPES.map(({ key, dpdmOnly }) => [
+        key,
+        (!dpdmOnly || isDpdmTenant(tenant.id)) && slideTypes[key] === true,
+      ]),
     );
 
     try {
@@ -259,7 +275,7 @@ function EditTenantModal({ tenant, onClose }) {
           <div className="form-group">
             <label>Actieve type slides</label>
             <div className="tenant-modules-list">
-              {SLIDETYPES.map(({ key, label, description, icon: Icon }) => (
+              {tenantSlideTypeList.map(({ key, label, description, icon: Icon }) => (
                 <div key={key} className="tenant-module-row">
                   <div className="tenant-module-info">
                     <Icon size={15} className="tenant-module-icon" />

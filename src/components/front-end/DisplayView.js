@@ -20,6 +20,7 @@ import {
   isSportlinkLayout,
   getSlideTypeGateKey,
 } from "../../utils/sportlinkTypes";
+import { isDpdmLayout, isLayoutAllowedForTenant } from "../../utils/dpdmTypes";
 import {
   isTimeRestrictionEnabled,
   isSlideCurrentlyInWindow,
@@ -927,6 +928,9 @@ function DisplayView() {
 
         const hasSlideTypeConfig = Object.keys(tenantSlideTypes).length > 0;
         const isSlideTypeAllowed = (slide) => {
+          if (!isLayoutAllowedForTenant(slide.layout, displayTenantId)) {
+            return false;
+          }
           if (!hasSlideTypeConfig) return true;
           const typeKey = getSlideTypeGateKey(slide.layout) || slide.type;
           return typeKey ? tenantSlideTypes[typeKey] : true;
@@ -958,6 +962,7 @@ function DisplayView() {
                 slide.sportlinkTeams &&
                 slide.sportlinkTeams.length > 0) ||
               (slide.layout === "qr-feed" && slide.qrUrl) ||
+              isDpdmLayout(slide.layout) ||
               (!slide.type && slide.text && slide.text.trim())),
         );
 
@@ -1043,7 +1048,7 @@ function DisplayView() {
     }
     console.log("🎬 Setting slides:", allSlides.length, "slides");
     setSlides(allSlides);
-  }, [playlists, tenantSlideTypes]);
+  }, [playlists, tenantSlideTypes, displayTenantId]);
 
   useEffect(() => {
     console.log(

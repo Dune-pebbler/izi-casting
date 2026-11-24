@@ -2,6 +2,10 @@ import React, { useMemo, useCallback, useState } from "react";
 import ReactDOM from "react-dom";
 import { getSlideTypeGateKey } from "../../utils/sportlinkTypes";
 import {
+  DPDM_SOURCES,
+  isLayoutAllowedForTenant,
+} from "../../utils/dpdmTypes";
+import {
   isTimeRestrictionEnabled,
   isSlideCurrentlyInWindow,
 } from "../../utils/timeRestriction";
@@ -30,6 +34,7 @@ import {
   Trophy,
   CloudIcon,
   ScanQrCode,
+  Activity,
 } from "lucide-react";
 
 const isTimeRestrictionActive = isTimeRestrictionEnabled;
@@ -104,6 +109,9 @@ const iconMap = {
   "sportlink-poulestand": <Trophy />,
   weather: <CloudIcon />,
   "qr-feed": <ScanQrCode />,
+  "dpdm-updates": <Activity />,
+  "dpdm-ssl": <Activity />,
+  "dpdm-uptime": <Activity />,
 };
 import { useTenant } from "../../context/TenantContext";
 import { sanitizeHTMLContent } from "../../utils/sanitize";
@@ -149,8 +157,9 @@ function SlideList({
 }) {
   const hasSlideTypeConfig = Object.keys(slideTypes).length > 0;
   const isSlideTypeDisabled = (slide) => {
-    if (!hasSlideTypeConfig) return false;
     const layout = slide.layout || "side-by-side";
+    if (!isLayoutAllowedForTenant(layout, tenantId)) return true;
+    if (!hasSlideTypeConfig) return false;
     return slideTypes[getSlideTypeGateKey(layout)] === false;
   };
   const { tenantId } = useTenant();
@@ -719,6 +728,10 @@ function SlideList({
           return "Weerbericht";
         case "qr-feed":
           return "QR + tekst";
+        case "dpdm-updates":
+        case "dpdm-ssl":
+        case "dpdm-uptime":
+          return DPDM_SOURCES[slide.layout].label;
         case "side-by-side":
         default:
           return "Side by Side";

@@ -7,6 +7,8 @@ import VideoPlayer from "./VideoPlayer";
 import TeletekstDisplay from "./TeletekstDisplay";
 import WeatherDisplay from "./WeatherDisplay";
 import QrFeedDisplay from "./QrFeedDisplay";
+import DpdmDisplay from "./DpdmDisplay";
+import { isDpdmLayout } from "../../utils/dpdmTypes";
 import { getTextPaginationConfig } from "../../config/textPagination";
 import {
   isSportlinkLayout,
@@ -1643,6 +1645,8 @@ function SlideDisplay({
         )}
 
         {layout === "qr-feed" && <QrFeedDisplay slide={slide} />}
+
+        {isDpdmLayout(layout) && <DpdmDisplay slide={slide} />}
       </>
     );
   };

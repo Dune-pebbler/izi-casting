@@ -14,11 +14,19 @@ import {
   ChevronDown,
   CloudIcon,
   QrCode,
+  Activity,
 } from "lucide-react";
+import { useTenant } from "../../../context/TenantContext";
+import {
+  DPDM_SOURCES,
+  DPDM_GATE_KEY,
+  isLayoutAllowedForTenant,
+} from "../../../utils/dpdmTypes";
 
 function LayoutSelector({ currentLayout, onLayoutChange, slideTypes = {} }) {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
+  const { tenantId } = useTenant();
 
   const allLayouts = [
     {
@@ -90,8 +98,20 @@ function LayoutSelector({ currentLayout, onLayoutChange, slideTypes = {} }) {
       gateKey: "sportlink",
     },
     { id: "weather", label: "Weer", icon: CloudIcon, title: "Weer bericht" },
-    { id: "qr-feed", label: "QR + Tekst", icon: QrCode, title: "QR code met tekst-slides" },
-  ];
+    {
+      id: "qr-feed",
+      label: "QR + Tekst",
+      icon: QrCode,
+      title: "QR code met tekst-slides",
+    },
+    ...Object.entries(DPDM_SOURCES).map(([id, { label }]) => ({
+      id,
+      label,
+      icon: Activity,
+      title: "DPDM",
+      gateKey: DPDM_GATE_KEY,
+    })),
+  ].filter(({ id }) => isLayoutAllowedForTenant(id, tenantId));
 
   const hasSlideTypeConfig = Object.keys(slideTypes).length > 0;
   const layouts = (

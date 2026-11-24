@@ -27,6 +27,8 @@ import EmailInput from "./EmailInput";
 import SportlinkInput from "./SportlinkInput";
 import WeatherInput from "./WeatherInput";
 import QrFeedInput from "./QrFeedInput";
+import DpdmInput from "./DpdmInput";
+import { isDpdmLayout } from "../../../utils/dpdmTypes";
 import BackgroundColorInput from "./BackgroundColorInput";
 import SlideEffectsModal from "../SlideEffectsModal";
 import { isSlideCurrentlyInWindow } from "../../../utils/timeRestriction";
@@ -175,6 +177,10 @@ function EditModal({
   weatherLeftBgImagePosition,
   onWeatherLeftBgImagePositionChange,
   onOpenWeatherLeftLibrary,
+  dpdmTitle,
+  onDpdmTitleChange,
+  dpdmMaxItems,
+  onDpdmMaxItemsChange,
   qrUrl,
   onQrUrlChange,
   qrLabel,
@@ -572,6 +578,19 @@ function EditModal({
         );
 
       default:
+        if (isDpdmLayout(slideLayout)) {
+          return (
+            <div className="modal-dpdm">
+              <DpdmInput
+                slideLayout={slideLayout}
+                dpdmTitle={dpdmTitle}
+                onTitleChange={onDpdmTitleChange}
+                dpdmMaxItems={dpdmMaxItems}
+                onMaxItemsChange={onDpdmMaxItemsChange}
+              />
+            </div>
+          );
+        }
         return null;
     }
   };
